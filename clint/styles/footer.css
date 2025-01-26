@@ -1,0 +1,28 @@
+.footer-main {
+  position: relative;
+  background-color: rgba(227, 227, 227, 0.4509803922);
+  padding-bottom: 48px;
+}
+.footer-main .footer-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  left: 48px;
+  width: 800px;
+}
+.footer-main .footer-container .related-links span {
+  font-size: 24px;
+}
+.footer-main .footer-container .contact {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  gap: 8px;
+}
+.footer-main .footer-container .contact .title {
+  font-size: 24px;
+}
+.footer-main .footer-container .contact span {
+  position: relative;
+  left: 12px;
+}/*# sourceMappingURL=footer.css.map */

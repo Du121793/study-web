@@ -1,0 +1,107 @@
+.main {
+  width: 100%;
+  height: 1000px;
+  background-color: #e3e3e373;
+  .title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80px;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  .horizontal-line {
+    height: 1px;
+    width: 100%;
+    background-color: #878787;
+    margin-bottom: 32px;
+  }
+  .board-container {
+    display: flex;
+    justify-content: center;
+    .board-option ul {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      margin-right: 40px;
+      position: relative;
+      li {
+        position: relative;
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: bold;
+      }::after{
+        position: absolute;
+        bottom: 0;
+        right: 50%;
+        transform: translate(50%, 0);
+        content: "";
+        height: 1px;
+        width: 0px;
+        background-color: black;
+        transition: 0.5s;
+      }li:hover::after{
+        width: 100%;
+      }
+    }
+    .vertical-line {
+      width: 1px;
+      height: 300px;
+      background-color: black;
+    }
+    .board-info {
+      width: 500px;
+      display: flex;
+      justify-content: center;
+      ul {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        li {
+          width: 400px;
+          position: relative;
+          padding: 0 0 4px 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          cursor: pointer;
+        }
+        ::after {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          right: 0;
+          height: 1px;
+          width: 100%;
+          background-color: black;
+        }
+      }
+    }
+  }
+  .board-image-container {
+    min-width: 200px;
+    border-bottom: 1px solid #878787;
+    overflow-x: scroll;
+    overflow-y:hidden;
+    ul{
+      display: flex;
+      height: 200px;
+      justify-content: center;
+      background-color: #7cabd0;
+    }
+    li{
+      height: 200px;
+    }
+    .horizontal-line {
+      margin: 0;
+      padding: 0;
+    }
+    ul li .image {
+      width: 400px;
+      height: 200px;
+      object-fit: cover;
+    }
+  }
+}

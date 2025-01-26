@@ -1,0 +1,30 @@
+.footer-main {
+  position: relative;
+  background-color: #e3e3e373;
+  padding-bottom: 48px;
+  .footer-container {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    left: 48px;
+    width: 800px;
+    .related-links {
+      span {
+        font-size: 24px;
+      }
+    }
+    .contact {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      gap: 8px;
+      .title{
+        font-size: 24px;
+      }
+      span{
+        position: relative;
+        left: 12px;
+      }
+    }
+  }
+}
