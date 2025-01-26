@@ -104,6 +104,15 @@ dist
 .temp
 .cache
 
+<<<<<<< HEAD
+=======
+# vitepress build output
+**/.vitepress/dist
+
+# vitepress cache directory
+**/.vitepress/cache
+
+>>>>>>> backend
 # Docusaurus cache and generated files
 .docusaurus
 
@@ -127,4 +136,8 @@ dist
 .yarn/unplugged
 .yarn/build-state.yml
 .yarn/install-state.gz
+<<<<<<< HEAD
 .pnp.*
+=======
+.pnp.*
+>>>>>>> backend
