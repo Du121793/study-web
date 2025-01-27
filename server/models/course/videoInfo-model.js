@@ -8,7 +8,7 @@ const videoInfoSchema = new Schema({
     require: true,
     maxlength: 30,
   },
-  coureseID: {
+  courseID: {
     type: String,
     require: true,
   },

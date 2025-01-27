@@ -62,7 +62,7 @@ async function uploadVideo(reqBody, courseInfo) {
 
   const newVideoInfo = new VideoInfo({
     title,
-    coureseID: courseInfo._id,
+    courseID: courseInfo._id,
     type,
     description: description || "",
     thumbnail: thumbnail || "",

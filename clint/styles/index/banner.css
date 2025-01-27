@@ -1,0 +1,15 @@
+.banner-main {
+  height: 400px;
+}
+.banner-main .banner {
+  position: relative;
+  height: 100px;
+  min-width: 1400px;
+}
+.banner-main .banner .img {
+  -o-object-fit: fill;
+     object-fit: fill;
+  width: 100%;
+  height: 400px;
+  z-index: 0;
+}/*# sourceMappingURL=banner.css.map */

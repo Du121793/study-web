@@ -1,0 +1,51 @@
+.my-course-main {
+  min-width: 600;
+  margin-top: 24px;
+  border: 1px solid black;
+  width: 1000px;
+  min-height: 700px;
+}
+.my-course-main .my-course-container {
+  display: flex;
+  flex-direction: column;
+}
+.my-course-main .my-course-container .header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 60px;
+  border-bottom: 1px solid black;
+}
+.my-course-main .my-course-container .header .title {
+  font-size: 24px;
+  font-weight: bold;
+}
+.my-course-main .my-course-container .contetn {
+  display: flex;
+  height: 639px;
+}
+.my-course-main .my-course-container .contetn .my-course-nav {
+  width: 100px;
+  height: 100%;
+  border-right: 1px solid black;
+}
+.my-course-main .my-course-container .contetn .my-course-nav ul {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-top: 4px;
+}
+.my-course-main .my-course-container .contetn .my-course-nav ul span {
+  font-size: 18px;
+  font-weight: bold;
+}
+.my-course-main .my-course-container .contetn .my-course-nav ul li {
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  border: 1px solid black;
+}/*# sourceMappingURL=myCourse.css.map */

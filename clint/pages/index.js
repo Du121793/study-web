@@ -1,16 +1,13 @@
-import Layout from '../components/Layout'
-import Header from '../components/Header'
-import Footer from '../components/Footer'
-import Navs from '../components/Navs'
-import Board from '../components/Board'
+import Header from '../components/index/Header'
+import Board from '../components/index/Board'
+import Boder from '../components/index/Banner'
 export default function Home(isLogined) {
   isLogined = false
   return (
     <div>
       <Header></Header>
+      <Boder></Boder>
       <Board></Board>
-      <Layout></Layout>
-      <Footer></Footer>
     </div>
   )
 }
