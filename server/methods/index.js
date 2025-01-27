@@ -1,4 +1,4 @@
 module.exports = {
-  uploader: require("./VimeoMethods"),
+  vimeoMethods: require("./VimeoMethods"),
   modifyCourse: require("./modifyCourse"),
 };

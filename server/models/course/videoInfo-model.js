@@ -26,6 +26,9 @@ const videoInfoSchema = new Schema({
   length: {
     type: Number,
   },
+  recordDate: {
+    type: Date,
+  },
   date: {
     type: Date,
     default: Date.now,

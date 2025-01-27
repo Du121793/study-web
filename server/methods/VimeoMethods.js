@@ -47,9 +47,17 @@ async function findOrCreateWebVideosFolder() {
 }
 
 /** 把 meta 寫入 description */
-function buildDescription(originalDesc, courseID, grade, subject, courseClass) {
+function buildDescription(
+  originalDesc,
+  videoID,
+  courseID,
+  grade,
+  subject,
+  courseClass
+) {
   let desc = originalDesc || "";
-  if (courseID) desc += `\n[courseID]=${courseID}`;
+  if (videoID) desc += `\n[VIDEOID]=${videoID}`;
+  if (courseID) desc += `\n[COURSEID]=${courseID}`;
   if (grade) desc += `\n[GRADE]=${grade}`;
   if (subject) desc += `\n[SUBJECT]=${subject}`;
   if (courseClass) desc += `\n[CLASS]=${courseClass}`;
@@ -84,6 +92,7 @@ async function uploadVideo(reqBody, courseInfo) {
     const finalDesc = buildDescription(
       description,
       savedVideoInfo._id,
+      courseInfo._id,
       grade,
       subject,
       courseClass
@@ -141,69 +150,212 @@ async function uploadVideo(reqBody, courseInfo) {
   }
 }
 
+async function findVideo(
+  videoID = "",
+  courseID = "",
+  grade = "",
+  subject = "",
+  courseClass = ""
+) {
+  try {
+    // 如果全都沒帶，就回空
+    if (!videoID && !courseID && !grade && !subject && !courseClass) {
+      return { success: true, total: 0, data: [] };
+    }
+
+    // 1) 找到/建立 WebVideos 資料夾
+    const me = await vimeoRequest({ method: "GET", path: "/me" });
+    const userId = me.uri.split("/").pop();
+
+    // 查找 "WebVideos" folder
+    let folderResp = await vimeoRequest({
+      method: "GET",
+      path: "/me/projects",
+      query: { per_page: 50, query: "WebVideos" },
+    });
+    let folder = folderResp.data.find((p) => p.name === "WebVideos");
+    if (!folder) {
+      // 若找不到 WebVideos，表示尚未建立 -> 直接回傳空
+      return { success: true, total: 0, data: [] };
+    }
+    const folderId = folder.uri.split("/").pop();
+
+    // 2) 分頁抓取該資料夾內所有影片，直到拿不到更多
+    let allVideos = [];
+    let page = 1;
+    let perPage = 100;
+
+    while (true) {
+      const videosResp = await vimeoRequest({
+        method: "GET",
+        path: `/users/${userId}/projects/${folderId}/videos`,
+        query: {
+          per_page: perPage,
+          page: page,
+          sort: "date",
+          direction: "desc",
+        },
+      });
+
+      // 合併當前頁影片
+      allVideos.push(...videosResp.data);
+
+      // 若這次拿到的筆數 < perPage，就代表沒有更多頁了
+      if (videosResp.data.length < perPage) {
+        break;
+      }
+
+      // 否則翻到下一頁
+      page++;
+    }
+
+    // 3) 做"絕對搜尋"：在 description 中尋找
+    function matchDescription(videoDesc, vid, cid, g, s, c) {
+      if (vid && !videoDesc.includes(`[VIDEOID]=${vid}`)) return false;
+      if (cid && !videoDesc.includes(`[COURSEID]=${cid}`)) return false;
+      if (g && !videoDesc.includes(`[GRADE]=${g}`)) return false;
+      if (s && !videoDesc.includes(`[SUBJECT]=${s}`)) return false;
+      if (c && !videoDesc.includes(`[CLASS]=${c}`)) return false;
+      return true;
+    }
+
+    const filtered = allVideos.filter((video) =>
+      matchDescription(
+        video.description || "",
+        videoID,
+        courseID,
+        grade,
+        subject,
+        courseClass
+      )
+    );
+
+    return {
+      success: true,
+      total: filtered.length,
+      data: filtered,
+    };
+  } catch (err) {
+    console.error("Find videos error:", err);
+    return {
+      success: false,
+      message: "搜尋失敗",
+      error: String(err),
+    };
+  }
+}
+
+/****
+ * 說明：
+ * 1. 與 findVideo 相同步驟搜尋、篩選影片。
+ * 2. 搜尋到的影片，依序呼叫 DELETE 進行刪除。
+ * 3. 刪除完成後，回傳成功刪除的筆數與被刪除的影片資訊。
+ ****/
+async function deleteVideo(
+  videoID = "",
+  courseID = "",
+  grade = "",
+  subject = "",
+  courseClass = ""
+) {
+  try {
+    // 如果全都沒帶，就回空
+    if (!videoID && !courseID && !grade && !subject && !courseClass) {
+      return { success: true, total: 0, data: [] };
+    }
+
+    // 1) 找到/建立 WebVideos 資料夾
+    const me = await vimeoRequest({ method: "GET", path: "/me" });
+    const userId = me.uri.split("/").pop();
+
+    // 查找 "WebVideos" folder
+    let folderResp = await vimeoRequest({
+      method: "GET",
+      path: "/me/projects",
+      query: { per_page: 50, query: "WebVideos" },
+    });
+    let folder = folderResp.data.find((p) => p.name === "WebVideos");
+    if (!folder) {
+      // 若找不到 WebVideos，表示尚未建立 -> 直接回傳空
+      return { success: true, total: 0, data: [] };
+    }
+    const folderId = folder.uri.split("/").pop();
+
+    // 2) 分頁抓取該資料夾內所有影片，直到拿不到更多
+    let allVideos = [];
+    let page = 1;
+    let perPage = 100;
+
+    while (true) {
+      const videosResp = await vimeoRequest({
+        method: "GET",
+        path: `/users/${userId}/projects/${folderId}/videos`,
+        query: {
+          per_page: perPage,
+          page: page,
+          sort: "date",
+          direction: "desc",
+        },
+      });
+
+      // 合併當前頁影片
+      allVideos.push(...videosResp.data);
+
+      // 若這次拿到的筆數 < perPage，就代表沒有更多頁了
+      if (videosResp.data.length < perPage) {
+        break;
+      }
+
+      // 否則翻到下一頁
+      page++;
+    }
+
+    // 3) 做"絕對搜尋"：在 description 中尋找
+    function matchDescription(videoDesc, vid, cid, g, s, c) {
+      if (vid && !videoDesc.includes(`[VIDEOID]=${vid}`)) return false;
+      if (cid && !videoDesc.includes(`[COURSEID]=${cid}`)) return false;
+      if (g && !videoDesc.includes(`[GRADE]=${g}`)) return false;
+      if (s && !videoDesc.includes(`[SUBJECT]=${s}`)) return false;
+      if (c && !videoDesc.includes(`[CLASS]=${c}`)) return false;
+      return true;
+    }
+
+    const filtered = allVideos.filter((video) =>
+      matchDescription(
+        video.description || "",
+        videoID,
+        courseID,
+        grade,
+        subject,
+        courseClass
+      )
+    );
+
+    // 4) 依序刪除符合條件的影片
+    //    (可改成 Promise.all 並行刪除，但要注意 API 配額/風險)
+    for (const vid of filtered) {
+      // vid.uri 形如 "/videos/123456789"
+      await vimeoRequest({
+        method: "DELETE",
+        path: vid.uri,
+      });
+    }
+
+    return {
+      success: true,
+      total: filtered.length,
+      data: filtered, // 回傳被刪除的影片資訊
+    };
+  } catch (err) {
+    console.error("Delete videos error:", err);
+    return {
+      success: false,
+      message: "刪除失敗",
+      error: String(err),
+    };
+  }
+}
+
+module.exports.delete = deleteVideo;
+module.exports.find = findVideo;
 module.exports.upload = uploadVideo;
-// app.get("/api/find-videos", async (req, res) => {
-//   try {
-//     const { grade, subject, courseClass } = req.query;
-
-//     // 如果全都沒帶，就回空
-//     if (!grade && !subject && !courseClass) {
-//       return res.json({ success: true, total: 0, data: [] });
-//     }
-
-//     // 1) 找到/建立 WebVideos 資料夾
-//     const me = await vimeoRequest({ method: "GET", path: "/me" });
-//     const userId = me.uri.split("/").pop();
-
-//     // 查找 "WebVideos" folder
-//     let folderResp = await vimeoRequest({
-//       method: "GET",
-//       path: "/me/projects",
-//       query: { per_page: 50, query: "WebVideos" },
-//     });
-//     let folder = folderResp.data.find((p) => p.name === "WebVideos");
-//     if (!folder) {
-//       // 若找不到 WebVideos，表示尚未建立 -> 直接回傳空
-//       return res.json({ success: true, total: 0, data: [] });
-//     }
-//     const folderId = folder.uri.split("/").pop();
-
-//     // 2) 抓取該資料夾內所有影片 (單頁)
-//     //    * 若影片很多，可能需要做翻頁
-//     const videosResp = await vimeoRequest({
-//       method: "GET",
-//       path: `/users/${userId}/projects/${folderId}/videos`,
-//       query: {
-//         per_page: 50, // 可自行提高, 如 100
-//         sort: "date",
-//         direction: "desc",
-//       },
-//     });
-
-//     // 3) 做"絕對搜尋"：在 description 中尋找
-//     //    [GRADE]=xxx, [SUBJECT]=xxx, [CLASS]=xxx
-//     function matchDescription(videoDesc, g, s, c) {
-//       if (g && !videoDesc.includes(`[GRADE]=${g}`)) return false;
-//       if (s && !videoDesc.includes(`[SUBJECT]=${s}`)) return false;
-//       if (c && !videoDesc.includes(`[CLASS]=${c}`)) return false;
-//       return true;
-//     }
-
-//     const filtered = videosResp.data.filter((video) =>
-//       matchDescription(video.description || "", grade, subject, courseClass)
-//     );
-
-//     res.json({
-//       success: true,
-//       total: filtered.length,
-//       data: filtered,
-//     });
-//   } catch (err) {
-//     console.error("Find videos error:", err);
-//     return res.status(500).json({
-//       success: false,
-//       message: "搜尋失敗",
-//       error: String(err),
-//     });
-//   }
-// });

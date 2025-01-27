@@ -15,9 +15,23 @@ router.get(
   })
 )
 
+<<<<<<< HEAD
+router.get(
+  "/successful",
+  passport.authenticate("line", { failureRedirect: "/" }),
+  (req, res) => {
+    const tokenObject = {
+      userID: req.user._id,
+    };
+    const token = jwt.sign(tokenObject, process.env.PASSPORT_SECRET);
+
+    res.redirect(301, `http://localhost:3000/?token=${token}`);
+    res.send({ token: "JWT " + token });
+=======
 router.get('/successful', passport.authenticate('line', { failureRedirect: '/' }), (req, res) => {
   const tokenObject = {
     userID: req.user._id,
+>>>>>>> 838d7cc7fe7a1adf456cf6d526e10c1e5696efdd
   }
   const token = jwt.sign(tokenObject, process.env.PASSPORT_SECRET)
   // ?token=${token}
