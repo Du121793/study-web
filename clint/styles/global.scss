@@ -13,3 +13,19 @@ a {
   text-decoration: none;
   cursor: pointer;
 }
+.flex {
+  display: flex;
+}
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+.justify-center{
+  justify-content: center;
+}
+.align-center{
+  align-items: center;
+}
+.relative{
+  position: relative;
+}

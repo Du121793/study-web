@@ -3,40 +3,63 @@
   min-height: 700px;
   height: 700px;
 }
-.teacherLayout-main .container {
+.teacherLayout-main .teacherLayout-container {
+  position: relative;
+  display: flex;
   width: 100%;
   height: 100%;
-  display: flex;
-  gap: 45px;
 }
-.teacherLayout-main .container .teacherLayout-nav {
-  min-width: 130px;
+.teacherLayout-main .teacherLayout-container .teacherLayout-nav {
   position: relative;
-  margin-left: 30px;
-  top: 0px;
   display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 24px;
+  transition: 0.5s;
+  top: 24px;
+  min-width: 240px;
+  margin-left: -120px;
 }
-.teacherLayout-main .container .teacherLayout-nav ul {
+.teacherLayout-main .teacherLayout-container .teacherLayout-nav .left-menu {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  padding-right: 24px;
+  cursor: pointer;
+  width: 150px;
+  height: 50px;
+  background-color: rgb(137, 224, 211);
+  border-top-right-radius: 64px;
+  border-bottom-right-radius: 64px;
+  transition: 0.5s;
+  top: 10%;
+  right: 35px;
+  z-index: 0;
+}
+.teacherLayout-main .teacherLayout-container .teacherLayout-nav .options {
+  z-index: 1;
+  background-color: rgb(135, 197, 213);
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  position: relative;
+  height: 100%;
+  width: 100%;
+  padding-top: 24px;
   gap: 12px;
 }
-.teacherLayout-main .container .teacherLayout-nav ul li {
+.teacherLayout-main .teacherLayout-container .teacherLayout-nav .options li {
   position: relative;
   font-size: 20px;
+  font-weight: bold;
   cursor: pointer;
 }
-.teacherLayout-main .container .teacherLayout-nav ul :hover {
+.teacherLayout-main .teacherLayout-container .teacherLayout-nav .options :hover {
   color: aqua;
 }
-.teacherLayout-main .container .teacherLayout-nav::after {
-  position: absolute;
-  right: 0;
-  content: "";
-  width: 1px;
-  height: 100%;
-  background-color: black;
+.teacherLayout-main .teacherLayout-container .my-course-container {
+  min-width: 800px;
+  max-width: 1200px;
+  width: 100%;
+  margin-right: 120px;
 }/*# sourceMappingURL=nav.css.map */

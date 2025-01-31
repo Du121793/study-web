@@ -1,48 +1,99 @@
-.my-course-main {
-  min-width: 600;
-  margin-top: 24px;
-  border: 1px solid black;
-  width: 1000px;
-  min-height: 700px;
-  .my-course-container {
-    display: flex;
-    flex-direction: column;
+.my-course-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  top: 24px;
+  .myCourse-main {
+    width: 100%;
+    border: 1px solid black;
+    border-radius: 12px;
     .header {
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      padding: 12px 0 12px 0;
       width: 100%;
-      height: 60px;
-      border-bottom: 1px solid black;
+      background-color: #ebe9e9;
+      border-top-right-radius: 12px;
+      border-top-left-radius: 12px;
       .title {
         font-size: 24px;
         font-weight: bold;
       }
     }
-    .contetn {
-      display: flex;
-      height: 639px;
-      .my-course-nav {
-        width: 100px;
-        height: 100%;
-        border-right: 1px solid black;
-        ul {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 4px;
-          padding-top: 4px;
-          span{
-            font-size: 18px;
-            font-weight: bold;
-          }
-          li {
-            height: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+    .header::after {
+      position: absolute;
+      content: "";
+      width: 100%;
+      height: 1px;
+      background-color: black;
+      bottom: 0;
+    }
+    .courses-container {
+      padding: 24px 0 24px 0;
+      width: 100%;
+      .courses {
+        width: 100%;
+        gap: 24px;
+        .course {
+          pointer-events: none;
+          overflow: hidden;
+          width: 80%;
+          background-color: #be7f7f;
+          border-radius: 8px;
+          position: relative;
+          transition: 0.2s;
+          .course-header {
+            pointer-events: fill;
+            cursor: pointer;
+            position: relative;
+            top: 0;
+            height: 60px;
             width: 100%;
-            border: 1px solid black;
+            background-color: #dd9494;
+            z-index: 99;
+            .course-name {
+              pointer-events: none;
+              font-weight: bold;
+              font-size: 20px;
+            }
+            .class-number {
+              pointer-events: none;
+              font-weight: bold;
+              font-size: 20px;
+              position: absolute;
+              right: 24px;
+            }
+            .course-fake-img {
+              pointer-events: none;
+              width: 48px;
+              height: 48px;
+              background-color: #fff;
+              border-radius: 64px;
+              margin: 0 12px 0 12px;
+            }
+            .course-title {
+              pointer-events: none;
+              font-size: 20px;
+              color: black;
+              font-weight: bold;
+            }
+          }
+          .course-info {
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            top: 40px;
+            padding-left: 48px;
+            font-size: 18px;
+            .introduce {
+              span {
+                font-weight: bold;
+              }
+            }
+            .max-member{
+              span{
+                font-weight: bold;
+              }
+            }
           }
         }
       }
