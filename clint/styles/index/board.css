@@ -1,138 +1,160 @@
-.main {
+.board-main {
   width: 100%;
+  margin-top: 48px;
   height: 1000px;
-  min-width: 1400px;
-}
-.main .board-container {
-  height: 500px;
-  position: relative;
   display: flex;
   justify-content: center;
-  align-items: center;
+  background-color: #fff;
 }
-.main .board-container .container-left .contact {
-  min-width: 1400px;
-  height: 300px;
+.board-main .board-contianer {
+  position: relative;
   display: flex;
   flex-direction: column;
-  border: 1px solid rgb(188, 188, 188);
-  border-radius: 12px;
-  padding: 12px;
-  gap: 16px;
+  align-items: center;
+  width: 100%;
 }
-.main .board-container .container-left .contact .title {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 12px;
-}
-.main .board-container .container-middle {
-  min-width: 1400px;
-}
-.main .board-container .container-middle .title {
+.board-main .board-contianer .title {
+  height: 100px;
+  left: 18px;
   display: flex;
-  justify-content: center;
   align-items: center;
   position: relative;
-  height: 50px;
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 24px;
+  font-size: 42px;
 }
-.main .board-container .container-middle .title::after {
+.board-main .board-contianer .title span:after {
   position: absolute;
-  bottom: 0;
+  left: 0;
+  bottom: 15px;
   content: "";
-  width: 600px;
-  height: 1px;
+  width: 80%;
+  height: 2px;
   background-color: black;
 }
-.main .board-container .container-middle .board-container {
-  display: flex;
-  justify-content: center;
-  align-items: start;
-  min-width: 1400px;
-  height: 300px;
-}
-.main .board-container .container-middle .board-container .board-option ul {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  margin-right: 40px;
+.board-main .board-contianer .title .icon {
   position: relative;
+  top: 2px;
 }
-.main .board-container .container-middle .board-container .board-option ul li {
+.board-main .board-contianer .news-types-area {
   position: relative;
-  cursor: pointer;
+  display: flex;
+  gap: 48px;
+  padding-bottom: 24px;
+}
+.board-main .board-contianer .news-types-area .news-type {
+  position: relative;
   font-size: 18px;
   font-weight: bold;
-}
-.main .board-container .container-middle .board-container .board-option ul ::after {
-  position: absolute;
-  bottom: 0;
-  right: 50%;
-  transform: translate(50%, 0);
-  content: "";
-  height: 1px;
-  width: 0px;
-  background-color: black;
-  transition: 0.5s;
-}
-.main .board-container .container-middle .board-container .board-option ul li:hover::after {
-  width: 100%;
-}
-.main .board-container .container-middle .board-container .vertical-line {
-  width: 1px;
-  height: 300px;
-  background-color: black;
-}
-.main .board-container .container-middle .board-container .board-info {
-  width: 500px;
-  display: flex;
-  justify-content: center;
-}
-.main .board-container .container-middle .board-container .board-info ul {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.main .board-container .container-middle .board-container .board-info ul li {
-  width: 400px;
-  position: relative;
-  padding: 0 0 4px 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   cursor: pointer;
 }
-.main .board-container .container-middle .board-container .board-info ul .board-info ul li::after {
+.board-main .board-contianer .news-types-area .news-type.active {
+  color: rgb(112, 166, 179);
+}
+.board-main .board-contianer .news-types-area .news-type.active::after {
   content: "";
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  height: 1px;
   width: 100%;
-  background-color: black;
+  height: 2px;
+  background-color: rgb(112, 166, 179);
+  position: absolute;
+  bottom: -10px;
+  left: 0;
 }
-.main .board-image-container {
-  min-width: 1400px;
+.board-main .board-contianer .news-types-area .news-type::after {
+  transition: 0.2s;
+  content: "";
+  width: 0;
+  height: 2px;
+  background-color: rgb(112, 166, 179);
+  position: absolute;
+  bottom: -10px;
+  left: 0;
 }
-.main .board-image-container ul {
+.board-main .board-contianer .news-types-area .news-type:hover::after {
+  width: 100%;
+}
+.board-main .board-contianer .news-link-area {
+  margin-top: 60px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 60px;
+  gap: 45px;
 }
-.main .board-image-container li {
+.board-main .board-contianer .news-link-area .news-container {
+  cursor: pointer;
+  background-color: #cfe5ef;
+  position: relative;
   display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.main .board-image-container li .image {
-  border-radius: 12px;
-  width: 800px;
-  -o-object-fit: cover;
-     object-fit: cover;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  width: 900px;
+  height: 120px;
   overflow: hidden;
+  transition: 0.3s;
+}
+.board-main .board-contianer .news-link-area .news-container .background {
+  height: 600px;
+  width: 600px;
+  background-color: #c0dcf2;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  transform: rotate(-135deg);
+  z-index: 0;
+  position: absolute;
+  top: -400px;
+  left: -400px;
+}
+.board-main .board-contianer .news-link-area .news-container .content {
+  width: 300px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+  position: relative;
+  left: 12px;
+  top: -12px;
+  z-index: 99;
+}
+.board-main .board-contianer .news-link-area .news-container .info {
+  position: relative;
+  left: -45px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  font-size: 20px;
+}
+.board-main .board-contianer .news-link-area .news-container:hover {
+  width: 905px;
+  height: 125px;
+  box-shadow: 0px 0px 0px 5px rgba(0, 0, 0, 0.443);
+}
+.board-main .board-contianer .more-news-link {
+  margin-top: 120px;
+  width: 240px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border: 2px solid #90a0a7;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.board-main .board-contianer .more-news-link span {
+  position: relative;
+  right: 12px;
+}
+.board-main .board-contianer .more-news-link::after {
+  z-index: -1;
+  transition: 0.2s;
+  border-radius: 8px;
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 100%;
+  background-color: #CFE5EF;
+}
+.board-main .board-contianer .more-news-link:hover::after {
+  width: 100%;
 }/*# sourceMappingURL=board.css.map */

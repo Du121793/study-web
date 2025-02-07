@@ -7,6 +7,10 @@
   font-size: 100%;
 }
 
+input {
+  border: 1px solid;
+}
+
 ul,
 li {
   list-style: none;
@@ -36,4 +40,18 @@ a {
 
 .relative {
   position: relative;
+}
+
+.alert {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  font-size: 24px;
+  z-index: 999;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(167, 167, 167, 0.5058823529);
 }/*# sourceMappingURL=global.css.map */

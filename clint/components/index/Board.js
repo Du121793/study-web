@@ -1,55 +1,52 @@
-import board1 from '../../public/imgs/board1.png'
 import Image from 'next/image'
+import Link from 'next/link'
+import titleIcon from '../../public/index/board/boardTitle.svg'
 export default function Board() {
-  const info = {
-    address: '嘉義縣',
-    phone: '09-xxxxxxxx',
-    fax: '45-23415648',
-    email: '123456@gmail.com',
-    Ext: '4567',
-  }
-  const images = [board1, board1, board1, board1]
-  const boardData = [{ title: '鯨魚會大便鯨魚會大便鯨魚會大便鯨魚會大便鯨魚會大便' }, { title: '海獅是同性戀海獅是同性戀海獅是同性戀海獅是同性戀海獅是同性戀' }, { title: '鄭霖恩改過向善鄭霖恩改過向善鄭霖恩改過向善鄭霖恩改過向善' }]
   return (
-    <div className="main">
-      <div className="board-container">
-        <div className="container-left"></div>
-        <div className="container-middle">
-          <div className="title">
-            <span>公告事項</span>
-          </div>
-          <div className="horizontal-line"></div>
-          <div className="board-container">
-            <div className="board-option">
-              <ul>
-                <li>綜合活動</li>
-                <li>課程公告</li>
-              </ul>
-            </div>
-            <div className="vertical-line"></div>
-            <div className="board-info">
-              <ul>
-                {boardData.map((item, index) => (
-                  <li key={index}>{item.title}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
+    <div className="board-main">
+      <div className="board-contianer">
+        <div className="title">
+          <span>最新消息</span>
+          <Image
+            className="icon"
+            src={titleIcon}
+            width={40}
+            height={40}></Image>
         </div>
-        <div className="container-right"></div>
-      </div>
-      <div className="board-image-container">
-        <ul>
-          {images.map((item, index) => (
-            <li key={index}>
-              <Image
-                className="image"
-                src={item}
-                alt="border images"
-              />
-            </li>
-          ))}
+        <ul className="news-types-area">
+          <li>
+            <div className="news-type active">班級公告</div>
+          </li>
+          <li>
+            <div className="news-type">教育新聞</div>
+          </li>
         </ul>
+        <ul className="news-link-area">
+          <li className="news-container">
+            <div className="categories">
+              <div className="background"></div>
+              <div className="content">高中三年專班</div>
+            </div>
+            <div className="info">113年暑期衝刺專班已開放報名!</div>
+          </li>
+          <li className="news-container">
+            <div className="categories">
+              <div className="background"></div>
+              <div className="content">高中三年專班</div>
+            </div>
+            <div className="info">113年暑期衝刺專班已開放報名!</div>
+          </li>
+          <li className="news-container">
+            <div className="categories">
+              <div className="background"></div>
+              <div className="content">高中三年專班</div>
+            </div>
+            <div className="info">113年暑期衝刺專班已開放報名!</div>
+          </li>
+        </ul>
+        <div className="more-news-link">
+          <span>查看更多最新消息 {'>>>'}</span>
+        </div>
       </div>
     </div>
   )

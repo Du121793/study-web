@@ -1,8 +1,130 @@
-.add-course-container {
-  min-width: 700px;
-  width: 70%;
-  height: auto;
-  background-color: rgb(169, 243, 104);
-  margin-top: 24px;
-  padding: 24px;
+.teacherLayout-main {
+  .teacherLayout-container {
+    .register-course-main {
+      overflow: hidden;
+      display: flex;
+      position: relative;
+      border: 2px solid rgba(0, 0, 0, 0.225);
+      top: 24px;
+      margin-right: 60px;
+      width: 900px;
+      max-width: 1200px;
+      width: 100%;
+      height: 100%;
+      z-index: 9;
+      border-radius: 12px;
+      .page-navs{
+       position: absolute; 
+       left: 0;
+       top: 0;
+       z-index: 99;
+      }
+      .register-course-container {
+        position: relative;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 32px;
+        width: 100%;
+        height: 100%;
+        .form {
+          position: relative;
+          justify-content: center;
+          display: flex;
+          top: 32px;
+          gap: 12px;
+          height: 300px;
+          .form-titles {
+            display: flex;
+            flex-direction: column;
+            align-items: end;
+            gap: 12px;
+            min-width: 70px;
+            span {
+              display: flex;
+              align-items: center;
+              height: 36px;
+              font-weight: bold;
+            }
+          }
+          .form-inputs {
+            position: relative;
+            gap: 12px;
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            .form-input-area {
+              display: flex;
+              position: relative;
+              align-items: center;
+              .down-arrow-img{
+                right: 12px;
+                width: 32px;
+                height: 32px;
+                position: absolute;
+                cursor: pointer;
+              }
+              .form-input {
+                width: 90%;
+                position: relative;
+                outline: none;
+                border: 2px solid rgba(0, 0, 0, 0.225);
+                position: relative;
+                height: 32px;
+                border-radius: 8px;
+                padding-left: 12px;
+                padding-right: 12px;
+              }
+            }
+          }
+          .hints {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            .hint {
+              color: gray;
+              display: flex;
+              align-items: center;
+              height: 36px;
+            }
+          }
+        }
+        .btns {
+          position: relative;
+          display: flex;
+          gap: 24px;
+          .clear-form-btn {
+            background-color: #ea8888;
+          }
+          .submit-form-btn {
+            background-color: #fff;
+          }
+          button {
+            cursor: pointer;
+            position: relative;
+            width: 80px;
+            height: 32px;
+            border: 2px solid rgba(0, 0, 0, 0.225);
+            border-radius: 4px;
+            overflow: hidden;
+            z-index: 1;
+          }
+          button::after {
+            transition: 0.2s;
+            position: absolute;
+            content: "";
+            height: 100%;
+            width: 100%;
+            z-index: 2;
+            top: 0;
+            left: 0;
+          }
+          button:hover::after {
+            background-color: #0000002a;
+          }
+        }
+      }
+    }
+  }
 }

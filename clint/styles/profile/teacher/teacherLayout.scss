@@ -1,0 +1,111 @@
+.teacherLayout-main {
+  .teacherLayout-container {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    .teacherLayout-left-nav {
+      position: relative;
+      display: flex;
+      transition: 0.2s;
+      top: 24px;
+      margin-left: 0;
+      .left-menu:hover {
+        width: 100px;
+      }
+      // 左方選單
+      .options {
+        display: flex;
+        flex-direction: column;
+        position: sticky;
+        overflow: hidden;
+        z-index: 1;
+        height: 320px;
+        min-width: 240px;
+        min-height: 320px;
+        background-color: rgb(255, 255, 255);
+        border: 1px solid gray;
+        border-top-right-radius: 12px;
+        border-bottom-right-radius: 12px;
+        gap: 14px;
+        z-index: 3;
+        li {
+          .title {
+            cursor: pointer;
+            position: relative;
+            transition: 0.2s;
+            left: 12px;
+            font-size: 16px;
+          }
+          .title:hover {
+            color: #858585;
+          }
+          .title::after {
+            content: "";
+            background-color: rgba(0, 0, 0, 0.5);
+            width: 0;
+            height: 1px;
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            transition: 0.2s;
+          }
+          .title:hover::after {
+            width: 100%;
+          }
+        }
+        .close-nav-left {
+          position: relative;
+          user-select: none;
+          background-color: #ffffff;
+          width: 100%;
+          height: 48px;
+          transition: 0.2s;
+          .close-nav-btn {
+            cursor: pointer;
+            pointer-events: fill;
+            width: 48px;
+            height: 48px;
+          }
+        }
+        .close-nav-left:hover {
+          background-color: #f0f0f0;
+        }
+        .close-nav-left::after {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          width: 100%;
+          height: 1px;
+          background-color: #0000004f;
+          left: 0;
+        }
+      }
+    }
+    // 左方選單按鈕
+    .left-menu {
+      z-index: 2;
+      overflow: hidden;
+      position: sticky;
+      display: flex;
+      align-items: center;
+      justify-content: end;
+      cursor: pointer;
+      border: 1px solid gray;
+      background-color: rgb(255, 255, 255);
+      border-top-right-radius: 64px;
+      border-bottom-right-radius: 64px;
+      height: 50px;
+      margin-right: 12px;
+      padding-right: 24px;
+      min-width: 100px;
+      transition: 0.5s;
+    }
+    .right-nav {
+      position: relative;
+      top: 24px;
+      width: 100px;
+      background-color: rgba(0, 0, 0, 0);
+    }
+  }
+}

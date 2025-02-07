@@ -1,4 +1,4 @@
-import banner from '../../public/imgs/board1.png'
+import banner from '../../public/index/banner/banner.png'
 import Image from 'next/image'
 export default function Home(isLogined) {
   isLogined = false

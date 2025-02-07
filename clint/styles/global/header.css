@@ -1,0 +1,164 @@
+.header-container {
+  display: flex;
+  width: 100%;
+  background-color: #ffffff;
+}
+.header-container .logo-container {
+  display: flex;
+  align-items: center;
+}
+.header-container .logo-container .logo-img {
+  box-shadow: 0px 0px 6px 1px rgb(167, 167, 167);
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  width: 80px;
+  height: 80px;
+  border-radius: 48px;
+  border: 1px solid rgba(0, 0, 0, 0.532);
+}
+.header-container .header-main {
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+  width: 80%;
+  min-width: 1005px;
+}
+.header-container .header-main .header-middle {
+  min-width: 710px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  height: 100%;
+}
+.header-container .header-main .header-middle .header-middle-nav-area {
+  position: relative;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgb(0, 0, 0);
+  height: 100%;
+  width: 100px;
+}
+.header-container .header-main .header-middle .header-middle-nav-area::after {
+  position: absolute;
+  bottom: 30px;
+  content: "";
+  height: 100%;
+  width: 0;
+  height: 2px;
+  background-color: black;
+  transition: 0.2s;
+}
+.header-container .header-main .header-middle .header-middle-nav-area:hover::after {
+  width: 60%;
+}
+.header-container .header-main .header-middle .login-area {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  overflow: hidden;
+  background-color: #3acd00;
+  transition: 0.3s;
+  width: 76px;
+  height: 60px;
+  border-radius: 12px;
+  right: 0;
+}
+.header-container .header-main .header-middle .login-area .login-content {
+  position: absolute;
+  left: 12px;
+  font-size: 18px;
+  color: white;
+  font-weight: bolds;
+}
+.header-container .header-main .header-middle .login-area .line-login-icon-area {
+  position: absolute;
+  background-color: #3acd00;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 60px;
+}
+.header-container .header-main .header-middle .login-area .line-login-icon-area .icon {
+  width: 40px;
+  height: 40px;
+  border: 2px solid white;
+  border-radius: 12px;
+}
+.header-container .header-main .header-middle .login-area:hover {
+  width: 170px;
+}
+.header-container .header-main .header-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.header-container .header-main .header-right .btn-area {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  font-weight: bold;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.337);
+  right: 0;
+  transition: 0.3s;
+  border-radius: 6px;
+  width: 65px;
+  height: 45px;
+  font-size: 18px;
+}
+.header-container .header-main .header-right .btn-area .cursor-btn {
+  background-color: rgba(0, 0, 0, 0);
+}
+.header-container .header-main .header-right .btn-area .sign-out-btn {
+  background-color: rgba(0, 0, 0, 0);
+}
+.header-container .header-main .header-right .btn-area:hover {
+  box-shadow: 0px 0px 6px 4px rgb(167, 167, 167);
+}
+.header-container .header-main .header-right .member-img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 64px;
+  background-color: #ffffff;
+  transition: 0.3s;
+}
+.header-container .header-main .header-right .member-img .shot {
+  width: 60px;
+  height: 60px;
+  border-radius: 64px;
+  border: 2px solid rgb(149, 193, 230);
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+.header-container .header-main .header-right .member-img:hover {
+  box-shadow: 0px 0px 6px 6px rgb(149, 193, 230);
+}
+.header-container .header-main .header-right .sign-out-area {
+  border: 1px solid rgba(0, 0, 0, 0.337);
+}
+.header-container .header-main .header-right .sign-out-area .sign-out-btn {
+  font-weight: bold;
+}/*# sourceMappingURL=header.css.map */
