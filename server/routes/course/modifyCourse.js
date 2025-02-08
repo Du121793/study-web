@@ -49,6 +49,7 @@ router.post("/createNewCourse", async (req, res) => {
 
 router.post("/register", async (req, res) => {
   try {
+    console.log(req.body)
     let { user_ids, course_id } = req.body; // 假設傳入的 user_ids 是一個陣列
     console.log(user_ids);
 
@@ -60,7 +61,7 @@ router.post("/register", async (req, res) => {
     if (!foundCourse) {
       return res.status(400).send("課程 ID 錯誤");
     }
-
+    
     let successCount = 0;
     let alreadyRegistered = [];
     let invalidUsers = [];
@@ -72,7 +73,6 @@ router.post("/register", async (req, res) => {
         invalidUsers.push(user_id); // 無效的學生 ID
         continue;
       }
-
       if (foundCourse.members.includes(user_id)) {
         alreadyRegistered.push(user_id); // 已註冊的學生
         continue;
@@ -106,7 +106,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.post("/unregister", async (req, res) => {
+router.post("/unRegister", async (req, res) => {
   try {
     let { user_ids, course_id } = req.body; // 假設傳入的 user_ids 是一個陣列
     if (!Array.isArray(user_ids) || user_ids.length === 0) {
@@ -159,9 +159,9 @@ router.post("/unregister", async (req, res) => {
   }
 });
 
-router.post("/findJoinedSubject", (req, res) => {
+router.get("/findJoinedSubject", (req, res) => {
   try {
-    const { grade } = req.body;
+    const { grade } = req.params;
     const foundSubject = modifyCourse.findSubject(grade);
     return res.send(foundSubject);
   } catch (e) {

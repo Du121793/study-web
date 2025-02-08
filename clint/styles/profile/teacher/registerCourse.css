@@ -16,6 +16,12 @@
   gap: 8px;
   font-weight: bold;
 }
+.register-cursor-main .search-input-area .select {
+  height: 26px;
+  outline: none;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  border-radius: 2px;
+}
 .register-cursor-main .search-input-area .submit {
   cursor: pointer;
   display: flex;
@@ -35,7 +41,7 @@
   outline: none;
   border-radius: 2px;
   width: 128px;
-  height: 20px;
+  height: 24px;
   padding: 0 4px 0 4px;
   border: 1px solid rgba(0, 0, 0, 0.5);
 }
@@ -54,8 +60,8 @@
 }
 .register-cursor-main .register-area {
   margin-top: 24px;
-  padding: 12px 12px 12px 12px;
-  width: 80%;
+  padding: 24px 24px 12px 24px;
+  width: 1000px;
   background-color: #fff;
   border: 2px solid rgba(0, 0, 0, 0.225);
   border-radius: 8px;
@@ -63,10 +69,12 @@
 .register-cursor-main .register-area .classification {
   position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  gap: 8px;
   width: 100%;
-  height: 30px;
+  height: 40px;
 }
 .register-cursor-main .register-area .classification input {
   font-size: 14px;
@@ -95,14 +103,18 @@
 .register-cursor-main .register-area .classification::after {
   content: "";
   position: absolute;
-  bottom: -6px;
+  bottom: -24px;
   right: 0;
   width: 100%;
   height: 1px;
   background-color: rgba(0, 0, 0, 0.5);
 }
+.register-cursor-main .register-area .btns {
+  display: flex;
+  gap: 12px;
+}
 .register-cursor-main .register-area ul {
-  margin-top: 12px;
+  margin-top: 48px;
 }
 .register-cursor-main .register-area ul li {
   display: flex;
@@ -112,4 +124,19 @@
 .register-cursor-main .register-area ul li .student-checkbox {
   width: 16px;
   height: 16px;
+}
+.register-cursor-main .register-area ul li .searched-info {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.register-cursor-main .register-area ul li .searched-info .username {
+  width: 60px;
+  text-align: center;
+}
+.register-cursor-main .register-area ul li .searched-info .phone-number {
+  width: 90px;
+}
+.register-cursor-main .register-area ul li .searched-info .grade {
+  width: 120px;
 }/*# sourceMappingURL=registerCourse.css.map */
