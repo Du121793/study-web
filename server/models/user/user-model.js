@@ -1,3 +1,4 @@
+const { type } = require("express/lib/response");
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
@@ -12,6 +13,9 @@ const userSchema = new Schema({
       type: String,
       required: true,
     },
+    phoneNumber: {
+      type: String,
+    },
     email: {
       type: String,
     },
@@ -19,7 +23,9 @@ const userSchema = new Schema({
       type: String,
     },
   },
-
+  courses: {
+    type: [String],
+  },
   role: {
     type: String,
     enum: ["student", "teacher"],

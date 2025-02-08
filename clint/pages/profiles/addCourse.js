@@ -1,30 +1,44 @@
-import { useEffect, useState } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
-import downArrowImg from '../../public/profile/downArrow.png'
-export default function stidentCourse() {
-  const profilePageUrl = 'http://localhost:3000/profiles/profile'
-  const homePage = 'http://localhost:3000'
-  const [grade, setGrade] = useState('')
-  const [subject, setSubject] = useState('')
-  const [studentClass, setStudentClass] = useState('')
-  const [cursorName, setCursorName] = useState('')
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import downArrowImg from "../../public/profile/downArrow.png";
+
+import adminService from "../methods/service/adminService";
+import { useUserToken } from "../methods/service/useUserToken";
+
+export default function studentCourse() {
+  const [grade, setGrade] = useState("");
+  const [subject, setSubject] = useState("");
+  const [courseClass, setCourseClass] = useState("");
+  const [courseName, setCourseName] = useState("");
   const initGrade = (e) => {
-    setGrade(e.target.value)
-  }
-  const initStudentClass = (e) => {
-    setStudentClass(e.target.value)
-  }
+    setGrade(e.target.value);
+  };
+  const initCourseClass = (e) => {
+    setCourseClass(e.target.value);
+  };
   const initSubject = (e) => {
-    setSubject(e.target.value)
-  }
-  const initCursorName = (e) => {
-    const value = e.target.value
-    setCursorName(value)
-  }
+    setSubject(e.target.value);
+  };
+  const initCourseName = (e) => {
+    const value = e.target.value;
+    setCourseName(value);
+  };
   useEffect(() => {
-    setCursorName(grade + studentClass + subject)
-  }, [grade, studentClass, subject])
+    setCourseName(grade + courseClass + subject);
+  }, [grade, courseClass, subject]);
+
+  const token = useUserToken();
+  const requireCreateCourse = async () => {
+    const courseInfo = {
+      grade,
+      subject,
+      courseClass,
+      courseName,
+    };
+    const response = await adminService.createANewCourse(token, courseInfo);
+    console.log(response);
+  };
   return (
     <div className="register-course-main">
       <div className="register-course-container">
@@ -44,44 +58,38 @@ export default function stidentCourse() {
                 type="text"
                 value={grade}
               />
-              <Image
-                className="down-arrow-img"
-                src={downArrowImg}></Image>
+              <Image className="down-arrow-img" src={downArrowImg}></Image>
             </div>
 
             <div className="form-input-area">
               <input
-                onChange={initStudentClass}
+                onChange={initCourseClass}
                 className="form-input"
                 id="subject"
                 type="text"
-                value={studentClass}
+                value={courseClass}
               />
-              <Image
-                className="down-arrow-img"
-                src={downArrowImg}></Image>
+              <Image className="down-arrow-img" src={downArrowImg}></Image>
             </div>
 
             <div className="form-input-area">
               <input
                 onChange={initSubject}
                 className="form-input"
-                id="studentClass"
+                id="courseClass"
                 type="text"
                 value={subject}
               />
-              <Image
-                className="down-arrow-img"
-                src={downArrowImg}></Image>
+              <Image className="down-arrow-img" src={downArrowImg}></Image>
             </div>
 
             <div className="form-input-area">
               <input
-                onChange={initCursorName}
+                onChange={initCourseName}
                 className="form-input"
-                id="cursorName"
+                id="courseName"
                 type="text"
-                value={cursorName}
+                value={courseName}
               />
             </div>
           </div>
@@ -89,23 +97,28 @@ export default function stidentCourse() {
             <div className="hint">例如:學年度</div>
             <div className="hint">例如:化學、物理</div>
             <div className="hint">例如:甲班，A班</div>
-            <div className="hint">此處會自動生成最終名稱，也可直接更改為自訂義名稱</div>
+            <div className="hint">
+              此處會自動生成最終名稱，也可直接更改為自訂義名稱
+            </div>
           </div>
         </div>
         <div className="btns">
           <button
             className="clear-form-btn"
             onClick={() => {
-              setGrade('')
-              setStudentClass('')
-              setSubject('')
-              setCursorName('')
-            }}>
+              setGrade("");
+              setCourseClass("");
+              setSubject("");
+              setCourseName("");
+            }}
+          >
             清除
           </button>
-          <button className="submit-form-btn">送出</button>
+          <button className="submit-form-btn" onClick={requireCreateCourse}>
+            送出
+          </button>
         </div>
       </div>
     </div>
-  )
+  );
 }

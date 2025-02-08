@@ -1,5 +1,5 @@
 export default function stidentCourse() {
-  const pages = [10]
+  const pages = [10];
   return (
     <div className="register-cursor-main">
       <div className="search-input-area">
@@ -17,5 +17,5 @@ export default function stidentCourse() {
       </div>
       <div className="submit">送出</div>
     </div>
-  )
+  );
 }

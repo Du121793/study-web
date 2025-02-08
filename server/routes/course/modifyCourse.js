@@ -1,15 +1,16 @@
+const { status } = require("express/lib/response");
+
 const router = require("express").Router();
 const Course = require("../../models").course;
 const User = require("../../models").user;
 const modifyCourse = require("../../methods/").modifyCourse;
 const VimeoMethods = require("../../methods").vimeoMethods;
 const VideoInfo = require("../../models").courseVideoInfo;
-const mongoose = require("mongoose");
 
 router.post("/createNewCourse", async (req, res) => {
   try {
     const { courseName, subject, grade, courseClass } = req.body;
-
+    console.log(courseName, subject, grade, courseClass);
     if (!(courseName && subject && grade && courseClass))
       return res.status(400).send("資料提供不完整");
 
@@ -25,15 +26,24 @@ router.post("/createNewCourse", async (req, res) => {
 
     modifyCourse.addSubject(grade, subject);
 
-    let newCourse = new Course({ courseName, subject, grade, courseClass });
+    let newCourse = new Course({
+      courseName,
+      subject,
+      grade,
+      courseClass,
+    });
 
     let savedCourse = await newCourse.save();
     return res.send({
-      msg: "課程註冊完畢",
+      success: "true",
+      msg: "課程創建完畢",
       savedCourse,
     });
   } catch (e) {
-    return res.status(500).send("很抱歉，伺服器儲存失敗");
+    return res.status(500).send({
+      success: "false",
+      msg: "很抱歉，伺服器儲存失敗",
+    });
   }
 });
 
@@ -69,6 +79,10 @@ router.post("/register", async (req, res) => {
       }
 
       foundCourse.members.push(user_id);
+      foundStudent.courses.push(course_id);
+
+      await foundStudent.save();
+
       successCount++;
     }
 
@@ -121,8 +135,10 @@ router.post("/unregister", async (req, res) => {
         continue;
       }
 
+      foundStudent.courses = foundStudent.courses.filter((n) => n != course_id);
       foundCourse.members = foundCourse.members.filter((n) => n != user_id);
       successCount++;
+      await foundStudent.save();
     }
 
     await foundCourse.save();
@@ -166,6 +182,20 @@ router.delete("/deleteCourse", async (req, res) => {
         courseID: course_id,
       })
     );
+    for (userID of foundCourse.members) {
+      let foundRegistedUser = await User.findOne({ _id: userID });
+      console.log(foundRegistedUser);
+      if (!foundRegistedUser) {
+        console.log(
+          "User:" + userID + "unable to unregister\nIs this user really exist?"
+        );
+        continue;
+      }
+      foundRegistedUser.courses = foundRegistedUser.courses.filter(
+        (n) => n != course_id
+      );
+      await foundRegistedUser.save();
+    }
     await Course.deleteOne({ _id: course_id });
     modifyCourse.deleteSubject(foundCourse.grade, foundCourse.subject);
 

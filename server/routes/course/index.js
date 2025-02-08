@@ -27,6 +27,43 @@ const checkCourseAccess = async (req, res, next) => {
   }
 };
 
+router.get("/getCourses", checkTeacherAccess, async (req, res) => {
+  try {
+    const { courseName, subject, grade, courseClass, members, _id } = req.query;
+
+    const filter = {};
+
+    if (_id) {
+      filter._id = _id;
+    }
+
+    if (courseName) {
+      filter.courseName = courseName;
+    }
+
+    if (subject) {
+      filter.subject = subject;
+    }
+
+    if (grade) {
+      filter.grade = grade;
+    }
+
+    if (courseClass) {
+      filter.courseClass = courseClass;
+    }
+
+    if (members) {
+      filter.courses = members;
+    }
+
+    const Courses = await Course.find(filter);
+    return res.json(Courses);
+  } catch (error) {
+    return res.status(500).send("發生了不可預期的錯誤");
+  }
+});
+
 router.use("/modifyCourse", checkTeacherAccess, modifyCourseRouter);
 
 router.use("/:course_id", checkCourseAccess, courseMethodRouter);
