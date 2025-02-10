@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import adminService from '../methods/service/adminService'
 import { useUserToken } from '../methods/service/useUserToken'
-export default function memberSelector({selectedStudentId, setSelectedStudentId}) {
+export default function memberSelector({ selectedStudentId, setSelectedStudentId }) {
   let studentCheckboxArray = []
   const token = useUserToken()
   const [members, setMembers] = useState([])
@@ -64,37 +64,49 @@ export default function memberSelector({selectedStudentId, setSelectedStudentId}
     <div className="register-area">
       <div className="classification">
         <div className="search-inputs">
-          <span>姓名:</span>
-          <input
-            onChange={(e) => {
-              searchStudentOptionNameChange(e)
-            }}
-            type="text"
-          />
-          <span>電話:</span>
-          <input
-            onChange={(e) => {
-              searchStudentOptionPhoneChange(e)
-            }}
-            type="text"
-          />
-          <span>年級:</span>
-          <input
-            onChange={(e) => {
-              searchStudentOptionGradeChange(e)
-            }}
-            type="text"
-          />
-          身分組:
-          <select
-            onChange={(e) => {
-              searchStudentOptionRoleChange(e)
-            }}
-            name=""
-            id="">
-            <option value="teacher">Teacher</option>
-            <option value="student">Student</option>
-          </select>
+          <div>
+            <span>姓名:</span>
+            <input
+              className="input-name"
+              onChange={(e) => {
+                searchStudentOptionNameChange(e)
+              }}
+              type="text"
+            />
+          </div>
+          <div>
+            <span>電話:</span>
+            <input
+              className="input-phone"
+              onChange={(e) => {
+                searchStudentOptionPhoneChange(e)
+              }}
+              type="text"
+            />
+          </div>
+          <div>
+            <span>年級:</span>
+            <input
+              className="input-grade"
+              onChange={(e) => {
+                searchStudentOptionGradeChange(e)
+              }}
+              type="text"
+            />
+          </div>
+          <div>
+            身分組:
+            <select
+              onChange={(e) => {
+                searchStudentOptionRoleChange(e)
+              }}
+              name=""
+              id="">
+              <option value="">全部</option>
+              <option value="teacher">教師</option>
+              <option value="student">學生</option>
+            </select>
+          </div>
         </div>
         <div className="btns">
           <button onClick={selectAllStudent}>全選</button>
@@ -109,14 +121,7 @@ export default function memberSelector({selectedStudentId, setSelectedStudentId}
               className="student-checkbox"
               type="checkbox"
               onChange={(e) => {
-                if (e.target.checked) {
-                  studentCheckboxArray.push(item._id)
-                } else {
-                  studentCheckboxArray = studentCheckboxArray.filter((e) => {
-                    return e != item._id
-                  })
-                }
-                setSelectedStudentId(studentCheckboxArray)
+                setSelectedStudentId((prev) => (e.target.checked ? [...prev, item._id] : prev.filter((id) => id !== item._id)))
               }}
             />
             <div>

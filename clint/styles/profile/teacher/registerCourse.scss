@@ -1,26 +1,20 @@
 .register-cursor-main {
+  background-color: #fff;
   padding: 32px;
   margin-top: 24px;
-  min-width: 800px;
-  background-color: #ffffff;
-  border: 2px solid rgba(0, 0, 0, 0.225);
+  border: 1px solid rgba(0, 0, 0, 0.5);
   border-radius: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
-  .search-input-area {
+  width: 60vw;
+  max-width: 1000px;
+  .sumbits {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: bold;
-    .select{
-      height: 26px;
-      outline: none;
-      border: 1px solid rgba(0, 0, 0, 0.5);
-      border-radius: 2px;
-    }
+    gap: 24px;
     .submit {
+      margin-top: 24px;
       cursor: pointer;
       display: flex;
       justify-content: center;
@@ -29,12 +23,64 @@
       transition: 0.2s;
       border: 2px solid rgb(209, 209, 209);
       border-radius: 4px;
-      width: 64px;
+      width: 111px;
       height: 32px;
     }
     .submit:hover {
       background-color: #abd690;
     }
+    .remove {
+      background-color: #e67c58a1;
+    }
+    .remove:hover {
+      background-color: #ca6b4ba1;
+    }
+  }
+
+  .alert {
+    font-weight: bold;
+    display: flex;
+    overflow: hidden;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0, 0, 0, 0);
+    background-color: rgba(0, 0, 0, 0);
+    transition: 0.5s;
+    border-radius: 8px;
+    font-size: 20px;
+    padding: 0 24px 0 24px;
+    height: 0;
+    opacity: 1;
+    margin-bottom: 24px;
+  }
+  .search-input-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+    .option-area {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      #grade {
+        width: 80px;
+      }
+      #subject {
+        width: 80px;
+      }
+      #class {
+        width: 80px;
+      }
+    }
+    .select {
+      height: 26px;
+      outline: none;
+      border: 1px solid rgba(0, 0, 0, 0.5);
+      border-radius: 2px;
+    }
+
     input {
       outline: none;
       border-radius: 2px;
@@ -55,88 +101,6 @@
     }
     button:hover {
       background-color: #d7d7d7;
-    }
-  }
-  .register-area {
-    margin-top: 24px;
-    padding: 24px 24px 12px 24px;
-    width: 1000px;
-    background-color: #fff;
-    border: 2px solid rgba(0, 0, 0, 0.225);
-    border-radius: 8px;
-    .classification {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      height: 40px;
-      input {
-        font-size: 14px;
-        outline: none;
-        border-radius: 2px;
-        width: 100px;
-        height: 20px;
-        padding: 0 4px 0 4px;
-        border: 1px solid rgba(0, 0, 0, 0.5);
-      }
-      select {
-        border-radius: 2px;
-        border: 1px solid rgba(0, 0, 0, 0.5);
-        font-size: 14px;
-        outline: none;
-        option {
-          font-size: 14px;
-        }
-      }
-      button {
-        width: 80px;
-        padding: 2px 0 2px 0;
-        border-radius: 2px;
-        border: 1px solid rgba(0, 0, 0, 0.5);
-      }
-    }
-    .classification::after {
-      content: "";
-      position: absolute;
-      bottom: -24px;
-      right: 0;
-      width: 100%;
-      height: 1px;
-      background-color: rgba(0, 0, 0, 0.5);
-    }
-    .btns {
-      display: flex;
-      gap: 12px;
-    }
-    ul {
-      margin-top: 48px;
-      li {
-        display: flex;
-        align-items: center;
-        gap: 2px;
-        .student-checkbox {
-          width: 16px;
-          height: 16px;
-        }
-        .searched-info {
-          display: flex;
-          gap: 4px;
-          align-items: center;
-          .username {
-            width: 60px;
-            text-align: center;
-          }
-          .phone-number {
-            width: 90px;
-          }
-          .grade {
-            width: 120px;
-          }
-        }
-      }
     }
   }
 }

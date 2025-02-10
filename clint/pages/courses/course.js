@@ -1,26 +1,32 @@
+// 組件庫
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import ReactPlayer from 'react-player'
-import { useRouter } from 'next/router'
+// global組件
 import Header from '../../components/global/Header'
+// method組件
 import { useUserToken } from '../methods/service/useUserToken'
 import userService from '../methods/service/userService'
 export default function userProfile() {
+  // 假資料
   const question = [
     { id: 1, message: '請問第一集的....', date: '四小時前', studentName: '黃永都', studentId: '11011121' },
     { id: 2, message: '請問第一集的....', date: '四小時前', studentName: '黃永都', studentId: '11011121' },
   ]
   const answer = [{ id: 1, message: '那集的問題......' }]
   const videos = ['第一集', '第二集', '第三集', '第四集', '第五集', '第六集']
-  // 確保 ReactPlayer 只會在客戶端渲染
-  const ReactPlayer = dynamic(() => import('react-player'), { ssr: false })
-  const router = useRouter()
-  const { courseName } = router.query
-  const token = useUserToken()
-  const [userInfo, setUserInfo] = useState(null)
+
   const [isLogined, setLogined] = useState(false)
+  const [userInfo, setUserInfo] = useState(null)
+  const token = useUserToken()
+  const router = useRouter()
+  // locks
+  let videoNavOpen = false
+  // 取出路由，後續新增useEffect獲取資料
+  const { courseName } = router.query
+
   const QuestionHasAnswer = (questId) => {
     const findAnswer = answer.find((e) => e.id === questId)
     if (findAnswer) {
@@ -33,6 +39,19 @@ export default function userProfile() {
     const findAnswer = answer.find((e) => e.id === questId)
     if (findAnswer) {
       return findAnswer.message
+    }
+  }
+  const showVideos = () => {
+    const background = document.querySelector('.videos-area')
+
+    if (!videoNavOpen) {
+      console.log(videoNavOpen)
+      background.style.height = '800px'
+      videoNavOpen = true
+    } else if (videoNavOpen) {
+      console.log(videoNavOpen)
+      background.style.height = '0'
+      videoNavOpen = false
     }
   }
   useEffect(() => {
@@ -51,8 +70,14 @@ export default function userProfile() {
       <Header loginState={isLogined}></Header>
       <div className="container">
         <div className="course-title">課程名稱:{courseName}</div>
-        <ul className="videos-area">
-          {videos.map((item, index) => (
+        <ul className="videos-nav">
+          <div
+            className="header"
+            onClick={showVideos}>
+            影片專區
+          </div>
+          <div className="videos-area"></div>
+          {/* {videos.map((item, index) => (
             <li
               key={index}
               className="video">
@@ -62,7 +87,7 @@ export default function userProfile() {
                 <div className="date">4個月前</div>
               </div>
             </li>
-          ))}
+          ))} */}
         </ul>
         <div className="message-board-area">
           <div className="board-area">

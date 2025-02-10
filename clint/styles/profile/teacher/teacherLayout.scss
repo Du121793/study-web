@@ -10,9 +10,6 @@
       transition: 0.2s;
       top: 24px;
       margin-left: 0;
-      .left-menu:hover {
-        width: 100px;
-      }
       // 左方選單
       .options {
         display: flex;
@@ -29,13 +26,26 @@
         border-bottom-right-radius: 12px;
         gap: 14px;
         z-index: 3;
+        .nav{
+          // width: 160px;
+          display: flex;
+          align-items: center;
+          position: relative;
+          .icon{
+            position: relative;
+            overflow: hidden;
+            left: 4px;
+            width: 24px;
+            height: 24px;
+          }
+        }
         li {
           .title {
             cursor: pointer;
             position: relative;
             transition: 0.2s;
             left: 12px;
-            font-size: 16px;
+            font-size: 18px;
           }
           .title:hover {
             color: #858585;
@@ -98,7 +108,7 @@
       height: 50px;
       margin-right: 12px;
       padding-right: 24px;
-      min-width: 100px;
+      min-width: 70px;
       transition: 0.5s;
     }
     .right-nav {
@@ -109,3 +119,4 @@
     }
   }
 }
+

@@ -1,28 +1,22 @@
 .register-cursor-main {
+  background-color: #fff;
   padding: 32px;
   margin-top: 24px;
-  min-width: 800px;
-  background-color: #ffffff;
-  border: 2px solid rgba(0, 0, 0, 0.225);
+  border: 1px solid rgba(0, 0, 0, 0.5);
   border-radius: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
+  width: 60vw;
+  max-width: 1000px;
 }
-.register-cursor-main .search-input-area {
+.register-cursor-main .sumbits {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: bold;
+  gap: 24px;
 }
-.register-cursor-main .search-input-area .select {
-  height: 26px;
-  outline: none;
-  border: 1px solid rgba(0, 0, 0, 0.5);
-  border-radius: 2px;
-}
-.register-cursor-main .search-input-area .submit {
+.register-cursor-main .sumbits .submit {
+  margin-top: 24px;
   cursor: pointer;
   display: flex;
   justify-content: center;
@@ -31,11 +25,61 @@
   transition: 0.2s;
   border: 2px solid rgb(209, 209, 209);
   border-radius: 4px;
-  width: 64px;
+  width: 111px;
   height: 32px;
 }
-.register-cursor-main .search-input-area .submit:hover {
+.register-cursor-main .sumbits .submit:hover {
   background-color: #abd690;
+}
+.register-cursor-main .sumbits .remove {
+  background-color: rgba(230, 124, 88, 0.631372549);
+}
+.register-cursor-main .sumbits .remove:hover {
+  background-color: rgba(202, 107, 75, 0.631372549);
+}
+.register-cursor-main .alert {
+  font-weight: bold;
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0);
+  background-color: rgba(0, 0, 0, 0);
+  transition: 0.5s;
+  border-radius: 8px;
+  font-size: 20px;
+  padding: 0 24px 0 24px;
+  height: 0;
+  opacity: 1;
+  margin-bottom: 24px;
+}
+.register-cursor-main .search-input-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+.register-cursor-main .search-input-area .option-area {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.register-cursor-main .search-input-area .option-area #grade {
+  width: 80px;
+}
+.register-cursor-main .search-input-area .option-area #subject {
+  width: 80px;
+}
+.register-cursor-main .search-input-area .option-area #class {
+  width: 80px;
+}
+.register-cursor-main .search-input-area .select {
+  height: 26px;
+  outline: none;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  border-radius: 2px;
 }
 .register-cursor-main .search-input-area input {
   outline: none;
@@ -57,86 +101,4 @@
 }
 .register-cursor-main .search-input-area button:hover {
   background-color: #d7d7d7;
-}
-.register-cursor-main .register-area {
-  margin-top: 24px;
-  padding: 24px 24px 12px 24px;
-  width: 1000px;
-  background-color: #fff;
-  border: 2px solid rgba(0, 0, 0, 0.225);
-  border-radius: 8px;
-}
-.register-cursor-main .register-area .classification {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  height: 40px;
-}
-.register-cursor-main .register-area .classification input {
-  font-size: 14px;
-  outline: none;
-  border-radius: 2px;
-  width: 100px;
-  height: 20px;
-  padding: 0 4px 0 4px;
-  border: 1px solid rgba(0, 0, 0, 0.5);
-}
-.register-cursor-main .register-area .classification select {
-  border-radius: 2px;
-  border: 1px solid rgba(0, 0, 0, 0.5);
-  font-size: 14px;
-  outline: none;
-}
-.register-cursor-main .register-area .classification select option {
-  font-size: 14px;
-}
-.register-cursor-main .register-area .classification button {
-  width: 80px;
-  padding: 2px 0 2px 0;
-  border-radius: 2px;
-  border: 1px solid rgba(0, 0, 0, 0.5);
-}
-.register-cursor-main .register-area .classification::after {
-  content: "";
-  position: absolute;
-  bottom: -24px;
-  right: 0;
-  width: 100%;
-  height: 1px;
-  background-color: rgba(0, 0, 0, 0.5);
-}
-.register-cursor-main .register-area .btns {
-  display: flex;
-  gap: 12px;
-}
-.register-cursor-main .register-area ul {
-  margin-top: 48px;
-}
-.register-cursor-main .register-area ul li {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-.register-cursor-main .register-area ul li .student-checkbox {
-  width: 16px;
-  height: 16px;
-}
-.register-cursor-main .register-area ul li .searched-info {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}
-.register-cursor-main .register-area ul li .searched-info .username {
-  width: 60px;
-  text-align: center;
-}
-.register-cursor-main .register-area ul li .searched-info .phone-number {
-  width: 90px;
-}
-.register-cursor-main .register-area ul li .searched-info .grade {
-  width: 120px;
 }/*# sourceMappingURL=registerCourse.css.map */

@@ -1,7 +1,6 @@
 import Image from 'next/image'
 import lineIcon from '../../public/imgs/line.png'
 import Link from 'next/link'
-import shot from '../../public/imgs/shot.jpg'
 import logo from '../../public/imgs/logo.jpg'
 import { useEffect, useState } from 'react'
 import { useUserToken } from '../../pages/methods/service/useUserToken'
@@ -45,12 +44,6 @@ export default function Header(loginState) {
         <div className="header-middle">
           <div
             className="header-middle-nav-area"
-            id="about">
-            <div className="line"></div>
-            <span>關於我們</span>
-          </div>
-          <div
-            className="header-middle-nav-area"
             id="newest">
             <div className="line"></div>
             <span>最新消息</span>
@@ -72,6 +65,12 @@ export default function Header(loginState) {
             id="recommend-link">
             <div className="line"></div>
             <span>推薦連結</span>
+          </div>
+          <div
+            className="header-middle-nav-area"
+            id="about">
+            <div className="line"></div>
+            <span>關於我們</span>
           </div>
           {/* Not logined show line login's Link */}
           {!loginState.loginState && (

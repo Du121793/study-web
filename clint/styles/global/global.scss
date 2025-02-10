@@ -7,7 +7,8 @@
   font-size: 100%;
 }
 input{
-  border: 1px solid;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
 }
 ul,
 li {
@@ -34,16 +35,3 @@ a {
   position: relative;
 }
 // 客制化
-.alert{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  font-size: 24px;
-  z-index: 999;
-  width: 100vw;
-  height: 100vh;
-  background-color: #a7a7a781;
-}

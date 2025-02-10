@@ -1,34 +1,31 @@
-.teacherLayout-main .teacherLayout-container .register-course-main {
-  overflow: hidden;
-  display: flex;
+.teacherLayout-container .register-course-container {
   position: relative;
-  border: 2px solid rgba(0, 0, 0, 0.225);
-  top: 24px;
-  margin-right: 60px;
-  width: 900px;
-  max-width: 1200px;
-  width: 100%;
-  height: 100%;
-  z-index: 9;
-  border-radius: 12px;
-}
-.teacherLayout-main .teacherLayout-container .register-course-main .page-navs {
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 99;
-}
-.teacherLayout-main .teacherLayout-container .register-course-main .register-course-container {
-  position: relative;
-  background-color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 32px;
-  width: 100%;
-  height: 100%;
+  width: 60vw;
+  background-color: #fff;
+  border: 1px solid black;
+  margin-top: 24px;
+  min-width: 650px;
 }
-.teacherLayout-main .teacherLayout-container .register-course-main .register-course-container .form {
+.teacherLayout-container .register-course-container .alert {
+  font-weight: bold;
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0);
+  background-color: rgba(0, 0, 0, 0);
+  transition: 0.5s;
+  border-radius: 8px;
+  font-size: 20px;
+  padding: 0 24px 0 24px;
+  height: 0;
+  opacity: 1;
+}
+.teacherLayout-container .register-course-container .form {
   position: relative;
   justify-content: center;
   display: flex;
@@ -36,72 +33,71 @@
   gap: 12px;
   height: 300px;
 }
-.teacherLayout-main .teacherLayout-container .register-course-main .register-course-container .form .form-titles {
+.teacherLayout-container .register-course-container .form .form-titles {
   display: flex;
   flex-direction: column;
   align-items: end;
-  gap: 12px;
+  gap: 10px;
   min-width: 70px;
 }
-.teacherLayout-main .teacherLayout-container .register-course-main .register-course-container .form .form-titles span {
+.teacherLayout-container .register-course-container .form .form-titles span {
   display: flex;
   align-items: center;
   height: 36px;
   font-weight: bold;
 }
-.teacherLayout-main .teacherLayout-container .register-course-main .register-course-container .form .form-inputs {
+.teacherLayout-container .register-course-container .form .form-inputs {
   position: relative;
   gap: 12px;
   width: 300px;
   display: flex;
   flex-direction: column;
 }
-.teacherLayout-main .teacherLayout-container .register-course-main .register-course-container .form .form-inputs .form-input-area {
+.teacherLayout-container .register-course-container .form .form-inputs .form-input-area {
   display: flex;
   position: relative;
   align-items: center;
 }
-.teacherLayout-main .teacherLayout-container .register-course-main .register-course-container .form .form-inputs .form-input-area .down-arrow-img {
+.teacherLayout-container .register-course-container .form .form-inputs .form-input-area .down-arrow-img {
   right: 12px;
   width: 32px;
   height: 32px;
   position: absolute;
   cursor: pointer;
 }
-.teacherLayout-main .teacherLayout-container .register-course-main .register-course-container .form .form-inputs .form-input-area .form-input {
+.teacherLayout-container .register-course-container .form .form-inputs .form-input-area .form-input {
   width: 90%;
   position: relative;
   outline: none;
-  border: 2px solid rgba(0, 0, 0, 0.225);
   position: relative;
   height: 32px;
   border-radius: 8px;
   padding-left: 12px;
   padding-right: 12px;
 }
-.teacherLayout-main .teacherLayout-container .register-course-main .register-course-container .form .hints {
+.teacherLayout-container .register-course-container .form .hints {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
-.teacherLayout-main .teacherLayout-container .register-course-main .register-course-container .form .hints .hint {
+.teacherLayout-container .register-course-container .form .hints .hint {
   color: gray;
   display: flex;
   align-items: center;
   height: 36px;
 }
-.teacherLayout-main .teacherLayout-container .register-course-main .register-course-container .btns {
+.teacherLayout-container .register-course-container .btns {
   position: relative;
   display: flex;
   gap: 24px;
 }
-.teacherLayout-main .teacherLayout-container .register-course-main .register-course-container .btns .clear-form-btn {
+.teacherLayout-container .register-course-container .btns .clear-form-btn {
   background-color: #ea8888;
 }
-.teacherLayout-main .teacherLayout-container .register-course-main .register-course-container .btns .submit-form-btn {
+.teacherLayout-container .register-course-container .btns .submit-form-btn {
   background-color: #fff;
 }
-.teacherLayout-main .teacherLayout-container .register-course-main .register-course-container .btns button {
+.teacherLayout-container .register-course-container .btns button {
   cursor: pointer;
   position: relative;
   width: 80px;
@@ -111,7 +107,7 @@
   overflow: hidden;
   z-index: 1;
 }
-.teacherLayout-main .teacherLayout-container .register-course-main .register-course-container .btns button::after {
+.teacherLayout-container .register-course-container .btns button::after {
   transition: 0.2s;
   position: absolute;
   content: "";
@@ -121,6 +117,11 @@
   top: 0;
   left: 0;
 }
-.teacherLayout-main .teacherLayout-container .register-course-main .register-course-container .btns button:hover::after {
+.teacherLayout-container .register-course-container .btns button:hover::after {
   background-color: rgba(0, 0, 0, 0.1647058824);
+}
+.teacherLayout-container .register-course-container .child-component {
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }/*# sourceMappingURL=addCourse.css.map */

@@ -1,130 +1,135 @@
-.teacherLayout-main {
-  .teacherLayout-container {
-    .register-course-main {
-      overflow: hidden;
+.teacherLayout-container {
+  // .page-navs {
+  //   position: absolute;
+  //   left: 0;
+  //   top: 0;
+  //   z-index: 99;
+  // }
+  .register-course-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px;
+    width: 60vw;
+    background-color: #fff;
+    border: 1px solid black;
+    margin-top: 24px;
+    min-width: 650px;
+    .alert {
+      font-weight: bold;
       display: flex;
+      overflow: hidden;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(0, 0, 0, 0);
+      background-color: rgba(0, 0, 0, 0);
+      transition: 0.5s;
+      border-radius: 8px;
+      font-size: 20px;
+      padding: 0 24px 0 24px;
+      height: 0;
+      opacity: 1;
+    }
+    .form {
       position: relative;
-      border: 2px solid rgba(0, 0, 0, 0.225);
-      top: 24px;
-      margin-right: 60px;
-      width: 900px;
-      max-width: 1200px;
-      width: 100%;
-      height: 100%;
-      z-index: 9;
-      border-radius: 12px;
-      .page-navs{
-       position: absolute; 
-       left: 0;
-       top: 0;
-       z-index: 99;
-      }
-      .register-course-container {
-        position: relative;
-        background-color: #fff;
+      justify-content: center;
+      display: flex;
+      top: 32px;
+      gap: 12px;
+      height: 300px;
+      .form-titles {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        padding: 32px;
-        width: 100%;
-        height: 100%;
-        .form {
-          position: relative;
-          justify-content: center;
+        align-items: end;
+        gap: 10px;
+        min-width: 70px;
+        span {
           display: flex;
-          top: 32px;
-          gap: 12px;
-          height: 300px;
-          .form-titles {
-            display: flex;
-            flex-direction: column;
-            align-items: end;
-            gap: 12px;
-            min-width: 70px;
-            span {
-              display: flex;
-              align-items: center;
-              height: 36px;
-              font-weight: bold;
-            }
-          }
-          .form-inputs {
-            position: relative;
-            gap: 12px;
-            width: 300px;
-            display: flex;
-            flex-direction: column;
-            .form-input-area {
-              display: flex;
-              position: relative;
-              align-items: center;
-              .down-arrow-img{
-                right: 12px;
-                width: 32px;
-                height: 32px;
-                position: absolute;
-                cursor: pointer;
-              }
-              .form-input {
-                width: 90%;
-                position: relative;
-                outline: none;
-                border: 2px solid rgba(0, 0, 0, 0.225);
-                position: relative;
-                height: 32px;
-                border-radius: 8px;
-                padding-left: 12px;
-                padding-right: 12px;
-              }
-            }
-          }
-          .hints {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            .hint {
-              color: gray;
-              display: flex;
-              align-items: center;
-              height: 36px;
-            }
-          }
+          align-items: center;
+          height: 36px;
+          font-weight: bold;
         }
-        .btns {
-          position: relative;
+      }
+      .form-inputs {
+        position: relative;
+        gap: 12px;
+        width: 300px;
+        display: flex;
+        flex-direction: column;
+        .form-input-area {
           display: flex;
-          gap: 24px;
-          .clear-form-btn {
-            background-color: #ea8888;
-          }
-          .submit-form-btn {
-            background-color: #fff;
-          }
-          button {
-            cursor: pointer;
-            position: relative;
-            width: 80px;
+          position: relative;
+          align-items: center;
+          .down-arrow-img {
+            right: 12px;
+            width: 32px;
             height: 32px;
-            border: 2px solid rgba(0, 0, 0, 0.225);
-            border-radius: 4px;
-            overflow: hidden;
-            z-index: 1;
-          }
-          button::after {
-            transition: 0.2s;
             position: absolute;
-            content: "";
-            height: 100%;
-            width: 100%;
-            z-index: 2;
-            top: 0;
-            left: 0;
+            cursor: pointer;
           }
-          button:hover::after {
-            background-color: #0000002a;
+          .form-input {
+            width: 90%;
+            position: relative;
+            outline: none;
+            position: relative;
+            height: 32px;
+            border-radius: 8px;
+            padding-left: 12px;
+            padding-right: 12px;
           }
         }
       }
+      .hints {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        .hint {
+          color: gray;
+          display: flex;
+          align-items: center;
+          height: 36px;
+        }
+      }
+    }
+    .btns {
+      position: relative;
+      display: flex;
+      gap: 24px;
+      .clear-form-btn {
+        background-color: #ea8888;
+      }
+      .submit-form-btn {
+        background-color: #fff;
+      }
+      button {
+        cursor: pointer;
+        position: relative;
+        width: 80px;
+        height: 32px;
+        border: 2px solid rgba(0, 0, 0, 0.225);
+        border-radius: 4px;
+        overflow: hidden;
+        z-index: 1;
+      }
+      button::after {
+        transition: 0.2s;
+        position: absolute;
+        content: "";
+        height: 100%;
+        width: 100%;
+        z-index: 2;
+        top: 0;
+        left: 0;
+      }
+      button:hover::after {
+        background-color: #0000002a;
+      }
+    }
+    .child-component{
+      display: flex;
+      justify-content: center;
+      width: 100%;
     }
   }
 }

@@ -1,17 +1,28 @@
+// 引用page/profiles下的組件
+import DeleteCourse from '../../pages/profiles/deleteCourse'
 import AddCourse from '../../pages/profiles/addCourse'
 import MyCourse from '../../pages/profiles/myCourse'
 import RegisterCourse from '../../pages/profiles/registerCourse'
 import UserProfile from '../../pages/profiles/userProfile'
+// 引用組件庫
 import Image from 'next/image'
+import { useEffect, useState } from 'react'
+// 引用public
 import menuIcon from '../../public/imgs/menu.png'
 import closeBtn from '../../public/profile/close.png'
-import { useEffect, useState } from 'react'
+import myCourseIcon from '../../public/profile/navIcons/myCourse.png'
+import addCourseIcon from '../../public/profile/navIcons/addCourse.png'
+import registerCourseIcon from '../../public/profile/navIcons/registerCourse.png'
+import deleteCourseIcon from '../../public/profile/navIcons/deleteCourse.png'
+import profileIcon from '../../public/profile/navIcons/profile.png'
+
 export default function TeacherLayout() {
   const [currentPage, setCurrentPage] = useState('MyCourse')
   const [menu, setMenu] = useState('')
   const [rightNav, setRightNav] = useState('')
   const [leftNavBtn, setLeftNavBtn] = useState('')
   const leftNavWidth = '-242px'
+  // nav的route
   const routes = {
     MyCourse: {
       component: <MyCourse />,
@@ -23,7 +34,11 @@ export default function TeacherLayout() {
     },
     RegisterCourse: {
       component: <RegisterCourse />,
-      className: 'register-course-container',
+      className: '',
+    },
+    DeleteCourse: {
+      component: <DeleteCourse />,
+      className: 'delete-course-container',
     },
     UserProfile: {
       component: <UserProfile />,
@@ -36,6 +51,7 @@ export default function TeacherLayout() {
     const leftNavSwitchBtn = document.querySelector('.left-menu')
     leftNavDocument.style.marginLeft = leftNavWidth
     leftNavSwitchBtn.style.opacity = '1'
+    leftNavSwitchBtn.style.position = 'sticky'
     setMenu(leftNavDocument)
     setRightNav(rightNavDocument)
     setLeftNavBtn(leftNavSwitchBtn)
@@ -73,35 +89,64 @@ export default function TeacherLayout() {
           className="teacherLayout-left-nav"
           style={{ marginLeft: leftNavWidth }}>
           <ul className="options">
+            {/* 關閉選單按鈕 */}
             <button
               className="close-nav-left"
               onClick={hideLeftNav}>
               <Image
                 className="close-nav-btn"
-                src={closeBtn}></Image>
+                src={closeBtn}
+                alt="close nav s button image"></Image>
             </button>
-            <li>
+            <li className="nav">
+              <div className="icon">
+                <Image src={myCourseIcon} width={24}
+                height={24}></Image>
+              </div>
               <span
                 onClick={() => setCurrentPage('MyCourse')}
                 className="title">
                 我的課程
               </span>
             </li>
-            <li>
+            <li className="nav">
+              <div className="icon">
+                <Image src={addCourseIcon} width={24}
+                height={24}></Image>
+              </div>
               <span
                 onClick={() => setCurrentPage('AddCourse')}
                 className="title">
-                新增課程
+                創建新課程
               </span>
             </li>
-            <li>
+            <li className="nav">
+              <div className="icon">
+                <Image src={registerCourseIcon} width={24}
+                height={24}></Image>
+              </div>
               <span
                 onClick={() => setCurrentPage('RegisterCourse')}
                 className="title">
-                註冊課程
+                加人至課程
               </span>
             </li>
-            <li>
+            <li className="nav">
+              <div className="icon">
+                <Image src={deleteCourseIcon} width={24}
+                height={24}></Image>
+              </div>
+              <span
+                onClick={() => setCurrentPage('DeleteCourse')}
+                className="title">
+                刪除課程
+              </span>
+            </li>
+            <li className="nav">
+              <div className="icon">
+                <Image src={profileIcon} width={24}
+                height={24}></Image>
+              </div>
               <span
                 onClick={() => setCurrentPage('UserProfile')}
                 className="title">

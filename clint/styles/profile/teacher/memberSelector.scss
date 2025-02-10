@@ -1,0 +1,100 @@
+.register-area {
+  width: 80%;
+  margin-top: 24px;
+  padding: 24px 24px 12px 24px;
+  background-color: #fff;
+  border: 2px solid rgba(0, 0, 0, 0.225);
+  border-radius: 8px;
+  .classification {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 80px;
+    .search-inputs {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      span {
+        width: 38px;
+      }
+      input {
+        font-size: 14px;
+        outline: none;
+        border-radius: 2px;
+        height: 20px;
+        padding: 0 4px 0 4px;
+        border: 1px solid rgba(0, 0, 0, 0.5);
+      }
+      .input-name {
+        width: 60px;
+      }
+      .input-grade {
+        width: 60px;
+      }
+      select {
+        height: 22px;
+        border-radius: 2px;
+        border: 1px solid rgba(0, 0, 0, 0.5);
+        font-size: 14px;
+        outline: none;
+        option {
+          font-size: 14px;
+        }
+      }
+    }
+
+    button {
+      margin-top: 12px;
+      width: 80px;
+      padding: 2px 0 2px 0;
+      border-radius: 2px;
+      border: 1px solid rgba(0, 0, 0, 0.5);
+    }
+  }
+  .classification::after {
+    content: "";
+    position: absolute;
+    bottom: -24px;
+    right: 0;
+    width: 100%;
+    height: 1px;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  .btns {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+  }
+  ul {
+    margin-top: 48px;
+    li {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      .student-checkbox {
+        width: 16px;
+        height: 16px;
+      }
+      .searched-info {
+        display: flex;
+        gap: 4px;
+        align-items: center;
+        .username {
+          width: 60px;
+          text-align: left;
+        }
+        .phone-number {
+          width: 90px;
+        }
+        .grade {
+          width: 120px;
+        }
+      }
+    }
+  }
+}
