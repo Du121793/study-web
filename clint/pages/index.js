@@ -6,7 +6,6 @@ import { useUserToken } from '../pages/methods/service/useUserToken'
 import userService from '../pages/methods/service/userService'
 import { useState, useEffect } from 'react'
 export default function Home() {
-  const [role, setRole] = useState('')
   const token = useUserToken()
   const [userInfo, setUserInfo] = useState(null)
   const [isLogined, setLogined] = useState(false)

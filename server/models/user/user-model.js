@@ -1,11 +1,10 @@
-const { type } = require('express/lib/response')
-const mongoose = require('mongoose')
-const { Schema } = mongoose
+const { type } = require("express/lib/response");
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
 const userSchema = new Schema({
   lineID: {
     type: String,
-    require: true,
   },
 
   userinfo: {
@@ -14,14 +13,17 @@ const userSchema = new Schema({
     },
     realname: {
       type: String,
+      required: true,
     },
     phoneNumber: {
-      type: String,
-    },
-    pictureUrl: {
-      type: String,
+      type: Number,
+      required: true,
     },
     grade: {
+      type: String,
+      required: true,
+    },
+    pictureUrl: {
       type: String,
     },
   },
@@ -30,21 +32,21 @@ const userSchema = new Schema({
   },
   role: {
     type: String,
-    enum: ['student', 'teacher'],
-    default: 'student',
+    enum: ["student", "teacher"],
+    default: "student",
   },
   date: {
     type: Date,
     default: Date.now,
   },
-})
+});
 
 userSchema.methods.isStudent = function () {
-  return this.role == 'student'
-}
+  return this.role == "student";
+};
 
-userSchema.methods.usTeacher = function () {
-  return this.role == 'teacher'
-}
+userSchema.methods.isTeacher = function () {
+  return this.role == "teacher";
+};
 
-module.exports = mongoose.model('User', userSchema)
+module.exports = mongoose.model("User", userSchema);

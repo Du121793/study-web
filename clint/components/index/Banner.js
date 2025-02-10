@@ -8,7 +8,7 @@ export default function Home(isLogined) {
         <Image
           className="img"
           src={banner}
-          alt="banner"
+          alt="banner,s image"
           width={400}
         />
       </div>

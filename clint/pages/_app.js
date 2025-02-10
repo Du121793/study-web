@@ -17,6 +17,8 @@ import '../styles/profile/teacher/userProfile.css'
 import '../styles/profile/teacher/deleteCourse.css'
 // course
 import '../styles/course/course.css'
+//method的layout
+import '../styles/method/completeInfo.css'
 function MyApp({ Component, pageProps }) {
   return <Component {...pageProps} />
 }

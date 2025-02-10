@@ -1,20 +1,22 @@
 .register-cursor-main {
-  background-color: #fff;
-  padding: 32px;
-  margin-top: 24px;
-  border: 1px solid rgba(0, 0, 0, 0.5);
+  background-color: #fefefe; // 淡色背景
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); // 柔和陰影
+  padding: 24px;
+  top: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
   width: 60vw;
   max-width: 1000px;
+  min-width: 600px;
   .sumbits {
+    margin-top: 24px;
     display: flex;
     gap: 24px;
     .submit {
-      margin-top: 24px;
       cursor: pointer;
       display: flex;
       justify-content: center;
@@ -38,6 +40,7 @@
   }
 
   .alert {
+    position: absolute;
     font-weight: bold;
     display: flex;
     overflow: hidden;
@@ -64,6 +67,10 @@
       display: flex;
       align-items: center;
       gap: 4px;
+      span {
+        font-weight: 500;
+        color: #333;
+      }
       #grade {
         width: 80px;
       }
@@ -75,19 +82,19 @@
       }
     }
     .select {
-      height: 26px;
       outline: none;
-      border: 1px solid rgba(0, 0, 0, 0.5);
-      border-radius: 2px;
+      padding: 4px 6px;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+      transition: border-color 0.2s;
     }
 
     input {
       outline: none;
-      border-radius: 2px;
-      width: 128px;
-      height: 24px;
-      padding: 0 4px 0 4px;
-      border: 1px solid rgba(0, 0, 0, 0.5);
+      padding: 4px 6px;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+      transition: border-color 0.2s;
     }
     .checkbox {
       padding: 2px;

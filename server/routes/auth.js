@@ -6,6 +6,14 @@ require("../config/passport");
 // require("./config/passport")(passport);
 const User = require("../models").user;
 const jwt = require("jsonwebtoken");
+const { user } = require("../models");
+
+const checkTeacherAccess = (req, res, next) => {
+  console.log(req.user);
+  if (req.user.role != "teacher")
+    return res.status(401).send("只有老師可以使用此資源");
+  next();
+};
 
 router.get(
   "/line",
@@ -18,16 +26,205 @@ router.get(
 router.get(
   "/successful",
   passport.authenticate("line", { failureRedirect: "/" }),
-  (req, res) => {
-    const tokenObject = {
-      userID: req.user._id,
+  async (req, res) => {
+    // 如果是已存在的使用者，req.user 會是從資料庫查到的 User model 實例 (包含 _id)
+    if (req.user && req.user._id) {
+      // 產生正式 JWT
+      const tokenObject = {
+        userID: req.user._id,
+      };
+      const token = jwt.sign(tokenObject, process.env.PASSPORT_SECRET);
+
+      // 導回前端的某個頁面，帶上正式 JWT
+      return res.redirect(
+        301,
+        `http://localhost:3000/methods/service/Res?token=${token}`
+      );
+    }
+
+    // 否則就是「尚未完成綁定」的狀況
+    // 將 lineID, displayName, pictureUrl 做成「暫時」的 JWT，帶給前端
+    // 注意有效期限可適度縮短，如 10~30 分鐘
+    const partialUserPayload = {
+      lineID: req.user.lineID,
+      displayName: req.user.displayName,
+      pictureUrl: req.user.pictureUrl,
     };
-    const token = jwt.sign(tokenObject, process.env.PASSPORT_SECRET);
-    res.redirect(
+    const tempToken = jwt.sign(
+      partialUserPayload,
+      process.env.PASSPORT_SECRET,
+      {
+        expiresIn: "30m",
+      }
+    );
+
+    // 導向前端的「填寫真實姓名與電話」頁面
+    return res.redirect(
       301,
-      `http://localhost:3000/methods/service/Res?token=${token}`
+      `http://localhost:3000/methods/service/completeInfo?token=${tempToken}`
     );
   }
 );
+
+router.post("/completeRegistration", async (req, res) => {
+  try {
+    const { tempToken, realname, phoneNumber } = req.body;
+    if (!tempToken) {
+      return res.status(400).json({ msg: "缺少 tempToken" });
+    }
+    if (!realname || !phoneNumber) {
+      return res
+        .status(400)
+        .json({ msg: "請提供完整的真實姓名與電話（必填）" });
+    }
+
+    // 解譯暫時的 Token
+    let decoded;
+    try {
+      decoded = jwt.verify(tempToken, process.env.PASSPORT_SECRET);
+    } catch (err) {
+      return res.status(400).json({ msg: "tempToken 無效或已過期" });
+    }
+
+    const { lineID, displayName, pictureUrl } = decoded;
+
+    // STEP1: 檢查是否已有綁定該 lineID 的使用者
+    const userWithSameLineID = await User.findOne({ lineID: lineID });
+    if (userWithSameLineID) {
+      return res.status(400).json({
+        msg: "已有使用者綁定此 Line 帳戶，請勿重複註冊。",
+      });
+    }
+
+    // STEP2: 檢查資料庫是否已有同樣 (realname + phoneNumber) 的使用者
+    let existingUser = await User.findOne({
+      "userinfo.realname": realname,
+      "userinfo.phoneNumber": phoneNumber,
+    });
+
+    if (existingUser) {
+      // 該使用者若已經有 lineID ，則註冊失敗
+      if (existingUser.lineID) {
+        return res.status(400).json({
+          msg: "此真實姓名與電話已經綁定過 Line 帳戶，註冊失敗。",
+        });
+      }
+      // 否則更新該使用者的 lineID
+      existingUser.lineID = lineID;
+      existingUser.userinfo.username = displayName;
+      existingUser.userinfo.pictureUrl = pictureUrl;
+
+      await existingUser.save();
+
+      // 產生最終 JWT
+      const tokenObject = { userID: existingUser._id };
+      const finalToken = jwt.sign(tokenObject, process.env.PASSPORT_SECRET);
+
+      return res.status(200).json({
+        msg: "成功綁定既有預註冊用戶資料並登入",
+        token: finalToken,
+      });
+    } else {
+      /*
+      // 沒找到預註冊用戶 → 直接建立新用戶
+      const newUser = new User({
+        lineID: lineID,
+        userinfo: {
+          username: displayName,
+          realname: realname,
+          phoneNumber: phoneNumber,
+          pictureUrl: pictureUrl,
+        },
+      });
+
+      const savedUser = await newUser.save();
+
+      // 產生最終 JWT
+      const tokenObject = { userID: savedUser._id };
+      const finalToken = jwt.sign(tokenObject, process.env.PASSPORT_SECRET);
+*/
+      return res.status(400).json({
+        msg: "你沒有註冊的權限",
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ msg: "伺服器處理失敗", error });
+  }
+});
+
+router.post("/preRegisterUser", checkTeacherAccess, async (req, res) => {
+  try {
+    // userinfo 必須包含 { realname, phoneNumber, grade }
+    const { userinfos } = req.body;
+
+    if (!Array.isArray(userinfos) || userinfos.length === 0) {
+      return res.status(400).send("請提供註冊資訊陣列");
+    }
+
+    let successCount = 0;
+    let alreadyRegisteredUsers = [];
+    let invalidUsers = [];
+    let serverSavedErrorUsers = [];
+
+    for (const userinfo of userinfos) {
+      if (!userinfo.realname || !userinfo.phoneNumber || !userinfo.grade) {
+        invalidUsers.push(userinfo.realname);
+        continue;
+      }
+
+      try {
+        let foundStudent = await User.findOne({
+          "userinfo.realname": userinfo.realname,
+          "userinfo.phoneNumber": userinfo.phoneNumber,
+        });
+        if (foundStudent) {
+          alreadyRegisteredUsers.push(userinfo.realname);
+          continue;
+        }
+      } catch (e) {
+        serverSavedErrorUsers.push(userinfo.realname);
+        continue;
+      }
+
+      try {
+        let newUser = new User({
+          userinfo,
+        });
+        let savedUser = await newUser.save();
+        if (savedUser) {
+          successCount++;
+        } else {
+          serverSavedErrorUsers.push(userinfo.realname);
+        }
+      } catch (e) {
+        serverSavedErrorUsers.push(userinfo.realname);
+      }
+    }
+    let responseMessage = `成功預註冊 ${successCount} 位學生\n`;
+
+    if (alreadyRegisteredUsers.length > 0) {
+      responseMessage += `以下學生已經註冊過：${alreadyRegisteredUsers.join(
+        ", "
+      )}。\n`;
+    }
+
+    if (invalidUsers.length > 0) {
+      responseMessage += `以下學生資訊提供不完整：${invalidUsers.join(
+        ", "
+      )}。\n`;
+    }
+
+    if (serverSavedErrorUsers.length > 0) {
+      responseMessage += `以下學生由於伺服器錯誤註冊失敗：${serverSavedErrorUsers.join(
+        ", "
+      )}。\n`;
+    }
+
+    return res.status(200).json({ msg: responseMessage });
+  } catch (error) {
+    return res.status(500).json({ msg: "伺服器處裡失敗", error });
+  }
+});
 
 module.exports = router;

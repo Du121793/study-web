@@ -47,13 +47,11 @@ export default function TeacherLayout() {
   }
   useEffect(() => {
     const leftNavDocument = document.querySelector('.teacherLayout-left-nav')
-    const rightNavDocument = document.querySelector('.right-nav')
     const leftNavSwitchBtn = document.querySelector('.left-menu')
     leftNavDocument.style.marginLeft = leftNavWidth
     leftNavSwitchBtn.style.opacity = '1'
     leftNavSwitchBtn.style.position = 'sticky'
     setMenu(leftNavDocument)
-    setRightNav(rightNavDocument)
     setLeftNavBtn(leftNavSwitchBtn)
   }, [])
   const showRightNav = () => {
@@ -100,8 +98,11 @@ export default function TeacherLayout() {
             </button>
             <li className="nav">
               <div className="icon">
-                <Image src={myCourseIcon} width={24}
-                height={24}></Image>
+                <Image
+                alt='nav,s myCourse Icon'
+                  src={myCourseIcon}
+                  width={24}
+                  height={24}></Image>
               </div>
               <span
                 onClick={() => setCurrentPage('MyCourse')}
@@ -111,8 +112,11 @@ export default function TeacherLayout() {
             </li>
             <li className="nav">
               <div className="icon">
-                <Image src={addCourseIcon} width={24}
-                height={24}></Image>
+                <Image
+                alt='nav,s addCourse Icon'
+                  src={addCourseIcon}
+                  width={24}
+                  height={24}></Image>
               </div>
               <span
                 onClick={() => setCurrentPage('AddCourse')}
@@ -122,8 +126,11 @@ export default function TeacherLayout() {
             </li>
             <li className="nav">
               <div className="icon">
-                <Image src={registerCourseIcon} width={24}
-                height={24}></Image>
+                <Image
+                alt='nav,s registerCourse Icon'
+                  src={registerCourseIcon}
+                  width={24}
+                  height={24}></Image>
               </div>
               <span
                 onClick={() => setCurrentPage('RegisterCourse')}
@@ -133,8 +140,11 @@ export default function TeacherLayout() {
             </li>
             <li className="nav">
               <div className="icon">
-                <Image src={deleteCourseIcon} width={24}
-                height={24}></Image>
+                <Image
+                alt='nav,s deleteCourse Icon'
+                  src={deleteCourseIcon}
+                  width={24}
+                  height={24}></Image>
               </div>
               <span
                 onClick={() => setCurrentPage('DeleteCourse')}
@@ -144,8 +154,11 @@ export default function TeacherLayout() {
             </li>
             <li className="nav">
               <div className="icon">
-                <Image src={profileIcon} width={24}
-                height={24}></Image>
+                <Image
+                alt='nav,s profile Icon'
+                  src={profileIcon}
+                  width={24}
+                  height={24}></Image>
               </div>
               <span
                 onClick={() => setCurrentPage('UserProfile')}

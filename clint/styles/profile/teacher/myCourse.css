@@ -2,7 +2,7 @@
   right: 0;
   top: 24px;
   min-width: 600px;
-  max-width: 1200px;
+  max-width: 1300px;
   margin-right: 60px;
   position: relative;
   height: 100%;
@@ -14,24 +14,29 @@
   z-index: 999;
   gap: 12px;
   z-index: 99;
-  border: 2px solid rgba(0, 0, 0, 0.225);
   background-color: #ffffff;
   border-radius: 12px;
   overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
 }
 .teacherLayout-main .teacherLayout-container .my-course-container .myCourse-main .courses-container {
   width: 100%;
-  padding: 64px 0 64px 0;
+  padding: 32px 0 32px 0;
+  display: flex;
+  justify-content: center;
 }
 .teacherLayout-main .teacherLayout-container .my-course-container .myCourse-main .courses-container .courses {
-  width: 100%;
+  width: 95%;
   gap: 24px;
 }
 .teacherLayout-main .teacherLayout-container .my-course-container .myCourse-main .courses-container .courses .course {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
   pointer-events: none;
   overflow: hidden;
-  width: 80%;
-  background-color: #c2d9dd;
+  width: 100%;
+  background-color: #e9e9e9;
   border-radius: 8px;
   position: relative;
   transition: 0.2s;
@@ -46,17 +51,18 @@
   top: 0;
   height: 60px;
   width: 100%;
-  background-color: #8bd0db;
+  background-color: #323232;
   z-index: 99;
 }
 .teacherLayout-main .teacherLayout-container .my-course-container .myCourse-main .courses-container .courses .course .course-header .course-name {
+  color: white;
   pointer-events: none;
-  font-weight: bold;
   font-size: 20px;
 }
 .teacherLayout-main .teacherLayout-container .my-course-container .myCourse-main .courses-container .courses .course .course-header .class-number {
+  color: white;
   pointer-events: none;
-  font-weight: bold;
+  font-weight: 500;
   font-size: 20px;
   position: absolute;
   right: 24px;

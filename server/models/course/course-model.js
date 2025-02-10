@@ -4,21 +4,21 @@ const { Schema } = mongoose;
 const courseSchema = new Schema({
   courseName: {
     type: String,
-    require: true,
+    required: true,
     maxlength: 30,
   },
   subject: {
     type: String,
     maxlength: 30,
-    require: true,
+    required: true,
   },
   grade: {
     type: String,
-    require: true,
+    required: true,
   },
   courseClass: {
     type: String,
-    require: true,
+    required: true,
   },
   members: {
     type: [String],

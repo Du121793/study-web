@@ -4,12 +4,12 @@ const { Schema } = mongoose;
 const videoInfoSchema = new Schema({
   title: {
     type: String,
-    require: true,
+    required: true,
     maxlength: 30,
   },
   courseID: {
     type: String,
-    require: true,
+    required: true,
   },
   type: {
     type: String,

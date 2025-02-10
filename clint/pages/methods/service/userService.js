@@ -21,6 +21,22 @@ const userService = {
       console.log(e);
     }
   },
+  async registerUser(tempToken, realname, phoneNumber) {
+    try {
+      console.log(tempToken, realname, phoneNumber);
+      const response = await axios.post(
+        API_URL + "/auth/completeRegistration",
+        {
+          tempToken,
+          realname,
+          phoneNumber,
+        }
+      );
+      return response.data;
+    } catch (e) {
+      console.log(e);
+    }
+  },
 };
 
 export default userService;

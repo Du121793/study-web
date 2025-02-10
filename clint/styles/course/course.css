@@ -1,3 +1,4 @@
+@charset "UTF-8";
 .course-main {
   min-width: 1250px;
 }
@@ -7,115 +8,146 @@
   align-items: center;
   width: 100%;
 }
+.course-main .container .header-title-area {
+  width: 1200px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.course-main .container .header-title-area .home-btn {
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+}
 .course-main .container .course-title {
+  padding: 8px 14px 8px 14px;
   margin: 12px 0 12px 0;
-  font-size: 32px;
+  font-size: 28px;
+  background-color: #fafafa;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   font-weight: bold;
 }
-.course-main .container .videos-nav {
+.course-main .container .nav {
   position: relative;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
+  top: 0;
   min-width: 1005px;
   width: 1200px;
   height: 80px;
-  background-color: #ffffff;
-  display: flex;
-  flex-direction: column;
+  border-radius: 8px;
+  transition: height 0.3s ease;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  margin-bottom: 24px;
 }
-.course-main .container .videos-nav .header {
+.course-main .container .nav .header {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  border-radius: 8px;
+  background-color: rgba(219, 235, 230, 0.9921568627);
   display: flex;
   cursor: pointer;
   align-items: center;
   position: relative;
-  left: 24px;
   width: 100%;
-  height: 80px;
+  min-height: 80px;
   font-size: 20px;
   z-index: 1;
 }
-.course-main .container .videos-nav .videos-area {
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  transition: 0.3s;
-  position: relative;
-  z-index: -1;
-  top: 0;
-  left: 0;
-  height: 100px;
+.course-main .container .nav .header div {
+  padding-left: 24px;
+}
+.course-main .container .nav .video-area {
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 24px;
   width: 100%;
-  background-color: rgba(144, 144, 144, 0.4196078431);
+  max-width: 1176px; /* 可自行調整，或乾脆不寫 */
+  padding: 24px;
+  background-color: rgb(255, 255, 255);
 }
-.course-main .container .message-board-area {
-  display: flex;
-  margin-top: 48px;
-  gap: 42px;
-  justify-content: center;
-}
-.course-main .container .message-board-area .board-area {
+.course-main .container .nav .video-area .video {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 800px;
-  border: 4px solid rgba(0, 0, 0, 0.2);
-  border-radius: 12px;
-  min-height: 400px;
+  border-radius: 4px;
+  width: 250px;
+  height: 180px;
+  background-color: #b7b7b7;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
-.course-main .container .message-board-area .board-area .board-area-title {
-  display: flex;
-  justify-content: center;
-  position: relative;
-  padding: 12px 0 12px 0;
-  font-size: 20px;
-  width: 100%;
-}
-.course-main .container .message-board-area .board-area .title::after {
+.course-main .container .nav .video-area .video .info {
   position: absolute;
-  content: "";
   bottom: 0;
-  left: 0;
   width: 100%;
-  height: 1px;
-  background-color: black;
-}
-.course-main .container .message-board-area .board-area .question {
-  border-radius: 8px;
+  height: 64px;
+  background-color: #ffffff;
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(0, 0, 0, 0.5);
-  padding: 12px 12px 12px 12px;
-  margin-top: 24px;
-  width: 600px;
-  gap: 4px;
 }
-.course-main .container .message-board-area .board-area .question .question-title {
-  font-weight: bold;
-  font-size: 18px;
-}
-.course-main .container .message-board-area .board-area .question .message-area {
-  margin: 0 auto;
-  width: 90%;
-}
-.course-main .container .message-board-area .board-area .question .student-info {
-  gap: 12px;
-  display: flex;
-  align-items: center;
-}
-.course-main .container .message-board-area .board-area .question .teacher-answer-area {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  gap: 4px;
-  width: 100%;
+.course-main .container .nav .video-area .video .info .title {
+  margin-left: 12px;
   margin-top: 12px;
-}
-.course-main .container .message-board-area .board-area .question .teacher-answer-area::before {
-  content: "";
   width: 100%;
-  height: 1px;
-  position: absolute;
-  top: -4px;
-  left: 0;
-  background-color: black;
+}
+.course-main .container .nav .video-area .video .info .time {
+  margin-left: 12px;
+  display: flex;
+  gap: 12px;
+  font-size: 15px;
+}
+.course-main .container .nav .QA-area {
+  display: flex;
+  flex-wrap: wrap; /* 內容超過可換行 */
+  gap: 24px; /* 區塊間距 */
+  padding: 24px;
+  background-color: #f5f5f5;
+}
+.course-main .container .nav .QA-area .type-section {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 12px;
+  width: 240px; /* 固定寬度，效果類似卡片 */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  /* QA 卡片 */
+}
+.course-main .container .nav .QA-area .type-section h2 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 6px;
+}
+.course-main .container .nav .QA-area .type-section .qa-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.course-main .container .nav .QA-area .type-section .qa-item {
+  cursor: pointer;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  padding-bottom: 12px;
+  transition: 0.3s;
+}
+.course-main .container .nav .QA-area .type-section .qa-item .image {
+  width: 100%;
+  height: 120px;
+  background-color: rgb(171, 171, 171);
+}
+.course-main .container .nav .QA-area .type-section .qa-item .qa-title {
+  margin-bottom: 4px;
+  margin-top: 12px;
+  margin-left: 12px;
+}
+.course-main .container .nav .QA-area .type-section .qa-item .qa-dateTime {
+  font-size: 14px;
+  color: #666;
+  margin-left: 12px;
+}
+.course-main .container .nav .QA-area .type-section .qa-item:hover {
+  border: 1px solid #373737;
 }/*# sourceMappingURL=course.css.map */

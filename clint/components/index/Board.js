@@ -10,6 +10,7 @@ export default function Board() {
           <Image
             className="icon"
             src={titleIcon}
+            alt='new info,s icon'
             width={40}
             height={40}></Image>
         </div>

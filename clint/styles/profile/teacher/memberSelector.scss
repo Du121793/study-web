@@ -1,10 +1,16 @@
 .register-area {
-  width: 80%;
   margin-top: 24px;
-  padding: 24px 24px 12px 24px;
-  background-color: #fff;
-  border: 2px solid rgba(0, 0, 0, 0.225);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 90%;
+  background-color: #fff; // 讓清單區域白底
+
   .classification {
     position: relative;
     display: flex;
@@ -20,15 +26,17 @@
       gap: 12px;
       flex-wrap: wrap;
       span {
-        width: 38px;
+        font-weight: 500;
+        color: #333;
+        margin-right: 4px;
       }
       input {
-        font-size: 14px;
         outline: none;
-        border-radius: 2px;
-        height: 20px;
-        padding: 0 4px 0 4px;
-        border: 1px solid rgba(0, 0, 0, 0.5);
+        padding: 4px 6px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+        transition: border-color 0.2s;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
       }
       .input-name {
         width: 60px;
@@ -37,23 +45,15 @@
         width: 60px;
       }
       select {
-        height: 22px;
-        border-radius: 2px;
-        border: 1px solid rgba(0, 0, 0, 0.5);
-        font-size: 14px;
         outline: none;
+        padding: 4px 6px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+        transition: border-color 0.2s;
         option {
           font-size: 14px;
         }
       }
-    }
-
-    button {
-      margin-top: 12px;
-      width: 80px;
-      padding: 2px 0 2px 0;
-      border-radius: 2px;
-      border: 1px solid rgba(0, 0, 0, 0.5);
     }
   }
   .classification::after {
@@ -69,30 +69,93 @@
     display: flex;
     justify-content: center;
     gap: 12px;
+    margin-top: 12px;
+    .search-option-btn {
+      outline: none;
+      padding: 4px 12px;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+      transition: border-color 0.2s;
+      background-color: #fff;
+      transition: 0.3s;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    }
+    .search-option-btn:hover {
+      background-color: #efefef;
+    }
   }
-  ul {
-    margin-top: 48px;
+  .member-area {
+    margin-top: 12px;
+    width: 100%;
+    .title-area {
+      margin-bottom: -8px;
+      display: flex;
+      width: 100%;
+      #username {
+        margin-left: 50px;
+        width: 120px;
+        text-align: left;
+      }
+      #realname {
+        width: 80px;
+      }
+      #phone-number {
+        width: 120px;
+      }
+      #grade {
+        width: 80px;
+      }
+      #role {
+        width: 80px;
+      }
+      span {
+        pointer-events: none;
+        display: flex;
+        align-items: flex-end;
+      }
+    }
     li {
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      margin-top: 12px;
+      width: 97.5%;
       display: flex;
       align-items: center;
-      gap: 2px;
+      position: relative;
+      padding: 4px 8px;
+      border: 2px solid rgb(0, 0, 0,0.2);
+      border-radius: 12px;
+      height: 40px;
+      background-color: #fafafa;
+      transition:0.2s;
+
       .student-checkbox {
         width: 16px;
         height: 16px;
       }
       .searched-info {
         display: flex;
-        gap: 4px;
-        align-items: center;
-        .username {
-          width: 60px;
+        pointer-events: none;
+        span {
+          pointer-events: none;
+          display: flex;
+          align-items: flex-end;
+        }
+        #username {
+          margin-left: 24px;
+          width: 120px;
           text-align: left;
         }
-        .phone-number {
-          width: 90px;
+        #realname {
+          width: 80px;
         }
-        .grade {
+        #phone-number {
           width: 120px;
+        }
+        #role {
+          width: 80px;
+        }
+        #grade {
+          width: 80px;
         }
       }
     }

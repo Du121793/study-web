@@ -1,22 +1,20 @@
 .teacherLayout-container {
-  // .page-navs {
-  //   position: absolute;
-  //   left: 0;
-  //   top: 0;
-  //   z-index: 99;
-  // }
   .register-course-container {
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 32px;
+    background-color: #fefefe; // 淡色背景
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); // 柔和陰影
+    top: 24px;
+    padding: 24px;
     width: 60vw;
-    background-color: #fff;
-    border: 1px solid black;
-    margin-top: 24px;
-    min-width: 650px;
+    min-width: 600px;
+    max-width: 950px;
     .alert {
+      position: absolute;
       font-weight: bold;
       display: flex;
       overflow: hidden;
@@ -30,6 +28,7 @@
       padding: 0 24px 0 24px;
       height: 0;
       opacity: 1;
+      z-index: 99;
     }
     .form {
       position: relative;
@@ -37,29 +36,19 @@
       display: flex;
       top: 32px;
       gap: 12px;
-      height: 300px;
-      .form-titles {
-        display: flex;
-        flex-direction: column;
-        align-items: end;
-        gap: 10px;
-        min-width: 70px;
-        span {
-          display: flex;
-          align-items: center;
-          height: 36px;
-          font-weight: bold;
-        }
-      }
+      height: 260px;
       .form-inputs {
         position: relative;
         gap: 12px;
-        width: 300px;
+        width: 100%;
         display: flex;
         flex-direction: column;
         .form-input-area {
+          gap: 12px;
+          width: 100%;
           display: flex;
           position: relative;
+          justify-content: flex-end;
           align-items: center;
           .down-arrow-img {
             right: 12px;
@@ -69,7 +58,7 @@
             cursor: pointer;
           }
           .form-input {
-            width: 90%;
+            width: 70%;
             position: relative;
             outline: none;
             position: relative;
@@ -97,17 +86,17 @@
       display: flex;
       gap: 24px;
       .clear-form-btn {
-        background-color: #ea8888;
+        background-color: #ea88888e;
       }
       .submit-form-btn {
-        background-color: #fff;
+        background-color: #6ee36a7a;
       }
       button {
         cursor: pointer;
         position: relative;
-        width: 80px;
-        height: 32px;
-        border: 2px solid rgba(0, 0, 0, 0.225);
+        width: 120px;
+        height: 36px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
         border-radius: 4px;
         overflow: hidden;
         z-index: 1;
@@ -123,10 +112,10 @@
         left: 0;
       }
       button:hover::after {
-        background-color: #0000002a;
+        background-color: #00000015;
       }
     }
-    .child-component{
+    .child-component {
       display: flex;
       justify-content: center;
       width: 100%;

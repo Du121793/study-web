@@ -104,73 +104,6 @@ export default function studentCourse() {
   return (
     <div className="register-course-container">
       <div className="alert">{message}</div>
-      <div className="form">
-        <div className="form-titles">
-          <span>年級:</span>
-          <span>科目:</span>
-          <span>班級:</span>
-          <span>課程名稱:</span>
-        </div>
-        <div className="form-inputs">
-          <div className="form-input-area">
-            <input
-              onChange={initGrade}
-              className="form-input"
-              id="grade"
-              type="text"
-              value={grade}
-            />
-            <Image
-              className="down-arrow-img"
-              alt='open grade options btn'
-              src={downArrowImg}></Image>
-          </div>
-
-          <div className="form-input-area">
-            <input
-              onChange={initCourseClass}
-              className="form-input"
-              id="subject"
-              type="text"
-              value={courseClass}
-            />
-            <Image
-              className="down-arrow-img"
-              alt='open subject options btn'
-              src={downArrowImg}></Image>
-          </div>
-
-          <div className="form-input-area">
-            <input
-              onChange={initSubject}
-              className="form-input"
-              id="courseClass"
-              type="text"
-              value={subject}
-            />
-            <Image
-              className="down-arrow-img"
-              alt='open courseClass options btn'
-              src={downArrowImg}></Image>
-          </div>
-
-          <div className="form-input-area">
-            <input
-              onChange={initCourseName}
-              className="form-input"
-              id="courseName"
-              type="text"
-              value={courseName}
-            />
-          </div>
-        </div>
-        <div className="hints">
-          <div className="hint">例如:學年度</div>
-          <div className="hint">例如:化學、物理</div>
-          <div className="hint">例如:甲班，A班</div>
-          <div className="hint">此處會自動生成最終名稱，也可直接更改為自訂義名稱</div>
-        </div>
-      </div>
       <div className="btns">
         <button
           className="clear-form-btn"
@@ -187,6 +120,71 @@ export default function studentCourse() {
           onClick={requireCreateCourse}>
           新增
         </button>
+      </div>
+      <div className="form">
+        <div className="form-inputs">
+          <div className="form-input-area">
+            <span>年級:</span>
+            <input
+              onChange={initGrade}
+              className="form-input"
+              id="grade"
+              type="text"
+              value={grade}
+            />
+            <Image
+              className="down-arrow-img"
+              alt="open grade options btn"
+              src={downArrowImg}></Image>
+          </div>
+
+          <div className="form-input-area">
+            <span>科目:</span>
+            <input
+              onChange={initCourseClass}
+              className="form-input"
+              id="subject"
+              type="text"
+              value={courseClass}
+            />
+            <Image
+              className="down-arrow-img"
+              alt="open subject options btn"
+              src={downArrowImg}></Image>
+          </div>
+
+          <div className="form-input-area">
+            <span>班級:</span>
+            <input
+              onChange={initSubject}
+              className="form-input"
+              id="courseClass"
+              type="text"
+              value={subject}
+            />
+            <Image
+              className="down-arrow-img"
+              alt="open courseClass options btn"
+              src={downArrowImg}></Image>
+          </div>
+
+          <div className="form-input-area">
+            <span>課程名稱:</span>
+            <input
+              onChange={initCourseName}
+              className="form-input"
+              id="courseName"
+              type="text"
+              value={courseName}
+            />
+          </div>
+        </div>
+        <div className="hints">
+          <div className="hint">例如:學年度</div>
+          <div className="hint">例如:化學、物理</div>
+          <div className="hint">例如:甲班，A班</div>
+          <div className="hint">此處會自動生成最終名稱，也可直接更改為自訂義名稱</div>
+        </div>
       </div>
       <div className="child-component">
         <MenberSelector
