@@ -1,0 +1,89 @@
+.preRegister-main {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fefefe;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  top: 24px;
+  padding: 24px;
+  width: 60vw;
+  min-width: 700px;
+  max-width: 950px;
+}
+.preRegister-main .header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.preRegister-main .header .title {
+  font-size: 24px;
+}
+.preRegister-main .form {
+  position: relative;
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 24px;
+}
+.preRegister-main .form .form-line {
+  position: relative;
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+}
+.preRegister-main .form .form-line .copy-area {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.preRegister-main .form .form-line .copy-area div {
+  gap: 12px;
+  display: flex;
+}
+.preRegister-main .form .form-line .copy-area div .input {
+  width: 200px;
+}
+.preRegister-main .form .form-line .copy-area div .name-input {
+  width: 90px;
+}
+.preRegister-main .form .form-line .copy-area div .name-title {
+  width: 96px;
+}
+.preRegister-main .form .form-line .copy-area div .phone-title {
+  width: 64px;
+}
+.preRegister-main .form .form-line .form-select {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+}
+.preRegister-main .form .form-line .form-select .form-title {
+  display: flex;
+  align-items: center;
+  width: 100px;
+}
+.preRegister-main .form-submit {
+  position: relative;
+  right: 0;
+  top: 12px;
+  display: flex;
+  justify-content: center;
+}
+.preRegister-main .form-submit .submit {
+  outline: none;
+  padding: 8px 24px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  transition: border-color 0.2s;
+  background-color: #fff;
+  transition: 0.3s;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+.preRegister-main .form-submit .submit:hover {
+  background-color: #efefef;
+}/*# sourceMappingURL=preRegister.css.map */
