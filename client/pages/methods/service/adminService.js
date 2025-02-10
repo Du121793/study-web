@@ -16,6 +16,7 @@ const adminService = {
     );
     return response.data;
   },
+
   async registerMember(token, registerInfo) {
     // registeInfo 內存放 學生id陣列與課程id { user_ids, course_id }
     const authHeader = token ? { Authorization: token } : {};
@@ -62,7 +63,6 @@ const adminService = {
   async getCourses(token, filter) {
     /* filter需要是物件
      { courseName, subject, grade, courseClass, members, _id, page, pageSize}*/
-    console.log(token);
     const authHeader = token ? { Authorization: token } : {};
     const response = await axios.get(API_URL + "/course/getCourses", {
       headers: authHeader,
@@ -86,6 +86,15 @@ const adminService = {
     const response = await axios.delete(COURSE_URL + "/deleteCourse", {
       headers: authHeader,
       data: { course_id: courseId },
+    });
+    return response.data;
+  },
+
+  async preRegisterUser(token, users) {
+    // users 是一個陣列 裝著物件 [{userinfo , role},...]
+    const authHeader = token ? { Authorization: token } : {};
+    const response = await axios.post(USER_URL + "/preRegisterUser", users, {
+      headers: authHeader,
     });
     return response.data;
   },
