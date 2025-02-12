@@ -96,7 +96,7 @@ export default function Header(loginState) {
               <div className="member-img">
                 <img
                   className="shot"
-                  src={userInfo.userinfo.pictureUrl}
+                  src={userInfo && userInfo.userinfo.pictureUrl}
                   alt="user's shot"
                 />
               </div>

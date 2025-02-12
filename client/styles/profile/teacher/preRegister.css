@@ -50,6 +50,9 @@
 .preRegister-main .form .form-line .copy-area div .name-input {
   width: 90px;
 }
+.preRegister-main .form .form-line .copy-area div .grade-input {
+  width: 90px;
+}
 .preRegister-main .form .form-line .copy-area div .name-title {
   width: 96px;
 }

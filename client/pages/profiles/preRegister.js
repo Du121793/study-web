@@ -1,89 +1,129 @@
-import { useEffect } from "react";
-
+// 組件庫
+import { use, useEffect } from 'react'
+// 導入方法
+import adminService from '../methods/service/adminService'
+import { useUserToken } from '../methods/service/useUserToken'
 export default function PreRegister() {
-  let choseRole = "";
-  let getAllName = [];
-  let getAllPhone = [];
-  let user = [];
+  // 這裡改為儲存平鋪的使用者物件，而非陣列的陣列
+  let users = []
+  let Busers = []
+  const token = useUserToken()
+
   const submitBtnClick = () => {
-    const role = document.querySelector(".chose-role").value;
+    const role = document.querySelector('.chose-role').value
     if (!role) {
-      alert("請先選擇身分組");
-      return;
+      alert('請先選擇身分組')
+      return
     }
 
-    // 選到 copy-area 下的所有 "行"
-    const rowDivs = document.querySelectorAll(".copy-area > div");
+    // 取得 .copy-area 下的所有「行」
+    const rowDivs = document.querySelectorAll('.copy-area > div')
 
-    // 用來存放最終使用者輸入的「每行資料」
-    let userArray = [];
+    // 用來存放使用者輸入的每筆資料
+    let userArray = []
 
     rowDivs.forEach((row) => {
-      // 在每個行容器中，選出 name 與 phone
-      const nameInput = row.querySelector(".name-input");
-      const phoneInput = row.querySelector(".phone-input");
+      // 取出每行中的 name 與 phone 輸入欄位
+      const nameInput = row.querySelector('.name-input')
+      const phoneInput = row.querySelector('.phone-input')
+      const gradeInput = row.querySelector('.grade-input')
 
-      // 若該行有 name/phone，就把它組成物件
       if (nameInput && phoneInput) {
-        const nameValue = nameInput.value.trim();
-        const phoneValue = phoneInput.value.trim();
+        const nameValue = nameInput.value.trim()
+        const phoneValue = phoneInput.value.trim()
+        const gradeValue = gradeInput.value.trim()
 
-        // 如果兩者都有輸入，才收進去 (依照需求可自行調整)
-        if (nameValue !== "" || phoneValue !== "") {
+        // 若該行有輸入資料就組成物件
+        if (nameValue !== '' || phoneValue !== '' || gradeValue !== '') {
           userArray.push({
-            name: nameValue,
-            phone: phoneValue,
+            realname: nameValue,
+            phoneNumber: phoneValue,
+            grade: gradeValue,
             role: role,
-          });
+          })
         }
       }
-    });
+    })
 
-    // 根據需求，把 userArray 傳到後端或做後續處理
-    console.log("選擇的角色：", role);
-    console.log("收集到的使用者資料：", userArray);
-    // e.g. user = userArray;
-  };
+    // 檢查新資料中是否有重複的物件 (與 users 陣列內已有的比較)
+    const duplicateFound = userArray.some((newUser) => users.some((existingUser) => existingUser.name === newUser.name && existingUser.phone === newUser.phone && existingUser.role === newUser.role))
+
+    if (duplicateFound) {
+      alert('警告：已有相同的使用者資料')
+      return
+    }
+
+    // 沒有重複才將新資料加入 users 陣列
+    userArray.forEach((user) => users.push(user))
+    console.log('收集到的資料：', userArray)
+    console.log('目前的所有資料：', users)
+
+    // 重置 input 欄位到初始狀態：
+    // 清空 .copy-area 內容，並重新插入初始那一行
+    const copyArea = document.querySelector('.copy-area')
+    copyArea.innerHTML = `
+      <div>
+        <div class="form-title">姓名:</div>
+        <input class="input name-input" type="text" />
+        <div class="form-title">年級:</div>
+        <input class="input grade-input" type="text" />
+        <div class="form-title">電話:</div>
+        <input class="input phone-input" type="text" />
+      </div>
+    `
+    // 重置下拉選單為預設值
+    document.querySelector('.chose-role').value = ''
+
+    // {userinfo , role}
+    users.map((item) => {
+      console.log(item)
+      let userinfo = {
+        realname: item.realname,
+        phoneNumber: item.phoneNumber,
+        grade: item.grade,
+      }
+      Busers.push({ userinfo }, role)
+    })
+    adminService.preRegisterUser(token, Busers).then((res) => {
+      console.log(res)
+    })
+  }
 
   useEffect(() => {
-    const area = document.querySelector(".copy-area");
+    const area = document.querySelector('.copy-area')
 
-    // 事件監聽函式：只要「target 是 .phone-input」並且「目前值長度 === 1」才新增
+    // 當使用者在電話欄位輸入第一個字時，自動新增一行
     const handleInput = (event) => {
-      if (event.target.matches(".phone-input")) {
-        const inputValue = event.target.value;
-        // 確認使用者剛輸入第 1 個字
+      if (event.target.matches('.phone-input')) {
+        const inputValue = event.target.value
         if (inputValue.length === 1) {
           area.insertAdjacentHTML(
-            "beforeend",
+            'beforeend',
             `
             <div>
-                <div class="form-title name-title"> </div>
-                <input
-                class="input name-input"
-                type="text"
-            />
-            <div class="form-title phone-title"> </div>
-                <input
-                class="input phone-input"
-                type="text"
-                />
+              <div class="form-title">姓名:</div>
+              <input class="input name-input" type="text" />
+              <div class="form-title">年級:</div>
+              <input class="input grade-input" type="text" />
+              <div class="form-title">電話:</div>
+              <input class="input phone-input" type="text" />
             </div>
             `
-          );
+          )
         }
       }
-    };
+    }
 
-    // 把監聽器掛在父容器 (copy-area) 上
-    area.addEventListener("input", handleInput);
+    // 監聽 .copy-area 的 input 事件
+    area.addEventListener('input', handleInput)
 
-    // 清理函式：元件卸載時移除監聽，避免 React 18 Strict Mode 重複綁定
+    // 清除監聽器 (避免 React 18 Strict Mode 重複掛載)
     return () => {
-      area.removeEventListener("input", handleInput);
-    };
-  }, []);
+      area.removeEventListener('input', handleInput)
+    }
+  }, [])
 
+  // layout
   return (
     <div className="preRegister-main">
       <div className="header">
@@ -103,20 +143,33 @@ export default function PreRegister() {
           <div className="copy-area">
             {/* 初始那一行 */}
             <div>
-              <div className="form-title">輸入真實姓名</div>
-              <input className="input name-input" type="text" />
-              <div className="form-title">輸入電話</div>
-              <input className="input phone-input" type="text" />
+              <div className="form-title">姓名:</div>
+              <input
+                className="input name-input"
+                type="text"
+              />
+              <div className="form-title">年級:</div>
+              <input
+                className="input grade-input"
+                type="text"
+              />
+              <div className="form-title">電話:</div>
+              <input
+                className="input phone-input"
+                type="text"
+              />
             </div>
           </div>
         </div>
       </div>
-      {/* 送出 */}
+      {/* 送出按鈕 */}
       <div className="form-submit">
-        <button className="submit" onClick={submitBtnClick}>
+        <button
+          className="submit"
+          onClick={submitBtnClick}>
           送出
         </button>
       </div>
     </div>
-  );
+  )
 }

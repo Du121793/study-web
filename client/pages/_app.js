@@ -17,6 +17,7 @@ import "../styles/profile/teacher/userProfile.css";
 import "../styles/profile/teacher/deleteCourse.css";
 // course
 import "../styles/course/course.css";
+import "../styles/course/videoUpload.css";
 //method的layout
 import "../styles/method/completeInfo.css";
 import "../styles/profile/teacher/preRegister.css";

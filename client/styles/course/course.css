@@ -2,6 +2,17 @@
 .course-main {
   min-width: 1250px;
 }
+.course-main .background {
+  display: none;
+  position: fixed; /* 固定定位 */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(142, 142, 142, 0.46);
+  z-index: 999;
+  transition: 0.3s;
+}
 .course-main .container {
   display: flex;
   flex-direction: column;
@@ -41,6 +52,7 @@
   margin-bottom: 24px;
 }
 .course-main .container .nav .header {
+  padding-left: 24px;
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
@@ -57,6 +69,30 @@
 }
 .course-main .container .nav .header div {
   padding-left: 24px;
+}
+.course-main .container .nav .update-video-area {
+  padding-top: 24px;
+  width: 100%;
+  background-color: #fff;
+}
+.course-main .container .nav .update-video-area .button {
+  width: 120px;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  left: 24px;
+  padding: 8px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  background-color: #f7f7f7;
+  transition: border-color 0.2s;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: 0.2s;
+}
+.course-main .container .nav .update-video-area .button:hover {
+  background-color: #ededed;
 }
 .course-main .container .nav .video-area {
   cursor: pointer;
@@ -77,6 +113,7 @@
   border: 1px solid rgba(0, 0, 0, 0.2);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  transition: 0.2s;
 }
 .course-main .container .nav .video-area .video .info {
   position: absolute;
@@ -97,6 +134,9 @@
   display: flex;
   gap: 12px;
   font-size: 15px;
+}
+.course-main .container .nav .video-area .video:hover {
+  border: 1px solid rgb(0, 0, 0);
 }
 .course-main .container .nav .QA-area {
   display: flex;

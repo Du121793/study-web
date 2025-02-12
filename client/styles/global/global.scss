@@ -6,7 +6,7 @@
   border: 0;
   font-size: 100%;
 }
-input{
+input {
   outline: none;
   padding: 4px 6px;
   border: 1px solid rgba(0, 0, 0, 0.2);
@@ -29,13 +29,13 @@ a {
   display: flex;
   flex-direction: column;
 }
-.justify-center{
+.justify-center {
   justify-content: center;
 }
-.align-center{
+.align-center {
   align-items: center;
 }
-.relative{
+.relative {
   position: relative;
 }
 // 客制化
