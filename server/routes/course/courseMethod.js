@@ -130,7 +130,8 @@ router.post("/uploadVideo", async (req, res) => {
 
 router.delete("/deleteVideo", async (req, res) => {
   try {
-    const { videoId } = req.body;
+    const { videoId } = req.query;
+    console.log(videoId);
     let foundVideoInfo = await VideoInfo.findOne({ _id: videoId });
     if (!foundVideoInfo) return res.status(400).send("找不到影片資料");
     await VideoInfo.findOneAndDelete({ _id: videoId });

@@ -115,6 +115,9 @@
   overflow: hidden;
   transition: 0.2s;
 }
+.course-main .container .nav .video-area .video .videos-shot {
+  width: 100%;
+}
 .course-main .container .nav .video-area .video .info {
   position: absolute;
   bottom: 0;

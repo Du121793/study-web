@@ -23,7 +23,7 @@ router.get("/registedCourse", async (req, res) => {
 
     // 若提供 course_id，則檢查該課程是否存在於使用者的已註冊課程中
     if (course_id) {
-      if (!req.user.courses.includes(course_id)) {
+      if (!req.user.courses.includes(course_id) && req.user.role != "teacher") {
         return res.status(404).send("您尚未註冊此課程");
       }
       const foundCourse = await Course.findOne({ _id: course_id });
