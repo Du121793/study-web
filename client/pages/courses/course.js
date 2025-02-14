@@ -1,233 +1,209 @@
 // 組件庫
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import dynamic from "next/dynamic";
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import dynamic from 'next/dynamic'
 // global組件
-import Header from "../../components/global/Header";
+import Header from '../../components/global/Header'
 // method組件
-import { useUserToken } from "../methods/service/useUserToken";
-import userService from "../methods/service/userService";
+import { useUserToken } from '../methods/service/useUserToken'
+import userService from '../methods/service/userService'
 // component
-import VideoUploadComponent from "./uploadVideo";
+import VideoUploadComponent from './uploadVideo'
 export default function userProfile() {
-  // url
-  const backToMyCoursePageUrl = "http://localhost:3000/profiles/profile";
-  const [videos, setVideos] = useState([]);
+  const token = useUserToken()
+  const router = useRouter()
 
-  const token = useUserToken();
-  const router = useRouter();
-  // 假資料
+  // 取出路由，用於useEffect獲取資料
+  const { courseName, courseId } = router.query
 
-  const question = [
-    {
-      id: 1,
-      message: "請問第一集的....",
-      date: "四小時前",
-      studentName: "黃永都",
-      studentId: "11011121",
-    },
-    {
-      id: 2,
-      message: "請問第一集的....",
-      date: "四小時前",
-      studentName: "黃永都",
-      studentId: "11011121",
-    },
-  ];
-  const QAs = [
-    {
-      type: "天文",
-      title: "112-1-1 天文問題",
-      date: "2024年1月1號",
-      time: "下午4點",
-    },
-    {
-      type: "天文",
-      title: "112-1-1 天文問題",
-      date: "2024年1月1號",
-      time: "下午4點",
-    },
-    {
-      type: "天文",
-      title: "112-1-1 天文問題",
-      date: "2024年1月1號",
-      time: "下午4點",
-    },
-    {
-      type: "地質",
-      title: "112-1-1 地質問題",
-      date: "2024年1月1號",
-      time: "下午4點",
-    },
-    {
-      type: "地質",
-      title: "112-1-1 地質問題",
-      date: "2024年1月1號",
-      time: "下午4點",
-    },
-    {
-      type: "無知識點",
-      title: "112-1-1 無知識點問題",
-      date: "2024年1月1號",
-      time: "下午4點",
-    },
-    {
-      type: "大氣",
-      title: "112-1-1 大氣問題",
-      date: "2024年1月1號",
-      time: "下午4點",
-    },
-    {
-      type: "大氣",
-      title: "112-1-1 大氣問題",
-      date: "2024年1月1號",
-      time: "下午4點",
-    },
-    {
-      type: "天然災害",
-      title: "112-1-1 天然災害問題",
-      date: "2024年1月1號",
-      time: "下午4點",
-    },
-    {
-      type: "天然災害",
-      title: "112-1-1 天然災害問題",
-      date: "2024年1月1號",
-      time: "下午4點",
-    },
-  ];
-
-  const types = [...new Set(QAs.map((item) => item.type))];
-  const answer = [{ id: 1, message: "那集的問題......" }];
-
-  const [course_id, setCourse_id] = useState("");
-  const [isLogined, setLogined] = useState(false);
-  const [userInfo, setUserInfo] = useState(null);
+  const [course_id, setCourse_id] = useState('')
+  const [isLogined, setLogined] = useState(false)
+  const [userInfo, setUserInfo] = useState(null)
 
   // locks
-  const [isShowVideoUpload, setIsShowVideoUpload] = useState(false);
-  let videoNavOpen = false;
-  let QaNavOpen = false;
-  // 取出路由，後續新增useEffect獲取資料
-  const { courseName, courseId } = router.query;
-  useEffect(() => {
-    if (courseName) {
-      setCourse_id(courseId);
-    }
-  });
+  const [isShowVideoUpload, setIsShowVideoUpload] = useState(false)
+  let videoNavOpen = false
+  let QaNavOpen = false
 
-  useEffect(() => {
-    (async function () {
-      const responseVideos = await userService.getVideoInfo(token, courseId, {
-        type: "MainClass",
-        page: 1,
-        pageSize: 16,
-        sortBy: "recordDate",
-        sortOrder: "asc",
-      });
-      if (responseVideos) setVideos(responseVideos.foundVideoInfo);
-    })();
-  }, [courseId]);
+  // url
+  const backToMyCoursePageUrl = 'http://localhost:3000/profiles/profile'
+  const [videos, setVideos] = useState([])
 
-  useEffect(() => {
-    console.log(videos);
-  }, [videos]);
-
-  // const videos = [
-  //   { title: "影片標題", date: "2024年1月1號", time: "下午4點" },
-  //   { title: "影片標題", date: "2024年1月1號", time: "下午4點" },
-  //   { title: "影片標題", date: "2024年1月1號", time: "下午4點" },
-  //   { title: "影片標題", date: "2024年1月1號", time: "下午4點" },
-  //   { title: "影片標題", date: "2024年1月1號", time: "下午4點" },
-  //   { title: "影片標題", date: "2024年1月1號", time: "下午4點" },
-  //   { title: "影片標題", date: "2024年1月1號", time: "下午4點" },
-  //   { title: "影片標題", date: "2024年1月1號", time: "下午4點" },
-  //   { title: "影片標題", date: "2024年1月1號", time: "下午4點" },
-  //   { title: "影片標題", date: "2024年1月1號", time: "下午4點" },
-  //   { title: "影片標題", date: "2024年1月1號", time: "下午4點" },
-  //   { title: "影片標題", date: "2024年1月1號", time: "下午4點" },
-  //   { title: "影片標題", date: "2024年1月1號", time: "下午4點" },
-  // ];
-
-  const showVideos = (e) => {
-    const background = e.target.parentNode;
-    if (!videoNavOpen) {
-      // 先移除 height 限制讓內容自然展開，再取得高度
-      background.style.height = "auto";
-      const targetHeight = background.clientHeight + "px";
-      // 設置為初始高度以便開始 transition
-      background.style.height = "80px";
-      // 強制重繪（reflow），然後設置目標高度
-      void background.offsetHeight;
-      background.style.height = targetHeight;
-      videoNavOpen = true;
-    } else {
-      background.style.height = "80px";
-      videoNavOpen = false;
-    }
-  };
-  const showQA = (e) => {
-    const background = e.target.parentNode;
-    if (!QaNavOpen) {
-      // 先移除 height 限制讓內容自然展開，再取得高度
-      background.style.height = "auto";
-      const targetHeight = background.clientHeight + "px";
-      // 設置為初始高度以便開始 transition
-      background.style.height = "80px";
-      // 強制重繪（reflow），然後設置目標高度
-      void background.offsetHeight;
-      background.style.height = targetHeight;
-      QaNavOpen = true;
-    } else {
-      background.style.height = "80px";
-      QaNavOpen = false;
-    }
-  };
-  const closeVideoUploadOnclick = () => {
-    if (isShowVideoUpload) {
-      let videoUpload = document.querySelector(".upload-vidoe-main");
-      let background = document.querySelector(".background");
-      videoUpload.style.height = "0";
-      background.style.display = "none";
-      setIsShowVideoUpload(false);
-    }
-  };
-  const showVideoUploadComponent = () => {
-    if (!isShowVideoUpload) {
-      let videoUpload = document.querySelector(".upload-vidoe-main");
-      let background = document.querySelector(".background");
-      videoUpload.style.height = "640px";
-      background.style.display = "block";
-      setIsShowVideoUpload(true);
-    } else {
-      let videoUpload = document.querySelector(".upload-vidoe-main");
-      videoUpload.style.height = "0";
-      setIsShowVideoUpload(false);
-    }
-  };
+  /* 獲取使用者資料以及是否登陸 */
   useEffect(() => {
     if (token) {
       userService
         .getUserInfo(token)
         .then((data) => {
-          setUserInfo(data);
-          setLogined(true);
+          setUserInfo(data)
+          setLogined(true)
         })
-        .catch((err) => console.error("Error:", err));
+        .catch((err) => console.error('Error:', err.message))
     }
-  }, [token]);
+  }, [token])
+
+  /* 把路由存到course_id */
+  useEffect(() => {
+    if (courseName) {
+      setCourse_id(courseId)
+    }
+  })
+
+  /* 發請求取得課程的影片資訊 */
+  useEffect(() => {
+    ;(async function () {
+      const responseVideos = await userService.getVideoInfo(token, courseId, {
+        type: 'MainClass',
+        page: 1,
+        pageSize: 16,
+        sortBy: 'recordDate',
+        sortOrder: 'asc',
+      })
+      if (responseVideos) setVideos(responseVideos.foundVideoInfo)
+    })()
+  }, [courseId])
+  // 假資料
+  const QAs = [
+    {
+      type: '天文',
+      title: '112-1-1 天文問題',
+      date: '2024年1月1號',
+      time: '下午4點',
+    },
+    {
+      type: '天文',
+      title: '112-1-1 天文問題',
+      date: '2024年1月1號',
+      time: '下午4點',
+    },
+    {
+      type: '天文',
+      title: '112-1-1 天文問題',
+      date: '2024年1月1號',
+      time: '下午4點',
+    },
+    {
+      type: '地質',
+      title: '112-1-1 地質問題',
+      date: '2024年1月1號',
+      time: '下午4點',
+    },
+    {
+      type: '地質',
+      title: '112-1-1 地質問題',
+      date: '2024年1月1號',
+      time: '下午4點',
+    },
+    {
+      type: '無知識點',
+      title: '112-1-1 無知識點問題',
+      date: '2024年1月1號',
+      time: '下午4點',
+    },
+    {
+      type: '大氣',
+      title: '112-1-1 大氣問題',
+      date: '2024年1月1號',
+      time: '下午4點',
+    },
+    {
+      type: '大氣',
+      title: '112-1-1 大氣問題',
+      date: '2024年1月1號',
+      time: '下午4點',
+    },
+    {
+      type: '天然災害',
+      title: '112-1-1 天然災害問題',
+      date: '2024年1月1號',
+      time: '下午4點',
+    },
+    {
+      type: '天然災害',
+      title: '112-1-1 天然災害問題',
+      date: '2024年1月1號',
+      time: '下午4點',
+    },
+  ]
+
+  const types = [...new Set(QAs.map((item) => item.type))]
+
+  /* 點擊影片專區 */
+  const showVideos = (e) => {
+    const background = e.target.parentNode
+    if (!videoNavOpen) {
+      // 先移除 height 限制讓內容自然展開，再取得高度
+      background.style.height = 'auto'
+      const targetHeight = background.clientHeight + 'px'
+      // 設置為初始高度以便開始 transition
+      background.style.height = '80px'
+      // 強制重繪（reflow），然後設置目標高度
+      void background.offsetHeight
+      background.style.height = targetHeight
+      videoNavOpen = true
+    } else {
+      background.style.height = '80px'
+      videoNavOpen = false
+    }
+  }
+
+  /* 點擊QA專區 */
+  const showQA = (e) => {
+    const background = e.target.parentNode
+    if (!QaNavOpen) {
+      // 先移除 height 限制讓內容自然展開，再取得高度
+      background.style.height = 'auto'
+      const targetHeight = background.clientHeight + 'px'
+      // 設置為初始高度以便開始 transition
+      background.style.height = '80px'
+      // 強制重繪（reflow），然後設置目標高度
+      void background.offsetHeight
+      background.style.height = targetHeight
+      QaNavOpen = true
+    } else {
+      background.style.height = '80px'
+      QaNavOpen = false
+    }
+  }
+
+  /* 隱藏上傳影片的介面 */
+  const closeVideoUploadOnclick = () => {
+    if (isShowVideoUpload) {
+      let videoUpload = document.querySelector('.upload-vidoe-main')
+      let background = document.querySelector('.background')
+      videoUpload.style.height = '0'
+      background.style.display = 'none'
+      setIsShowVideoUpload(false)
+    }
+  }
+
+  /* 顯示上傳影片的介面 */
+  const showVideoUploadComponent = () => {
+    if (!isShowVideoUpload) {
+      let videoUpload = document.querySelector('.upload-vidoe-main')
+      let background = document.querySelector('.background')
+      videoUpload.style.height = '640px'
+      background.style.display = 'block'
+      setIsShowVideoUpload(true)
+    } else {
+      let videoUpload = document.querySelector('.upload-vidoe-main')
+      videoUpload.style.height = '0'
+      setIsShowVideoUpload(false)
+    }
+  }
   return (
     <div className="course-main">
-      <div className="background" onClick={closeVideoUploadOnclick}></div>
+      <div
+        className="background"
+        onClick={closeVideoUploadOnclick}></div>
       <Header loginState={isLogined}></Header>
       <div className="container">
         <VideoUploadComponent
           course_id={course_id}
           isShowVideoUpload={isShowVideoUpload}
-          setIsShowVideoUpload={setIsShowVideoUpload}
-        ></VideoUploadComponent>
+          setIsShowVideoUpload={setIsShowVideoUpload}></VideoUploadComponent>
         <div className="header-title-area">
           <div className="course-title">{courseName}</div>
           <Link href={backToMyCoursePageUrl}>
@@ -239,14 +215,15 @@ export default function userProfile() {
           <div
             className="header"
             onClick={(e) => {
-              showVideos(e);
-            }}
-          >
+              showVideos(e)
+            }}>
             影片專區
           </div>
-          {userInfo && userInfo.role === "teacher" && (
+          {userInfo && userInfo.role === 'teacher' && (
             <div className="update-video-area">
-              <div className="button" onClick={showVideoUploadComponent}>
+              <div
+                className="button"
+                onClick={showVideoUploadComponent}>
                 上傳影片
               </div>
             </div>
@@ -255,12 +232,22 @@ export default function userProfile() {
             {videos &&
               videos.map((item) => (
                 <div className="video">
-                  <img src={item.thumbnail} className="videos-shot"></img>
+                  <img
+                    src={item.thumbnail}
+                    className="videos-shot"></img>
                   <div className="info">
                     <div className="title">{item.title}</div>
                     <div className="time">
-                      <div>{item.date}</div>
-                      <div>{item.time}</div>
+                      <div className="day">
+                        <div>{item.date.split(/[-T:.]/)[0]}年</div>
+                        <div>{item.date.split(/[-T:.]/)[1]}月</div>
+                        <div>{item.date.split(/[-T:.]/)[2]}日</div>
+                      </div>
+                      <div className="clock">
+                        {item.date.split(/[-T:.]/)[3] >= 0 && item.date.split(/[-T:.]/)[3] <= 11 && <div>上午{item.date.split(/[-T:.]/)[3]}點</div>}
+                        {item.date.split(/[-T:.]/)[3] >= 13 && item.date.split(/[-T:.]/)[3] <= 23 && <div>下午{item.date.split(/[-T:.]/)[3] - 12}點</div>}
+                        <div>{item.date.split(/[-T:.]/)[4]}分</div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -273,26 +260,29 @@ export default function userProfile() {
             <div
               className="header"
               onClick={(e) => {
-                showQA(e);
-              }}
-            >
+                showQA(e)
+              }}>
               Q & A
             </div>
             <div className="QA-area">
               {/* 2. 迭代每個類型 */}
               {types.map((type) => {
                 // 過濾出此 type 對應的所有 QA
-                const filteredQAs = QAs.filter((qa) => qa.type === type);
+                const filteredQAs = QAs.filter((qa) => qa.type === type)
 
                 return (
-                  <div className="type-section" key={type}>
+                  <div
+                    className="type-section"
+                    key={type}>
                     {/* 類別標題 */}
                     <h2>{type}</h2>
 
                     {/* 3. 逐筆渲染 QA 項目 */}
                     <ul className="qa-list">
                       {filteredQAs.map((qa, index) => (
-                        <li key={index} className="qa-item">
+                        <li
+                          key={index}
+                          className="qa-item">
                           <div className="image"></div>
                           <div className="qa-title">{qa.title}</div>
                           <div className="qa-dateTime">
@@ -302,12 +292,12 @@ export default function userProfile() {
                       ))}
                     </ul>
                   </div>
-                );
+                )
               })}
             </div>
           </div>
         </ul>
       </div>
     </div>
-  );
+  )
 }

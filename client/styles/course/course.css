@@ -95,7 +95,6 @@
   background-color: #ededed;
 }
 .course-main .container .nav .video-area {
-  cursor: pointer;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 24px;
@@ -105,6 +104,7 @@
   background-color: rgb(255, 255, 255);
 }
 .course-main .container .nav .video-area .video {
+  cursor: pointer;
   position: relative;
   border-radius: 4px;
   width: 250px;
@@ -117,6 +117,8 @@
 }
 .course-main .container .nav .video-area .video .videos-shot {
   width: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
 }
 .course-main .container .nav .video-area .video .info {
   position: absolute;
@@ -126,6 +128,7 @@
   background-color: #ffffff;
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 .course-main .container .nav .video-area .video .info .title {
   margin-left: 12px;
@@ -137,6 +140,12 @@
   display: flex;
   gap: 12px;
   font-size: 15px;
+}
+.course-main .container .nav .video-area .video .info .time .day {
+  display: flex;
+}
+.course-main .container .nav .video-area .video .info .time .clock {
+  display: flex;
 }
 .course-main .container .nav .video-area .video:hover {
   border: 1px solid rgb(0, 0, 0);
