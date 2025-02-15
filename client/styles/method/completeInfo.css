@@ -3,33 +3,54 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 }
 .complate-info-main .form {
+  padding: 32px;
   margin-top: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 800px;
-  height: 800px;
+  gap: 12px;
   background-color: #fff;
   border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 .complate-info-main .form .title {
+  font-weight: bold;
   font-size: 24px;
-  margin-top: 24px;
 }
 .complate-info-main .form .inputs {
+  display: flex;
+  align-items: center;
   margin-top: 24px;
+  gap: 12px;
+}
+.complate-info-main .form .inputs .user-input {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
-.complate-info-main .form .submit-btn {
+.complate-info-main .form .inputs .user-input span {
+  font-weight: bold;
+  margin-right: 4px;
+}
+.complate-info-main .form .inputs .submit-btn {
+  height: 100%;
+  display: flex;
+  align-items: center;
   cursor: pointer;
-  background-color: #76e270;
-  width: 62px;
-  height: 36px;
+}
+.complate-info-main .form .inputs .submit-btn button {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  padding: 12px;
   font-size: 18px;
-  margin-top: 24px;
+  font-weight: bold;
+  background-color: #87e982;
+  transition: 0.1s;
+}
+.complate-info-main .form .inputs .submit-btn button:hover {
+  background-color: #7ad176;
 }/*# sourceMappingURL=completeInfo.css.map */

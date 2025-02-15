@@ -1,129 +1,102 @@
+'use client'
 // 組件庫
-import { use, useEffect } from 'react'
-// 導入方法
+import { useEffect, useState } from 'react'
+// 導入methmod
 import adminService from '../methods/service/adminService'
 import { useUserToken } from '../methods/service/useUserToken'
+
 export default function PreRegister() {
-  // 這裡改為儲存平鋪的使用者物件，而非陣列的陣列
+  const token = useUserToken()
+  const [getCourses, setGetCourses] = useState([])
+  // 選擇身分組變換
+  const [chooseRole, setChooseRole] = useState('')
+  // 使用 state 儲存所有使用者輸入的行資料
+  const [inputRows, setInputRows] = useState([{ name: '', grade: '', phone: '' }])
+  // 儲存最後要提交的使用者資料
   let users = []
   let Busers = []
-  const token = useUserToken()
 
+  // 獲取課程給select
+  useEffect(() => {
+    if (token) {
+      try {
+        adminService.getCourses(token).then((res) => {
+          setGetCourses(res.courses)
+        })
+      } catch (e) {
+        console.log(e)
+      }
+    }
+  }, [token])
+
+  // 處理各欄位輸入
+  const handleInputChange = (index, field, value) => {
+    const newRows = [...inputRows]
+    newRows[index] = { ...newRows[index], [field]: value }
+    setInputRows(newRows)
+
+    // 當在最後一行的電話欄位輸入第一個字時，新增一行
+    if (field === 'phone' && value.length === 1 && index === inputRows.length - 1) {
+      setInputRows([...newRows, { name: '', grade: '', phone: '' }])
+    }
+  }
+
+  // 提交按鈕
   const submitBtnClick = () => {
-    const role = document.querySelector('.chose-role').value
-    if (!role) {
+    if (!chooseRole) {
       alert('請先選擇身分組')
       return
     }
 
-    // 取得 .copy-area 下的所有「行」
-    const rowDivs = document.querySelectorAll('.copy-area > div')
+    // 檢查每一行資料
+    const userArray = inputRows
+      .filter((row) => row.name.trim() !== '' || row.phone.trim() !== '' || row.grade.trim() !== '')
+      .map((row) => ({
+        realname: row.name.trim(),
+        phoneNumber: row.phone.trim(),
+        grade: row.grade.trim(),
+        role: chooseRole,
+      }))
 
-    // 用來存放使用者輸入的每筆資料
-    let userArray = []
-
-    rowDivs.forEach((row) => {
-      // 取出每行中的 name 與 phone 輸入欄位
-      const nameInput = row.querySelector('.name-input')
-      const phoneInput = row.querySelector('.phone-input')
-      const gradeInput = row.querySelector('.grade-input')
-
-      if (nameInput && phoneInput) {
-        const nameValue = nameInput.value.trim()
-        const phoneValue = phoneInput.value.trim()
-        const gradeValue = gradeInput.value.trim()
-
-        // 若該行有輸入資料就組成物件
-        if (nameValue !== '' || phoneValue !== '' || gradeValue !== '') {
-          userArray.push({
-            realname: nameValue,
-            phoneNumber: phoneValue,
-            grade: gradeValue,
-            role: role,
-          })
-        }
-      }
-    })
-
-    // 檢查新資料中是否有重複的物件 (與 users 陣列內已有的比較)
-    const duplicateFound = userArray.some((newUser) => users.some((existingUser) => existingUser.name === newUser.name && existingUser.phone === newUser.phone && existingUser.role === newUser.role))
+    // 檢查重複
+    const duplicateFound = userArray.some((newUser) => users.some((existingUser) => existingUser.realname === newUser.realname && existingUser.phoneNumber === newUser.phoneNumber && existingUser.role === newUser.role))
 
     if (duplicateFound) {
       alert('警告：已有相同的使用者資料')
       return
     }
 
-    // 沒有重複才將新資料加入 users 陣列
+    // 將新資料加入 users 陣列
     userArray.forEach((user) => users.push(user))
     console.log('收集到的資料：', userArray)
     console.log('目前的所有資料：', users)
 
-    // 重置 input 欄位到初始狀態：
-    // 清空 .copy-area 內容，並重新插入初始那一行
-    const copyArea = document.querySelector('.copy-area')
-    copyArea.innerHTML = `
-      <div>
-        <div class="form-title">姓名:</div>
-        <input class="input name-input" type="text" />
-        <div class="form-title">年級:</div>
-        <input class="input grade-input" type="text" />
-        <div class="form-title">電話:</div>
-        <input class="input phone-input" type="text" />
-      </div>
-    `
-    // 重置下拉選單為預設值
-    document.querySelector('.chose-role').value = ''
-
-    // {userinfo , role}
-    users.map((item) => {
-      console.log(item)
+    // 組裝要送出的資料格式 (範例中 Busers 的結構)
+    userArray.forEach((item) => {
       let userinfo = {
         realname: item.realname,
         phoneNumber: item.phoneNumber,
         grade: item.grade,
       }
-      Busers.push({ userinfo }, role)
+      Busers.push({ userinfo, role: item.role })
     })
+
     adminService.preRegisterUser(token, Busers).then((res) => {
       console.log(res)
     })
+
+    // 重置 state，用於清空欄位
+    setInputRows([{ name: '', grade: '', phone: '' }])
+    setChooseRole('')
   }
 
-  useEffect(() => {
-    const area = document.querySelector('.copy-area')
+  // 切換身分組
+  const switchRoleOption = (value) => {
+    console.log(getCourses)
+    console.log(getCourses)
+    setChooseRole(value)
+  }
 
-    // 當使用者在電話欄位輸入第一個字時，自動新增一行
-    const handleInput = (event) => {
-      if (event.target.matches('.phone-input')) {
-        const inputValue = event.target.value
-        if (inputValue.length === 1) {
-          area.insertAdjacentHTML(
-            'beforeend',
-            `
-            <div>
-              <div class="form-title">姓名:</div>
-              <input class="input name-input" type="text" />
-              <div class="form-title">年級:</div>
-              <input class="input grade-input" type="text" />
-              <div class="form-title">電話:</div>
-              <input class="input phone-input" type="text" />
-            </div>
-            `
-          )
-        }
-      }
-    }
-
-    // 監聽 .copy-area 的 input 事件
-    area.addEventListener('input', handleInput)
-
-    // 清除監聽器 (避免 React 18 Strict Mode 重複掛載)
-    return () => {
-      area.removeEventListener('input', handleInput)
-    }
-  }, [])
-
-  // layout
   return (
     <div className="preRegister-main">
       <div className="header">
@@ -133,32 +106,57 @@ export default function PreRegister() {
         <div className="form-line">
           {/* 選擇身分組 */}
           <div className="form-select">
-            <div className="form-title">選擇身分組</div>
-            <select className="chose-role">
-              <option value="">請選擇</option>
-              <option value="teacher">老師</option>
-              <option value="student">學生</option>
-            </select>
-          </div>
-          <div className="copy-area">
-            {/* 初始那一行 */}
-            <div>
-              <div className="form-title">姓名:</div>
-              <input
-                className="input name-input"
-                type="text"
-              />
-              <div className="form-title">年級:</div>
-              <input
-                className="input grade-input"
-                type="text"
-              />
-              <div className="form-title">電話:</div>
-              <input
-                className="input phone-input"
-                type="text"
-              />
+            <div className="choose-role-cantainer">
+              選擇身分組
+              <select
+                className="chose-role"
+                value={chooseRole}
+                onChange={(e) => switchRoleOption(e.target.value)}>
+                <option value="">請選擇</option>
+                <option value="teacher">老師</option>
+                <option value="student">學生</option>
+              </select>
             </div>
+            <div className="choose-course-cantainer">
+              選擇要直接加入的課程
+              <select className="chose-course">
+                <option value="">請選擇</option>
+                {getCourses && getCourses.map((item) => <option value={item._id}>{item.courseName}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className="copy-area">
+            {inputRows.map((row, index) => (
+              <div key={index}>
+                <div className="form-title">姓名:</div>
+                <input
+                  className="input name-input"
+                  type="text"
+                  value={row.name}
+                  onChange={(e) => handleInputChange(index, 'name', e.target.value)}
+                />
+                {/* 如果是學生，顯示年級欄位 */}
+                {chooseRole === 'student' && (
+                  <>
+                    <div className="form-title">年級:</div>
+                    <input
+                      className="input grade-input"
+                      type="text"
+                      value={row.grade}
+                      onChange={(e) => handleInputChange(index, 'grade', e.target.value)}
+                    />
+                  </>
+                )}
+                <div className="form-title">電話:</div>
+                <input
+                  className="input phone-input"
+                  type="text"
+                  value={row.phone}
+                  onChange={(e) => handleInputChange(index, 'phone', e.target.value)}
+                />
+              </div>
+            ))}
           </div>
         </div>
       </div>

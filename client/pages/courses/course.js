@@ -11,6 +11,9 @@ import { useUserToken } from '../methods/service/useUserToken'
 import userService from '../methods/service/userService'
 // component
 import VideoUploadComponent from './uploadVideo'
+// public
+import downArrow from '../../public/course/downArrow.png'
+import leftArrow from '../../public/course/leftArrow.png'
 export default function userProfile() {
   const token = useUserToken()
   const router = useRouter()
@@ -28,6 +31,7 @@ export default function userProfile() {
   let QaNavOpen = false
 
   // url
+  const baseUrl = 'http://localhost:3000/'
   const backToMyCoursePageUrl = 'http://localhost:3000/profiles/profile'
   const [videos, setVideos] = useState([])
 
@@ -50,20 +54,9 @@ export default function userProfile() {
       setCourse_id(courseId)
     }
   })
-
-  /* 發請求取得課程的影片資訊 */
   useEffect(() => {
-    ;(async function () {
-      const responseVideos = await userService.getVideoInfo(token, courseId, {
-        type: 'MainClass',
-        page: 1,
-        pageSize: 16,
-        sortBy: 'recordDate',
-        sortOrder: 'asc',
-      })
-      if (responseVideos) setVideos(responseVideos.foundVideoInfo)
-    })()
-  }, [courseId])
+    getCourseVideos()
+  }, [token, courseId])
   // 假資料
   const QAs = [
     {
@@ -129,9 +122,29 @@ export default function userProfile() {
   ]
 
   const types = [...new Set(QAs.map((item) => item.type))]
-
+  const getCourseVideos = () => {
+    if (token && courseId) {
+      try {
+        userService
+          .getVideoInfo(token, courseId, {
+            type: 'MainClass',
+            page: 1,
+            pageSize: 16,
+            sortBy: 'recordDate',
+            sortOrder: 'asc',
+          })
+          .then((res) => {
+            console.log(res)
+            setVideos(res.foundVideoInfo)
+          })
+      } catch (e) {
+        console.log(e)
+      }
+    }
+  }
   /* 點擊影片專區 */
   const showVideos = (e) => {
+    console.log(videos)
     const background = e.target.parentNode
     if (!videoNavOpen) {
       // 先移除 height 限制讓內容自然展開，再取得高度
@@ -206,7 +219,14 @@ export default function userProfile() {
           setIsShowVideoUpload={setIsShowVideoUpload}></VideoUploadComponent>
         <div className="header-title-area">
           <div className="course-title">{courseName}</div>
-          <Link href={backToMyCoursePageUrl}>
+          <Link
+            className="back-to-course-btn"
+            href={backToMyCoursePageUrl}>
+            <Image
+              src={leftArrow}
+              alt="back of course page button icon"
+              width={24}
+              height={24}></Image>
             <div className="home-btn">回到我的課程</div>
           </Link>
         </div>
@@ -217,7 +237,12 @@ export default function userProfile() {
             onClick={(e) => {
               showVideos(e)
             }}>
-            影片專區
+            <Image
+              src={downArrow}
+              alt="open video nav's icon"
+              width={40}
+              height={40}></Image>
+            <span>影片專區</span>
           </div>
           {userInfo && userInfo.role === 'teacher' && (
             <div className="update-video-area">
@@ -231,7 +256,9 @@ export default function userProfile() {
           <div className="video-area">
             {videos &&
               videos.map((item) => (
-                <div className="video">
+                <Link
+                  href={`${baseUrl}videoPlay/player?course_name=${courseName}&video_id=${item._id}&course_id=${courseId}&info=${[item.description, item.title, item.date]}`}
+                  className="video">
                   <img
                     src={item.thumbnail}
                     className="videos-shot"></img>
@@ -250,7 +277,7 @@ export default function userProfile() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
           </div>
         </ul>
@@ -262,7 +289,12 @@ export default function userProfile() {
               onClick={(e) => {
                 showQA(e)
               }}>
-              Q & A
+              <Image
+                src={downArrow}
+                alt="open Q & A nav's icon"
+                width={40}
+                height={40}></Image>
+              <span>Q & A</span>
             </div>
             <div className="QA-area">
               {/* 2. 迭代每個類型 */}

@@ -1,9 +1,12 @@
+// 組件庫
 import Image from 'next/image'
-import lineIcon from '../../public/imgs/line.png'
 import Link from 'next/link'
-import logo from '../../public/imgs/logo.jpg'
 import { useEffect, useState } from 'react'
 import { useUserToken } from '../../pages/methods/service/useUserToken'
+// public
+import lineIcon from '../../public/imgs/line.png'
+import logo from '../../public/imgs/logo.jpg'
+// method
 import userService from '../../pages/methods/service/userService'
 export default function Header(loginState) {
   const [userInfo, setUserInfo] = useState(null)

@@ -21,10 +21,20 @@
       display: flex;
       align-items: center;
       position: relative;
-      .home-btn {
-        cursor: pointer;
-        position: absolute;
-        right: 0;
+      justify-content: space-between;
+
+      .back-to-course-btn {
+        color: black;
+        background-color: #fafafa;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 8px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        transition: 0.2s;
+      }
+      .back-to-course-btn:hover {
+        background-color: #ececec;
       }
     }
     .course-title {
@@ -46,12 +56,15 @@
       transition: height 0.3s ease;
       overflow: hidden;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      background-color: rgba(0, 0, 0, 0.6);
       margin-bottom: 24px;
       .header {
+        font-weight: bold;
+        color: #e0e0e0;
         padding-left: 24px;
         user-select: none;
         border-radius: 8px;
-        background-color: #dbebe6fd;
+        background-color: rgba(0, 0, 0, 0.6);
         display: flex;
         cursor: pointer;
         align-items: center;
@@ -60,6 +73,7 @@
         min-height: 80px;
         font-size: 20px;
         z-index: 1;
+        gap: 12px;
         div {
           padding-left: 24px;
         }
@@ -112,6 +126,7 @@
             object-fit: cover;
           }
           .info {
+            color: black;
             position: absolute;
             bottom: 0;
             width: 100%;
@@ -126,6 +141,7 @@
               width: 100%;
             }
             .time {
+              color: rgba(0, 0, 0, 0.574);
               margin-left: 12px;
               display: flex;
               gap: 12px;

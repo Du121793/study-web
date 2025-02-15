@@ -2,11 +2,31 @@
   display: flex;
   flex-direction: column;
   max-width: 100vw;
-    overflow-x: hidden;
+  overflow-x: hidden;
   .header {
     height: 60px;
     width: 100%;
-    background-color: #fff;
+    background-color: #282828;
+    display: flex;
+    justify-content: space-between;
+    .logos {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      background-color: #fff;
+      margin-left: 64px;
+    }
+    .user-shot {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 120px;
+      height: 100%;
+      background-color: #fff;
+      margin-right: 64px;
+    }
   }
 
   //   父級，包著播放器與列表與影片資訊
@@ -24,7 +44,6 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-right: 2px;
 
       iframe {
         transition: 0.3s;
@@ -34,9 +53,34 @@
       }
 
       .video-info {
+        border-radius: 12px;
         width: 100%;
-        background-color: #fff;
         padding: 16px 0 16px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        background-color: #fff;
+        .title {
+          padding-left: 40px;
+          font-size: 24px;
+          font-weight: 500;
+        }
+        .introduce {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          margin-left: 40px;
+          background-color: #f2f2f2;
+          height: 220px;
+          width: 80%;
+          min-width: 600px;
+          padding: 18px;
+          border-radius: 8px;
+          .time {
+            font-size: 15px;
+            display: flex;
+          }
+        }
       }
     }
 
@@ -78,7 +122,7 @@
       overflow-y: scroll;
       overflow-x: hidden;
       border-top: 1px solid rgba(0, 0, 0, 0.2);
-      background-color: #fff;
+      background-color: #f6f6f6;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -90,7 +134,7 @@
       right: 0;
 
       .title {
-        min-width: 300px;
+        width: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -106,18 +150,52 @@
         }
       }
 
-      ul {
-        min-width: 300px;
+      .selections {
         width: 100%;
         list-style: none;
         margin: 0;
         padding: 0;
-        li {
+        .option-lv1 {
+          position: relative;
+          cursor: pointer;
           border-bottom: 1px solid #ccc;
-          height: 60px;
-          display: flex;
-          align-items: center;
-          padding-left: 16px;
+          // height: 60px;
+          // display: flex;
+          // flex-direction: column;
+          // justify-content: center;
+          // overflow: hidden;
+
+          .episodes {
+            pointer-events: none;
+            background-color: #282828;
+            // overflow: hidden;
+            width: 100%;
+            height: 0;
+            transition: 0.3s;
+            .option-lv2 {
+              height: 60px;
+            }
+          }
+          .option-header {
+            pointer-events: none;
+            padding-left: 6px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            .open-list-arrow {
+              pointer-events: none;
+              margin-right: 12px;
+            }
+            .video-list-title {
+              height: 60px;
+              display: flex;
+              align-items: center;
+            }
+          }
+        }
+        .option-header.active {
+          border: 2px solid rgb(191, 243, 149);
         }
       }
     }

@@ -202,6 +202,7 @@ export default function VimeoUploadPage({ isShowVideoUpload, setIsShowVideoUploa
       uploadUrl: upUrl,
       chunkSize: 5 * 1024 * 1024,
       uploadLength: videoFile.size,
+      // 失敗
       onError: async (error) => {
         console.error('TUS 上傳失敗:', error)
         setUploads((prev) => prev.map((u) => (u.id === uploadId ? { ...u, message: '上傳失敗', progress: 0 } : u)))
@@ -215,13 +216,15 @@ export default function VimeoUploadPage({ isShowVideoUpload, setIsShowVideoUploa
           }
         }
       },
+      // 進行中
       onProgress: (bytesUploaded, bytesTotal) => {
         // 目前上傳進度
         const pct = ((bytesUploaded / bytesTotal) * 100).toFixed(2)
         setUploads((prev) => prev.map((u) => (u.id === uploadId ? { ...u, progress: pct, message: '上傳中' } : u)))
       },
+      // 成功
       onSuccess: () => {
-        console.log('影片上傳完成')
+        console.log('TUS 上傳成功:')
         setUploads((prev) => prev.filter((u) => u.id !== uploadId))
       },
     })
@@ -232,7 +235,6 @@ export default function VimeoUploadPage({ isShowVideoUpload, setIsShowVideoUploa
     <div>
       <div className="upload-vidoe-main">
         <h1 className="title">影片上傳</h1>
-
         <div className="section">
           <label className="label">上傳影片檔案:</label>
           <input
