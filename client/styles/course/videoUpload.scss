@@ -1,4 +1,3 @@
-/* 原有上傳元件樣式 */
 .upload-vidoe-main {
   position: fixed;
   top: 50%;
@@ -69,36 +68,122 @@
     }
   }
 }
-
-/* 右下角上傳進度顯示區塊 */
+/* 外層容器：固定在右下角 */
 .upload-progress-container {
-  background-color: #969696;
   position: fixed;
   bottom: 20px;
   right: 20px;
   z-index: 1100;
+  width: 320px;
+  /* 半透明背景 + 滑入效果 */
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  padding: 12px;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
+/* 單個上傳任務區塊 */
 .upload-progress-item {
   display: flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 8px;
+  flex-direction: column;
+  padding: 12px;
   margin-top: 8px;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* 第一行：標題、狀態、按鈕 */
+.header-row {
+  display: flex;
+  align-items: center;
+}
+
+/* 用於顯示上傳中時的轉圈 */
 .spinner {
-  border: 4px solid #f3f3f3; /* 淡灰色 */
-  border-top: 4px solid #3498db; /* 藍色 */
+  width: 18px;
+  height: 18px;
+  border: 3px solid #f3f3f3; /* 淡灰 */
+  border-top: 3px solid #3498db; /* 藍色 */
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  animation: spin 2s linear infinite;
-  margin-right: 8px;
+  animation: spin 1s linear infinite;
 }
 
+/* 若上傳或連結建立失敗 → 顯示叉叉或警示圖示 */
+.fail-icon {
+  font-size: 18px;
+  color: #e74c3c;
+}
+
+/* 檔案資訊容器：包含 file-name & status-message */
+.file-info {
+  display: flex;
+  flex-direction: column;
+  margin-left: 8px;
+  min-width: 0; /* 防止 flex 收縮影響 text-overflow */
+}
+
+/* 檔案名稱太長時加上省略號 */
+.file-name {
+  font-weight: 500;
+  color: #333;
+  max-width: 140px; /* 根據需求自行調整 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 狀態文字（例如 35% or 上傳失敗…） */
+.status-message {
+  margin-top: 2px;
+  color: #666;
+  font-size: 13px;
+}
+
+/* 右側的按鈕容器 */
+.actions {
+  margin-left: auto;
+}
+
+.actions button {
+  background: #ddd;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: 6px;
+  color: #333;
+  transition: background-color 0.2s;
+}
+
+.actions button:hover {
+  background: #bbb;
+}
+.actions button:active {
+  transform: scale(0.96);
+}
+
+/* 進度條外層容器 */
+.progress-bar-container {
+  margin-top: 8px; /* 與上方間距 */
+  width: 100%;
+  height: 6px;
+  background-color: #eee;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+/* 進度條本體 */
+.progress-bar {
+  height: 100%;
+  background-color: #3498db; /* 可換成你想要的顏色 */
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+/* 轉圈圈動畫 */
 @keyframes spin {
   0% {
     transform: rotate(0deg);

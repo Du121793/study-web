@@ -11,7 +11,7 @@ const userService = {
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.get(USER_URL, { headers: authHeader })
-      return response.data
+      return response.data.data
     } catch (error) {
       console.log(error)
     }
@@ -25,7 +25,7 @@ const userService = {
         headers: authHeader,
         params: course_id,
       })
-      return response.data
+      return response.data.data
     } catch (e) {
       console.log(e)
     }
@@ -37,7 +37,7 @@ const userService = {
     // type 類型 MainClass為正課 QA為問答 noImg非必填 傳入true則不回傳縮圖
     // sortBy 排序欄位: length(影片長度) 或 recordDate(錄影日期)
     // sortOrder  排序順序 'asc'(正序) 或 'desc'(倒序)
-
+    console.log(filter)
     try {
       const authHeader = token ? { Authorization: token } : {}
       console.log(COURSE_URL + `/${course_id}/videoInfo`)
@@ -45,7 +45,8 @@ const userService = {
         headers: authHeader,
         params: filter,
       })
-      return response.data
+      console.log('msg', response.data.data)
+      return response.data.data
     } catch (e) {
       console.log(e)
     }
@@ -58,7 +59,7 @@ const userService = {
         headers: authHeader,
         params: { videoId: video_id },
       })
-      return response.data.embedLink
+      return response.data.data.embedLink
     } catch (e) {
       console.log(e)
     }
@@ -72,9 +73,9 @@ const userService = {
         realname,
         phoneNumber,
       })
-      return response.data
+      return response.data.data
     } catch (e) {
-      console.log(e)
+      return { success: false, msg: e.response.data.msg }
     }
   },
 }

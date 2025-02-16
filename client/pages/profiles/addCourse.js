@@ -7,14 +7,31 @@ import { useUserToken } from '../methods/service/useUserToken'
 import MenberSelector from './memberSelector'
 
 export default function studentCourse() {
+  const token = useUserToken()
   // 子組件
   const [selectedStudentId, setSelectedStudentId] = useState([])
+  const [createdCourseId, setCreatedCourseId] = useState('')
   // 父組件 (目前)
   const [message, setMessage] = useState('')
   const [grade, setGrade] = useState('')
   const [subject, setSubject] = useState('')
   const [courseClass, setCourseClass] = useState('')
   const [courseName, setCourseName] = useState('')
+
+  // 請求參數
+  let courseInfo = {}
+
+  // 初始化總課程名稱
+  useEffect(() => {
+    setCourseName(grade + courseClass + subject)
+  }, [grade, courseClass, subject])
+
+  // createdCourseId改變時執行加入課程的請求，用於同步
+  useEffect(() => {
+    addStudentIntoNewCourse()
+  }, [createdCourseId])
+
+  // 初始化
   const initGrade = (e) => {
     setGrade(e.target.value)
   }
@@ -28,81 +45,71 @@ export default function studentCourse() {
     const value = e.target.value
     setCourseName(value)
   }
-  useEffect(() => {
-    setCourseName(grade + courseClass + subject)
-  }, [grade, courseClass, subject])
 
-  const token = useUserToken()
-  const requireCreateCourse = async () => {
+  // 將學生加進課程的請求，在createdCourseId改變時會執行
+  const addStudentIntoNewCourse = () => {
+    const alert = document.querySelector('.alert')
+    // 如果有選擇學生
+    if (selectedStudentId.length && createdCourseId) {
+      // 批量成員加進指定課程
+      adminService
+        .registerMember(token, {
+          user_ids: selectedStudentId,
+          course_id: createdCourseId,
+        })
+        .then((res) => {
+          // 除錯
+          console.error(res)
+          alert.style.backgroundColor = '#a0db6c'
+        })
+    }
+  }
+  // 新增按鈕
+  const requireCreateCourse = () => {
     // 參數
-    const courseInfo = {
-      grade,
-      subject,
-      courseClass,
-      courseName,
+    courseInfo = {
+      grade: grade.trim(),
+      subject: subject.trim(),
+      courseClass: courseClass.trim(),
+      courseName: courseName.trim(),
     }
     const alert = document.querySelector('.alert')
-    // 第一層try
+    // 請求
     try {
-      const a = async (token, courseInfo) => {
-        // 第二層try
-        try {
-          const res = await adminService.createANewCourse(token, courseInfo)
-          if (Array.isArray(selectedStudentId) && selectedStudentId.length > 0) {
-            await adminService.registerMember(token, {
-              user_ids: selectedStudentId,
-              course_id: res.savedCourse._id,
-            })
-            setMessage('課程創建成功!')
-          }
-          if (res.success) {
-            setMessage('課程創建成功!')
-          } else {
-            console.log(res.success)
-          }
-          // 開關警告
-          alert.style.backgroundColor = '#a0db6c'
-          alert.style.opacity = '1'
-          alert.style.height = '60px'
-          setTimeout(() => {
-            alert.style.opacity = '0'
-            alert.style.height = '0'
-          }, 2000)
-          // 第二層 catch
-        } catch (error) {
-          if (error.response.data === '你已經有一樣名稱，科目，年級，班級的課程了') {
-            console.log(error.response.data)
-            setMessage('你已經有一樣名稱，科目，年級，班級的課程了')
-          } else if (error.response.data === '資料提供不完整') {
-            console.log(error.response.data)
-            setMessage('資料提供不完整')
-          } else {
-            setMessage('不知名錯誤')
-            console.log(error)
-          }
-          // 開關警告
+      // 創建新課程
+      adminService.createANewCourse(token, courseInfo).then((res) => {
+        // 檢查是否回傳res.success
+        if (res.success === false) {
           alert.style.backgroundColor = 'red'
-          alert.style.opacity = '1'
-          alert.style.height = '60px'
-          setTimeout(() => {
-            alert.style.opacity = '0'
-            alert.style.height = '0'
-          }, 2000)
+          setMessage(`課程創建失敗!${res.msg}`)
+        } else if (res.courseName) {
+          alert.style.backgroundColor = '#a0db6c'
+          setMessage(`課程創建成功!`)
+          setCreatedCourseId(res._id)
         }
-      }
-      a(token, courseInfo)
-      // 第一層 catch
+      })
     } catch (error) {
-      console.log(error)
+      // 紅色警告
+      alert.style.backgroundColor = 'red'
+      setMessage(`發生不明錯誤!${error}`)
     }
+    // 開關警告
+    alert.style.opacity = '1'
+    alert.style.height = '60px'
+    setTimeout(() => {
+      alert.style.opacity = '0'
+      alert.style.height = '0'
+    }, 2000)
     // 清空輸入欄位
     setGrade('')
     setCourseClass('')
     setSubject('')
     setCourseName('')
   }
+
   return (
     <div className="register-course-container">
+      <div className="register-page-header">創建課程系統</div>
       <div className="alert">{message}</div>
       <div className="btns">
         <button
@@ -113,18 +120,18 @@ export default function studentCourse() {
             setSubject('')
             setCourseName('')
           }}>
-          清除
+          清除欄位
         </button>
         <button
           className="submit-form-btn"
           onClick={requireCreateCourse}>
-          新增
+          創建課程
         </button>
       </div>
       <div className="form">
         <div className="form-inputs">
           <div className="form-input-area">
-            <span>年級:</span>
+            <div className="form-input-title">年級:</div>
             <input
               onChange={initGrade}
               className="form-input"
@@ -132,14 +139,11 @@ export default function studentCourse() {
               type="text"
               value={grade}
             />
-            <Image
-              className="down-arrow-img"
-              alt="open grade options btn"
-              src={downArrowImg}></Image>
+            <div className="hint">例如:學年度</div>
           </div>
 
           <div className="form-input-area">
-            <span>科目:</span>
+            <div className="form-input-title">科目:</div>
             <input
               onChange={initCourseClass}
               className="form-input"
@@ -147,14 +151,11 @@ export default function studentCourse() {
               type="text"
               value={courseClass}
             />
-            <Image
-              className="down-arrow-img"
-              alt="open subject options btn"
-              src={downArrowImg}></Image>
+            <div className="hint">例如:化學、物理</div>
           </div>
 
           <div className="form-input-area">
-            <span>班級:</span>
+            <div className="form-input-title">班級:</div>
             <input
               onChange={initSubject}
               className="form-input"
@@ -162,14 +163,11 @@ export default function studentCourse() {
               type="text"
               value={subject}
             />
-            <Image
-              className="down-arrow-img"
-              alt="open courseClass options btn"
-              src={downArrowImg}></Image>
+            <div className="hint">例如:甲班，A班</div>
           </div>
 
           <div className="form-input-area">
-            <span>課程名稱:</span>
+            <div className="form-input-title">課程名稱:</div>
             <input
               onChange={initCourseName}
               className="form-input"
@@ -177,15 +175,11 @@ export default function studentCourse() {
               type="text"
               value={courseName}
             />
+            <div className="hint">此處會自動生成最終名稱</div>
           </div>
         </div>
-        <div className="hints">
-          <div className="hint">例如:學年度</div>
-          <div className="hint">例如:化學、物理</div>
-          <div className="hint">例如:甲班，A班</div>
-          <div className="hint">此處會自動生成最終名稱，也可直接更改為自訂義名稱</div>
-        </div>
       </div>
+      <div className="gray-hint">可從底部選擇學生直接加入創建的新課程</div>
       <div className="child-component">
         <MenberSelector
           selectedStudentId={selectedStudentId}

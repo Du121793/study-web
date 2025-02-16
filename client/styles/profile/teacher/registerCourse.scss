@@ -12,50 +12,10 @@
   width: 60vw;
   max-width: 1000px;
   min-width: 600px;
-  .sumbits {
-    margin-top: 24px;
-    display: flex;
-    gap: 24px;
-    .submit {
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: #86e859a1;
-      transition: 0.2s;
-      border: 2px solid rgb(209, 209, 209);
-      border-radius: 4px;
-      width: 111px;
-      height: 32px;
-    }
-    .submit:hover {
-      background-color: #abd690;
-    }
-    .remove {
-      background-color: #e67c58a1;
-    }
-    .remove:hover {
-      background-color: #ca6b4ba1;
-    }
+  .register-cursor-page-header {
+    font-size: 28px;
   }
 
-  .alert {
-    position: absolute;
-    font-weight: bold;
-    display: flex;
-    overflow: hidden;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(0, 0, 0, 0);
-    background-color: rgba(0, 0, 0, 0);
-    transition: 0.5s;
-    border-radius: 8px;
-    font-size: 20px;
-    padding: 0 24px 0 24px;
-    height: 0;
-    opacity: 1;
-    margin-bottom: 24px;
-  }
   .search-input-area {
     display: flex;
     align-items: center;
@@ -63,6 +23,7 @@
     flex-wrap: wrap;
     gap: 8px;
     width: 100%;
+    margin-top: 12px;
     .option-area {
       display: flex;
       align-items: center;
@@ -109,5 +70,50 @@
     button:hover {
       background-color: #d7d7d7;
     }
+  }
+
+  .sumbits {
+    margin-top: 24px;
+    display: flex;
+    gap: 24px;
+    .submit {
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #86e859a1;
+      transition: 0.2s;
+      border: 2px solid rgb(209, 209, 209);
+      border-radius: 4px;
+      width: 111px;
+      height: 32px;
+    }
+    .submit:hover {
+      background-color: #abd690;
+    }
+    .remove {
+      background-color: #e67c58a1;
+    }
+    .remove:hover {
+      background-color: #ca6b4ba1;
+    }
+  }
+
+  .alert {
+    position: absolute;
+    font-weight: bold;
+    display: flex;
+    overflow: hidden;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0, 0, 0, 0);
+    background-color: rgba(0, 0, 0, 0);
+    transition: 0.5s;
+    border-radius: 8px;
+    font-size: 20px;
+    padding: 0 24px 0 24px;
+    height: 0;
+    opacity: 1;
+    margin-bottom: 24px;
   }
 }

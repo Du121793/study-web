@@ -27,11 +27,18 @@ const videoInfoSchema = new Schema({
   },
   recordDate: {
     type: Date,
+    default: Date.now,
+  },
+  isUploadSuccess: {
+    type: Boolean,
+    default: false,
   },
   date: {
     type: Date,
     default: Date.now,
   },
 });
+
+videoInfoSchema.index({ isUploadSuccess: 1, date: 1 });
 
 module.exports = mongoose.model("VideoInfo", videoInfoSchema);

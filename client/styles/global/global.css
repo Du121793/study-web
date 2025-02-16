@@ -16,6 +16,10 @@ input {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
+select {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
 ul,
 li {
   list-style: none;

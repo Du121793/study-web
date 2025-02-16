@@ -1,206 +1,253 @@
 // 引用page/profiles下的組件
-import DeleteCourse from "../../pages/profiles/deleteCourse";
-import AddCourse from "../../pages/profiles/addCourse";
-import MyCourse from "../../pages/profiles/myCourse";
-import RegisterCourse from "../../pages/profiles/registerCourse";
-import UserProfile from "../../pages/profiles/userProfile";
-import PreRegister from "../../pages/profiles/preRegister";
+import DeleteCourse from '../../pages/profiles/deleteCourse'
+import AddCourse from '../../pages/profiles/addCourse'
+import MyCourse from '../../pages/profiles/myCourse'
+import RegisterCourse from '../../pages/profiles/registerCourse'
+import UserProfile from '../../pages/profiles/userProfile'
+import PreRegister from '../../pages/profiles/preRegister'
 // 引用組件庫
-import Image from "next/image";
-import { useEffect, useState } from "react";
+import Image from 'next/image'
+import { useEffect, useState } from 'react'
 // 引用public
-import menuIcon from "../../public/imgs/menu.png";
-import closeBtn from "../../public/profile/close.png";
-import myCourseIcon from "../../public/profile/navIcons/myCourse.png";
-import addCourseIcon from "../../public/profile/navIcons/addCourse.png";
-import registerCourseIcon from "../../public/profile/navIcons/registerCourse.png";
-import deleteCourseIcon from "../../public/profile/navIcons/deleteCourse.png";
-import profileIcon from "../../public/profile/navIcons/profile.png";
+import menuIcon from '../../public/imgs/menu.png'
+import closeBtn from '../../public/profile/close.png'
+import myCourseIcon from '../../public/profile/navIcons/myCourse.png'
+import profileIcon from '../../public/profile/navIcons/profile.png'
+import turnRightItem from '../../public/profile/navIcons/turnRightArrow.png'
+// 引用token
+import { useUserToken } from '../../pages/methods/service/useUserToken'
+import userService from '../../pages/methods/service/userService'
+import Link from 'next/link'
 
 export default function TeacherLayout() {
-  const [currentPage, setCurrentPage] = useState("MyCourse");
-  const [menu, setMenu] = useState("");
-  const [rightNav, setRightNav] = useState("");
-  const [leftNavBtn, setLeftNavBtn] = useState("");
-  const leftNavWidth = "-242px";
+  const [navSelecter, setNavSelecter] = useState(['MyCourse', 'index'])
+  const [menu, setMenu] = useState('')
+  const [rightNav, setRightNav] = useState('')
+  const [leftNavBtn, setLeftNavBtn] = useState('')
+  const [getCourses, setGetCourses] = useState([])
+
+  const leftNavWidth = '-242px'
+  const token = useUserToken()
   // nav的route
-  const routes = {
+  const curserBaseUrl = 'http://localhost:3000/courses/course'
+
+  let routes = {
     MyCourse: {
-      component: <MyCourse />,
-      className: "my-course-container",
+      index: {
+        component: <MyCourse />,
+        className: 'my-course-container',
+      },
+      className: '',
     },
-    AddCourse: {
-      component: <AddCourse />,
-      className: "add-course-container",
-    },
-    RegisterCourse: {
-      component: <RegisterCourse />,
-      className: "",
-    },
-    DeleteCourse: {
-      component: <DeleteCourse />,
-      className: "delete-course-container",
+    TeacherFunction: {
+      AddCourse: {
+        component: <AddCourse />,
+        className: 'add-course-container',
+      },
+      RegisterCourse: {
+        component: <RegisterCourse />,
+        className: '',
+      },
+      DeleteCourse: {
+        component: <DeleteCourse />,
+        className: 'delete-course-container',
+      },
+      PreRegister: {
+        component: <PreRegister />,
+        className: '',
+      },
+      className: '',
     },
     UserProfile: {
-      component: <UserProfile />,
-      className: "user-profile-main",
+      index: {
+        component: <UserProfile />,
+        className: 'user-profile-main',
+      },
+      className: '',
     },
-    PreRegister: {
-      component: <PreRegister />,
-      className: "",
-    },
-  };
+  }
+
   useEffect(() => {
-    const leftNavDocument = document.querySelector(".teacherLayout-left-nav");
-    const leftNavSwitchBtn = document.querySelector(".left-menu");
-    leftNavDocument.style.marginLeft = leftNavWidth;
-    leftNavSwitchBtn.style.opacity = "1";
-    leftNavSwitchBtn.style.position = "sticky";
-    setMenu(leftNavDocument);
-    setLeftNavBtn(leftNavSwitchBtn);
-  }, []);
+    if (token) {
+      ;(async function () {
+        const res = await userService.getUserRegistedCourses(token)
+        setGetCourses(
+          res.map((item) => {
+            return { name: item.courseName, _id: item._id }
+          })
+        )
+      })()
+    }
+  }, [token])
+
+  useEffect(() => {
+    const leftNavDocument = document.querySelector('.teacherLayout-left-nav')
+    const leftNavSwitchBtn = document.querySelector('.left-menu')
+    leftNavDocument.style.marginLeft = leftNavWidth
+    leftNavSwitchBtn.style.opacity = '1'
+    leftNavSwitchBtn.style.position = 'sticky'
+    setMenu(leftNavDocument)
+    setLeftNavBtn(leftNavSwitchBtn)
+  }, [])
   const showRightNav = () => {
-    if (menu.style.marginLeft === "-162px") {
-      menu.style.marginLeft = "0px";
+    if (menu.style.marginLeft === '-162px') {
+      menu.style.marginLeft = '0px'
     }
-  };
+  }
   const hideRightNav = () => {
-    if (menu.style.marginLeft === "-162px") {
-      menu.style.marginLeft = "0px";
+    if (menu.style.marginLeft === '-162px') {
+      menu.style.marginLeft = '0px'
     }
-  };
+  }
   const showLeftNav = () => {
     if (menu.style.marginLeft === leftNavWidth) {
-      menu.style.marginLeft = "0px";
-      leftNavBtn.style.opacity = "0";
-      leftNavBtn.style.cursor = "auto";
+      menu.style.marginLeft = '0px'
+      leftNavBtn.style.opacity = '0'
+      leftNavBtn.style.cursor = 'auto'
     }
-  };
+  }
   const hideLeftNav = () => {
-    if (menu.style.marginLeft === "0px") {
-      menu.style.marginLeft = leftNavWidth;
-      leftNavBtn.style.opacity = "1";
-      leftNavBtn.style.cursor = "pointer";
+    if (menu.style.marginLeft === '0px') {
+      menu.style.marginLeft = leftNavWidth
+      leftNavBtn.style.opacity = '1'
+      leftNavBtn.style.cursor = 'pointer'
     }
-  };
-  const { component, className } = routes[currentPage];
+  }
+  const { component, className } = routes[navSelecter[0]][navSelecter[1]]
   return (
     <div className="teacherLayout-main">
       <div className="teacherLayout-container">
         {/* left nav area */}
         <nav
           className="teacherLayout-left-nav"
-          style={{ marginLeft: leftNavWidth }}
-        >
+          style={{ marginLeft: leftNavWidth }}>
           <ul className="options">
             {/* 關閉選單按鈕 */}
-            <button className="close-nav-left" onClick={hideLeftNav}>
+            <button
+              className="close-nav-left"
+              onClick={hideLeftNav}>
               <Image
                 className="close-nav-btn"
                 src={closeBtn}
-                alt="close nav s button image"
-              ></Image>
+                alt="close nav s button image"></Image>
             </button>
-            {/* 預註冊 */}
+            {/* 我的課程 */}
             <li className="nav">
-              <div className="icon">
-                <Image
-                  alt="pre register page,s Icon"
-                  src={myCourseIcon}
-                  width={24}
-                  height={24}
-                ></Image>
+              <div className="nav-container">
+                <div className="icon">
+                  <Image
+                    alt="nav,s myCourse Icon"
+                    src={myCourseIcon}
+                    width={24}
+                    height={24}></Image>
+                </div>
+                <span
+                  onClick={() => setNavSelecter(['MyCourse', 'index'])}
+                  className="title">
+                  我的課程
+                </span>
               </div>
-              <span
-                onClick={() => setCurrentPage("PreRegister")}
-                className="title"
-              >
-                預註冊
-              </span>
+              <div className="nav-options">
+                {getCourses.length &&
+                  getCourses.map((course) => {
+                    return (
+                      <li
+                        key={course.id}
+                        className="nav-option-li">
+                        <Image
+                          className="turn-right-icon"
+                          src={turnRightItem}
+                          alt="nav option icon"></Image>
+                        <Link
+                          className="link"
+                          href={curserBaseUrl + `?courseName=${course.name}&courseId=${course._id}`}>
+                          {course.name}
+                        </Link>
+                      </li>
+                    )
+                  })}
+              </div>
             </li>
+            {/* 教師功能 */}
             <li className="nav">
-              <div className="icon">
-                <Image
-                  alt="nav,s myCourse Icon"
-                  src={myCourseIcon}
-                  width={24}
-                  height={24}
-                ></Image>
+              <div className="nav-container">
+                <div className="icon">
+                  <Image
+                    alt="nav,s myCourse Icon"
+                    src={myCourseIcon}
+                    width={24}
+                    height={24}></Image>
+                </div>
+                <span
+                  // onClick={() => setNavSelecter(["MyCourse", "index"])}
+                  className="title">
+                  教師功能
+                </span>
               </div>
-              <span
-                onClick={() => setCurrentPage("MyCourse")}
-                className="title"
-              >
-                我的課程
-              </span>
+              <div className="nav-options">
+                <div
+                  className="option"
+                  onClick={() => setNavSelecter(['TeacherFunction', 'PreRegister'])}>
+                  <Image
+                    className="turn-right-icon"
+                    src={turnRightItem}
+                    alt="nav option icon"></Image>
+                  預註冊使用者
+                </div>
+                <div
+                  className="option"
+                  onClick={() => setNavSelecter(['TeacherFunction', 'AddCourse'])}>
+                  <Image
+                    className="turn-right-icon"
+                    src={turnRightItem}
+                    alt="nav option icon"></Image>
+                  創建新課程
+                </div>
+                <div
+                  className="option"
+                  onClick={() => setNavSelecter(['TeacherFunction', 'RegisterCourse'])}>
+                  <Image
+                    className="turn-right-icon"
+                    src={turnRightItem}
+                    alt="nav option icon"></Image>
+                  加人至課程
+                </div>
+                <div
+                  className="option"
+                  onClick={() => setNavSelecter(['TeacherFunction', 'DeleteCourse'])}>
+                  <Image
+                    className="turn-right-icon"
+                    src={turnRightItem}
+                    alt="nav option icon"></Image>
+                  刪除課程
+                </div>
+              </div>
             </li>
+
             <li className="nav">
-              <div className="icon">
-                <Image
-                  alt="nav,s addCourse Icon"
-                  src={addCourseIcon}
-                  width={24}
-                  height={24}
-                ></Image>
+              <div className="nav-container">
+                <div className="icon">
+                  <Image
+                    alt="nav,s profile Icon"
+                    src={profileIcon}
+                    width={24}
+                    height={24}></Image>
+                </div>
+                <span
+                  onClick={() => setNavSelecter(['UserProfile', 'index'])}
+                  className="title">
+                  個人資訊
+                </span>
               </div>
-              <span
-                onClick={() => setCurrentPage("AddCourse")}
-                className="title"
-              >
-                創建新課程
-              </span>
-            </li>
-            <li className="nav">
-              <div className="icon">
-                <Image
-                  alt="nav,s registerCourse Icon"
-                  src={registerCourseIcon}
-                  width={24}
-                  height={24}
-                ></Image>
-              </div>
-              <span
-                onClick={() => setCurrentPage("RegisterCourse")}
-                className="title"
-              >
-                加人至課程
-              </span>
-            </li>
-            <li className="nav">
-              <div className="icon">
-                <Image
-                  alt="nav,s deleteCourse Icon"
-                  src={deleteCourseIcon}
-                  width={24}
-                  height={24}
-                ></Image>
-              </div>
-              <span
-                onClick={() => setCurrentPage("DeleteCourse")}
-                className="title"
-              >
-                刪除課程
-              </span>
-            </li>
-            <li className="nav">
-              <div className="icon">
-                <Image
-                  alt="nav,s profile Icon"
-                  src={profileIcon}
-                  width={24}
-                  height={24}
-                ></Image>
-              </div>
-              <span
-                onClick={() => setCurrentPage("UserProfile")}
-                className="title"
-              >
-                個人資訊
-              </span>
             </li>
           </ul>
-          <button onClick={showLeftNav} className="left-menu">
-            <Image src={menuIcon} alt="menu button" width={30}></Image>
+          <button
+            onClick={showLeftNav}
+            className="left-menu">
+            <Image
+              src={menuIcon}
+              alt="menu button"
+              width={30}></Image>
           </button>
         </nav>
         {/* middle cursor info area */}
@@ -208,5 +255,5 @@ export default function TeacherLayout() {
         <div className="right-nav"></div>
       </div>
     </div>
-  );
+  )
 }

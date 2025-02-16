@@ -1,9 +1,10 @@
-.register-area {
+.member-select-area {
   margin-top: 24px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-  padding: 24px;
+  padding-top: 64px;
+  padding: 24px 24px 24px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -11,28 +12,31 @@
   width: 90%;
   background-color: #fff;
 }
-.register-area .classification {
+.member-select-area .member-select-header {
+  font-size: 24px;
+}
+.member-select-area .classification {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 8px;
   width: 100%;
-  height: 80px;
 }
-.register-area .classification .search-inputs {
+.member-select-area .classification .search-inputs {
   display: flex;
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
 }
-.register-area .classification .search-inputs span {
+.member-select-area .classification .search-inputs span {
   font-weight: 500;
   color: #333;
   margin-right: 4px;
 }
-.register-area .classification .search-inputs input {
+.member-select-area .classification .search-inputs input {
   outline: none;
   padding: 4px 6px;
   border: 1px solid rgba(0, 0, 0, 0.2);
@@ -40,23 +44,23 @@
   transition: border-color 0.2s;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
-.register-area .classification .search-inputs .input-name {
+.member-select-area .classification .search-inputs .input-name {
   width: 60px;
 }
-.register-area .classification .search-inputs .input-grade {
+.member-select-area .classification .search-inputs .input-grade {
   width: 60px;
 }
-.register-area .classification .search-inputs select {
+.member-select-area .classification .search-inputs select {
   outline: none;
   padding: 4px 6px;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   transition: border-color 0.2s;
 }
-.register-area .classification .search-inputs select option {
+.member-select-area .classification .search-inputs select option {
   font-size: 14px;
 }
-.register-area .classification::after {
+.member-select-area .classification::after {
   content: "";
   position: absolute;
   bottom: -24px;
@@ -65,13 +69,13 @@
   height: 1px;
   background-color: rgba(0, 0, 0, 0.5);
 }
-.register-area .btns {
+.member-select-area .btns {
   display: flex;
   justify-content: center;
   gap: 12px;
   margin-top: 12px;
 }
-.register-area .btns .search-option-btn {
+.member-select-area .btns .search-option-btn {
   outline: none;
   padding: 4px 12px;
   border: 1px solid rgba(0, 0, 0, 0.2);
@@ -81,41 +85,41 @@
   transition: 0.3s;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
-.register-area .btns .search-option-btn:hover {
+.member-select-area .btns .search-option-btn:hover {
   background-color: #efefef;
 }
-.register-area .member-area {
+.member-select-area .member-area {
   margin-top: 12px;
   width: 100%;
 }
-.register-area .member-area .title-area {
+.member-select-area .member-area .title-area {
   margin-bottom: -8px;
   display: flex;
   width: 100%;
 }
-.register-area .member-area .title-area #username {
+.member-select-area .member-area .title-area #username {
   margin-left: 50px;
   width: 120px;
   text-align: left;
 }
-.register-area .member-area .title-area #realname {
+.member-select-area .member-area .title-area #realname {
   width: 80px;
 }
-.register-area .member-area .title-area #phone-number {
+.member-select-area .member-area .title-area #phone-number {
   width: 120px;
 }
-.register-area .member-area .title-area #grade {
+.member-select-area .member-area .title-area #grade {
   width: 80px;
 }
-.register-area .member-area .title-area #role {
+.member-select-area .member-area .title-area #role {
   width: 80px;
 }
-.register-area .member-area .title-area span {
+.member-select-area .member-area .title-area span {
   pointer-events: none;
   display: flex;
   align-items: flex-end;
 }
-.register-area .member-area li {
+.member-select-area .member-area li {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   margin-top: 12px;
   width: 97.5%;
@@ -129,33 +133,33 @@
   background-color: #fafafa;
   transition: 0.2s;
 }
-.register-area .member-area li .student-checkbox {
+.member-select-area .member-area li .student-checkbox {
   width: 16px;
   height: 16px;
 }
-.register-area .member-area li .searched-info {
+.member-select-area .member-area li .searched-info {
   display: flex;
   pointer-events: none;
 }
-.register-area .member-area li .searched-info span {
+.member-select-area .member-area li .searched-info span {
   pointer-events: none;
   display: flex;
   align-items: flex-end;
 }
-.register-area .member-area li .searched-info #username {
+.member-select-area .member-area li .searched-info #username {
   margin-left: 24px;
   width: 120px;
   text-align: left;
 }
-.register-area .member-area li .searched-info #realname {
+.member-select-area .member-area li .searched-info #realname {
   width: 80px;
 }
-.register-area .member-area li .searched-info #phone-number {
+.member-select-area .member-area li .searched-info #phone-number {
   width: 120px;
 }
-.register-area .member-area li .searched-info #role {
+.member-select-area .member-area li .searched-info #role {
   width: 80px;
 }
-.register-area .member-area li .searched-info #grade {
+.member-select-area .member-area li .searched-info #grade {
   width: 80px;
 }/*# sourceMappingURL=memberSelector.css.map */

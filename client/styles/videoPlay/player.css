@@ -146,21 +146,29 @@
 }
 .video-player-main .player-area .video-info-list .selections .option-lv1 {
   position: relative;
-  cursor: pointer;
   border-bottom: 1px solid #ccc;
 }
 .video-player-main .player-area .video-info-list .selections .option-lv1 .episodes {
-  pointer-events: none;
-  background-color: #282828;
+  overflow: hidden;
   width: 100%;
-  height: 0;
-  transition: 0.3s;
+  max-height: 0;
+  transition: 0.2s;
 }
-.video-player-main .player-area .video-info-list .selections .option-lv1 .episodes .option-lv2 {
+.video-player-main .player-area .video-info-list .selections .option-lv1 .episodes li {
+  cursor: pointer;
+  background-color: #dcdcdc;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
   height: 60px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+.video-player-main .player-area .video-info-list .selections .option-lv1 .episodes li .Link {
+  color: black;
+  width: 100%;
 }
 .video-player-main .player-area .video-info-list .selections .option-lv1 .option-header {
-  pointer-events: none;
+  cursor: pointer;
   padding-left: 6px;
   height: 60px;
   display: flex;
@@ -172,6 +180,7 @@
   margin-right: 12px;
 }
 .video-player-main .player-area .video-info-list .selections .option-lv1 .option-header .video-list-title {
+  pointer-events: none;
   height: 60px;
   display: flex;
   align-items: center;

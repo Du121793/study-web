@@ -23,11 +23,18 @@
 }
 .teacherLayout-main .teacherLayout-container .my-course-container .myCourse-main .courses-container {
   width: 100%;
-  padding: 32px 0 32px 0;
+  padding: 24px 0 32px 0;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+.teacherLayout-main .teacherLayout-container .my-course-container .myCourse-main .courses-container .course-page-header {
+  font-size: 28px;
 }
 .teacherLayout-main .teacherLayout-container .my-course-container .myCourse-main .courses-container .courses {
+  display: flex;
+  flex-direction: column;
+  margin-top: 12px;
   width: 95%;
   gap: 24px;
 }

@@ -1,4 +1,3 @@
-
 // 導入public
 import shotA from '../../public/profile/shot1.jpg'
 import shotB from '../../public/profile/shot2.jpg'
@@ -19,11 +18,7 @@ export default function myCourse() {
   const curserBaseUrl = 'http://localhost:3000/courses/course'
   // 假圖片，用於課程左邊頭像
   const shots = [shotA, shotB, shotC, shotA, shotB, shotC, shotA, shotB, shotC, shotA]
-  const randomShot = () => {
-    let randomNumber = Math.random()
-    randomNumber = randomNumber * 10
-    return shots[parseInt(randomNumber)]
-  }
+
   // 渲染執行請求用戶資料，存到getCourse
   useEffect(() => {
     if (token) {
@@ -36,14 +31,32 @@ export default function myCourse() {
     }
   }, [token])
 
+  const randomShot = () => {
+    let randomNumber = Math.random()
+    randomNumber = randomNumber * 10
+    return shots[parseInt(randomNumber)]
+  }
+
+  // const test = () => {
+  //   getCourses.map((item) => {
+  //     console.log(item.members.length)
+  //   })
+  // }
+
   return (
     <div className="myCourse-main">
-      <div className="courses-container flex-col align-center">
-        <ul className="courses flex-col align-center">
-          {getCourses.map((item) => (
+      {/* <button
+        id="test"
+        onClick={test}>
+        123
+      </button> */}
+      <div className="courses-container">
+        <div className="course-page-header">我的課程</div>
+        <ul className="courses">
+          {getCourses.map((item, index) => (
             <li
               className="course"
-              key={item.id}
+              key={index}
               style={{ height: '80px' }}>
               <Link
                 className="link"
@@ -58,7 +71,7 @@ export default function myCourse() {
                       height={100}></Image>
                   </div>
                   <div className="course-name">{item.courseName}</div>
-                  <div className="class-number">成員人數:xxx</div>
+                  <div className="class-number">成員人數:{item.members.length}</div>
                 </div>
               </Link>
 

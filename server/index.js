@@ -8,6 +8,7 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const passport = require("passport");
 require("./config/passport")(passport);
+require("./jobs/cleanUpDataBase");
 const authRoute = require("./routes").auth;
 const courseRoute = require("./routes").course;
 const userRoute = require("./routes").user;
@@ -51,7 +52,7 @@ const tokenCheck = (req, res, next) => {
     }
     if (!user) {
       // 如果驗證失敗，回覆 401 或你想要的錯誤訊息
-      return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({ success: false, message: "Unauthorized" });
     }
     // 如果驗證成功，把 user 放到 req.user
     req.user = user;

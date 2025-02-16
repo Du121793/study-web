@@ -4,15 +4,17 @@ const User = require("../models/").user;
 
 const checkTeacherAccess = (req, res, next) => {
   if (req.user.role != "teacher")
-    return res.status(401).send("只有老師可以使用此資源");
+    return res
+      .status(401)
+      .json({ success: false, msg: "只有老師可以使用此資源" });
   next();
 };
 
 router.get("/", (req, res) => {
   try {
-    return res.send(req.user);
+    return res.json({ success: true, data: req.user });
   } catch (e) {
-    return res.status(500).send("發生了不可預期的錯誤");
+    return res.status(500).json({ success: false, msg: "伺服器發生問題" });
   }
 });
 
@@ -24,13 +26,15 @@ router.get("/registedCourse", async (req, res) => {
     // 若提供 course_id，則檢查該課程是否存在於使用者的已註冊課程中
     if (course_id) {
       if (!req.user.courses.includes(course_id) && req.user.role != "teacher") {
-        return res.status(404).send("您尚未註冊此課程");
+        return res
+          .status(404)
+          .json({ success: false, msg: "您尚未註冊此課程" });
       }
       const foundCourse = await Course.findOne({ _id: course_id });
       if (!foundCourse) {
-        return res.status(404).send("找不到該課程");
+        return res.status(404).json({ success: false, msg: "找不到該課程" });
       }
-      return res.send(foundCourse);
+      return res.json({ success: true, data: foundCourse });
     } else {
       // 若未提供 course_id，則回傳使用者所有已註冊課程的資料
       const coursesInfo = await Promise.all(
@@ -38,11 +42,13 @@ router.get("/registedCourse", async (req, res) => {
           return await Course.findOne({ _id: courseID });
         })
       );
-      return res.send(coursesInfo);
+      return res.json({ success: true, data: coursesInfo });
     }
   } catch (error) {
     console.error(error);
-    return res.status(500).send("發生了不可預期的錯誤");
+    return res
+      .status(500)
+      .json({ success: false, msg: "發生了不可預期的錯誤" });
   }
 });
 
@@ -73,9 +79,11 @@ router.get("/getMembers", checkTeacherAccess, async (req, res) => {
     }
 
     const students = await User.find(filter);
-    return res.json(students);
+    return res.json({ success: true, data: students });
   } catch (error) {
-    return res.status(500).send("發生了不可預期的錯誤");
+    return res
+      .status(500)
+      .json({ success: false, msg: "發生了不可預期的錯誤" });
   }
 });
 
@@ -84,7 +92,9 @@ router.post("/preRegisterUser", checkTeacherAccess, async (req, res) => {
     // 直接將 req.body 當作陣列來處理，每個元素應為 { userinfo, role }
     const users = req.body;
     if (!Array.isArray(users) || users.length === 0) {
-      return res.status(400).json({ msg: "請提供正確的註冊陣列" });
+      return res
+        .status(400)
+        .json({ success: false, msg: "請提供正確的註冊陣列" });
     }
 
     let successCount = 0;
@@ -98,12 +108,7 @@ router.post("/preRegisterUser", checkTeacherAccess, async (req, res) => {
       const { userinfo, role } = user;
 
       // 驗證 userinfo 是否存在並具備必要欄位
-      if (
-        !userinfo ||
-        !userinfo.realname ||
-        !userinfo.phoneNumber ||
-        !userinfo.grade
-      ) {
+      if (!userinfo || !userinfo.realname || !userinfo.phoneNumber || !role) {
         invalidUsers.push(userinfo ? userinfo.realname : "未知使用者");
         continue;
       }
@@ -127,7 +132,7 @@ router.post("/preRegisterUser", checkTeacherAccess, async (req, res) => {
       try {
         let newUser = new User({
           userinfo,
-          role: role || "student",
+          role,
         });
         let savedUser = await newUser.save();
         if (savedUser) {
@@ -162,9 +167,15 @@ router.post("/preRegisterUser", checkTeacherAccess, async (req, res) => {
       )}。\n`;
     }
 
-    return res.status(200).json({ msg: responseMessage, successStudentId });
+    return res
+      .status(200)
+      .json({ success: true, msg: responseMessage, successStudentId });
   } catch (error) {
-    return res.status(500).json({ msg: "伺服器處理失敗", error });
+    return res.status(500).json({
+      success: false,
+      msg: "伺服器處理失敗",
+      error: "伺服器端發生問題",
+    });
   }
 });
 

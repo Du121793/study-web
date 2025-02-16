@@ -13,48 +13,8 @@
   max-width: 1000px;
   min-width: 600px;
 }
-.register-cursor-main .sumbits {
-  margin-top: 24px;
-  display: flex;
-  gap: 24px;
-}
-.register-cursor-main .sumbits .submit {
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(134, 232, 89, 0.631372549);
-  transition: 0.2s;
-  border: 2px solid rgb(209, 209, 209);
-  border-radius: 4px;
-  width: 111px;
-  height: 32px;
-}
-.register-cursor-main .sumbits .submit:hover {
-  background-color: #abd690;
-}
-.register-cursor-main .sumbits .remove {
-  background-color: rgba(230, 124, 88, 0.631372549);
-}
-.register-cursor-main .sumbits .remove:hover {
-  background-color: rgba(202, 107, 75, 0.631372549);
-}
-.register-cursor-main .alert {
-  position: absolute;
-  font-weight: bold;
-  display: flex;
-  overflow: hidden;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(0, 0, 0, 0);
-  background-color: rgba(0, 0, 0, 0);
-  transition: 0.5s;
-  border-radius: 8px;
-  font-size: 20px;
-  padding: 0 24px 0 24px;
-  height: 0;
-  opacity: 1;
-  margin-bottom: 24px;
+.register-cursor-main .register-cursor-page-header {
+  font-size: 28px;
 }
 .register-cursor-main .search-input-area {
   display: flex;
@@ -63,6 +23,7 @@
   flex-wrap: wrap;
   gap: 8px;
   width: 100%;
+  margin-top: 12px;
 }
 .register-cursor-main .search-input-area .option-area {
   display: flex;
@@ -108,4 +69,47 @@
 }
 .register-cursor-main .search-input-area button:hover {
   background-color: #d7d7d7;
+}
+.register-cursor-main .sumbits {
+  margin-top: 24px;
+  display: flex;
+  gap: 24px;
+}
+.register-cursor-main .sumbits .submit {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(134, 232, 89, 0.631372549);
+  transition: 0.2s;
+  border: 2px solid rgb(209, 209, 209);
+  border-radius: 4px;
+  width: 111px;
+  height: 32px;
+}
+.register-cursor-main .sumbits .submit:hover {
+  background-color: #abd690;
+}
+.register-cursor-main .sumbits .remove {
+  background-color: rgba(230, 124, 88, 0.631372549);
+}
+.register-cursor-main .sumbits .remove:hover {
+  background-color: rgba(202, 107, 75, 0.631372549);
+}
+.register-cursor-main .alert {
+  position: absolute;
+  font-weight: bold;
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0);
+  background-color: rgba(0, 0, 0, 0);
+  transition: 0.5s;
+  border-radius: 8px;
+  font-size: 20px;
+  padding: 0 24px 0 24px;
+  height: 0;
+  opacity: 1;
+  margin-bottom: 24px;
 }/*# sourceMappingURL=registerCourse.css.map */

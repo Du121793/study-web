@@ -6,7 +6,7 @@
   justify-content: center;
 }
 .complate-info-main .form {
-  padding: 32px;
+  padding: 0 32px 32px 32px;
   margin-top: 24px;
   display: flex;
   flex-direction: column;
@@ -16,6 +16,18 @@
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.complate-info-main .form .alert {
+  position: relative;
+  top: 6px;
+  font-size: 18px;
+  font-weight: bold;
+  color: rgb(28, 28, 28);
+  background-color: #f88c8c;
+  padding: 8px;
+  border-radius: 8px;
+  transition: 0.2s;
+  height: 0;
 }
 .complate-info-main .form .title {
   font-weight: bold;

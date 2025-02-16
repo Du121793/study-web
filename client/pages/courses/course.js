@@ -1,41 +1,104 @@
 // 組件庫
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import dynamic from 'next/dynamic'
 // global組件
 import Header from '../../components/global/Header'
-// method組件
+// method
 import { useUserToken } from '../methods/service/useUserToken'
 import userService from '../methods/service/userService'
-// component
-import VideoUploadComponent from './uploadVideo'
 // public
 import downArrow from '../../public/course/downArrow.png'
 import leftArrow from '../../public/course/leftArrow.png'
-export default function userProfile() {
+// video組件
+import VideoUploadComponent from './uploadVideo'
+
+export default function Course() {
+  // 假資料 (Q&A)
+  const QAs = [
+    { type: '天文', title: '112-1-1 天文問題', date: '2024年1月1號', time: '下午4點' },
+    { type: '天文', title: '112-1-1 天文問題', date: '2024年1月1號', time: '下午4點' },
+    { type: '天文', title: '112-1-1 天文問題', date: '2024年1月1號', time: '下午4點' },
+    { type: '地質', title: '112-1-1 地質問題', date: '2024年1月1號', time: '下午4點' },
+    { type: '地質', title: '112-1-1 地質問題', date: '2024年1月1號', time: '下午4點' },
+    { type: '無知識點', title: '112-1-1 無知識點問題', date: '2024年1月1號', time: '下午4點' },
+    { type: '大氣', title: '112-1-1 大氣問題', date: '2024年1月1號', time: '下午4點' },
+    { type: '大氣', title: '112-1-1 大氣問題', date: '2024年1月1號', time: '下午4點' },
+    { type: '天然災害', title: '112-1-1 天然災害問題', date: '2024年1月1號', time: '下午4點' },
+    { type: '天然災害', title: '112-1-1 天然災害問題', date: '2024年1月1號', time: '下午4點' },
+  ]
+  // 獲取資料
   const token = useUserToken()
   const router = useRouter()
-
-  // 取出路由，用於useEffect獲取資料
   const { courseName, courseId } = router.query
 
+  // 給video子組件的參數
+  const [uploadSuccess, setUploadSuccess] = useState(false) // 用於上傳完成更新影片區域
+  const [uploadError, setUploadError] = useState(false) // 存取是否上傳發生錯誤
+
+  // 參數
+  const baseUrl = 'http://localhost:3000/'
+  const backToMyCoursePageUrl = 'http://localhost:3000/profiles/profile'
   const [course_id, setCourse_id] = useState('')
   const [isLogined, setLogined] = useState(false)
   const [userInfo, setUserInfo] = useState(null)
-
-  // locks
+  const [chooseType, setChooseType] = useState('')
+  const [videosShowPage, setVideosShowPage] = useState(1)
+  const [videosPageSize, setVideosPageSize] = useState(8)
+  const [chooseSortOrder, setChooseSortOrder] = useState('desc')
   const [isShowVideoUpload, setIsShowVideoUpload] = useState(false)
-  let videoNavOpen = false
-  let QaNavOpen = false
-
-  // url
-  const baseUrl = 'http://localhost:3000/'
-  const backToMyCoursePageUrl = 'http://localhost:3000/profiles/profile'
   const [videos, setVideos] = useState([])
 
-  /* 獲取使用者資料以及是否登陸 */
+  // 影片專區 - 使用 ref 與 state 控制展開/收合
+  const [videoNavOpen, setVideoNavOpen] = useState(false)
+  const videoContentRef = useRef(null)
+  const [videoContentHeight, setVideoContentHeight] = useState(0)
+
+  // Q&A 區塊 - 同樣使用 ref 與 state 控制展開/收合
+  const [qaOpen, setQaOpen] = useState(false)
+  const qaContentRef = useRef(null)
+  const [qaContentHeight, setQaContentHeight] = useState(0)
+
+  // 切換影片專區的展示收回狀態
+  const toggleVideoNav = () => {
+    if (!videoNavOpen) {
+      if (videoContentRef.current) {
+        setVideoContentHeight(videoContentRef.current.scrollHeight)
+      }
+      setVideoNavOpen(true)
+    } else {
+      setVideoContentHeight(0)
+      setVideoNavOpen(false)
+    }
+  }
+
+  // 切換Q&A的展示收回狀態
+  const toggleQA = () => {
+    if (!qaOpen) {
+      if (qaContentRef.current) {
+        setQaContentHeight(qaContentRef.current.scrollHeight)
+      }
+      setQaOpen(true)
+    } else {
+      setQaContentHeight(0)
+      setQaOpen(false)
+    }
+  }
+
+  useEffect(() => {
+    if (videoNavOpen && videoContentRef.current) {
+      setVideoContentHeight(videoContentRef.current.scrollHeight)
+    }
+  }, [videos, videoNavOpen])
+
+  useEffect(() => {
+    if (qaOpen && qaContentRef.current) {
+      setQaContentHeight(qaContentRef.current.scrollHeight)
+    }
+  }, [qaOpen])
+
+  // 請求使用者資料
   useEffect(() => {
     if (token) {
       userService
@@ -48,140 +111,56 @@ export default function userProfile() {
     }
   }, [token])
 
-  /* 把路由存到course_id */
+  // 透過query拿到的courseName來更改course_id的狀態
   useEffect(() => {
     if (courseName) {
       setCourse_id(courseId)
     }
-  })
+  }, [courseName, courseId])
+
+  // 若是任何一個有改變，重新發一次影片請求
   useEffect(() => {
     getCourseVideos()
-  }, [token, courseId])
-  // 假資料
-  const QAs = [
-    {
-      type: '天文',
-      title: '112-1-1 天文問題',
-      date: '2024年1月1號',
-      time: '下午4點',
-    },
-    {
-      type: '天文',
-      title: '112-1-1 天文問題',
-      date: '2024年1月1號',
-      time: '下午4點',
-    },
-    {
-      type: '天文',
-      title: '112-1-1 天文問題',
-      date: '2024年1月1號',
-      time: '下午4點',
-    },
-    {
-      type: '地質',
-      title: '112-1-1 地質問題',
-      date: '2024年1月1號',
-      time: '下午4點',
-    },
-    {
-      type: '地質',
-      title: '112-1-1 地質問題',
-      date: '2024年1月1號',
-      time: '下午4點',
-    },
-    {
-      type: '無知識點',
-      title: '112-1-1 無知識點問題',
-      date: '2024年1月1號',
-      time: '下午4點',
-    },
-    {
-      type: '大氣',
-      title: '112-1-1 大氣問題',
-      date: '2024年1月1號',
-      time: '下午4點',
-    },
-    {
-      type: '大氣',
-      title: '112-1-1 大氣問題',
-      date: '2024年1月1號',
-      time: '下午4點',
-    },
-    {
-      type: '天然災害',
-      title: '112-1-1 天然災害問題',
-      date: '2024年1月1號',
-      time: '下午4點',
-    },
-    {
-      type: '天然災害',
-      title: '112-1-1 天然災害問題',
-      date: '2024年1月1號',
-      time: '下午4點',
-    },
-  ]
+  }, [videosPageSize])
 
-  const types = [...new Set(QAs.map((item) => item.type))]
+  // 若是任何一個有改變，重新發一次影片請求
+  useEffect(() => {
+    getCourseVideos()
+  }, [token, courseId, chooseType, chooseSortOrder, uploadSuccess])
+
+  // 透過query的courseId請求課程影片
   const getCourseVideos = () => {
     if (token && courseId) {
       try {
         userService
           .getVideoInfo(token, courseId, {
             type: 'MainClass',
-            page: 1,
-            pageSize: 16,
-            sortBy: 'recordDate',
-            sortOrder: 'asc',
+            page: videosShowPage,
+            pageSize: videosPageSize,
+            sortBy: chooseType,
+            sortOrder: chooseSortOrder,
           })
           .then((res) => {
             console.log(res)
-            setVideos(res.foundVideoInfo)
+            setVideos(res)
           })
       } catch (e) {
         console.log(e)
       }
     }
   }
-  /* 點擊影片專區 */
-  const showVideos = (e) => {
-    console.log(videos)
-    const background = e.target.parentNode
-    if (!videoNavOpen) {
-      // 先移除 height 限制讓內容自然展開，再取得高度
-      background.style.height = 'auto'
-      const targetHeight = background.clientHeight + 'px'
-      // 設置為初始高度以便開始 transition
-      background.style.height = '80px'
-      // 強制重繪（reflow），然後設置目標高度
-      void background.offsetHeight
-      background.style.height = targetHeight
-      videoNavOpen = true
-    } else {
-      background.style.height = '80px'
-      videoNavOpen = false
-    }
+
+  // 切換排序的type
+  const switchSortBy = (e) => {
+    setChooseType(e)
   }
 
-  /* 點擊QA專區 */
-  const showQA = (e) => {
-    const background = e.target.parentNode
-    if (!QaNavOpen) {
-      // 先移除 height 限制讓內容自然展開，再取得高度
-      background.style.height = 'auto'
-      const targetHeight = background.clientHeight + 'px'
-      // 設置為初始高度以便開始 transition
-      background.style.height = '80px'
-      // 強制重繪（reflow），然後設置目標高度
-      void background.offsetHeight
-      background.style.height = targetHeight
-      QaNavOpen = true
-    } else {
-      background.style.height = '80px'
-      QaNavOpen = false
-    }
+  // 切換排序的正倒序
+  const switchSortOrder = (e) => {
+    setChooseSortOrder(e)
   }
 
-  /* 隱藏上傳影片的介面 */
+  // 關閉上傳影片的介面
   const closeVideoUploadOnclick = () => {
     if (isShowVideoUpload) {
       let videoUpload = document.querySelector('.upload-vidoe-main')
@@ -192,12 +171,12 @@ export default function userProfile() {
     }
   }
 
-  /* 顯示上傳影片的介面 */
+  // 開啟上傳影片的介面
   const showVideoUploadComponent = () => {
     if (!isShowVideoUpload) {
       let videoUpload = document.querySelector('.upload-vidoe-main')
       let background = document.querySelector('.background')
-      videoUpload.style.height = '640px'
+      videoUpload.style.height = '720px'
       background.style.display = 'block'
       setIsShowVideoUpload(true)
     } else {
@@ -206,17 +185,57 @@ export default function userProfile() {
       setIsShowVideoUpload(false)
     }
   }
+
+  // 點擊加載更多影片
+  const showMoreVideos = () => {
+    setVideosPageSize(videosPageSize + 8)
+  }
+
+  // 影片長度計算
+  const formatSecondsToHMS = (totalSeconds) => {
+    // 先把秒數做四捨五入或直接取 floor
+    // 這裡用 Math.floor 來避免有小數
+    const seconds = Math.floor(totalSeconds)
+
+    const hours = Math.floor(seconds / 3600)
+    const minutes = Math.floor((seconds % 3600) / 60)
+    const secs = seconds % 60
+
+    // 補零 (padStart) 讓它們保持兩位數
+    const hoursString = String(hours).padStart(2, '0')
+    const minutesString = String(minutes).padStart(2, '0')
+    const secsString = String(secs).padStart(2, '0')
+    if (hoursString === '0000') {
+      return `${hoursString}:${minutesString}:${secsString}`
+    }
+    return `${minutesString}:${secsString}`
+  }
+
+  const types = [...new Set(QAs.map((item) => item.type))]
+
+  // const test = () => {
+  //   videos.map((item) => {
+  //     console.log(item.length)
+  //   })
+  // }
+
   return (
     <div className="course-main">
+      {/* <button onClick={test}>123456</button> */}
       <div
         className="background"
         onClick={closeVideoUploadOnclick}></div>
-      <Header loginState={isLogined}></Header>
+      <Header loginState={isLogined} />
       <div className="container">
         <VideoUploadComponent
           course_id={course_id}
           isShowVideoUpload={isShowVideoUpload}
-          setIsShowVideoUpload={setIsShowVideoUpload}></VideoUploadComponent>
+          setIsShowVideoUpload={setIsShowVideoUpload}
+          setUploadSuccess={setUploadSuccess}
+          uploadSuccess={uploadSuccess}
+          uploadError={uploadError}
+          setUploadError={setUploadError}
+        />
         <div className="header-title-area">
           <div className="course-title">{courseName}</div>
           <Link
@@ -226,90 +245,145 @@ export default function userProfile() {
               src={leftArrow}
               alt="back of course page button icon"
               width={24}
-              height={24}></Image>
+              height={24}
+            />
             <div className="home-btn">回到我的課程</div>
           </Link>
         </div>
         {/* 影片專區 */}
-        <ul className="nav">
+        <div
+          className="nav"
+          id="video-nav">
           <div
-            className="header"
-            onClick={(e) => {
-              showVideos(e)
-            }}>
+            onClick={toggleVideoNav}
+            id="video-header"
+            className="header">
             <Image
               src={downArrow}
               alt="open video nav's icon"
               width={40}
-              height={40}></Image>
+              height={40}
+            />
             <span>影片專區</span>
           </div>
-          {userInfo && userInfo.role === 'teacher' && (
+          <div
+            className="video-nav-content"
+            ref={videoContentRef}
+            style={{
+              height: videoNavOpen ? videoContentHeight + 'px' : '0px',
+              overflow: 'hidden',
+              transition: 'height 0.3s ease',
+            }}>
             <div className="update-video-area">
-              <div
-                className="button"
-                onClick={showVideoUploadComponent}>
-                上傳影片
+              {userInfo && userInfo.role === 'teacher' && (
+                <div
+                  className="button"
+                  onClick={showVideoUploadComponent}>
+                  上傳影片
+                </div>
+              )}
+              <span>排序根據</span>
+              <div className="select">
+                <select onChange={(e) => switchSortBy(e.target.value)}>
+                  <option value="">上傳時間</option>
+                  <option value="length">影片長度</option>
+                  <option value="recordDate">錄影時間</option>
+                </select>
+              </div>
+              <div className="select">
+                <select onChange={(e) => switchSortOrder(e.target.value)}>
+                  <option value="desc">倒序</option>
+                  <option value="asc">正序</option>
+                </select>
               </div>
             </div>
-          )}
-          <div className="video-area">
-            {videos &&
-              videos.map((item) => (
-                <Link
-                  href={`${baseUrl}videoPlay/player?course_name=${courseName}&video_id=${item._id}&course_id=${courseId}&info=${[item.description, item.title, item.date]}`}
-                  className="video">
-                  <img
-                    src={item.thumbnail}
-                    className="videos-shot"></img>
-                  <div className="info">
-                    <div className="title">{item.title}</div>
-                    <div className="time">
-                      <div className="day">
-                        <div>{item.date.split(/[-T:.]/)[0]}年</div>
-                        <div>{item.date.split(/[-T:.]/)[1]}月</div>
-                        <div>{item.date.split(/[-T:.]/)[2]}日</div>
-                      </div>
-                      <div className="clock">
-                        {item.date.split(/[-T:.]/)[3] >= 0 && item.date.split(/[-T:.]/)[3] <= 11 && <div>上午{item.date.split(/[-T:.]/)[3]}點</div>}
-                        {item.date.split(/[-T:.]/)[3] >= 13 && item.date.split(/[-T:.]/)[3] <= 23 && <div>下午{item.date.split(/[-T:.]/)[3] - 12}點</div>}
-                        <div>{item.date.split(/[-T:.]/)[4]}分</div>
+            <div className="video-area">
+              {videos &&
+                videos.map((item) => (
+                  <Link
+                    key={item._id}
+                    href={`${baseUrl}videoPlay/player?course_name=${courseName}&video_id=${item._id}&course_id=${courseId}&info=${[item.description, item.title, item.date]}`}
+                    className="video">
+                    <img
+                      src={item.thumbnail}
+                      className="videos-shot"
+                      alt={item.title}
+                    />
+                    <div className="video-length">{formatSecondsToHMS(item.length)}</div>
+                    <div className="info">
+                      <div className="title">{item.title}</div>
+                      <div className="time">
+                        <div className="day">
+                          <div>{item.date.split(/[-T:.]/)[0]}/</div>
+                          <div>{item.date.split(/[-T:.]/)[1]}/</div>
+                          <div>{item.date.split(/[-T:.]/)[2]}</div>
+                        </div>
+                        <div className="clock">
+                          {item.date.split(/[-T:.]/)[3] >= 0 && item.date.split(/[-T:.]/)[3] && <div>{Number(item.date.split(/[-T:.]/)[3]) + 8}點</div>}
+                          <div>{item.date.split(/[-T:.]/)[4]}分</div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
-          </div>
-        </ul>
-        {/* Q&A */}
-        <ul>
-          <div className="nav">
-            <div
-              className="header"
-              onClick={(e) => {
-                showQA(e)
-              }}>
-              <Image
-                src={downArrow}
-                alt="open Q & A nav's icon"
-                width={40}
-                height={40}></Image>
-              <span>Q & A</span>
+                  </Link>
+                ))}
             </div>
-            <div className="QA-area">
-              {/* 2. 迭代每個類型 */}
-              {types.map((type) => {
-                // 過濾出此 type 對應的所有 QA
-                const filteredQAs = QAs.filter((qa) => qa.type === type)
+            <div className="bottom-area">
+              <div
+                className="show-more-video-btn"
+                onClick={showMoreVideos}>
+                點擊加載更多影片
+              </div>
+            </div>
+          </div>
+        </div>
 
+        {/* Q&A 區塊 */}
+        <div
+          className="nav"
+          id="qa-nav">
+          <div
+            onClick={toggleQA}
+            className="header">
+            <Image
+              src={downArrow}
+              alt="open Q & A nav's icon"
+              width={40}
+              height={40}
+            />
+            <span>Q & A</span>
+          </div>
+          {/* 打開部分 */}
+          <div
+            className="QA-area"
+            ref={qaContentRef}
+            style={{
+              height: qaOpen ? qaContentHeight + 'px' : '0px',
+              overflow: 'hidden',
+              transition: 'height 0.3s ease',
+            }}>
+            <div className="QA-header">
+              <span>排序根據</span>
+              <div className="select">
+                <select>
+                  <option value="">主題排序</option>
+                  <option value="">內容排序</option>
+                </select>
+              </div>
+              <div className="select">
+                <select>
+                  <option value="">倒序</option>
+                  <option value="">正序</option>
+                </select>
+              </div>
+            </div>
+            <div className="QA-grid">
+              {types.map((type) => {
+                const filteredQAs = QAs.filter((qa) => qa.type === type)
                 return (
                   <div
                     className="type-section"
                     key={type}>
-                    {/* 類別標題 */}
                     <h2>{type}</h2>
-
-                    {/* 3. 逐筆渲染 QA 項目 */}
                     <ul className="qa-list">
                       {filteredQAs.map((qa, index) => (
                         <li
@@ -328,7 +402,7 @@ export default function userProfile() {
               })}
             </div>
           </div>
-        </ul>
+        </div>
       </div>
     </div>
   )

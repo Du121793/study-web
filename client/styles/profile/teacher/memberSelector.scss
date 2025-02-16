@@ -1,9 +1,10 @@
-.register-area {
+.member-select-area {
   margin-top: 24px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-  padding: 24px;
+  padding-top: 64px;
+  padding: 24px 24px 24px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -11,15 +12,18 @@
   width: 90%;
   background-color: #fff; // 讓清單區域白底
 
+  .member-select-header {
+    font-size: 24px;
+  }
   .classification {
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    flex-wrap: wrap;
     gap: 8px;
     width: 100%;
-    height: 80px;
     .search-inputs {
       display: flex;
       align-items: center;
@@ -122,11 +126,11 @@
       align-items: center;
       position: relative;
       padding: 4px 8px;
-      border: 2px solid rgb(0, 0, 0,0.2);
+      border: 2px solid rgb(0, 0, 0, 0.2);
       border-radius: 12px;
       height: 40px;
       background-color: #fafafa;
-      transition:0.2s;
+      transition: 0.2s;
 
       .student-checkbox {
         width: 16px;

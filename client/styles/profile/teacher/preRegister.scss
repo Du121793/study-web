@@ -17,7 +17,7 @@
     display: flex;
     justify-content: center;
     .title {
-      font-size: 24px;
+      font-size: 28px;
     }
   }
   .form {
@@ -34,7 +34,7 @@
       flex-direction: column;
       gap: 24px;
       justify-content: center;
-      .form-select {
+      .form-selects {
         left: 0;
         top: 0;
         display: flex;
@@ -44,6 +44,11 @@
         select {
           border: 1px solid rgba(0, 0, 0, 0.4);
           outline: none;
+        }
+        .chose-grade {
+          display: flex;
+          align-items: center;
+          gap: 8px;
         }
         .choose-role-cantainer {
           display: flex;

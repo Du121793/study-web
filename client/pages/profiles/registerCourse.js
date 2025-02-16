@@ -16,6 +16,20 @@ export default function registerCourse() {
   const [courseName, setCourseName] = useState('')
   const [grade, setGrade] = useState('')
   const [courseClass, setCourseClass] = useState('')
+
+  // 獲取所有課程，用於select
+  useEffect(() => {
+    if (token) {
+      try {
+        adminService.getCourses(token).then((res) => {
+          setGetedCourse(res)
+        })
+      } catch (e) {
+        alert(e)
+      }
+    }
+  }, [token])
+
   // 按下"加入到課程"的函式，將選擇的人加入到指定課程
   const registerCourse = async () => {
     const alert = document.querySelector('.alert')
@@ -107,20 +121,9 @@ export default function registerCourse() {
       }
     }
   }
-  // useEffect
-  useEffect(() => {
-    if (token) {
-      try {
-        adminService.getCourses(token).then((res) => {
-          setGetedCourse(res)
-        })
-      } catch (e) {
-        alert(e)
-      }
-    }
-  }, [token])
   return (
     <div className="register-cursor-main">
+      <div className="register-cursor-page-header">加入成員至課程系統</div>
       <div className="alert">{message}</div>
       <div className="search-input-area">
         <div className="option-area">

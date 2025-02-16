@@ -1,6 +1,7 @@
 require("dotenv").config();
 const { Vimeo } = require("@vimeo/vimeo");
 const VideoInfo = require("../models/").courseVideoInfo;
+const imageCompresser = require("./imageCompresser");
 
 const VIMEO_ACCESS_TOKEN = process.env.VIMEO_ACCESS_TOKEN;
 if (!VIMEO_ACCESS_TOKEN) {
@@ -66,17 +67,29 @@ function buildDescription(
 
 async function uploadVideo(reqBody, courseInfo) {
   const { subject, grade, courseClass } = courseInfo;
-  const { title, fileSize, description, type, thumbnail, length } = reqBody;
+  const { title, fileSize, description, type, thumbnail, length, recordDate } =
+    reqBody;
 
-  const newVideoInfo = new VideoInfo({
+  const returnImg = await imageCompresser.compressBase64Image(thumbnail);
+
+  const newVideoInfoParams = recordDate? {
     title,
     courseID: courseInfo._id,
     type,
     description: description || "",
-    thumbnail: thumbnail || "",
+    thumbnail: returnImg || "",
     length: length || 0,
-  });
+    recordDate,
+  } : {
+    title,
+    courseID: courseInfo._id,
+    type,
+    description: description || "",
+    thumbnail: returnImg || "",
+    length: length || 0,
+  }
 
+  const newVideoInfo = new VideoInfo(newVideoInfoParams);
   const savedVideoInfo = await newVideoInfo.save();
 
   try {
@@ -140,6 +153,7 @@ async function uploadVideo(reqBody, courseInfo) {
     };
   } catch (err) {
     (async () => {
+      await deleteVideo(savedVideoInfo._id);
       await VideoInfo.findOneAndDelete({ _id: savedVideoInfo._id });
     })();
     return {

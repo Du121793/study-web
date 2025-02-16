@@ -1,5 +1,3 @@
-const { status } = require("express/lib/response");
-
 const router = require("express").Router();
 const Course = require("../../models").course;
 const User = require("../../models").user;
@@ -12,7 +10,7 @@ router.post("/createNewCourse", async (req, res) => {
     const { courseName, subject, grade, courseClass } = req.body;
     console.log(courseName, subject, grade, courseClass);
     if (!(courseName && subject && grade && courseClass))
-      return res.status(400).send("資料提供不完整");
+      return res.status(400).json({ success: false, msg: "資料提供不完整" });
 
     let foundCourse = await Course.findOne({
       courseName,
@@ -22,7 +20,10 @@ router.post("/createNewCourse", async (req, res) => {
     }).exec();
 
     if (foundCourse)
-      return res.status(400).send("你已經有一樣名稱，科目，年級，班級的課程了");
+      return res.status(400).json({
+        success: false,
+        msg: "你已經有一樣名稱，科目，年級，班級的課程了",
+      });
 
     modifyCourse.addSubject(grade, subject, courseClass);
 
@@ -34,14 +35,14 @@ router.post("/createNewCourse", async (req, res) => {
     });
 
     let savedCourse = await newCourse.save();
-    return res.send({
-      success: "true",
+    return res.json({
+      success: true,
       msg: "課程創建完畢",
-      savedCourse,
+      data: savedCourse,
     });
   } catch (e) {
-    return res.status(500).send({
-      success: "false",
+    return res.status(500).json({
+      success: false,
       msg: "很抱歉，伺服器儲存失敗",
     });
   }
@@ -54,12 +55,14 @@ router.post("/register", async (req, res) => {
     console.log(user_ids);
 
     if (!Array.isArray(user_ids) || user_ids.length === 0) {
-      return res.status(400).send("請提供有效的學生 ID 陣列");
+      return res
+        .status(400)
+        .json({ success: false, msg: "請提供有效的學生 ID 陣列" });
     }
 
     let foundCourse = await Course.findOne({ _id: course_id });
     if (!foundCourse) {
-      return res.status(400).send("課程 ID 錯誤");
+      return res.status(400).json({ success: false, msg: "課程 ID 錯誤" });
     }
 
     let successCount = 0;
@@ -100,12 +103,12 @@ router.post("/register", async (req, res) => {
       responseMessage += `以下學生 ID 無效：${invalidUsers.join(", ")}。\n`;
     }
 
-    return res.status(200).send(responseMessage);
+    return res.status(200).json({ success: true, data: responseMessage });
   } catch (e) {
     console.log(e);
     return res
       .status(500)
-      .json({ msg: "伺服器發生問題，無法成功註冊", error: e });
+      .json({ success: false, msg: "伺服器發生問題，無法成功註冊" });
   }
 });
 
@@ -113,12 +116,14 @@ router.post("/unRegister", async (req, res) => {
   try {
     let { user_ids, course_id } = req.body; // 假設傳入的 user_ids 是一個陣列
     if (!Array.isArray(user_ids) || user_ids.length === 0) {
-      return res.status(400).send("請提供有效的學生 ID 陣列");
+      return res
+        .status(400)
+        .json({ success: false, msg: "請提供有效的學生 ID 陣列" });
     }
 
     let foundCourse = await Course.findOne({ _id: course_id });
     if (!foundCourse) {
-      return res.status(400).send("課程 ID 錯誤");
+      return res.status(400).json({ success: false, msg: "課程 ID 錯誤" });
     }
 
     let successCount = 0;
@@ -156,9 +161,11 @@ router.post("/unRegister", async (req, res) => {
       responseMessage += `以下學生 ID 無效：${invalidUsers.join(", ")}。\n`;
     }
 
-    return res.status(200).send(responseMessage);
+    return res.status(200).json({ success: true, data: responseMessage });
   } catch (e) {
-    return res.status(500).send("很抱歉，註銷發生問題: " + e);
+    return res
+      .status(500)
+      .json({ success: false, msg: "很抱歉，註銷發生問題" });
   }
 });
 
@@ -169,9 +176,9 @@ router.get("/findJoinedSubject", (req, res) => {
 
     const foundSubject = modifyCourse.findSubject(grade, subject);
     console.log(foundSubject); // 這裡會在後端 console 印出純陣列
-    return res.json(foundSubject); // 回傳 JSON 給前端
+    return res.json({ success: true, data: foundSubject }); // 回傳 JSON 給前端
   } catch (e) {
-    return res.status(500).send("伺服器錯誤");
+    return res.status(500).json({ success: false, msg: "伺服器錯誤" });
   }
 });
 
@@ -179,7 +186,8 @@ router.delete("/deleteCourse", async (req, res) => {
   try {
     let { course_id } = req.body;
     let foundCourse = await Course.findOne({ _id: course_id }).exec();
-    if (!foundCourse) return res.status(400).send("沒有找到所屬課程");
+    if (!foundCourse)
+      return res.status(400).json({ success: false, msg: "沒有找到所屬課程" });
     let courseName = foundCourse.courseName;
 
     console.log(await VimeoMethods.delete("", course_id));
@@ -210,9 +218,9 @@ router.delete("/deleteCourse", async (req, res) => {
       foundCourse.courseClass
     );
 
-    res.send(`課程 ${courseName} 已成功刪除`);
+    res.json({ success: true, msg: `課程 ${courseName} 已成功刪除` });
   } catch (e) {
-    res.status(500).send("很抱歉，伺服器刪除課程失敗" + e);
+    res.status(500).json({ success: false, msg: "很抱歉，伺服器刪除課程失敗" });
   }
 });
 

@@ -3,6 +3,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   background-color: #fefefe; // 淡色背景
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
@@ -13,7 +14,11 @@
   min-width: 600px;
   max-width: 950px;
 
+  .delete-course-page-header {
+    font-size: 28px;
+  }
   #spinner {
+    z-index: 999;
     position: absolute;
     width: 40px;
     height: 40px;
@@ -35,12 +40,42 @@
       transform: rotate(360deg);
     }
   }
+  .delete-alert-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 998;
+    .delete-alert {
+      font-weight: bold;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      z-index: 999;
+      position: absolute;
+      padding: 24px;
+      background-color: rgba(191, 191, 191, 0.672);
+      border-radius: 12px;
+      .btns {
+        display: flex;
+        gap: 12px;
+        button {
+          cursor: pointer;
+          padding: 8px;
+          border-radius: 4px;
+        }
+      }
+    }
+  }
 
   .alert {
     width: 120px;
     height: 60px;
     position: absolute;
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
     background-color: rgb(236, 104, 104);
@@ -57,7 +92,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 16px; // 與下方清單做一點區隔
+    margin: 12px 0 12px 0;
 
     .option-area {
       display: flex;

@@ -8,6 +8,8 @@ export default function myCourse() {
   const [tempToken, setTempToken] = useState(null)
   const [realname, setRealname] = useState(null)
   const [phoneNumber, setPhoneNumber] = useState(null)
+  const [message, setMessage] = useState('')
+  const [hasMessage, setHasMessage] = useState(false)
   const baseUrl = 'http://localhost:3000/'
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -18,24 +20,40 @@ export default function myCourse() {
   }, [])
   // 丁建中
   const postRequest = async (tempToken, realname, phoneNumber) => {
-    try {
-      if ((tempToken, realname, phoneNumber)) {
-        userService
-          .registerUser(tempToken, realname, phoneNumber)
-          .then((res) => {
-            console.log(res)
-            if (res.token) {
-              localStorage.setItem('token', `JWT ${res.token}`)
-            } else {
-              console.log('沒有token')
-            }
-          })
-          .then(() => {
+    if ((tempToken, realname, phoneNumber)) {
+      userService.registerUser(tempToken, realname, phoneNumber).then((res) => {
+        console.log(res)
+        if (res.success === false && res.msg === '缺少 tempToken') {
+          // 欄位為空的處理
+          setMessage('請從正常管道進入該網頁')
+          setHasMessage(true)
+          setTimeout(() => {
+            setHasMessage(false)
+            setTimeout(() => {
+              setMessage('')
+            }, 200)
+          }, 2000)
+          return
+        }
+        if (res.token) {
+          localStorage.setItem('token', `JWT ${res.token}`)
+          setTimeout(() => {
             window.location.href = `${baseUrl}profiles/profile`
-          })
-      }
-    } catch (e) {
-      console.log(e)
+          }, 3000)
+        } else {
+          console.log('沒有token')
+        }
+      })
+    } else {
+      // 欄位為空的處理
+      setMessage('欄位不能為空')
+      setHasMessage(true)
+      setTimeout(() => {
+        setHasMessage(false)
+        setTimeout(() => {
+          setMessage('')
+        }, 200)
+      }, 2000)
     }
   }
 
@@ -43,6 +61,11 @@ export default function myCourse() {
     <div className="complate-info-main">
       <Header></Header>
       <div className="form">
+        <div
+          className="alert"
+          style={hasMessage ? { opacity: '1', height: '24px' } : { opacity: '0', height: '0' }}>
+          {message}
+        </div>
         <div className="title">輸入個人資料</div>
         <div className="inputs">
           <div className="user-input">

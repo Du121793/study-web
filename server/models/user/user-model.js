@@ -21,7 +21,6 @@ const userSchema = new Schema({
     },
     grade: {
       type: String,
-      required: true,
     },
     pictureUrl: {
       type: String,
