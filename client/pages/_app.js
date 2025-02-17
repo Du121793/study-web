@@ -15,6 +15,7 @@ import "../styles/profile/teacher/myCourse.css";
 import "../styles/profile/teacher/registerCourse.css";
 import "../styles/profile/teacher/userProfile.css";
 import "../styles/profile/teacher/deleteCourse.css";
+import "../styles/profile/teacher/removeFromCourse.css";
 // course
 import "../styles/course/course.css";
 import "../styles/course/videoUpload.css";

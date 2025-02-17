@@ -1,0 +1,133 @@
+.remove-from-course-main {
+  background-color: #fefefe; // 淡色背景
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); // 柔和陰影
+  padding: 24px;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  width: 60vw;
+  max-width: 1000px;
+  min-width: 600px;
+  .alert {
+    position: absolute;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    // background-color: rgba(0, 0, 0, 1);
+    background-color: rgb(186, 179, 179);
+    // background-color: rgb(233, 102, 102);
+    transition: 0.5s;
+    border-radius: 8px;
+    font-size: 20px;
+    height: 0;
+    padding: 0 40px 0 40px;
+    overflow: hidden;
+    opacity: 1;
+    margin-bottom: 24px;
+    z-index: 0;
+  }
+  .remove-from-course-header {
+    font-size: 28px;
+  }
+  .system-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 80%;
+    background-color: #ececec;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); // 柔和陰影
+    .selects-area {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      .chose-course-area {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        height: 60px;
+        .title {
+          font-size: 18px;
+        }
+        select {
+          outline: none;
+          border-radius: 2px;
+        }
+      }
+      .submit-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+        height: 32px;
+        background-color: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); // 柔和陰影
+        border-radius: 4px;
+        transition: 0.2s;
+      }
+      .submit-btn:hover {
+        background-color: #e1fdd8;
+      }
+    }
+    .members-area {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      width: 100%;
+      margin-bottom: 12px;
+      .members-area-title {
+        font-size: 20px;
+      }
+      .show-members {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        .member {
+          cursor: pointer;
+          display: flex;
+          background-color: #fff;
+          gap: 12px;
+          padding: 4px 0 4px 0;
+          border: 2px solid rgba(0, 0, 0, 0);
+          width: 80%;
+          border-radius: 4px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); // 柔和陰影
+          .username {
+            pointer-events: none;
+            margin-left: 24px;
+            width: 64px;
+          }
+          .realname {
+            pointer-events: none;
+            width: 84px;
+          }
+          .phoneNumber {
+            pointer-events: none;
+            width: 128px;
+          }
+          .grade {
+            pointer-events: none;
+            width: 48px;
+          }
+          .role {
+            pointer-events: none;
+            width: 64px;
+          }
+        }
+        #title {
+          margin-top: 18px;
+          background-color: #ffffff00;
+          box-shadow: none; // 柔和陰影
+        }
+      }
+    }
+  }
+}

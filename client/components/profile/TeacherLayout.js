@@ -5,6 +5,7 @@ import MyCourse from '../../pages/profiles/myCourse'
 import RegisterCourse from '../../pages/profiles/registerCourse'
 import UserProfile from '../../pages/profiles/userProfile'
 import PreRegister from '../../pages/profiles/preRegister'
+import RemoveFromCourse from '../../pages/profiles/removeFromCourse'
 // 引用組件庫
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
@@ -54,6 +55,10 @@ export default function TeacherLayout() {
       },
       PreRegister: {
         component: <PreRegister />,
+        className: '',
+      },
+      RemoveFromCourse: {
+        component: <RemoveFromCourse />,
         className: '',
       },
       className: '',
@@ -148,24 +153,23 @@ export default function TeacherLayout() {
                 </span>
               </div>
               <div className="nav-options">
-                {getCourses.length &&
-                  getCourses.map((course) => {
-                    return (
-                      <li
-                        key={course.id}
-                        className="nav-option-li">
-                        <Image
-                          className="turn-right-icon"
-                          src={turnRightItem}
-                          alt="nav option icon"></Image>
-                        <Link
-                          className="link"
-                          href={curserBaseUrl + `?courseName=${course.name}&courseId=${course._id}`}>
-                          {course.name}
-                        </Link>
-                      </li>
-                    )
-                  })}
+                {getCourses.map((course) => {
+                  return (
+                    <li
+                      key={course.id}
+                      className="nav-option-li">
+                      <Image
+                        className="turn-right-icon"
+                        src={turnRightItem}
+                        alt="nav option icon"></Image>
+                      <Link
+                        className="link"
+                        href={curserBaseUrl + `?courseName=${course.name}&courseId=${course._id}`}>
+                        {course.name}
+                      </Link>
+                    </li>
+                  )
+                })}
               </div>
             </li>
             {/* 教師功能 */}
@@ -211,6 +215,15 @@ export default function TeacherLayout() {
                     src={turnRightItem}
                     alt="nav option icon"></Image>
                   加人至課程
+                </div>
+                <div
+                  className="option"
+                  onClick={() => setNavSelecter(['TeacherFunction', 'RemoveFromCourse'])}>
+                  <Image
+                    className="turn-right-icon"
+                    src={turnRightItem}
+                    alt="nav option icon"></Image>
+                  移除出課程
                 </div>
                 <div
                   className="option"

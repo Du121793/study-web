@@ -19,6 +19,7 @@ const userService = {
 
   // 獲得使用者註冊過的所有課程的內容
   async getUserRegistedCourses(token, course_id) {
+    console.log(course_id)
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.get(USER_URL + '/registedCourse', {

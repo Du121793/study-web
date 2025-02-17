@@ -150,57 +150,17 @@ export default function StudentLayout() {
                 </span>
               </div>
               <div className="nav-options">
-                {getCourses.length &&
-                  getCourses.map((course) => {
-                    return (
-                      <li key={course.id}>
-                        <Link
-                          className="link"
-                          href={curserBaseUrl + `?courseName=${course.name}&courseId=${course._id}`}>
-                          {course.name}
-                        </Link>
-                      </li>
-                    )
-                  })}
-              </div>
-            </li>
-            {/* 教師功能 */}
-            <li className="nav">
-              <div className="nav-container">
-                <div className="icon">
-                  <Image
-                    alt="nav,s myCourse Icon"
-                    src={myCourseIcon}
-                    width={24}
-                    height={24}></Image>
-                </div>
-                <span
-                  // onClick={() => setNavSelecter(["MyCourse", "index"])}
-                  className="title">
-                  教師功能
-                </span>
-              </div>
-              <div className="nav-options">
-                <div
-                  className="option"
-                  onClick={() => setNavSelecter(['TeacherFunction', 'PreRegister'])}>
-                  預註冊使用者
-                </div>
-                <div
-                  className="option"
-                  onClick={() => setNavSelecter(['TeacherFunction', 'AddCourse'])}>
-                  創建新課程
-                </div>
-                <div
-                  className="option"
-                  onClick={() => setNavSelecter(['TeacherFunction', 'RegisterCourse'])}>
-                  加人至課程
-                </div>
-                <div
-                  className="option"
-                  onClick={() => setNavSelecter(['TeacherFunction', 'DeleteCourse'])}>
-                  刪除課程
-                </div>
+                {getCourses.map((course) => {
+                  return (
+                    <li key={course.id}>
+                      <Link
+                        className="link"
+                        href={curserBaseUrl + `?courseName=${course.name}&courseId=${course._id}`}>
+                        {course.name}
+                      </Link>
+                    </li>
+                  )
+                })}
               </div>
             </li>
 

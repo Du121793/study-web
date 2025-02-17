@@ -21,7 +21,7 @@ const adminService = {
 
   // 註冊該課程給成員
   async registerMember(token, registerInfo) {
-    console.log(registerInfo) 
+    console.log(registerInfo)
     // registeInfo 內存放 學生id陣列與課程id { user_ids, course_id }
     const authHeader = token ? { Authorization: token } : {}
     try {
@@ -38,10 +38,14 @@ const adminService = {
   async unRegisterMember(token, unRegisterInfo) {
     // unRegisterInfo 內存放 學生id陣列與課程id { user_ids, course_id }
     const authHeader = token ? { Authorization: token } : {}
-    const response = await axios.post(COURSE_URL + '/unRegister', unRegisterInfo, {
-      headers: authHeader,
-    })
-    return response.data.data
+    try {
+      const response = await axios.post(COURSE_URL + '/unRegister', unRegisterInfo, {
+        headers: authHeader,
+      })
+      return response.data.data
+    } catch (e) {
+      return e
+    }
   },
 
   async findJoinedSubject(token, grade) {
@@ -63,6 +67,7 @@ const adminService = {
       headers: authHeader,
       params: filter,
     })
+    console.log(filter)
     return response.data.data
   },
 
