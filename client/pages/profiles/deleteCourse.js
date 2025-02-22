@@ -22,14 +22,10 @@ export default function DeleteCourse() {
   const initCourses = (token) => {
     if (token) {
       try {
-        userService
-          .getUserRegistedCourses(token, null, {
-            page: 1,
-            pageSize: 10,
-          })
+        adminService
+          .getCourses(token, { page: 1, pageSize: 10 })
           .then((res) => {
-            console.log(res.data);
-            setGetCourses(res.data);
+            setGetCourses(res.data.courses);
           });
       } catch (error) {
         console.log(error);

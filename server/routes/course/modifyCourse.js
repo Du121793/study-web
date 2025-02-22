@@ -6,7 +6,7 @@ const VimeoMethods = require("../../methods").vimeoMethods;
 const VideoInfo = require("../../models").courseVideoInfo;
 
 const accessChecker = require("../routesMiddleware/accessChecker");
-const checkAdminAccess = accessChecker.admin;
+const checkCourseAccess = accessChecker.course;
 
 router.post("/createNewCourse", async (req, res) => {
   try {
@@ -35,15 +35,22 @@ router.post("/createNewCourse", async (req, res) => {
       subject,
       grade,
       courseClass,
+      members: [],
     });
+    if (req.user.role !== "admin") {
+      newCourse.members.push(req.user._id);
+      let savedCourse = await newCourse.save();
+      req.user.courses.push(savedCourse._id);
+      await req.user.save();
+    }
 
-    let savedCourse = await newCourse.save();
     return res.json({
       success: true,
       msg: "課程創建完畢",
       data: savedCourse,
     });
   } catch (e) {
+    console.log(e);
     return res.status(500).json({
       success: false,
       msg: "很抱歉，伺服器儲存失敗",
@@ -53,9 +60,15 @@ router.post("/createNewCourse", async (req, res) => {
 
 router.post("/register", async (req, res) => {
   try {
-    console.log(req.body);
     let { user_ids, course_id } = req.body; // 假設傳入的 user_ids 是一個陣列
-    console.log(user_ids);
+
+    if (
+      !req.user.courses.find((n) => n == course_id) &&
+      req.user.role !== "admin"
+    )
+      return res
+        .status(400)
+        .json({ success: false, msg: "你沒有為此課程註冊成員的權限" });
 
     if (!Array.isArray(user_ids) || user_ids.length === 0) {
       return res
@@ -118,6 +131,15 @@ router.post("/register", async (req, res) => {
 router.post("/unRegister", async (req, res) => {
   try {
     let { user_ids, course_id } = req.body; // 假設傳入的 user_ids 是一個陣列
+
+    if (
+      !req.user.courses.find((n) => n == course_id) &&
+      req.user.role !== "admin"
+    )
+      return res
+        .status(400)
+        .json({ success: false, msg: "你沒有為此課程註銷成員的權限" });
+
     if (!Array.isArray(user_ids) || user_ids.length === 0) {
       return res
         .status(400)

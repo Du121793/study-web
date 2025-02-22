@@ -17,9 +17,9 @@ const adminService = {
           headers: authHeader,
         }
       );
-      return response.data.data;
+      return response.data;
     } catch (e) {
-      return e.response.data;
+      return e.response;
     }
   },
 
@@ -36,23 +36,23 @@ const adminService = {
           headers: authHeader,
         }
       );
-      return response.data.data;
+      return response.data;
     } catch (e) {
-      return e.response.data;
+      return e.response;
     }
   },
 
   // 取消註冊該課程的成員
   async unRegisterMember(token, unRegisterInfo) {
     // unRegisterInfo 內存放 學生id陣列與課程id { user_ids, course_id }
-    const authHeader = token ? { Authorization: token } : {}
+    const authHeader = token ? { Authorization: token } : {};
     try {
       const response = await axios.post(COURSE_URL + '/unRegister', unRegisterInfo, {
         headers: authHeader,
       })
-      return response.data.data
+      return response.data
     } catch (e) {
-      return e
+      return e;
     }
   },
 
@@ -63,7 +63,7 @@ const adminService = {
       headers: authHeader,
       params: grade,
     });
-    return response.data.data;
+    return response.data;
   },
 
   // 獲得課程內的成員
@@ -74,9 +74,9 @@ const adminService = {
     const response = await axios.get(USER_URL + "/getMembers", {
       headers: authHeader,
       params: filter,
-    })
+    });
     // console.log(filter)
-    return response.data.data
+    return response.data
   },
 
   // 獲得課程
@@ -89,7 +89,7 @@ const adminService = {
       params: filter,
     });
 
-    return response.data.data;
+    return response.data;
   },
 
   // 獲得課程資訊清單
@@ -99,7 +99,7 @@ const adminService = {
       headers: authHeader,
       params: filter,
     });
-    return response.data.data;
+    return response.data;
   },
 
   // 刪除課程
@@ -109,7 +109,7 @@ const adminService = {
       headers: authHeader,
       data: { course_id: courseId },
     });
-    return response.data.data;
+    return response.data;
   },
 
   // 預註冊
@@ -124,6 +124,22 @@ const adminService = {
       return response.data;
     } catch (e) {
       return e;
+    }
+  },
+  async deleteMembers(token, userIds) {
+    try {
+      // 設定 Authorization 標頭，若 token 存在則加入
+      const authHeader = token ? { Authorization: token } : {};
+
+      const response = await axios.delete(USER_URL + "/deleteMember", {
+        headers: authHeader,
+        data: userIds,
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
   },
 };

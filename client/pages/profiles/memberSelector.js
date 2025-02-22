@@ -86,7 +86,7 @@ export default function memberSelector({ selectedStudentId, setSelectedStudentId
     setIsSelectAllCheckbox(false)
     try {
       adminService.getMembers(token, searchStudentOption).then((res) => {
-        setMembers(res)
+        setMembers(res.data)
       })
     } catch (e) {
       alert(e)
@@ -111,8 +111,7 @@ export default function memberSelector({ selectedStudentId, setSelectedStudentId
     if (token) {
       try {
         adminService.getMembers(token).then((res) => {
-          setMembers(res)
-          console.log(res)
+          setMembers(res.data)
         })
       } catch (e) {
         alert(e)
@@ -199,43 +198,44 @@ export default function memberSelector({ selectedStudentId, setSelectedStudentId
           <span id="grade">年級</span>
           <span id="role">身分組</span>
         </div>
-        {members.map((item, index) => (
-          <li
-            key={index}
-            onClick={(e) => {
-              memberAreaClickEvent(e.target)
-            }}>
-            {/* 勾選框 */}
-            <input
-              className="student-checkbox"
-              type="checkbox"
-              onChange={(e) => {
-                checkboxClickEvent(e.target)
-                setSelectedStudentId((prev) => {
-                  return e.target.checked ? [...prev, item._id] : prev.filter((id) => id !== item._id)
-                })
-              }}
-            />
-            {!searchStudentOption && (
-              <div className="searched-info">
-                <span id="username">{item.userinfo.username}</span>
-                <span id="realname">{item.userinfo.realname}</span>
-                <span id="phone-number">{item.userinfo.phoneNumber}</span>
-                <span id="course-class">{item.userinfo.courseClass}</span>
-                <span id="grade">{item.userinfo.grade}</span>
-              </div>
-            )}
-            {searchStudentOption && (
-              <div className="searched-info">
-                <span id="username">{item.userinfo.username}</span>
-                <span id="realname">{item.userinfo.realname}</span>
-                <span id="phone-number">{item.userinfo.phoneNumber}</span>
-                <span id="grade">{item.userinfo.grade}</span>
-                {item.role === 'teacher' ? <span id="role">老師</span> : <span id="role">學生</span>}
-              </div>
-            )}
-          </li>
-        ))}
+        {members &&
+          members.map((item, index) => (
+            <li
+              key={index}
+              onClick={(e) => {
+                memberAreaClickEvent(e.target)
+              }}>
+              {/* 勾選框 */}
+              <input
+                className="student-checkbox"
+                type="checkbox"
+                onChange={(e) => {
+                  checkboxClickEvent(e.target)
+                  setSelectedStudentId((prev) => {
+                    return e.target.checked ? [...prev, item._id] : prev.filter((id) => id !== item._id)
+                  })
+                }}
+              />
+              {!searchStudentOption && (
+                <div className="searched-info">
+                  <span id="username">{item.userinfo.username}</span>
+                  <span id="realname">{item.userinfo.realname}</span>
+                  <span id="phone-number">{item.userinfo.phoneNumber}</span>
+                  <span id="course-class">{item.userinfo.courseClass}</span>
+                  <span id="grade">{item.userinfo.grade}</span>
+                </div>
+              )}
+              {searchStudentOption && (
+                <div className="searched-info">
+                  <span id="username">{item.userinfo.username}</span>
+                  <span id="realname">{item.userinfo.realname}</span>
+                  <span id="phone-number">{item.userinfo.phoneNumber}</span>
+                  <span id="grade">{item.userinfo.grade}</span>
+                  {item.role === 'teacher' ? <span id="role">老師</span> : <span id="role">學生</span>}
+                </div>
+              )}
+            </li>
+          ))}
       </ul>
       <div className="page-switch"></div>
     </div>

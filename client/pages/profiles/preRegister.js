@@ -27,7 +27,7 @@ export default function PreRegister() {
     if (token) {
       try {
         adminService.getCourses(token).then((res) => {
-          setGetCourses(res.courses)
+          setGetCourses(res.data.courses)
         })
       } catch (e) {
         console.log(e)
@@ -164,7 +164,6 @@ export default function PreRegister() {
               <select
                 className="chose-course"
                 onChange={(e) => {
-                  console.log(e.target.value)
                   setChooseCourse(e.target.value)
                 }}>
                 <option value="">請選擇</option>

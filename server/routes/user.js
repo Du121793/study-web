@@ -37,12 +37,10 @@ router.get("/registedCourse", async (req, res) => {
       try {
         parsedFilter = typeof filter === "string" ? JSON.parse(filter) : filter;
       } catch (e) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            msg: "filter 格式錯誤，請傳入合法的 JSON 字串",
-          });
+        return res.status(400).json({
+          success: false,
+          msg: "filter 格式錯誤，請傳入合法的 JSON 字串",
+        });
       }
       // 從 filter 中抽取分頁參數（若存在則取出，page 預設為 1）
       if (parsedFilter.hasOwnProperty("page")) {
@@ -250,6 +248,90 @@ router.post("/preRegisterUser", checkAdminAccess, async (req, res) => {
       error: "伺服器端發生問題",
     });
   }
+});
+
+// 刪除使用者，並從該使用者所註冊的課程中移除該使用者的 _id
+// 直接將 req.body 當作陣列來處理，每個元素應為使用者的 _id
+router.delete("/deleteMember", checkAdminAccess, async (req, res) => {
+  // 取得前端傳入的使用者 _id 陣列
+  const users = req.body;
+  if (!Array.isArray(users) || users.length === 0) {
+    return res
+      .status(400)
+      .json({ success: false, msg: "請提供要刪除的使用者 _id 陣列" });
+  }
+
+  // 用於分類操作結果
+  let successCount = 0;
+  let successUserIds = [];
+  let notFoundUsers = []; // 找不到使用者的 _id
+  let invalidUsers = []; // 無效的使用者 _id（例如格式錯誤）
+  let serverErrorUsers = []; // 伺服器錯誤導致無法刪除的使用者
+
+  // 逐一處理每個使用者 _id
+  for (const userId of users) {
+    // 檢查 userId 是否存在且格式正確
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      invalidUsers.push(userId);
+      continue;
+    }
+
+    try {
+      // 依據 userId 查詢使用者資料
+      const user = await User.findById(userId);
+      if (!user) {
+        notFoundUsers.push(userId);
+        continue;
+      }
+
+      // 針對該使用者已註冊的每個課程，從對應課程的 members 陣列中移除該使用者的 _id
+      for (const courseId of user.courses) {
+        try {
+          await Course.findByIdAndUpdate(courseId, {
+            $pull: { members: userId },
+          });
+        } catch (err) {
+          // 若更新課程時發生錯誤，將該 userId 記錄為伺服器錯誤，並跳過後續動作
+          serverErrorUsers.push(userId);
+          continue;
+        }
+      }
+
+      // 刪除該使用者
+      await User.findByIdAndDelete(userId);
+      successCount++;
+      successUserIds.push(userId);
+    } catch (err) {
+      serverErrorUsers.push(userId);
+      continue;
+    }
+  }
+
+  // 組合回應訊息
+  let responseMessage = `成功刪除 ${successCount} 位使用者。\n`;
+  if (notFoundUsers.length > 0) {
+    responseMessage += `以下使用者不存在：${notFoundUsers.join(", ")}。\n`;
+  }
+  if (invalidUsers.length > 0) {
+    responseMessage += `以下使用者 ID 無效：${invalidUsers.join(", ")}。\n`;
+  }
+  if (serverErrorUsers.length > 0) {
+    responseMessage += `以下使用者由於伺服器錯誤刪除失敗：${serverErrorUsers.join(
+      ", "
+    )}。\n`;
+  }
+
+  return res.json({
+    success: true,
+    msg: responseMessage,
+    data: {
+      successCount,
+      successUserIds,
+      notFoundUsers,
+      invalidUsers,
+      serverErrorUsers,
+    },
+  });
 });
 
 module.exports = router;
