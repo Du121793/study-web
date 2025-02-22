@@ -30,6 +30,10 @@ export default function Header(loginState) {
         .catch((err) => console.error('Error:', err))
     }
   }, [token])
+
+  const test = () => {
+    console.log(userInfo)
+  }
   // Layout
   return (
     <div className="header-container">
@@ -46,6 +50,7 @@ export default function Header(loginState) {
         </Link>
         <div className="header-middle">
           <div
+            onClick={test}
             className="header-middle-nav-area"
             id="newest">
             <div className="line"></div>
@@ -99,7 +104,7 @@ export default function Header(loginState) {
               <div className="member-img">
                 <img
                   className="shot"
-                  src={userInfo && userInfo.userinfo.pictureUrl}
+                  src={userInfo && userInfo.data.userinfo.pictureUrl}
                   alt="user's shot"
                 />
               </div>

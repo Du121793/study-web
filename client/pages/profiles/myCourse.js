@@ -1,23 +1,34 @@
 // 導入public
-import shotA from '../../public/profile/shot1.jpg'
-import shotB from '../../public/profile/shot2.jpg'
-import shotC from '../../public/profile/shot3.jpg'
+import shotA from "../../public/profile/shot1.jpg";
+import shotB from "../../public/profile/shot2.jpg";
+import shotC from "../../public/profile/shot3.jpg";
 // 組件庫
-import { useState, useEffect } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
 // 導入methmod
-import userService from '../methods//service/userService'
-import { useUserToken } from '../methods/service/useUserToken'
+import userService from "../methods//service/userService";
+import { useUserToken } from "../methods/service/useUserToken";
 
 export default function myCourse() {
-  const [getCourses, setGetCourses] = useState([])
+  const [getCourses, setGetCourses] = useState([]);
   // 使用method獲取token
-  const token = useUserToken()
+  const token = useUserToken();
   // 請求課程網址
-  const curserBaseUrl = 'http://localhost:3000/courses/course'
+  const curserBaseUrl = "http://localhost:3000/courses/course";
   // 假圖片，用於課程左邊頭像
-  const shots = [shotA, shotB, shotC, shotA, shotB, shotC, shotA, shotB, shotC, shotA]
+  const shots = [
+    shotA,
+    shotB,
+    shotC,
+    shotA,
+    shotB,
+    shotC,
+    shotA,
+    shotB,
+    shotC,
+    shotA,
+  ];
 
   // 渲染執行請求用戶資料，存到getCourse
   useEffect(() => {
@@ -25,42 +36,37 @@ export default function myCourse() {
       userService
         .getUserRegistedCourses(token)
         .then((data) => {
-          setGetCourses(data)
+          console.log(data);
+          setGetCourses(data.data);
         })
-        .catch((err) => console.error('Error:', err))
+        .catch((err) => console.error("Error:", err));
     }
-  }, [token])
+  }, [token]);
 
   const randomShot = () => {
     let randomNumber = Math.random()
     randomNumber = randomNumber * 10
     return shots[parseInt(randomNumber)]
   }
-
-  // const test = () => {
-  //   getCourses.map((item) => {
-  //     console.log(item.members.length)
-  //   })
-  // }
+  const test = () => {
+    console.log(getCourses)
+  }
 
   return (
     <div className="myCourse-main">
-      {/* <button
-        id="test"
-        onClick={test}>
-        123
-      </button> */}
+      {/* <button onClick={test}>測試按鈕</button> */}
       <div className="courses-container">
         <div className="course-page-header">我的課程</div>
         <ul className="courses">
           {getCourses.map((item, index) => (
-            <li
-              className="course"
-              key={index}
-              style={{ height: '80px' }}>
+            <li className="course" key={index} style={{ height: "80px" }}>
               <Link
                 className="link"
-                href={curserBaseUrl + `?courseName=${item.courseName}&courseId=${item._id}`}>
+                href={
+                  curserBaseUrl +
+                  `?courseName=${item.courseName}&courseId=${item._id}`
+                }
+              >
                 <div className="course-header flex align-center">
                   <div className="course-fake-shot">
                     <Image
@@ -68,10 +74,13 @@ export default function myCourse() {
                       src={randomShot()}
                       alt="cursor shot"
                       width={100}
-                      height={100}></Image>
+                      height={100}
+                    ></Image>
                   </div>
                   <div className="course-name">{item.courseName}</div>
-                  <div className="class-number">成員人數:{item.members.length}</div>
+                  <div className="class-number">
+                    成員人數:{item.members.length}
+                  </div>
                 </div>
               </Link>
 
@@ -90,5 +99,5 @@ export default function myCourse() {
         </ul>
       </div>
     </div>
-  )
+  );
 }

@@ -8,12 +8,9 @@ const User = require("../models").user;
 const jwt = require("jsonwebtoken");
 const { user } = require("../models");
 
-const checkTeacherAccess = (req, res, next) => {
-  console.log(req.user);
-  if (req.user.role != "teacher")
-    return res.status(401).send("只有老師可以使用此資源");
-  next();
-};
+const accessChecker = require("./routesMiddleware/accessChecker");
+
+const checkTeacherAccess = accessChecker.teacher;
 
 router.get(
   "/line",
@@ -70,12 +67,12 @@ router.post("/completeRegistration", async (req, res) => {
   try {
     const { tempToken, realname, phoneNumber } = req.body;
     if (!tempToken) {
-      return res.status(400).json({ msg: "缺少 tempToken" });
+      return res.status(400).json({ success: false, msg: "缺少 tempToken" });
     }
     if (!realname || !phoneNumber) {
       return res
         .status(400)
-        .json({ msg: "請提供完整的真實姓名與電話（必填）" });
+        .json({ success: false, msg: "請提供完整的真實姓名與電話（必填）" });
     }
 
     // 解譯暫時的 Token
@@ -92,6 +89,7 @@ router.post("/completeRegistration", async (req, res) => {
     const userWithSameLineID = await User.findOne({ lineID: lineID });
     if (userWithSameLineID) {
       return res.status(400).json({
+        success: false,
         msg: "已有使用者綁定此 Line 帳戶，請勿重複註冊。",
       });
     }
@@ -106,6 +104,7 @@ router.post("/completeRegistration", async (req, res) => {
       // 該使用者若已經有 lineID ，則註冊失敗
       if (existingUser.lineID) {
         return res.status(400).json({
+          success: false,
           msg: "此真實姓名與電話已經綁定過 Line 帳戶，註冊失敗。",
         });
       }
@@ -121,6 +120,7 @@ router.post("/completeRegistration", async (req, res) => {
       const finalToken = jwt.sign(tokenObject, process.env.PASSPORT_SECRET);
 
       return res.status(200).json({
+        success: true,
         msg: "成功綁定既有預註冊用戶資料並登入",
         token: finalToken,
       });
@@ -144,12 +144,13 @@ router.post("/completeRegistration", async (req, res) => {
       const finalToken = jwt.sign(tokenObject, process.env.PASSPORT_SECRET);
 */
       return res.status(400).json({
+        success: false,
         msg: "你沒有註冊的權限",
       });
     }
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ msg: "伺服器處理失敗", error });
+    return res.status(500).json({ success: false, msg: "伺服器處理失敗" });
   }
 });
 

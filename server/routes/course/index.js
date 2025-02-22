@@ -3,39 +3,13 @@ const Course = require("../../models").course;
 const courseMethodRouter = require("./courseMethod");
 const modifyCourseRouter = require("./modifyCourse");
 
-const checkTeacherAccess = (req, res, next) => {
-  if (req.user.role != "teacher")
-    return res
-      .status(401)
-      .json({ success: false, msg: "只有老師可以使用此資源" });
-  next();
-};
+const accessChecker = require("../routesMiddleware/accessChecker");
 
-const checkCourseAccess = async (req, res, next) => {
-  try {
-    let { course_id } = req.params;
-    let foundCourse = await Course.findOne({ _id: course_id }).exec();
+const checkAdminAccess = accessChecker.admin;
+const checkTeacherAccess = accessChecker.teacher;
+const checkCourseAccess = accessChecker.course;
 
-    if (req.user.role == "student") {
-      if (!foundCourse.members.find((n) => n == req.user._id))
-        return res
-          .status(401)
-          .json({ success: false, msg: "你沒有訪問此課程的權限" });
-    }
-    if (!foundCourse)
-      return res.status(400).json({ success: false, msg: "無法找到課程" });
-
-    req.course = foundCourse;
-    next();
-  } catch (e) {
-    console.error(e);
-    return res
-      .status(500)
-      .json({ success: false, msg: "很抱歉，伺服器無法訪問此課程" });
-  }
-};
-
-router.get("/getCourses", checkTeacherAccess, async (req, res) => {
+router.get("/getCourses", checkAdminAccess, async (req, res) => {
   try {
     const {
       courseName,

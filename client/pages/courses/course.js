@@ -103,8 +103,8 @@ export default function Course() {
     if (token) {
       userService
         .getUserInfo(token)
-        .then((data) => {
-          setUserInfo(data)
+        .then((res) => {
+          setUserInfo(res.data)
           setLogined(true)
         })
         .catch((err) => console.error('Error:', err.message))
@@ -142,7 +142,7 @@ export default function Course() {
           })
           .then((res) => {
             console.log(res)
-            setVideos(res)
+            setVideos(res.data)
           })
       } catch (e) {
         console.log(e)

@@ -5,6 +5,9 @@ const modifyCourse = require("../../methods/").modifyCourse;
 const VimeoMethods = require("../../methods").vimeoMethods;
 const VideoInfo = require("../../models").courseVideoInfo;
 
+const accessChecker = require("../routesMiddleware/accessChecker");
+const checkAdminAccess = accessChecker.admin;
+
 router.post("/createNewCourse", async (req, res) => {
   try {
     const { courseName, subject, grade, courseClass } = req.body;
@@ -190,7 +193,11 @@ router.delete("/deleteCourse", async (req, res) => {
       return res.status(400).json({ success: false, msg: "沒有找到所屬課程" });
     let courseName = foundCourse.courseName;
 
-    console.log(await VimeoMethods.delete("", course_id));
+    if (
+      req.user.role !== "admin" &&
+      !req.user.courses.find((n) => n === course_id)
+    )
+      console.log(await VimeoMethods.delete("", course_id));
     console.log(
       await VideoInfo.deleteMany({
         courseID: course_id,

@@ -39,18 +39,19 @@
   flex-direction: column;
   justify-content: center;
   position: relative;
-  margin-right: 12px;
   text-overflow: ellipsis;
 }
 .teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options .nav .nav-container {
   display: flex;
 }
 .teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options .nav .nav-options {
+  overflow: hidden;
   font-size: 16px;
   margin-top: 8px;
   margin-left: 20px;
   display: flex;
   flex-direction: column;
+  transition: 0.2s;
   gap: 4px;
 }
 .teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options .nav .nav-options .nav-option-li {
@@ -91,10 +92,12 @@
   height: 24px;
 }
 .teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options li .title {
+  margin-left: 12px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
   position: relative;
   transition: 0.2s;
-  left: 12px;
   font-size: 18px;
 }
 .teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options li .title:hover {

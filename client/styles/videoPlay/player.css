@@ -9,25 +9,39 @@
   width: 100%;
   background-color: #282828;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
+  align-items: center;
 }
 .video-player-main .header .logos {
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 140px;
+  height: 50px;
+}
+.video-player-main .header .user-shot {
+  border-radius: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 60px;
   height: 60px;
-  background-color: #fff;
-  margin-left: 64px;
 }
-.video-player-main .header .user-shot {
+.video-player-main .header .back-to-course-btn {
+  font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 120px;
-  height: 100%;
-  background-color: #fff;
-  margin-right: 64px;
+  padding: 12px 12px 12px 12px;
+  background-color: #ffffff;
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+  border-radius: 4px;
+  transition: 0.2s;
+}
+.video-player-main .header .back-to-course-btn:hover {
+  background-color: #e3e3e3;
 }
 .video-player-main .player-area {
   max-width: 100%;
@@ -55,10 +69,12 @@
   padding: 16px 0 16px 0;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 16px;
   background-color: #fff;
 }
 .video-player-main .player-area .player .video-info .title {
+  width: 80%;
   padding-left: 40px;
   font-size: 24px;
   font-weight: 500;
@@ -86,8 +102,8 @@
   width: 102px;
   right: -65px;
   z-index: 999;
-  background-color: #8652ff;
-  color: #fff;
+  background-color: #ffffff;
+  color: #505050;
   border-top-left-radius: 100px;
   border-bottom-left-radius: 100px;
   display: flex;

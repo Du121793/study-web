@@ -2,13 +2,10 @@ const router = require("express").Router();
 const Course = require("../models").course;
 const User = require("../models/").user;
 
-const checkTeacherAccess = (req, res, next) => {
-  if (req.user.role != "teacher")
-    return res
-      .status(401)
-      .json({ success: false, msg: "只有老師可以使用此資源" });
-  next();
-};
+const accessChecker = require("./routesMiddleware/accessChecker");
+
+const checkTeacherAccess = accessChecker.teacher;
+const checkAdminAccess = accessChecker.admin;
 
 router.get("/", (req, res) => {
   try {
@@ -20,29 +17,102 @@ router.get("/", (req, res) => {
 
 router.get("/registedCourse", async (req, res) => {
   try {
-    // 從 query 參數中取得 course_id (前端呼叫時，若提供則為單筆查詢)
-    const { course_id } = req.query;
+    // 從 query 參數中取得 course_id 與 filter (filter 為 JSON 格式字串或物件)
+    const { course_id, filter } = req.query;
+    let projection = {};
+    let page, pageSize; // 從 filter 中抽取出來的分頁參數
 
-    // 若提供 course_id，則檢查該課程是否存在於使用者的已註冊課程中
+    // 定義允許過濾的欄位（對應 schema）
+    const allowedFields = [
+      "courseName",
+      "subject",
+      "grade",
+      "courseClass",
+      "members",
+      "date",
+    ];
+
+    if (filter) {
+      let parsedFilter = {};
+      try {
+        parsedFilter = typeof filter === "string" ? JSON.parse(filter) : filter;
+      } catch (e) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+            msg: "filter 格式錯誤，請傳入合法的 JSON 字串",
+          });
+      }
+      // 從 filter 中抽取分頁參數（若存在則取出，page 預設為 1）
+      if (parsedFilter.hasOwnProperty("page")) {
+        page = parseInt(parsedFilter.page) || 1;
+        delete parsedFilter.page;
+      }
+      if (parsedFilter.hasOwnProperty("pageSize")) {
+        pageSize = parseInt(parsedFilter.pageSize);
+        delete parsedFilter.pageSize;
+      }
+      // 根據剩下的 parsedFilter 中的屬性建立投影物件，只允許 schema 定義的欄位
+      allowedFields.forEach((field) => {
+        if (parsedFilter.hasOwnProperty(field)) {
+          projection[field] = 1;
+        }
+      });
+    }
+
+    // 若有指定 course_id，則只查詢該筆資料
     if (course_id) {
-      if (!req.user.courses.includes(course_id) && req.user.role != "teacher") {
+      // 非 teacher 身份需檢查該課程是否在使用者的已註冊清單中
+      if (
+        !req.user.courses.includes(course_id) &&
+        req.user.role !== "teacher"
+      ) {
         return res
           .status(404)
           .json({ success: false, msg: "您尚未註冊此課程" });
       }
-      const foundCourse = await Course.findOne({ _id: course_id });
+      const foundCourse =
+        Object.keys(projection).length > 0
+          ? await Course.findOne({ _id: course_id }, projection)
+          : await Course.findOne({ _id: course_id });
       if (!foundCourse) {
         return res.status(404).json({ success: false, msg: "找不到該課程" });
       }
       return res.json({ success: true, data: foundCourse });
     } else {
-      // 若未提供 course_id，則回傳使用者所有已註冊課程的資料
+      // 未指定 course_id，回傳使用者所有已註冊課程的資料
+      let courseIds = req.user.courses;
+      const totalCourses = courseIds.length;
+
+      // 若有設定 pageSize 則執行分頁（若未提供則全部回傳）
+      if (pageSize) {
+        const currentPage = page || 1;
+        const start = (currentPage - 1) * pageSize;
+        courseIds = courseIds.slice(start, start + pageSize);
+      }
+
       const coursesInfo = await Promise.all(
-        req.user.courses.map(async (courseID) => {
-          return await Course.findOne({ _id: courseID });
+        courseIds.map(async (courseID) => {
+          return Object.keys(projection).length > 0
+            ? await Course.findOne({ _id: courseID }, projection)
+            : await Course.findOne({ _id: courseID });
         })
       );
-      return res.json({ success: true, data: coursesInfo });
+
+      if (pageSize) {
+        return res.json({
+          success: true,
+          data: coursesInfo,
+          pagination: {
+            total: totalCourses,
+            page: page || 1,
+            pageSize: pageSize,
+          },
+        });
+      } else {
+        return res.json({ success: true, data: coursesInfo });
+      }
     }
   } catch (error) {
     console.error(error);
@@ -55,6 +125,9 @@ router.get("/registedCourse", async (req, res) => {
 router.get("/getMembers", checkTeacherAccess, async (req, res) => {
   try {
     const { username, phoneNumber, _id, role, courses } = req.query;
+    const { page = 1, sortBy, sortOrder } = req.query;
+
+    // const sortDirection = sortOrder ==
 
     const filter = {};
 
@@ -87,7 +160,7 @@ router.get("/getMembers", checkTeacherAccess, async (req, res) => {
   }
 });
 
-router.post("/preRegisterUser", checkTeacherAccess, async (req, res) => {
+router.post("/preRegisterUser", checkAdminAccess, async (req, res) => {
   try {
     // 直接將 req.body 當作陣列來處理，每個元素應為 { userinfo, role }
     const users = req.body;

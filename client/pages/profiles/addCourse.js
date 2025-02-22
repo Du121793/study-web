@@ -59,7 +59,7 @@ export default function studentCourse() {
         })
         .then((res) => {
           // 除錯
-          console.error(res)
+          console.error(res.data)
           alert.style.backgroundColor = '#a0db6c'
         })
     }

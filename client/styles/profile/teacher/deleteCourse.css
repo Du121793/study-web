@@ -195,23 +195,35 @@
   margin-left: 12px;
   border-right: 1px solid rgba(0, 0, 0, 0.1);
   font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .delete-course-main .courses-area .courses-per-map .course-name {
   width: 180px;
   margin-left: 2px;
   border-right: 1px solid rgba(0, 0, 0, 0.1);
   padding-left: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .delete-course-main .courses-area .courses-per-map .grade {
   width: 100px;
   margin-left: 2px;
   border-right: 1px solid rgba(0, 0, 0, 0.1);
   padding-left: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .delete-course-main .courses-area .courses-per-map .subject {
   width: 60px;
   margin-left: 2px;
   padding-left: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .delete-course-main .courses-area .courses-per-map .delete-btn {
   position: absolute;
