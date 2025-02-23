@@ -1,9 +1,10 @@
 // userService.js (純函式，不用 Hook)
-import axios from "axios";
+import axios from 'axios'
 
-const API_URL = "http://localhost:8080";
-const COURSE_URL = `${API_URL}/course`;
-const USER_URL = `${API_URL}/user`;
+const API_URL = 'http://localhost:8080'
+const COURSE_URL = `${API_URL}/course`
+const USER_URL = `${API_URL}/user`
+const QA_URL = `${API_URL}/course/question`
 
 const userService = {
   // 獲得使用者資料
@@ -13,7 +14,7 @@ const userService = {
       const response = await axios.get(USER_URL, { headers: authHeader })
       return response.data
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
   },
 
@@ -31,31 +32,31 @@ const userService = {
   async getUserRegistedCourses(token, course_id, filter) {
     try {
       // 設定 Authorization 標頭，若 token 存在則加入
-      const authHeader = token ? { Authorization: token } : {};
+      const authHeader = token ? { Authorization: token } : {}
 
       // 若 filter 為物件，則轉換為 JSON 字串傳遞給後端
-      if (filter && typeof filter === "object") {
-        filter = JSON.stringify(filter);
+      if (filter && typeof filter === 'object') {
+        filter = JSON.stringify(filter)
       }
 
       // 構建 axios GET 請求的參數物件
       // 若 course_id 為 falsy 則不加入該參數
-      const params = { filter };
+      const params = { filter }
       if (course_id) {
-        params.course_id = course_id;
+        params.course_id = course_id
       }
 
       // 發送 GET 請求到 /registedCourse API，參數包含 course_id（若有）與 filter
-      const response = await axios.get(USER_URL + "/registedCourse", {
+      const response = await axios.get(USER_URL + '/registedCourse', {
         headers: authHeader,
         params,
-      });
+      })
 
       // 回傳 API 回應的完整資料 (包含查詢結果與分頁資訊)
-      return response.data;
+      return response.data
     } catch (e) {
-      console.error(e);
-      throw e;
+      console.error(e)
+      throw e
     }
   },
 
@@ -65,10 +66,10 @@ const userService = {
     // type 類型 MainClass為正課 QA為問答 noImg非必填 傳入true則不回傳縮圖
     // sortBy 排序欄位: length(影片長度) 或 recordDate(錄影日期)
     // sortOrder  排序順序 'asc'(正序) 或 'desc'(倒序)
-    console.log(filter);
+    console.log(filter)
     try {
-      const authHeader = token ? { Authorization: token } : {};
-      console.log(COURSE_URL + `/${course_id}/videoInfo`);
+      const authHeader = token ? { Authorization: token } : {}
+      console.log(COURSE_URL + `/${course_id}/videoInfo`)
       const response = await axios.get(COURSE_URL + `/${course_id}/videoInfo`, {
         headers: authHeader,
         params: filter,
@@ -76,20 +77,20 @@ const userService = {
       console.log('msg', response.data)
       return response.data
     } catch (e) {
-      console.log(e);
+      console.log(e)
     }
   },
 
   async getVideoLink(token, course_id, video_id) {
     try {
-      const authHeader = token ? { Authorization: token } : {};
+      const authHeader = token ? { Authorization: token } : {}
       const response = await axios.get(COURSE_URL + `/${course_id}/videoUri`, {
         headers: authHeader,
         params: { videoId: video_id },
       })
       return response.data
     } catch (e) {
-      console.log(e);
+      console.log(e)
     }
   },
 
@@ -103,9 +104,64 @@ const userService = {
       })
       return response.data
     } catch (e) {
-      return e.response.data;
+      return e.response.data
     }
   },
-};
+  // 新增新的QA給指定課程
+  async createNewQuestion(token, questionParam) {
+    // isPublic, course_ids, description, image, resourceCategories, hints
+    try {
+      // 將傳入的圖片修改為base64
+      const base64Array = await Promise.all(
+        questionParam.image.map(file => {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = e => resolve(e.target.result);
+            reader.onerror = err => reject(err);
+            reader.readAsDataURL(file);
+          });
+        })
+      );
+      questionParam.image = base64Array;
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.post(QA_URL + '/modifyQA/postQuestion', questionParam, { headers: authHeader })
+      return response.data
+    } catch (e) {
+      return e.response.data
+    }
+  },
+  // 獲得已公開(公開區)的QA
+  async getPublicQA(course_ids, description, image, resourceCategories, hints) {
+    try {
+      const response = await axios.get(QA_URL + '/getPublicQAs', {
+        course_ids,
+        isPublic,
+        description,
+        image,
+        resourceCategories,
+        hints,
+      })
+      return response.data
+    } catch (e) {
+      return e.response.data
+    }
+  },
+  // 獲得課程的指定QA
+  async getCourseQA(course_id, description, image, resourceCategories, hints) {
+    try {
+      const response = await axios.get(QA_URL + `/getCourseQAs/${course_id}`, {
+        params: course_id,
+        isPublic,
+        description,
+        image,
+        resourceCategories,
+        hints,
+      })
+      return response.data
+    } catch (e) {
+      return e.response.data
+    }
+  },
+}
 
-export default userService;
+export default userService

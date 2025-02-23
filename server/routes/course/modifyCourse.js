@@ -37,12 +37,10 @@ router.post("/createNewCourse", async (req, res) => {
       courseClass,
       members: [],
     });
-    if (req.user.role !== "admin") {
-      newCourse.members.push(req.user._id);
-      let savedCourse = await newCourse.save();
-      req.user.courses.push(savedCourse._id);
-      await req.user.save();
-    }
+    newCourse.members.push(req.user._id);
+    let savedCourse = await newCourse.save();
+    req.user.courses.push(savedCourse._id);
+    await req.user.save();
 
     return res.json({
       success: true,

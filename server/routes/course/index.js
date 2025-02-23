@@ -1,7 +1,9 @@
 const router = require("express").Router();
 const Course = require("../../models").course;
+const QA = require("../../models").QA;
 const courseMethodRouter = require("./courseMethod");
 const modifyCourseRouter = require("./modifyCourse");
+const QARouter = require("./QA/index");
 
 const accessChecker = require("../routesMiddleware/accessChecker");
 
@@ -90,6 +92,8 @@ router.get("/getCourses", checkTeacherAccess, async (req, res) => {
       .json({ success: false, msg: "發生了不可預期的錯誤" });
   }
 });
+
+router.use("/question", QARouter);
 
 router.use("/modifyCourse", checkTeacherAccess, modifyCourseRouter);
 

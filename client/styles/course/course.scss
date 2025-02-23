@@ -265,6 +265,74 @@
         display: flex;
         gap: 24px;
       }
+      .ask-area {
+        display: flex;
+        flex-direction: column;
+        gap: 24px; /* 區塊間距 */
+        padding-left: 24px;
+        background-color: #f5f5f5;
+        .ask-form {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin: 24px 0 24px 0;
+          gap: 12px;
+          button {
+            padding: 4px 12px 4px 12px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+          }
+          .upload-img-area {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            input {
+              width: 200px;
+              cursor: pointer;
+            }
+          }
+          .description-input-area {
+            display: flex;
+            flex-direction: column;
+            .ask-text-area {
+              outline: none;
+              padding: 4px;
+              border: 1px solid rgba(0, 0, 0, 0.5);
+              height: 240px;
+              width: 600px;
+              resize: none;
+            }
+          }
+          .resourceCategory-input-area {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+          }
+          .hints-area {
+            display: flex;
+            gap: 8px;
+            .hint {
+              padding: 2px 4px 2px 4px;
+              border: 1px solid rgba(0, 0, 0, 0.3);
+              display: flex;
+              align-items: center;
+              span {
+                cursor: pointer;
+                display: flex;
+                justify-content: center;
+                color: red;
+                height: 100%;
+                width: 12px;
+              }
+            }
+          }
+          .hints-input-area {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+          }
+        }
+      }
     }
   }
 }

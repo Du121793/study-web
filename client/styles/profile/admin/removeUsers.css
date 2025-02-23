@@ -1,5 +1,5 @@
 .remove-users-page {
-  min-width: 700px;
+  min-width: 620px;
   max-width: 950px;
   position: relative;
   display: flex;
@@ -12,4 +12,102 @@
   top: 24px;
   padding: 24px;
   width: 60vw;
+  gap: 8px;
+}
+.remove-users-page .remove-users-title {
+  font-size: 28px;
+}
+.remove-users-page .remove-user-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.remove-users-page .remove-user-header div {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.remove-users-page .remove-user-header div .name-input {
+  width: 100px;
+}
+.remove-users-page .header-btns {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.remove-users-page .header-btns .button {
+  cursor: pointer;
+  padding: 4px 8px 4px 8px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  transition: 0.2s;
+}
+.remove-users-page .header-btns .button:hover {
+  background-color: #f0f0f0;
+}
+.remove-users-page .header-btns #delete-btn {
+  background-color: #efb5b5;
+}
+.remove-users-page .header-btns #delete-btn:hover {
+  background-color: #e0aaaa;
+}
+.remove-users-page .user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.remove-users-page .user-list .container {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  padding: 4px 0 4px 0;
+}
+.remove-users-page .user-list .container .username {
+  pointer-events: none;
+  width: 80px;
+  margin-left: 6px;
+}
+.remove-users-page .user-list .container .realname {
+  pointer-events: none;
+  width: 70px;
+}
+.remove-users-page .user-list .container .phone {
+  pointer-events: none;
+  width: 140px;
+}
+.remove-users-page .user-list .container .userid {
+  pointer-events: none;
+  width: 240px;
+}
+.remove-users-page .user-list .container .role {
+  pointer-events: none;
+  width: 70px;
+}
+.remove-users-page .user-list-title {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.remove-users-page .user-list-title .container {
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  padding: 4px 0 4px 0;
+}
+.remove-users-page .user-list-title .container .username {
+  width: 80px;
+  margin-left: 6px;
+}
+.remove-users-page .user-list-title .container .realname {
+  width: 70px;
+}
+.remove-users-page .user-list-title .container .phone {
+  width: 140px;
+}
+.remove-users-page .user-list-title .container .userid {
+  width: 240px;
+}
+.remove-users-page .user-list-title .container .role {
+  width: 70px;
 }/*# sourceMappingURL=removeUsers.css.map */
