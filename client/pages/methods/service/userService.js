@@ -66,7 +66,6 @@ const userService = {
     // type 類型 MainClass為正課 QA為問答 noImg非必填 傳入true則不回傳縮圖
     // sortBy 排序欄位: length(影片長度) 或 recordDate(錄影日期)
     // sortOrder  排序順序 'asc'(正序) 或 'desc'(倒序)
-    console.log(filter)
     try {
       const authHeader = token ? { Authorization: token } : {}
       console.log(COURSE_URL + `/${course_id}/videoInfo`)
@@ -77,11 +76,14 @@ const userService = {
       console.log('msg', response.data)
       return response.data
     } catch (e) {
-      console.log(e)
+      console.log(e.response.data)
     }
   },
 
+  // 獲得影片連結，用於播放器頁面
   async getVideoLink(token, course_id, video_id) {
+    console.log(course_id)
+    console.log(video_id)
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.get(COURSE_URL + `/${course_id}/videoUri`, {
@@ -107,22 +109,23 @@ const userService = {
       return e.response.data
     }
   },
+
   // 新增新的QA給指定課程
   async createNewQuestion(token, questionParam) {
     // isPublic, course_ids, description, image, resourceCategories, hints
     try {
       // 將傳入的圖片修改為base64
       const base64Array = await Promise.all(
-        questionParam.image.map(file => {
+        questionParam.image.map((file) => {
           return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = e => resolve(e.target.result);
-            reader.onerror = err => reject(err);
-            reader.readAsDataURL(file);
-          });
+            const reader = new FileReader()
+            reader.onload = (e) => resolve(e.target.result)
+            reader.onerror = (err) => reject(err)
+            reader.readAsDataURL(file)
+          })
         })
-      );
-      questionParam.image = base64Array;
+      )
+      questionParam.image = base64Array
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.post(QA_URL + '/modifyQA/postQuestion', questionParam, { headers: authHeader })
       return response.data
@@ -130,6 +133,7 @@ const userService = {
       return e.response.data
     }
   },
+
   // 獲得已公開(公開區)的QA
   async getPublicQA(course_ids, description, image, resourceCategories, hints) {
     try {
@@ -146,6 +150,7 @@ const userService = {
       return e.response.data
     }
   },
+
   // 獲得課程的指定QA
   async getCourseQA(course_id, description, image, resourceCategories, hints) {
     try {
@@ -160,6 +165,61 @@ const userService = {
       return response.data
     } catch (e) {
       return e.response.data
+    }
+  },
+
+  // 獲得QA問題的詳細
+  async getQaInfo(token, question_id) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.get(QA_URL + `/QAMethod/${question_id}`, {
+        headers: authHeader,
+      })
+      console.log(response.data)
+      return response.data
+    } catch (e) {
+      return e
+    }
+  },
+  // 獲得QA問題的留言區
+  /*
+    reqBody{
+      content,
+      image = [],
+      fileSize,
+      isPrivate = false,
+      isBest = false,
+    }
+  */
+  async submitQaMessage(token, question_id, reqBody) {
+    try {
+      console.log(reqBody)
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.post(QA_URL + `/QAMethod/${question_id}/postNewComment`, reqBody, {
+        headers: authHeader,
+      })
+      return response.data
+    } catch (e) {
+      if (!e.response) {
+        return (e.response = {
+          success: false,
+          msg: '前端沒有接收到訊息',
+        })
+      }
+      return e.response.data
+    }
+  },
+  // 獲得QA問題的詳細
+  async getQaInfo(token, question_id) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.get(QA_URL + `/QAMethod/${question_id}`, {
+        headers: authHeader,
+      })
+      console.log(response.data)
+      return response.data
+    } catch (e) {
+      return e
     }
   },
 }

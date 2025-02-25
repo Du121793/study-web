@@ -3,5 +3,5 @@ module.exports = {
   course: require("./course/course-model"),
   courseVideoInfo: require("./course/videoInfo-model"),
   QA: require("./course/QA-model"),
-  message: require("./course/message-model"),
+  QAmessage: require("./course/QAmessage-model"),
 };

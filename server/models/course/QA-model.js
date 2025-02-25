@@ -1,4 +1,3 @@
-const { type } = require("express/lib/response");
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
@@ -11,7 +10,7 @@ const QASchema = new Schema({
     type: String,
     maxlength: 30,
   },
-  resourceCategory: {
+  resourceCategories: {
     required: true,
     type: [String],
   },

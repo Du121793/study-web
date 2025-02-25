@@ -217,7 +217,7 @@ router.delete("/deleteCourse", async (req, res) => {
       req.user.role !== "admin" &&
       !req.user.courses.find((n) => n === course_id)
     )
-      console.log(await VimeoMethods.delete("", course_id));
+      console.log(await VimeoMethods.delete({ course_id }));
     console.log(
       await VideoInfo.deleteMany({
         courseID: course_id,

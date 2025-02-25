@@ -1,6 +1,8 @@
 const router = require("express").Router();
 const VideoInfo = require("../../models").courseVideoInfo;
+const QAmessage = require("../../models").QAmessage;
 const VimeoMethods = require("../../methods").vimeoMethods;
+const imageCompresser = require("../../methods/imageCompresser");
 
 router.get("/members", async (req, res) => {
   try {
@@ -81,8 +83,8 @@ router.get("/videoUri", async (req, res) => {
     // 3. 呼叫 VimeoMethods.find，依照我們的慣例：
     //    我們在上傳時會將 [VIDEOID]={_id} 塞到 Vimeo description 中，
     //    所以只要把 videoId 傳給 VimeoMethods.find，應該就能找出該影片
-    const vimeoSearch = await VimeoMethods.find(videoId);
-
+    const vimeoSearch = await VimeoMethods.find({ videoId });
+    
     if (!vimeoSearch.success) {
       // 代表在呼叫 Vimeo API 過程中失敗
       return res.status(500).json({
@@ -126,13 +128,55 @@ router.get("/videoUri", async (req, res) => {
     });
   }
 });
+
 router.post("/uploadVideo", async (req, res) => {
   try {
-    const { title, fileSize } = req.body;
+    const {
+      title,
+      fileSize,
+      description,
+      type,
+      thumbnail,
+      length,
+      recordDate,
+    } = req.body;
+
     if (!title || !fileSize)
       return res.status(400).json({ success: false, msg: "上傳資料缺少" });
 
-    const uploadUri = await VimeoMethods.upload(req.body, req.course);
+    const { subject, grade, courseClass } = req.course;
+
+    const returnImg = await imageCompresser.compressBase64Image(thumbnail);
+    const newVideoInfoParams = recordDate
+      ? {
+          title,
+          courseID: req.course._id,
+          type,
+          description: description || "",
+          thumbnail: returnImg || "",
+          length: length || 0,
+          recordDate,
+        }
+      : {
+          title,
+          courseID: req.course._id,
+          type,
+          description: description || "",
+          thumbnail: returnImg || "",
+          length: length || 0,
+        };
+    const newVideoInfo = new VideoInfo(newVideoInfoParams);
+    const savedVideoInfo = await newVideoInfo.save();
+
+    let videoIndex = {
+      videoID: savedVideoInfo._id,
+      courseID: req.course._id,
+      subject,
+      grade,
+      courseClass,
+    };
+    // reqBody必須包含{ title, fileSize, description, type }
+    const uploadUri = await VimeoMethods.upload(req.body, videoIndex);
     if (!uploadUri.success) throw { uploadUri };
     console.log(uploadUri);
     return res.json({ success: true, data: uploadUri });
@@ -150,19 +194,24 @@ router.patch("/uploadVideoStatus", async (req, res) => {
     if (typeof isUploadSuccess !== "boolean" || !videoId)
       return res.status(400).json({ success: false, msg: "上傳資料缺少" });
 
-    const foundVideoInfo = await VideoInfo.findById(videoId);
-    if (!foundVideoInfo)
+    let foundItem = await VideoInfo.findById(videoId);
+
+    if (!foundItem)
       return res
         .status(400)
-        .json({ success: false, msg: "伺服器無法找到此影片" });
+        .json({ success: false, msg: "伺服器無法找到此資源" });
 
-    if (isUploadSuccess) {
-      await VideoInfo.findByIdAndUpdate(
-        videoId,
-        { $set: { isUploadSuccess: true } },
-        { new: true }
-      );
-    }
+    // if (isUploadSuccess) {
+    //   await VideoInfo.findByIdAndUpdate(
+    //     videoId,
+    //     { $set: { isUploadSuccess: true } },
+    //     { new: true }
+    //   );
+    // }
+
+    foundItem.isUploadSuccess = true;
+
+    await foundItem.save();
 
     return res.json({ success: true, msg: "已收到您的回傳結果" });
   } catch (e) {
@@ -180,7 +229,7 @@ router.delete("/deleteVideo", async (req, res) => {
     let foundVideoInfo = await VideoInfo.findOne({ _id: videoId });
     if (!foundVideoInfo)
       return res.status(400).json({ success: false, msg: "找不到影片資料" });
-    await VimeoMethods.delete(videoId);
+    await VimeoMethods.delete({ videoId });
     await VideoInfo.findOneAndDelete({ _id: videoId });
     return res.json({ success: false, msg: "已更新資料庫" });
   } catch (e) {

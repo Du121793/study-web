@@ -18,12 +18,12 @@ const User = require("./models").user;
 
 app.use(
   cors({
-    origin: "http://localhost:3000", // 或你的前端網域
+    origin: process.env.CLIENT_IP, // 或你的前端網域
     credentials: true, // 允許附帶cookie
   })
 );
 mongoose
-  .connect("mongodb://localhost:27017/StudyWebDBAlpha")
+  .connect(process.env.DB_IP)
   .then(() => {
     console.log("Successful to mongodb");
   })

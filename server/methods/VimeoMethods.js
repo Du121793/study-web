@@ -1,7 +1,6 @@
 require("dotenv").config();
 const { Vimeo } = require("@vimeo/vimeo");
 const VideoInfo = require("../models/").courseVideoInfo;
-const imageCompresser = require("./imageCompresser");
 
 const VIMEO_ACCESS_TOKEN = process.env.VIMEO_ACCESS_TOKEN;
 if (!VIMEO_ACCESS_TOKEN) {
@@ -48,49 +47,22 @@ async function findOrCreateWebVideosFolder() {
 }
 
 /** 把 meta 寫入 description */
-function buildDescription(
-  originalDesc,
-  videoID,
-  courseID,
-  grade,
-  subject,
-  courseClass
-) {
+function buildDescription(originalDesc, data) {
   let desc = originalDesc || "";
-  if (videoID) desc += `\n[VIDEOID]=${videoID}`;
-  if (courseID) desc += `\n[COURSEID]=${courseID}`;
-  if (grade) desc += `\n[GRADE]=${grade}`;
-  if (subject) desc += `\n[SUBJECT]=${subject}`;
-  if (courseClass) desc += `\n[CLASS]=${courseClass}`;
+
+  // 走訪 data 物件的所有 key/value
+  for (const [key, value] of Object.entries(data)) {
+    if (value) {
+      // 統一轉成大寫的 key，並拼接到 desc
+      desc += `\n[${key.toUpperCase()}]=${value}`;
+    }
+  }
+
   return desc;
 }
 
-async function uploadVideo(reqBody, courseInfo) {
-  const { subject, grade, courseClass } = courseInfo;
-  const { title, fileSize, description, type, thumbnail, length, recordDate } =
-    reqBody;
-
-  const returnImg = await imageCompresser.compressBase64Image(thumbnail);
-
-  const newVideoInfoParams = recordDate? {
-    title,
-    courseID: courseInfo._id,
-    type,
-    description: description || "",
-    thumbnail: returnImg || "",
-    length: length || 0,
-    recordDate,
-  } : {
-    title,
-    courseID: courseInfo._id,
-    type,
-    description: description || "",
-    thumbnail: returnImg || "",
-    length: length || 0,
-  }
-
-  const newVideoInfo = new VideoInfo(newVideoInfoParams);
-  const savedVideoInfo = await newVideoInfo.save();
+async function uploadVideo(videoInfo, videoIndex) {
+  const { title, fileSize, description = "", type } = videoInfo;
 
   try {
     console.log(fileSize);
@@ -102,14 +74,7 @@ async function uploadVideo(reqBody, courseInfo) {
     const { userId, folderId } = await findOrCreateWebVideosFolder();
 
     // 2) 合併描述
-    const finalDesc = buildDescription(
-      description,
-      savedVideoInfo._id,
-      courseInfo._id,
-      grade,
-      subject,
-      courseClass
-    );
+    const finalDesc = buildDescription(description, videoIndex);
 
     // 3) 透過 "query" 帶入上傳資料 (含 upload)
     //    讓套件自動幫我們 JSON.stringify(這些資料)
@@ -148,35 +113,31 @@ async function uploadVideo(reqBody, courseInfo) {
     return {
       success: true,
       vimeoUri: createResp.uri,
-      videoId: savedVideoInfo._id,
+      videoId: videoIndex.videoID,
       uploadLink: createResp.upload.upload_link,
     };
   } catch (err) {
     (async () => {
-      await deleteVideo(savedVideoInfo._id);
-      await VideoInfo.findOneAndDelete({ _id: savedVideoInfo._id });
+      await deleteVideo({ videoID: videoIndex.videoID });
+      if (type === "MainClass")
+        await VideoInfo.findOneAndDelete({ _id: videoIndex.videoID });
     })();
     return {
       success: false,
-      message: "Vimeo API 錯誤",
+      msg: "Vimeo API 錯誤",
       error: err,
     };
   }
 }
 
-async function findVideo(
-  videoID = "",
-  courseID = "",
-  grade = "",
-  subject = "",
-  courseClass = ""
-) {
+async function findVideo(videoIndex = {}) {
   try {
-    // 如果全都沒帶，就回空
-    if (!videoID && !courseID && !grade && !subject && !courseClass) {
+    // 如果沒有任何有效條件 (所有值都是 falsy)，就直接回傳空
+    const hasAtLeastOneCondition = Object.values(videoIndex).some(Boolean);
+    if (!hasAtLeastOneCondition) {
       return { success: true, total: 0, data: [] };
     }
-
+    console.log("as", videoIndex);
     // 1) 找到/建立 WebVideos 資料夾
     const me = await vimeoRequest({ method: "GET", path: "/me" });
     const userId = me.uri.split("/").pop();
@@ -218,32 +179,30 @@ async function findVideo(
       if (videosResp.data.length < perPage) {
         break;
       }
-
-      // 否則翻到下一頁
       page++;
     }
 
-    // 3) 做"絕對搜尋"：在 description 中尋找
-    function matchDescription(videoDesc, vid, cid, g, s, c) {
-      if (vid && !videoDesc.includes(`[VIDEOID]=${vid}`)) return false;
-      if (cid && !videoDesc.includes(`[COURSEID]=${cid}`)) return false;
-      if (g && !videoDesc.includes(`[GRADE]=${g}`)) return false;
-      if (s && !videoDesc.includes(`[SUBJECT]=${s}`)) return false;
-      if (c && !videoDesc.includes(`[CLASS]=${c}`)) return false;
+    // 3) 做"絕對搜尋"：自動根據傳入的 key-value 逐一比對 description
+    function matchDescription(videoDesc, conditions) {
+      for (const [key, value] of Object.entries(conditions)) {
+        // 若該 key 有值，才做比對；空字串等 falsy 值就跳過
+        if (value) {
+          // KEY 一律轉成大寫後比對，如 [VIDEOID]=xxx
+          const upperKey = key.toUpperCase();
+          console.log(`[${upperKey}]=${value}`)
+          if (!videoDesc.includes(`[${upperKey}]=${value}`)) {
+            return false;
+          }
+        }
+      }
       return true;
     }
 
     const filtered = allVideos.filter((video) =>
-      matchDescription(
-        video.description || "",
-        videoID,
-        courseID,
-        grade,
-        subject,
-        courseClass
-      )
+      matchDescription(video.description || "", videoIndex)
     );
 
+    // 回傳結果
     return {
       success: true,
       total: filtered.length,
@@ -265,16 +224,11 @@ async function findVideo(
  * 2. 搜尋到的影片，依序呼叫 DELETE 進行刪除。
  * 3. 刪除完成後，回傳成功刪除的筆數與被刪除的影片資訊。
  ****/
-async function deleteVideo(
-  videoID = "",
-  courseID = "",
-  grade = "",
-  subject = "",
-  courseClass = ""
-) {
+async function deleteVideo(videoIndex = {}) {
   try {
-    // 如果全都沒帶，就回空
-    if (!videoID && !courseID && !grade && !subject && !courseClass) {
+    // 如果沒有任何有效條件 (所有值都是 falsy)，就直接回傳空
+    const hasAtLeastOneCondition = Object.values(videoIndex).some(Boolean);
+    if (!hasAtLeastOneCondition) {
       return { success: true, total: 0, data: [] };
     }
 
@@ -290,7 +244,6 @@ async function deleteVideo(
     });
     let folder = folderResp.data.find((p) => p.name === "WebVideos");
     if (!folder) {
-      // 若找不到 WebVideos，表示尚未建立 -> 直接回傳空
       return { success: true, total: 0, data: [] };
     }
     const folderId = folder.uri.split("/").pop();
@@ -312,46 +265,37 @@ async function deleteVideo(
         },
       });
 
-      // 合併當前頁影片
       allVideos.push(...videosResp.data);
 
-      // 若這次拿到的筆數 < perPage，就代表沒有更多頁了
       if (videosResp.data.length < perPage) {
         break;
       }
-
-      // 否則翻到下一頁
       page++;
     }
 
-    // 3) 做"絕對搜尋"：在 description 中尋找
-    function matchDescription(videoDesc, vid, cid, g, s, c) {
-      if (vid && !videoDesc.includes(`[VIDEOID]=${vid}`)) return false;
-      if (cid && !videoDesc.includes(`[COURSEID]=${cid}`)) return false;
-      if (g && !videoDesc.includes(`[GRADE]=${g}`)) return false;
-      if (s && !videoDesc.includes(`[SUBJECT]=${s}`)) return false;
-      if (c && !videoDesc.includes(`[CLASS]=${c}`)) return false;
+    // 3) 絕對搜尋
+    function matchDescription(videoDesc, conditions) {
+      for (const [key, value] of Object.entries(conditions)) {
+        if (value) {
+          const upperKey = key.toUpperCase();
+          if (!videoDesc.includes(`[${upperKey}]=${value}`)) {
+            return false;
+          }
+        }
+      }
       return true;
     }
 
     const filtered = allVideos.filter((video) =>
-      matchDescription(
-        video.description || "",
-        videoID,
-        courseID,
-        grade,
-        subject,
-        courseClass
-      )
+      matchDescription(video.description || "", videoIndex)
     );
 
     // 4) 依序刪除符合條件的影片
-    //    (可改成 Promise.all 並行刪除，但要注意 API 配額/風險)
+    //    (可改成 Promise.all 併發，但要留意 API 流量限制)
     for (const vid of filtered) {
-      // vid.uri 形如 "/videos/123456789"
       await vimeoRequest({
         method: "DELETE",
-        path: vid.uri,
+        path: vid.uri, // 形如 "/videos/123456789"
       });
     }
 

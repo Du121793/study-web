@@ -8,6 +8,9 @@ const User = require("../models").user;
 const jwt = require("jsonwebtoken");
 const { user } = require("../models");
 
+const dotenv = require("dotenv");
+dotenv.config();
+
 const accessChecker = require("./routesMiddleware/accessChecker");
 
 const checkTeacherAccess = accessChecker.teacher;
@@ -35,7 +38,7 @@ router.get(
       // 導回前端的某個頁面，帶上正式 JWT
       return res.redirect(
         301,
-        `http://localhost:3000/methods/service/Res?token=${token}`
+        `${process.env.CLIENT_IP}/methods/service/Res?token=${token}`
       );
     }
 
@@ -58,7 +61,7 @@ router.get(
     // 導向前端的「填寫真實姓名與電話」頁面
     return res.redirect(
       301,
-      `http://localhost:3000/methods/service/completeInfo?token=${tempToken}`
+      `${process.env.CLIENT_IP}/methods/service/completeInfo?token=${tempToken}`
     );
   }
 );

@@ -1,0 +1,114 @@
+.qaPage-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .qaPage-container {
+    width: 90%;
+    padding: 20px;
+    display: flex; // 左右分欄
+    gap: 24px;
+    justify-content: center;
+    @media (max-width: 770px) {
+      flex-direction: column;
+      align-items: center;
+      .right-area {
+        width: 100%;
+      }
+    }
+    .left-area {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      @media (min-width: 770px) {
+        width: 40%;
+      }
+      .top {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 32px;
+        .back-btn {
+          // 返回課程按鈕的樣式
+          // 例：
+          padding: 6px 12px;
+          border: none;
+          background-color: #333;
+          color: #fff;
+          cursor: pointer;
+        }
+
+        .course-name-title {
+          // 課程名稱標題樣式
+          // 例：
+          font-size: 18px;
+          font-weight: bold;
+        }
+      }
+
+      .middle {
+        // 中段放圖片的區域
+        // 例如可讓圖片區域有固定高度或自適應
+        border: 1px solid black;
+
+        .image-area {
+          // 例：佔滿父容器
+          width: 100%;
+          height: 100%;
+          .no-image-icon {
+            width: 100%;
+            height: 100%;
+          }
+        }
+      }
+
+      .bottom {
+        // 下方顯示 QA 資訊的區域
+
+        .qa-info-area {
+          // QA 資訊樣式
+          // 例：
+          background: #fafafa;
+          border: 1px solid #ccc;
+          padding: 10px;
+          height: 200px; // 視需求而定
+        }
+      }
+    }
+
+    .right-area {
+      // 右側區域，可使用 flex: 1 撐滿剩餘空間
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+
+      .title {
+        // 標題列區域
+        // padding: 10px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        .message-board-title {
+          // 例：標題字體、大小
+          display: flex;
+          justify-content: center;
+          width: 30%;
+          font-size: 28px;
+          padding: 6px 16px 6px 16px;
+          border: 1px solid #ccc;
+          background-color: #fff;
+        }
+      }
+
+      .message-board-area {
+        // 留言板主要區域
+        padding: 10px;
+        flex: 1;
+        // height: 400px;  // 視情況而定
+        background: #fff;
+        border: 1px solid #ccc;
+        overflow-y: auto; // 若內容過多可加捲軸
+      }
+    }
+  }
+}

@@ -10,12 +10,15 @@ import Link from 'next/link'
 import userService from '../methods//service/userService'
 import { useUserToken } from '../methods/service/useUserToken'
 
+// env
+const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
+
 export default function myCourse() {
   const [getCourses, setGetCourses] = useState([])
   // 使用method獲取token
   const token = useUserToken()
   // 請求課程網址
-  const curserBaseUrl = 'http://localhost:3000/courses/course'
+  const curserBaseUrl = `${clientIp}/courses/course`
   // 假圖片，用於課程左邊頭像
   const shots = [shotA, shotB, shotC, shotA, shotB, shotC, shotA, shotB, shotC, shotA]
 

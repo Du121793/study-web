@@ -57,7 +57,7 @@ passport.use(
     {
       channelID: process.env.LINECHANNELID,
       channelSecret: process.env.LINECHANNELSECRET,
-      callbackURL: "http://localhost:8080/auth/successful",
+      callbackURL: `${process.env.SERVER_IP}/auth/successful`,
       scope: ["profile", "openid", "email"],
       botPrompt: "normal",
     },

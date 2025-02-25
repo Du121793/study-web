@@ -25,14 +25,18 @@
   align-items: center;
   justify-content: space-around;
   height: 100px;
-  width: 80vw;
-  min-width: 1005px;
+  width: 90vw;
+}
+@media (max-width: 770px) {
+  .header-container .header-main .header-middle {
+    width: 0px;
+  }
 }
 .header-container .header-main .header-middle {
-  min-width: 500px;
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
   gap: 24px;
   height: 100%;
 }

@@ -20,6 +20,8 @@ import "../styles/profile/admin/removeUsers.css";
 // course
 import "../styles/course/course.css";
 import "../styles/course/videoUpload.css";
+import "../styles/course/qaPage.css";
+import "../styles/course/msgBoard.css";
 // videoPlay
 import "../styles/videoPlay/player.css";
 //method的layout

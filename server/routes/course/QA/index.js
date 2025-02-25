@@ -1,10 +1,16 @@
 const router = require("express").Router();
 const Course = require("../../../models").course;
 const QA = require("../../../models").QA;
-const modifyQA = require("./modifyQA");
-const checkTeacherAccess = require("../../routesMiddleware/accessChecker").teacher;
+const modifyQARoute = require("./modifyQA");
+const QAMethodRoute = require("./QAMethod");
+const checkTeacherAccess =
+  require("../../routesMiddleware/accessChecker").teacher;
 
-router.use("/modifyQA", modifyQA);
+const checkQuestionAccess =
+  require("../../routesMiddleware/accessChecker").question;
+
+router.use("/modifyQA", modifyQARoute);
+router.use("/QAMethod/:question_id", checkQuestionAccess, QAMethodRoute);
 
 router.get("/getPublicQAs", checkTeacherAccess, async (req, res) => {
   try {
@@ -38,6 +44,5 @@ router.get("/getCourseQAs/:course_id", async (req, res) => {
     });
   }
 });
-
 
 module.exports = router;

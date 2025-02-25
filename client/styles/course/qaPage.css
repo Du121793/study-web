@@ -1,0 +1,92 @@
+.qaPage-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.qaPage-main .qaPage-container {
+  width: 90%;
+  padding: 20px;
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+}
+@media (max-width: 770px) {
+  .qaPage-main .qaPage-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  .qaPage-main .qaPage-container .right-area {
+    width: 100%;
+  }
+}
+.qaPage-main .qaPage-container .left-area {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+@media (min-width: 770px) {
+  .qaPage-main .qaPage-container .left-area {
+    width: 40%;
+  }
+}
+.qaPage-main .qaPage-container .left-area .top {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+.qaPage-main .qaPage-container .left-area .top .back-btn {
+  padding: 6px 12px;
+  border: none;
+  background-color: #333;
+  color: #fff;
+  cursor: pointer;
+}
+.qaPage-main .qaPage-container .left-area .top .course-name-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+.qaPage-main .qaPage-container .left-area .middle {
+  border: 1px solid black;
+}
+.qaPage-main .qaPage-container .left-area .middle .image-area {
+  width: 100%;
+  height: 100%;
+}
+.qaPage-main .qaPage-container .left-area .middle .image-area .no-image-icon {
+  width: 100%;
+  height: 100%;
+}
+.qaPage-main .qaPage-container .left-area .bottom .qa-info-area {
+  background: #fafafa;
+  border: 1px solid #ccc;
+  padding: 10px;
+  height: 200px;
+}
+.qaPage-main .qaPage-container .right-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.qaPage-main .qaPage-container .right-area .title {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.qaPage-main .qaPage-container .right-area .title .message-board-title {
+  display: flex;
+  justify-content: center;
+  width: 30%;
+  font-size: 28px;
+  padding: 6px 16px 6px 16px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+}
+.qaPage-main .qaPage-container .right-area .message-board-area {
+  padding: 10px;
+  flex: 1;
+  background: #fff;
+  border: 1px solid #ccc;
+  overflow-y: auto;
+}/*# sourceMappingURL=qaPage.css.map */
