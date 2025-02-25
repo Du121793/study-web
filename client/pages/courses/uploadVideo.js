@@ -3,7 +3,7 @@ import { Upload } from 'tus-js-client'
 import videoUploader from '../methods/service/videoUploader'
 import { useUserToken } from '../methods/service/useUserToken'
 
-export default function VimeoUploadPage({ isShowVideoUpload, setIsShowVideoUpload, course_id, setUploadSuccess, uploadSuccess, uploadError, setUploadError }) {
+export default function uploadVideoFc({ isShowVideoUpload, setIsShowVideoUpload, course_id, setUploadSuccess, uploadSuccess, uploadError, setUploadError }) {
   const token = useUserToken()
   const [videoFiles, setVideoFiles] = useState([])
 

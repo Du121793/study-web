@@ -206,8 +206,8 @@ const AskNav = (courseId, courseName) => {
           </div>
           <div className="hints-area">
             {hints &&
-              hints.map((item) => (
-                <div className="hint">
+              hints.map((item, index) => (
+                <div className="hint" key={index}>
                   {item}
                   <span
                     onClick={() => {

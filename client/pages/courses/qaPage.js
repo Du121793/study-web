@@ -65,7 +65,7 @@ const QaPage = () => {
           <div className="middle">
             <div className="image-area">
               {!image && (
-                <Image
+                <img
                   className="no-image-icon"
                   src={noImageIcon}
                   alt="course has no image icon"

@@ -6,7 +6,7 @@ import adminService from "../methods/service/adminService";
 import { useUserToken } from "../methods/service/useUserToken";
 import MenberSelector from "./memberSelector";
 
-export default function studentCourse() {
+export default function addCourse() {
   const token = useUserToken();
   // 子組件
   const [selectedStudentId, setSelectedStudentId] = useState([]);
