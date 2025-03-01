@@ -1,6 +1,6 @@
 // 樣式
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans&display=swap");
-// @import url('https://fonts.googleapis.com/css2?family=Nunito&display=swap');
+
 * {
   font-family: "Open Sans", "Iansui", sans-serif;
   // font-family: 'Nunito', 'Swei Gothic', sans-serif;
@@ -17,7 +17,7 @@ input {
   transition: border-color 0.2s;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
-select{
+select {
   border: 1px solid rgba(0, 0, 0, 0.2);
 }
 ul,
@@ -44,4 +44,3 @@ a {
 .relative {
   position: relative;
 }
-// 客制化

@@ -1,8 +1,13 @@
+// global組件
+import Head from '../../components/global/Globla'
+// 原生組件庫
 import { useEffect, useState } from "react";
-import adminService from "../methods/service/adminService";
-import { useUserToken } from "../methods/service/useUserToken";
-import MenberSelector from "./memberSelector";
-export default function registerCourse() {
+// method
+import adminService from "../../method/adminService";
+import { useUserToken } from "../../method/useUserToken";
+// prfiles的component
+import MenberSelector from "./MemberSelector";
+export default function RegisterCourse() {
   // 子組件
   const [selectedStudentId, setSelectedStudentId] = useState([]);
   // 父組件 (目前)
@@ -143,8 +148,8 @@ export default function registerCourse() {
           >
             <option value="">請選擇</option>
             {getedCourse.courses &&
-              getedCourse.courses.map((item) => (
-                <option value={item._id}>{item.courseName}</option>
+              getedCourse.courses.map((item,index) => (
+                <option key={index} value={item._id}>{item.courseName}</option>
               ))}
           </select>
         </div>

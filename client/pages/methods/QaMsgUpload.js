@@ -1,10 +1,13 @@
 // QAMsgUpload.js (MyUploadComponent)
-import React, { useState } from 'react'
+// 組件庫
+import React, { use, useState } from 'react'
+// TSU
 import { Upload } from 'tus-js-client'
-import videoUploader from '../methods/service/videoUploader'
-import userService from '../methods/service/userService'
+import videoUploader from '../../method/videoUploader'
+// 外部method
+import userService from '../../method/userService'
 
-function QAMsgUpload({
+export default function QAMsgUpload({
   token,
   question_id,
   file, // 影片檔案 (File)
@@ -14,19 +17,22 @@ function QAMsgUpload({
   isPrivate,
   isBest,
 }) {
+  /* 控制上傳狀態 */
   const [uploads, setUploads] = useState([])
   const [uploadSuccess, setUploadSuccess] = useState(false)
   const [uploading, setUploading] = useState(false)
 
+  /* 第一次請求拿到上傳影片的Link與留言ID */
+  const [uploadLink, setUploadLink] = useState(null)
+  const [commentID, setCommentID] = useState(null)
+
   // 這個函式就是「開始上傳」的按鈕點擊事件
   const handleTusUpload = async () => {
-    // 避免重複點擊
     if (uploading) return
+    setUploading(true)
 
     try {
-      setUploading(true)
-
-      // (1) 先把圖片(File)轉成 Base64
+      // 先轉成 base64
       let base64Array = []
       if (images && images.length > 0) {
         base64Array = await Promise.all(
@@ -41,41 +47,43 @@ function QAMsgUpload({
         )
       }
 
-      // (2) 先呼叫後端api: 送出留言(文字＋圖片) & 拿到 uploadLink
+      // (2) 送出留言並取得 uploadLink、commentID
       const res = await userService.submitQaMessage(token, question_id, {
         content,
         image: base64Array,
-        fileSize, // 若有影片才要帶size，沒影片可以帶0或不帶
+        fileSize,
         isPrivate,
         isBest,
       })
 
+      const { uploadLink, commentID } = res.data
+      setUploadLink(uploadLink)
+      setCommentID(commentID)
+
       console.log('submitQaMessage 結果:', res)
-      const uploadLink = res.data.uploadLink
-      const commentID = res.data.commentID
+      console.log('取得的 uploadLink:', uploadLink)
 
       // (3) 若沒有要上傳影片，就結束
       if (!file) {
         console.log('沒有影片需要上傳，流程結束')
-        setUploadSuccess(true) // 代表整個流程都OK
+        setUploadSuccess(true)
         return
       }
 
-      // 如果 uploadLink 不存在 → 回報後端上傳失敗
+      // (4) 若沒有拿到 uploadLink，通知後端失敗
       if (!uploadLink) {
-        console.error('後端沒有回傳uploadLink, 上傳影片失敗')
+        console.error('後端沒有回傳 uploadLink, 上傳影片失敗')
         await videoUploader.returnQuestionUploadStatus(token, question_id, commentID, false)
         return
       }
 
-      // (4) 有影片的話，開始 TUS 上傳
-      let uploadId = Date.now() + '-' + file.name
+      // (5) 開始 Tus 上傳
+      const uploadId = Date.now() + '-' + file.name
       const tusUpload = new Upload(file, {
         uploadUrl: uploadLink,
         chunkSize: 5 * 1024 * 1024,
         uploadLength: file.size,
 
-        // 上傳失敗
         onError: async (error) => {
           console.error('TUS 上傳失敗:', error)
           setUploads((prev) => prev.map((u) => (u.id === uploadId ? { ...u, message: '上傳失敗', progress: 0 } : u)))
@@ -86,13 +94,11 @@ function QAMsgUpload({
           }
         },
 
-        // 上傳進度
         onProgress: (bytesUploaded, bytesTotal) => {
           const pct = ((bytesUploaded / bytesTotal) * 100).toFixed(2)
           setUploads((prev) => prev.map((u) => (u.id === uploadId ? { ...u, progress: pct, message: '上傳中' } : u)))
         },
 
-        // 上傳完成
         onSuccess: async () => {
           console.log('TUS 上傳成功')
           try {
@@ -108,7 +114,6 @@ function QAMsgUpload({
         },
       })
 
-      // (5) 註冊到 uploads，然後開始上傳
       setUploads((prev) => [...prev, { id: uploadId, progress: 0, message: '準備上傳中' }])
       tusUpload.start()
     } catch (err) {
@@ -120,23 +125,16 @@ function QAMsgUpload({
 
   return (
     <div>
-      <button onClick={handleTusUpload}>{uploading ? '上傳中...' : '開始上傳'}</button>
-
       <div>
         {uploads.map((upload) => (
           <div
             key={upload.id}
             style={{ marginBottom: '8px' }}>
-            <p>上傳ID: {upload.id}</p>
-            <p>狀態: {upload.message}</p>
             <p>進度: {upload.progress}%</p>
           </div>
         ))}
       </div>
-
-      {uploadSuccess && <p>整個流程成功結束！</p>}
+      <button onClick={handleTusUpload}>{uploading ? '上傳中...' : '開始上傳'}</button>
     </div>
   )
 }
-
-export default QAMsgUpload

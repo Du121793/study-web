@@ -1,16 +1,18 @@
 // 組件庫
-import { useState, useEffect } from 'react'
-import { useUserToken } from '../methods/service/useUserToken'
+import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
-// 導入方法
-import adminService from '../methods/service/adminService'
-import userService from '../methods/service/userService'
+// method
+import { useUserToken } from '../../method/useUserToken'
+import adminService from '../../method/adminService'
+import userService from '../../method/userService'
 // profiles組件
-import MemberSelector from './memberSelector'
+import MemberSelector from './MemberSelector'
 
 export default function RemoveFromCourse() {
-  const alert = document.querySelector('.alert')
   const token = useUserToken()
+  const [alertBGC, setAlertBGC] = useState('rgb(186, 179, 179)')
+  const [alertZindex, setAlertZindex] = useState(-1)
+  const [alertHeight, setAlertHeight] = useState('0')
   const [message, setMessage] = useState('')
   const [courses, setCourses] = useState('')
   // 選擇的學生
@@ -23,28 +25,6 @@ export default function RemoveFromCourse() {
   const [UnRegisterMemberedStatus, setsUnRegisterMemberStatus] = useState(true)
   // 刪除二次確認
   let doubleCheckDelete = false
-
-  useEffect(() => {
-    initCourses(token)
-  }, [token])
-
-  // 當有成員被移除後再發一次請求用於刷新畫面
-  useEffect(() => {
-    if (token) SelectedCourseMembers(selectCourse)
-  }, [token, UnRegisterMemberedStatus])
-
-  // 請求課程資料
-  const initCourses = (token) => {
-    if (token) {
-      try {
-        adminService.getCourses(token, { page: 1 }).then((res) => {
-          setCourses(res.data)
-        })
-      } catch (error) {
-        console.log(error)
-      }
-    }
-  }
 
   // 點擊選擇學生，存到selectedMember
   const clickSelectedStudent = (e, student_id) => {
@@ -81,31 +61,47 @@ export default function RemoveFromCourse() {
           console.log(res)
           setsUnRegisterMemberStatus(!UnRegisterMemberedStatus)
           setMessage('移除成功')
-          alert.style.backgroundColor = 'rgb(172, 220, 159)'
-          // if (res === '') {
-          //   setMessage('請選擇欲移除的成員')
-          //   alert.style.backgroundColor = 'rgb(233, 102, 102)'
-          // }
+          setAlertBGC('rgb(172, 220, 159)')
         })
     } else {
       setMessage('請選擇課程')
       console.log(message)
-      alert.style.backgroundColor = 'rgb(233, 102, 102)'
+      setAlertBGC('rgb(233, 102, 102)')
     }
-    alert.style.zIndex = '1'
-    alert.style.height = '80px'
+    setAlertZindex(1)
+    setAlertHeight('80px')
     setTimeout(() => {
-      alert.style.zIndex = '-1'
-      alert.style.height = '0'
+      setAlertZindex(-1)
+      setAlertHeight(0)
     }, 1500)
   }
 
   // 請求獲得所選擇的課程的所有成員
-  const SelectedCourseMembers = (course_id) => {
-    adminService.getMembers(token, { courses: course_id }).then((res) => {
-      setSelectedCourseMembers(res.data)
-    })
-  }
+  const SelectedCourseMembers = useCallback(
+    (course_id) => {
+      adminService.getMembers(token, { courses: course_id }).then((res) => {
+        setSelectedCourseMembers(res.data)
+      })
+    },
+    [token]
+  )
+
+  useEffect(() => {
+    if (token) {
+      try {
+        adminService.getCourses(token, { page: 1 }).then((res) => {
+          setCourses(res.data)
+        })
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  }, [token])
+
+  // 當有成員被移除後再發一次請求用於刷新畫面
+  useEffect(() => {
+    if (token) SelectedCourseMembers(selectCourse)
+  }, [token, UnRegisterMemberedStatus, SelectedCourseMembers])
 
   // 二次確認刪除
   const confirmDelete = (e) => {}
@@ -116,7 +112,11 @@ export default function RemoveFromCourse() {
   }
   return (
     <div className="remove-from-course-main">
-      <div className="alert">{message}</div>
+      <div
+        className="alert"
+        style={{ backgroundColor: alertBGC, zIndex: alertZindex, height: alertHeight }}>
+        {message}
+      </div>
       <div className="remove-from-course-header">課程移除成員系統</div>
       <div className="system-body">
         <div className="selects-area">
@@ -129,7 +129,14 @@ export default function RemoveFromCourse() {
                 setSelectCourse(e.target.value)
               }}>
               <option value="123">請選擇</option>
-              {courses && courses.courses.map((item) => <option value={item._id}>{item.courseName}</option>)}
+              {courses &&
+                courses.courses.map((item, index) => (
+                  <option
+                    key={index}
+                    value={item._id}>
+                    {item.courseName}
+                  </option>
+                ))}
             </select>
           </div>
           <button
@@ -152,9 +159,10 @@ export default function RemoveFromCourse() {
             </div>
           </div>
           <div className="show-members">
-            {selectedCourseMembers.map((item) => (
+            {selectedCourseMembers.map((item, index) => (
               <div
                 className="member"
+                key={index}
                 onClick={(e) => {
                   clickSelectedStudent(e.target, item._id)
                 }}>

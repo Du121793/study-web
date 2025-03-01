@@ -8,18 +8,17 @@ import Link from 'next/link'
 // global組件
 
 // method
-import { useUserToken } from '../methods/service/useUserToken'
-import userService from '../methods/service/userService'
+import { useUserToken } from '../../method/useUserToken'
+import userService from '../../method/userService'
 
 // 傳送影片的請求
 // import {startTusUpload} from '../methods/qaMsgUpload.js'
-import QAMsgUpload from '../methods/qaMsgUpload'
+import QAMsgUpload from '../methods/QaMsgUpload'
 
-const MessageBoard = () => {
+export default function MessageBoard({qa_id}) {
   // 從url獲取參數
   const router = useRouter()
   const { course_id } = router.query
-  const question_id = '67bd66c2032865bc616bf2cc'
 
   // 大部分api需要的token
   const token = useUserToken()
@@ -54,7 +53,7 @@ const MessageBoard = () => {
   // 67bb6569c646a56b343ed51c
   const submitMsg = () => {
     userService
-      .submitQaMessage(token, question_id, {
+      .submitQaMessage(token, qa_id, {
         content,
         image: images,
         fileSize: video.size,
@@ -70,20 +69,10 @@ const MessageBoard = () => {
   }
 
   const test = () => {
-    console.log(images)
   }
 
   return (
     <div className="msg-board">
-      <QAMsgUpload
-        token={token}
-        file={video}
-        question_id={question_id}
-        content={content}
-        images={images}
-        fileSize={video && video.size}
-        isPrivate={isPrivate}
-        isBest={isBest}></QAMsgUpload>
       <textarea
         type="text-area"
         className="text-area"
@@ -92,7 +81,7 @@ const MessageBoard = () => {
           setContent(e.target.value)
         }}></textarea>
       <div className="settings-area">
-        <div className="upload-video-btn-area">
+        <div className="upload-video-btn-area" onClick={test}>
           可傳送最多一部影片
           <input
             type="file"
@@ -126,18 +115,17 @@ const MessageBoard = () => {
           是否隱藏該留言
         </div>
         <div className="submit-btn-area">
-          <button
-            className="submit"
-            onClick={() => {
-              submitMsg()
-              test()
-            }}>
-            送出留言
-          </button>
+          <QAMsgUpload
+            token={token}
+            file={video}
+            question_id={qa_id}
+            content={content}
+            images={images}
+            fileSize={video && video.size}
+            isPrivate={isPrivate}
+            isBest={isBest}></QAMsgUpload>
         </div>
       </div>
     </div>
   )
 }
-
-export default MessageBoard

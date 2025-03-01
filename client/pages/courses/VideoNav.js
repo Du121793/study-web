@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 // 組件庫
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
@@ -10,20 +10,16 @@ import downArrow from '../../public/course/downArrow.png'
 import leftArrow from '../../public/course/leftArrow.png'
 
 // method
-import { useUserToken } from '../methods/service/useUserToken'
-import userService from '../methods/service/userService'
+import { useUserToken } from '../../method/useUserToken'
+import userService from '../../method/userService'
 
 // 子組件
-import VideoUploadComponent from './uploadVideo'
+import VideoUploadComponent from './UploadVideo'
 
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
-const VideoNav = ({ course_id, courseName }) => {
-  const test = () => {
-    console.log(baseUrl)
-  }
-
+export default function VideoNav({ course_id, courseName }) {
   const token = useUserToken()
   // 使用者資料狀態
   const [userInfo, setUserInfo] = useState(null)
@@ -37,7 +33,7 @@ const VideoNav = ({ course_id, courseName }) => {
 
   // 請求影片資訊的參數
   const baseUrl = `${clientIp}/`
-  const backToMyCoursePageUrl = `${clientIp}/profiles/profile`
+  const backToMyCoursePageUrl = `${clientIp}/profiles/Profile`
   const [chooseType, setChooseType] = useState('')
   const [videosShowPage, setVideosShowPage] = useState(1)
   const [videosPageSize, setVideosPageSize] = useState(8)
@@ -48,31 +44,12 @@ const VideoNav = ({ course_id, courseName }) => {
   const [uploadSuccess, setUploadSuccess] = useState(false) // 用於上傳完成更新影片區域
   const [uploadError, setUploadError] = useState(false) // 存取是否上傳發生錯誤
 
-  // 請求使用者資料
-  useEffect(() => {
-    if (token) {
-      userService
-        .getUserInfo(token)
-        .then((res) => {
-          setUserInfo(res.data)
-          setLogined(true)
-        })
-        .catch((err) => console.error('Error:', err.message))
-    }
-  }, [token])
-
-  useEffect(() => {
-    if (videoNavOpen && videoContentRef.current) {
-      setVideoContentHeight(videoContentRef.current.scrollHeight)
-    }
-  }, [videos, videoNavOpen])
-
-  // 若是任何一個有改變，重新發一次影片請求
-  useEffect(() => {
-    getCourseVideos()
-  }, [token, course_id, chooseType, chooseSortOrder, uploadSuccess, videosPageSize])
+  const test = () => {
+    console.log(baseUrl)
+  }
+  
   // 獲得影片資訊
-  const getCourseVideos = () => {
+  const getCourseVideos = useCallback(() => {
     if (token && course_id) {
       userService
         .getVideoInfo(token, course_id, {
@@ -87,7 +64,7 @@ const VideoNav = ({ course_id, courseName }) => {
           setVideos(res.data)
         })
     }
-  }
+  }, [token, course_id])
 
   // 計算高度進行切換，用於transition
   const toggleVideoNav = () => {
@@ -163,6 +140,30 @@ const VideoNav = ({ course_id, courseName }) => {
     return `${minutesString}:${secsString}`
   }
 
+  // 若是任何一個有改變，重新發一次影片請求
+  useEffect(() => {
+    getCourseVideos()
+  }, [token, course_id, chooseType, chooseSortOrder, uploadSuccess, videosPageSize])
+
+  useEffect(() => {
+    if (videoNavOpen && videoContentRef.current) {
+      setVideoContentHeight(videoContentRef.current.scrollHeight)
+    }
+  }, [videos, videoNavOpen])
+
+  // 請求使用者資料
+  useEffect(() => {
+    if (token) {
+      userService
+        .getUserInfo(token)
+        .then((res) => {
+          setUserInfo(res.data)
+          setLogined(true)
+        })
+        .catch((err) => console.error('Error:', err.message))
+    }
+  }, [token])
+
   return (
     <div
       className="nav"
@@ -228,12 +229,14 @@ const VideoNav = ({ course_id, courseName }) => {
             videos.map((item) => (
               <Link
                 key={item._id}
-                href={`${baseUrl}videoPlay/player?course_name=${courseName}&video_id=${item._id}&course_id=${course_id}&info=${[item.description, item.title, item.date]}`}
+                href={`${baseUrl}videoPlay/Player?course_name=${courseName}&video_id=${item._id}&course_id=${course_id}&info=${[item.description, item.title, item.date]}`}
                 className="video">
-                <img
+                <Image
                   src={item.thumbnail}
                   className="videos-shot"
                   alt={item.title}
+                  width={142}
+                  height={142}
                 />
                 <div className="video-length">{formatSecondsToHMS(item.length)}</div>
                 <div className="info">
@@ -264,5 +267,3 @@ const VideoNav = ({ course_id, courseName }) => {
     </div>
   )
 }
-
-export default VideoNav

@@ -1,40 +1,44 @@
-.teacherLayout-main {
-  .teacherLayout-container {
+@import "../../global/variables";
+.Layout-main {
+  .Layout-container {
     position: relative;
     display: flex;
     justify-content: space-between;
     width: 100%;
-    .teacherLayout-left-nav {
+    height: 100%;
+    position: absolute;
+    .Layout-left-nav {
       position: relative;
       display: flex;
       transition: 0.2s;
-      top: 24px;
       margin-left: 0;
-      height: 100%;
       // 左方選單
       .options {
         display: flex;
         flex-direction: column;
+        align-items: center;
         position: sticky;
         // overflow: hidden;
         z-index: 1;
         height: 100%;
-        width: 200px;
+        width: 240px;
         padding-bottom: 12px;
-        background-color: rgb(255, 255, 255);
-        border: 1px solid gray;
-        border-top-right-radius: 12px;
-        border-bottom-right-radius: 12px;
+        border-right: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+        background-color: #ffffff;
         gap: 14px;
         z-index: 3;
+        .active {
+          background-color: rgb(119, 164, 240, 0.5);
+          border-radius: 6px;
+        }
         .turn-right-icon {
           position: relative;
-          top: 3px;
-          width: 24px;
-          height: 24px;
+          width: 13px;
+          height: 13px;
         }
         .nav {
-          width: 100%;
+          width: 90%;
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -42,7 +46,25 @@
           text-overflow: ellipsis;
           .nav-container {
             display: flex;
+            align-items: center;
+            .nav-option-header {
+              padding: 0 6px 0 6px;
+              transition: 0.2s;
+              display: flex;
+              align-items: center;
+              .title-icon {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+              }
+            }
+            .list-switch-btn {
+              transition: 0.2s;
+            }
           }
+
           .nav-options {
             overflow: hidden;
             font-size: 16px;
@@ -51,14 +73,11 @@
             display: flex;
             flex-direction: column;
             transition: 0.2s;
-            gap: 4px;
+            gap: 8px;
             .nav-option-li {
               display: flex;
-              position: relative;
-              .turn-right-icon {
-                top: -3px;
-                position: relative;
-              }
+              align-items: center;
+              gap: 6px;
             }
             .link {
               overflow: hidden;
@@ -75,35 +94,36 @@
               color: rgb(87, 87, 87);
             }
             .option {
-              transition: 0.2s;
+              display: flex;
+              align-items: center;
+              font-weight: bold;
               cursor: pointer;
+              padding-left: 4px;
+              transition: 0.2s;
+              gap: 6px;
+              font-size: 17px;
+              color: rgb(171, 98, 234);
             }
             .option:hover {
-              font-size: 18px;
-              color: rgb(87, 87, 87);
             }
-          }
-          .icon {
-            position: relative;
-            overflow: hidden;
-            left: 4px;
-            width: 24px;
-            height: 24px;
           }
         }
 
         li {
+          display: flex;
           .title {
-            margin-left: 12px;
+            color: $webMainColor;
+            font-weight: bold;
             cursor: pointer;
             display: flex;
             align-items: center;
             position: relative;
+            margin-left: 12px;
             transition: 0.2s;
-            font-size: 18px;
+            font-size: 22px;
           }
           .title:hover {
-            color: #858585;
+            color: $webMainColor;
           }
           .title::after {
             content: "";
@@ -125,8 +145,7 @@
           justify-content: center;
           position: relative;
           user-select: none;
-          background-color: #ffffff;
-          border-top-right-radius: 12px;
+          background-color: #fff;
           width: 100%;
           height: 48px;
           transition: 0.2s;
@@ -136,9 +155,6 @@
             width: 24px;
             height: 24px;
           }
-        }
-        .close-nav-left:hover {
-          background-color: #f0f0f0;
         }
         .close-nav-left::after {
           content: "";
@@ -153,28 +169,19 @@
     }
     // 左方選單按鈕
     .left-menu {
+      margin-right: 24px;
       z-index: 2;
       overflow: hidden;
       position: sticky;
       display: flex;
       align-items: center;
-      justify-content: end;
+      justify-content: center;
       cursor: pointer;
-      border: 1px solid gray;
       background-color: rgb(255, 255, 255);
-      border-top-right-radius: 64px;
-      border-bottom-right-radius: 64px;
+      border-top-right-radius: 24px;
+      border-bottom-right-radius: 24px;
       height: 50px;
-      margin-right: 12px;
-      padding-right: 24px;
-      min-width: 110px;
-      transition: 0.5s;
-    }
-    .right-nav {
-      position: relative;
-      top: 24px;
-      width: 100px;
-      background-color: rgba(0, 0, 0, 0);
+      transition: 0.2s;
     }
   }
 }

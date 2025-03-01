@@ -8,25 +8,22 @@ import Link from 'next/link'
 import Header from '../../components/global/Header'
 
 // method
-import { useUserToken } from '../methods/service/useUserToken'
-import userService from '../methods/service/userService'
+import { useUserToken } from '../../method/useUserToken'
+import userService from '../../method/userService'
 
 // public
 import downArrow from '../../public/course/downArrow.png'
 import leftArrow from '../../public/course/leftArrow.png'
 
 // nav組件
-import VideoNav from './videoNav'
-import QaNav from './qaNav'
-import AskNav from './askNav'
+import VideoNav from './VideoNav'
+import QaNav from './QaNav'
+import AskNav from './AskNav'
 
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
 export default function Course() {
-  const test = () => {
-    console.log('路徑為', clientIp)
-  }
   // 獲取資料
   const token = useUserToken()
   const router = useRouter()
@@ -37,11 +34,16 @@ export default function Course() {
 
   // 參數
   const baseUrl = `${clientIp}/`
-  const backToMyCoursePageUrl = `${clientIp}/profiles/profile`
+  const backToMyCoursePageUrl = `${clientIp}/profiles/Profile`
   const [course_id, setCourse_id] = useState('')
   const [isLogined, setLogined] = useState(false)
   const [userInfo, setUserInfo] = useState(null)
   const [isShowVideoUpload, setIsShowVideoUpload] = useState(false)
+
+  const test = () => {
+    console.log(course_id)
+    console.log(courseName)
+  }
 
   // 請求使用者資料
   useEffect(() => {
@@ -66,7 +68,7 @@ export default function Course() {
   return (
     <div className="course-main">
       <button onClick={test}>測試按鈕</button>
-      <Link href={`${baseUrl}courses/qaPage?course_id=${course_id}`}>提問URL</Link>
+      <Link href={`${baseUrl}courses/QaPage?course_id=${course_id}`}>提問URL</Link>
       <Header loginState={isLogined} />
       <div className="container">
         <div className="header-title-area">
@@ -91,12 +93,14 @@ export default function Course() {
             courseName={courseName}></VideoNav>
         )}
         {/* Q&A 組件 */}
-        <QaNav
-          courseId={course_id}
-          courseName={courseName}></QaNav>
+        {course_id && (
+          <QaNav
+            course_id={course_id}
+            courseName={courseName}></QaNav>
+        )}
         {/* Ask 組件 */}
         <AskNav
-          courseId={course_id}
+          course_id={course_id}
           courseName={courseName}></AskNav>
       </div>
     </div>

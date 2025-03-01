@@ -1,9 +1,9 @@
 // 組件庫
 import { useEffect, useState } from 'react'
 // method組件
-import adminService from '../methods/service/adminService'
-import { useUserToken } from '../methods/service/useUserToken'
-export default function memberSelector({ selectedStudentId, setSelectedStudentId }) {
+import adminService from '../../method/adminService'
+import { useUserToken } from '../../method/useUserToken'
+export default function MemberSelector({ selectedStudentId, setSelectedStudentId }) {
   const [isSelectAllCheckbox, setIsSelectAllCheckbox] = useState(false)
   const token = useUserToken()
   // 獲取資料

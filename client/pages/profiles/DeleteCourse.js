@@ -1,12 +1,11 @@
 // 組件庫
 import { useState, useEffect } from "react";
-import { useUserToken } from "../methods/service/useUserToken";
 import Image from "next/image";
 // 導入方法
-import adminService from "../methods/service/adminService";
+import adminService from '../../method/adminService'
+import { useUserToken } from '../../method/useUserToken'
 // public 資料夾的圖片
 import searchIcon from "../../public/global/search.png";
-import userService from "../methods/service/userService";
 
 export default function DeleteCourse() {
   const token = useUserToken();

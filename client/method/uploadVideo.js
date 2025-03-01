@@ -3,6 +3,10 @@ import { Upload } from 'tus-js-client'
 import Image from 'next/image'
 
 export default function VimeoUploadPage() {
+  // env
+  const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
+  const serverIp = process.env.NEXT_PUBLIC_SERVER_IP
+
   const [videoFile, setVideoFile] = useState(null)
   const [thumbFile, setThumbFile] = useState(null) // 若用戶自行上傳縮圖
   const [thumbnailBase64, setThumbnailBase64] = useState('')
@@ -74,7 +78,7 @@ export default function VimeoUploadPage() {
         type,
       }
 
-      const resp = await fetch('http://localhost:8080/course/67a9f6e69d476a457231207e/uploadVideo', {
+      const resp = await fetch(`${serverIp}/course/67a9f6e69d476a457231207e/uploadVideo`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -141,7 +145,7 @@ export default function VimeoUploadPage() {
     if (!videoFile || !upUrl) {
       ;(async () => {
         try {
-          await fetch('http://localhost:8080/course/6794eb7ef473349a7f30e15c/deleteVideo', {
+          await fetch(`${serverIp}/course/6794eb7ef473349a7f30e15c/deleteVideo`, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',
@@ -170,7 +174,7 @@ export default function VimeoUploadPage() {
 
         if (vidId) {
           try {
-            await fetch('http://localhost:8080/course/6794eb7ef473349a7f30e15c/deleteVideo', {
+            await fetch(`${serverIp}/course/6794eb7ef473349a7f30e15c/deleteVideo`, {
               method: 'DELETE',
               headers: {
                 'Content-Type': 'application/json',

@@ -2,9 +2,14 @@ import Image from 'next/image'
 import Link from 'next/link'
 import lineIcon from '../../public/imgs/line.png'
 export default function Unlogined() {
-  const loginURL = 'http://localhost:8080/auth/line'
-  const HomePageURL = 'http://localhost:3000'
-  const ProfilePageURL = 'http://localhost:3000/profile'
+  // env
+  const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
+  const serverIp = process.env.NEXT_PUBLIC_SERVER_IP
+  
+  // 路由參數
+  const loginURL = `${serverIp}/auth/line`
+  const HomePageURL = clientIp
+  const ProfilePageURL = `${clientIp}/profiles/profile`
   return (
     <div className="unlogined-main">
       <div className="content">請先進行登錄</div>

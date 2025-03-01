@@ -9,7 +9,6 @@ const course = async (req, res, next) => {
     if (!course_id || !mongoose.Types.ObjectId.isValid(course_id)) {
       return res.status(400).json({ success: false, msg: "無效的路由" });
     }
-
     let foundCourse = await Course.findOne({ _id: course_id }).exec();
     if (!foundCourse)
       return res.status(400).json({ success: false, msg: "無法找到課程" });

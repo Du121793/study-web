@@ -1,4 +1,4 @@
-.teacherLayout-container .register-course-container {
+.Layout-container .register-course-container {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -13,10 +13,10 @@
   min-width: 600px;
   max-width: 950px;
 }
-.teacherLayout-container .register-course-container .register-page-header {
+.Layout-container .register-course-container .register-page-header {
   font-size: 28px;
 }
-.teacherLayout-container .register-course-container .alert {
+.Layout-container .register-course-container .alert {
   position: absolute;
   font-weight: bold;
   display: flex;
@@ -33,19 +33,19 @@
   opacity: 1;
   z-index: 99;
 }
-.teacherLayout-container .register-course-container .btns {
+.Layout-container .register-course-container .btns {
   margin-top: 12px;
   position: relative;
   display: flex;
   gap: 24px;
 }
-.teacherLayout-container .register-course-container .btns .clear-form-btn {
+.Layout-container .register-course-container .btns .clear-form-btn {
   background-color: rgba(234, 136, 136, 0.5568627451);
 }
-.teacherLayout-container .register-course-container .btns .submit-form-btn {
+.Layout-container .register-course-container .btns .submit-form-btn {
   background-color: rgba(110, 227, 106, 0.4784313725);
 }
-.teacherLayout-container .register-course-container .btns button {
+.Layout-container .register-course-container .btns button {
   cursor: pointer;
   position: relative;
   width: 120px;
@@ -55,7 +55,7 @@
   overflow: hidden;
   z-index: 1;
 }
-.teacherLayout-container .register-course-container .btns button::after {
+.Layout-container .register-course-container .btns button::after {
   transition: 0.2s;
   position: absolute;
   content: "";
@@ -65,26 +65,26 @@
   top: 0;
   left: 0;
 }
-.teacherLayout-container .register-course-container .btns button:hover::after {
+.Layout-container .register-course-container .btns button:hover::after {
   background-color: rgba(0, 0, 0, 0.0823529412);
 }
-.teacherLayout-container .register-course-container .form {
+.Layout-container .register-course-container .form {
   padding: 24px 0 24px 0;
 }
-.teacherLayout-container .register-course-container .form .form-input-title {
+.Layout-container .register-course-container .form .form-input-title {
   display: flex;
   width: 70px;
   align-items: center;
   justify-content: flex-end;
 }
-.teacherLayout-container .register-course-container .form .form-inputs {
+.Layout-container .register-course-container .form .form-inputs {
   position: relative;
   gap: 12px;
   width: 100%;
   display: flex;
   flex-direction: column;
 }
-.teacherLayout-container .register-course-container .form .form-inputs .form-input-area {
+.Layout-container .register-course-container .form .form-inputs .form-input-area {
   gap: 12px;
   width: 100%;
   display: flex;
@@ -92,7 +92,7 @@
   justify-content: flex-start;
   align-items: center;
 }
-.teacherLayout-container .register-course-container .form .form-inputs .form-input-area .form-input {
+.Layout-container .register-course-container .form .form-inputs .form-input-area .form-input {
   width: 200px;
   position: relative;
   outline: none;
@@ -102,21 +102,21 @@
   padding-left: 12px;
   padding-right: 12px;
 }
-.teacherLayout-container .register-course-container .form .form-inputs .form-input-area .hint {
+.Layout-container .register-course-container .form .form-inputs .form-input-area .hint {
   color: gray;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   height: 36px;
 }
-.teacherLayout-container .register-course-container .gray-hint {
+.Layout-container .register-course-container .gray-hint {
   color: gray;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   height: 36px;
 }
-.teacherLayout-container .register-course-container .child-component {
+.Layout-container .register-course-container .child-component {
   display: flex;
   justify-content: center;
   width: 100%;

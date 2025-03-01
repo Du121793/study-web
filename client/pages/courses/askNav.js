@@ -8,28 +8,30 @@ import Link from 'next/link'
 import Header from '../../components/global/Header'
 
 // method
-import { useUserToken } from '../methods/service/useUserToken'
-import userService from '../methods/service/userService'
+import { useUserToken } from '../../method/useUserToken'
+import userService from '../../method/userService'
 
 // public
 import downArrow from '../../public/course/downArrow.png'
 import leftArrow from '../../public/course/leftArrow.png'
 
 // nav組件
-import VideoNav from './videoNav'
-import QaNav from './qaNav'
+import VideoNav from './VideoNav'
+import QaNav from './QaNav'
 
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
-const AskNav = (courseId, courseName) => {
+export default function AskNav({course_id, courseName}) {
   // 獲取資料
   const token = useUserToken()
-
+  // 處理標籤狀態
+  const [rerander, setRerander] = useState(false)
+  // ref
+  const fileInputRef = useRef(null)
   // 常用參數
   const baseUrl = `${clientIp}/`
   const backToMyCoursePageUrl = `${clientIp}/profiles/profile`
-  const [course_id, setCourse_id] = useState('')
   const [isLogined, setLogined] = useState(false)
   const [userInfo, setUserInfo] = useState(null)
   const [isShowVideoUpload, setIsShowVideoUpload] = useState(false)
@@ -50,30 +52,28 @@ const AskNav = (courseId, courseName) => {
   // 是否公開，只有教師可以設定
   const [isPublic, setIsPublic] = useState(false)
   // 圖片
-  const [image, setImage] = useState('')
+  const [images, setImages] = useState([])
   // 主題
   const [resourceCategoriesm, setResourceCategories] = useState('')
   // 標籤 陣列
   const [hints, setHints] = useState(['標籤'])
 
-  // 請求使用者資料
-  useEffect(() => {
-    if (token) {
-      userService
-        .getUserInfo(token)
-        .then((res) => {
-          setUserInfo(res.data)
-          setLogined(true)
-        })
-        .catch((err) => console.error('Error:', err.message))
-    }
-  }, [token])
+  // 用於預覽圖片
+  const [previewUrl, setPreviewUrl] = useState([])
 
-  // ask使用的，存大量course_id
-  useEffect(() => {
-    setCourse_ids([courseId])
-    // setCourse_ids(course_id)
-  }, [courseId])
+  // 點擊刪除移除圖片功能
+  const removeChoseImage = (imageIndex) => {
+    setImages(
+      images.filter((item, index) => {
+        return index !== imageIndex
+      })
+    )
+    setPreviewUrl(
+      previewUrl.filter((item, index) => {
+        return index !== imageIndex
+      })
+    )
+  }
 
   // ask，移除標籤功能
   const removeHint = (hint) => {
@@ -112,13 +112,12 @@ const AskNav = (courseId, courseName) => {
 
   // ask，新增提問給該課程
   const createNewQA = () => {
-    console.log(courseId.courseId)
     userService
       .createNewQuestion(token, {
         isPublic: isPublic,
-        course_ids: [courseId.courseId],
+        course_ids: [course_id],
         description: description,
-        image: [image],
+        image: images,
         resourceCategoriesm: resourceCategoriesm,
         hints: hints,
       })
@@ -139,6 +138,31 @@ const AskNav = (courseId, courseName) => {
       setQaAsk(false)
     }
   }
+
+  // 初始化askNav高度
+  const initToggle = () => {}
+
+  //
+  const handleButtonClick = () => {
+    fileInputRef.current.click()
+  }
+
+  const test = () => {
+    console.log(course_id)
+  }
+
+  // 請求使用者資料
+  useEffect(() => {
+    if (token) {
+      userService
+        .getUserInfo(token)
+        .then((res) => {
+          setUserInfo(res.data)
+          setLogined(true)
+        })
+        .catch((err) => console.error('Error:', err.message))
+    }
+  }, [token])
 
   return (
     <div
@@ -165,78 +189,121 @@ const AskNav = (courseId, courseName) => {
           transition: 'height 0.3s ease',
         }}>
         <div className="ask-form">
-          {userInfo && userInfo.role === 'teacher' && (
-            <div className="public-area">
-              是否要公開此提問
-              <input
-                type="checkbox"
-                onChange={(e) => {
-                  setIsPublic(e.target.checked)
-                }}
-              />
-            </div>
-          )}
           <div className="upload-img-area">
-            <span>可選:</span>
+            <span onClick={test}>可上傳多張圖片</span>
+            <button
+              onClick={handleButtonClick}
+              className="upload-img-btn">
+              選擇檔案
+            </button>
             <input
+              ref={fileInputRef}
               onChange={(e) => {
-                setImage(e.target.files?.[0])
+                setImages([...images, e.target.files?.[0]])
+                const file = e.target.files?.[0]
+                setPreviewUrl([...previewUrl, URL.createObjectURL(file)])
+                if (!file) return
+                console.log(e.target.value)
+                e.target.value = ''
               }}
-              className="upload-img-btn"
+              style={{ display: 'none' }}
               accept="image/jpeg, image/png"
               type="file"
             />
-          </div>
-          <div className="description-input-area">
-            <span>問題描述</span>
-            <textarea
-              onChange={(e) => {
-                setDescription(e.target.value)
-              }}
-              className="ask-text-area"></textarea>
-          </div>
-          <div className="resourceCategory-input-area">
-            <span>主題</span>
-            <select
-              onChange={(e) => {
-                setResourceCategories(e.target.value)
-              }}>
-              <option value="">無特定主題</option>
-            </select>
-          </div>
-          <div className="hints-area">
-            {hints &&
-              hints.map((item, index) => (
-                <div className="hint" key={index}>
-                  {item}
-                  <span
+            <div className="preview-img">
+              {previewUrl.map((item, index) => (
+                <div
+                  key={index}
+                  className="preview-images-container">
+                  {/* 刪除圖片 */}
+                  <div
+                    className="remove-image-btn"
                     onClick={() => {
-                      removeHint(item)
+                      removeChoseImage(index)
                     }}>
-                    x
-                  </span>
+                    刪除
+                  </div>
+                  <Image
+                    className="preview-images"
+                    src={item}
+                    alt="user chose image"
+                    width={400}
+                    height={400}></Image>
                 </div>
               ))}
+            </div>
           </div>
-          <div className="hints-input-area">
-            <span>標籤:</span>
-            <input
-              onChange={(e) => {
-                setHintInput(e.target.value)
-              }}
-              type="text"
-            />
-            <button onClick={addNewHint}>新增</button>
+          <div className="qa-info-area">
+            {/* 主題 */}
+            <div className="resourceCategory-input-area">
+              <span>主題:</span>
+              <select
+                onChange={(e) => {
+                  setResourceCategories(e.target.value)
+                }}>
+                <option value="">無特定主題</option>
+              </select>
+            </div>
+            {/* 輸入標籤 */}
+            <div className="hints-input-area">
+              <span>標籤:</span>
+              <input
+                onChange={(e) => {
+                  setHintInput(e.target.value)
+                }}
+                className="hint-input"
+                type="text"
+              />
+              <button onClick={addNewHint}>新增</button>
+            </div>
+            {/* 顯示標籤 */}
+            <div className="hints-area">
+              {hints &&
+                hints.map((item, index) => (
+                  <div
+                    className="hint"
+                    key={index}>
+                    {item}
+                    <span
+                      onClick={() => {
+                        removeHint(item)
+                      }}>
+                      x
+                    </span>
+                  </div>
+                ))}
+            </div>
+            {/* 問題描述區 */}
+            <div className="description-input-area">
+              <span>問題描述</span>
+              <textarea
+                onChange={(e) => {
+                  setDescription(e.target.value)
+                }}
+                className="ask-text-area"></textarea>
+            </div>
+            <div className="submit-area">
+              {userInfo && userInfo.role === 'teacher' && (
+                <div className="public-area">
+                  是否要公開此提問
+                  <input
+                    type="checkbox"
+                    className="isPublic-checkbox"
+                    onChange={(e) => {
+                      setIsPublic(e.target.checked)
+                    }}
+                  />
+                </div>
+              )}
+              <button
+                onClick={createNewQA}
+                className="submit">
+                送出
+              </button>
+            </div>
           </div>
-          <button
-            onClick={createNewQA}
-            className="submit">
-            送出
-          </button>
         </div>
       </div>
     </div>
   )
 }
-
-export default AskNav

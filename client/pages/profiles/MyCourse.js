@@ -7,18 +7,17 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 // 導入methmod
-import userService from '../methods//service/userService'
-import { useUserToken } from '../methods/service/useUserToken'
-
+import userService from '../../method/userService'
+import { useUserToken } from '../../method/useUserToken'
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
-export default function myCourse() {
+export default function MyCourse() {
   const [getCourses, setGetCourses] = useState([])
   // 使用method獲取token
   const token = useUserToken()
   // 請求課程網址
-  const curserBaseUrl = `${clientIp}/courses/course`
+  const curserBaseUrl = `${clientIp}/courses/Course`
   // 假圖片，用於課程左邊頭像
   const shots = [shotA, shotB, shotC, shotA, shotB, shotC, shotA, shotB, shotC, shotA]
 
@@ -29,7 +28,6 @@ export default function myCourse() {
         .getUserRegistedCourses(token)
         .then((res) => {
           setGetCourses(res.data)
-          console.log(res.data)
         })
         .catch((err) => console.error('Error:', err))
     }

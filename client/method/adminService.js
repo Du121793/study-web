@@ -1,14 +1,16 @@
 import axios from 'axios'
 
-const API_URL = 'http://localhost:8080'
-const COURSE_URL = `${API_URL}/course/modifyCourse`
-const USER_URL = `${API_URL}/user`
+// env
+const serverIp = process.env.NEXT_PUBLIC_SERVER_IP
+// 路由參數
+const API_URL = serverIp
+const COURSE_URL = `${serverIp}/course/modifyCourse`
+const USER_URL = `${serverIp}/user`
 
 const adminService = {
   // 創建新課程
   async createANewCourse(token, courseInfo) {
     const authHeader = token ? { Authorization: token } : {}
-    console.log(courseInfo)
     try {
       const response = await axios.post(COURSE_URL + '/createNewCourse', courseInfo, {
         headers: authHeader,
@@ -39,14 +41,10 @@ const adminService = {
     // unRegisterInfo 內存放 學生id陣列與課程id { user_ids, course_id }
     const authHeader = token ? { Authorization: token } : {}
     try {
-      const response = await axios.post(
-        COURSE_URL + "/unRegister",
-        unRegisterInfo,
-        {
-          headers: authHeader,
-        }
-      );
-      return response.data;
+      const response = await axios.post(COURSE_URL + '/unRegister', unRegisterInfo, {
+        headers: authHeader,
+      })
+      return response.data
     } catch (e) {
       return e
     }
@@ -64,7 +62,6 @@ const adminService = {
 
   // 獲得課程內的成員
   async getMembers(token, filter) {
-    console.log(filter)
     /* filter需要是物件
      {username, phoneNumber, _id, role, courses}*/
     const authHeader = token ? { Authorization: token } : {}
@@ -73,7 +70,7 @@ const adminService = {
       params: filter,
     })
     // console.log(filter)
-    return response.data;
+    return response.data
   },
 
   // 獲得課程
@@ -85,7 +82,6 @@ const adminService = {
       headers: authHeader,
       params: filter,
     })
-
     return response.data
   },
 

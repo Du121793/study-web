@@ -1,54 +1,49 @@
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import downArrowImg from "../../public/profile/downArrow.png";
-import adminService from "../methods/service/adminService";
-import { useUserToken } from "../methods/service/useUserToken";
-import MenberSelector from "./memberSelector";
+import { useCallback, useEffect, useState } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import downArrowImg from '../../public/profile/downArrow.png'
+import adminService from '../../method/adminService'
+import { useUserToken } from '../../method/useUserToken'
+import MenberSelector from './MemberSelector'
 
 export default function addCourse() {
   const token = useUserToken();
   // 子組件
-  const [selectedStudentId, setSelectedStudentId] = useState([]);
-  const [createdCourseId, setCreatedCourseId] = useState("");
-  // 父組件 (目前)
-  const [message, setMessage] = useState("");
-  const [grade, setGrade] = useState("");
-  const [subject, setSubject] = useState("");
-  const [courseClass, setCourseClass] = useState("");
-  const [courseName, setCourseName] = useState("");
+  const [selectedStudentId, setSelectedStudentId] = useState([])
+  const [createdCourseId, setCreatedCourseId] = useState('')
+  // 訊息框
+  const [message, setMessage] = useState('')
+  // 更新使用者輸入的資料
+  const [grade, setGrade] = useState('')
+  const [subject, setSubject] = useState('')
+  const [courseClass, setCourseClass] = useState('')
+  const [courseName, setCourseName] = useState('')
+  // alert
+  const [alertBGC, setAlertBGC] = useState('rgb(186, 179, 179)')
+  const [alertZindex, setAlertZindex] = useState(-1)
+  const [alertHeight, setAlertHeight] = useState('0px')
 
   // 請求參數
-  let courseInfo = {};
-
-  // 初始化總課程名稱
-  useEffect(() => {
-    setCourseName(grade + courseClass + subject);
-  }, [grade, courseClass, subject]);
-
-  // createdCourseId改變時執行加入課程的請求，用於同步
-  useEffect(() => {
-    addStudentIntoNewCourse();
-  }, [createdCourseId]);
+  let courseInfo = {}
 
   // 初始化
   const initGrade = (e) => {
-    setGrade(e.target.value);
-  };
+    setGrade(e.target.value)
+  }
   const initCourseClass = (e) => {
-    setCourseClass(e.target.value);
-  };
+    setCourseClass(e.target.value)
+  }
   const initSubject = (e) => {
-    setSubject(e.target.value);
-  };
+    setSubject(e.target.value)
+  }
   const initCourseName = (e) => {
-    const value = e.target.value;
-    setCourseName(value);
-  };
+    const value = e.target.value
+    setCourseName(value)
+  }
 
   // 將學生加進課程的請求，在createdCourseId改變時會執行
-  const addStudentIntoNewCourse = () => {
-    const alert = document.querySelector(".alert");
+  const addStudentIntoNewCourse = useCallback(() => {
+    const alert = document.querySelector('.alert')
     // 如果有選擇學生
     if (selectedStudentId.length && createdCourseId) {
       // 批量成員加進指定課程
@@ -58,13 +53,13 @@ export default function addCourse() {
           course_id: createdCourseId,
         })
         .then((res) => {
-          console.log(res);
+          console.log(res)
           // 除錯
-          console.error(res.data);
-          alert.style.backgroundColor = "#a0db6c";
-        });
+          console.error(res.data)
+          alert.style.backgroundColor = '#a0db6c'
+        })
     }
-  };
+  }, [selectedStudentId, createdCourseId, token])
   // 新增按鈕
   const requireCreateCourse = () => {
     // 參數
@@ -73,59 +68,79 @@ export default function addCourse() {
       subject: subject.trim(),
       courseClass: courseClass.trim(),
       courseName: courseName.trim(),
-    };
-    const alert = document.querySelector(".alert");
-    // 請求
-    try {
-      // 創建新課程
-      adminService.createANewCourse(token, courseInfo).then((res) => {
-        // 檢查是否回傳res.success
-        if (res.success === false) {
-          alert.style.backgroundColor = "red";
-          setMessage(`課程創建失敗!${res.msg}`);
-        } else if (res.courseName) {
-          alert.style.backgroundColor = "#a0db6c";
-          setMessage(`課程創建成功!`);
-          console.log(res._id);
-          setCreatedCourseId(res._id);
-        }
-      });
-    } catch (error) {
-      // 紅色警告
-      alert.style.backgroundColor = "red";
-      setMessage(`發生不明錯誤!${error}`);
     }
-    // 開關警告
-    alert.style.opacity = "1";
-    alert.style.height = "60px";
-    setTimeout(() => {
-      alert.style.opacity = "0";
-      alert.style.height = "0";
-    }, 2000);
+    const alert = document.querySelector('.alert')
+    // 請求
+    // 創建新課程
+    adminService
+      .createANewCourse(token, courseInfo)
+      .then((res) => {
+        // 檢查是否回傳res.success
+        if (res.data.success === false) {
+          setAlertBGC('red')
+          setMessage(`課程創建失敗!${res.data.msg}`)
+        } else if (res.data.courseName) {
+          setAlertBGC('#a0db6c')
+          setMessage(`課程創建成功!`)
+          console.log(res._id)
+          setCreatedCourseId(res._id)
+        }
+      })
+      .catch((err) => {
+        console.err(err)
+        // 紅色警告
+        setAlertBGC('red')
+        setMessage(`發生不明錯誤!${err}`)
+      })
+      .then(() => {
+        // 開啟2秒後關閉警告
+        setAlertZindex(1)
+        setAlertHeight('60px')
+        setTimeout(() => {
+          setAlertZindex(-1)
+          setAlertHeight('0')
+        }, 2000)
+      })
+
     // 清空輸入欄位
-    setGrade("");
-    setCourseClass("");
-    setSubject("");
-    setCourseName("");
-  };
+    setGrade('')
+    setCourseClass('')
+    setSubject('')
+    setCourseName('')
+  }
+
+  // 初始化總課程名稱
+  useEffect(() => {
+    setCourseName(grade + courseClass + subject)
+  }, [grade, courseClass, subject])
+
+  // createdCourseId改變時執行加入課程的請求，用於同步
+  useEffect(() => {
+    addStudentIntoNewCourse()
+  }, [createdCourseId, addStudentIntoNewCourse])
 
   return (
     <div className="register-course-container">
       <div className="register-page-header">創建課程系統</div>
-      <div className="alert">{message}</div>
+      <div
+        className="alert"
+        style={{ backgroundColor: alertBGC, zIndex: alertZindex, height: alertHeight }}>
+        {message}
+      </div>
       <div className="btns">
         <button
           className="clear-form-btn"
           onClick={() => {
-            setGrade("");
-            setCourseClass("");
-            setSubject("");
-            setCourseName("");
-          }}
-        >
+            setGrade('')
+            setCourseClass('')
+            setSubject('')
+            setCourseName('')
+          }}>
           清除欄位
         </button>
-        <button className="submit-form-btn" onClick={requireCreateCourse}>
+        <button
+          className="submit-form-btn"
+          onClick={requireCreateCourse}>
           創建課程
         </button>
       </div>
@@ -184,9 +199,8 @@ export default function addCourse() {
       <div className="child-component">
         <MenberSelector
           selectedStudentId={selectedStudentId}
-          setSelectedStudentId={setSelectedStudentId}
-        ></MenberSelector>
+          setSelectedStudentId={setSelectedStudentId}></MenberSelector>
       </div>
     </div>
-  );
+  )
 }

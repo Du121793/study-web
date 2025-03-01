@@ -3,9 +3,13 @@ const Course = require("../../models").course;
 const QA = require("../../models").QA;
 const courseMethodRouter = require("./courseMethod");
 const modifyCourseRouter = require("./modifyCourse");
-const QARouter = require("./QA/index");
+const QARouter = require("./QA");
 
 const accessChecker = require("../routesMiddleware/accessChecker");
+router.use(function (req, res, next) {
+  console.log("doing this router");
+  next();
+});
 
 const checkTeacherAccess = accessChecker.teacher;
 const checkCourseAccess = accessChecker.course;

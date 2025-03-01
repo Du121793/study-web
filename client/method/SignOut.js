@@ -6,6 +6,5 @@ export function useUserToken() {
       setToken(foundToken)
     }
   }, [])
-
   return token
 }

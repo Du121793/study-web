@@ -12,7 +12,7 @@ router.post("/postQuestion", async (req, res) => {
       course_ids,
       isPublic = false,
       description,
-      image,
+      image =[],
       resourceCategories = ["無特定主題"],
       hints = ["無特定知識點"],
     } = req.body;
@@ -27,8 +27,7 @@ router.post("/postQuestion", async (req, res) => {
     if (
       !Array.isArray(course_ids) ||
       course_ids.length === 0 ||
-      !Array.isArray(image) ||
-      image.length === 0
+      !Array.isArray(image)
     ) {
       return res
         .status(400)

@@ -1,50 +1,70 @@
-.teacherLayout-main .teacherLayout-container {
+.Layout-main .Layout-container {
   position: relative;
   display: flex;
   justify-content: space-between;
   width: 100%;
+  height: 100%;
+  position: absolute;
 }
-.teacherLayout-main .teacherLayout-container .teacherLayout-left-nav {
+.Layout-main .Layout-container .Layout-left-nav {
   position: relative;
   display: flex;
   transition: 0.2s;
-  top: 24px;
   margin-left: 0;
-  height: 100%;
 }
-.teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options {
+.Layout-main .Layout-container .Layout-left-nav .options {
   display: flex;
   flex-direction: column;
+  align-items: center;
   position: sticky;
   z-index: 1;
   height: 100%;
-  width: 200px;
+  width: 240px;
   padding-bottom: 12px;
-  background-color: rgb(255, 255, 255);
-  border: 1px solid gray;
-  border-top-right-radius: 12px;
-  border-bottom-right-radius: 12px;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  background-color: #ffffff;
   gap: 14px;
   z-index: 3;
 }
-.teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options .turn-right-icon {
-  position: relative;
-  top: 3px;
-  width: 24px;
-  height: 24px;
+.Layout-main .Layout-container .Layout-left-nav .options .active {
+  background-color: rgba(119, 164, 240, 0.5);
+  border-radius: 6px;
 }
-.teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options .nav {
-  width: 100%;
+.Layout-main .Layout-container .Layout-left-nav .options .turn-right-icon {
+  position: relative;
+  width: 13px;
+  height: 13px;
+}
+.Layout-main .Layout-container .Layout-left-nav .options .nav {
+  width: 90%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   position: relative;
   text-overflow: ellipsis;
 }
-.teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options .nav .nav-container {
+.Layout-main .Layout-container .Layout-left-nav .options .nav .nav-container {
   display: flex;
+  align-items: center;
 }
-.teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options .nav .nav-options {
+.Layout-main .Layout-container .Layout-left-nav .options .nav .nav-container .nav-option-header {
+  padding: 0 6px 0 6px;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+}
+.Layout-main .Layout-container .Layout-left-nav .options .nav .nav-container .nav-option-header .title-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+.Layout-main .Layout-container .Layout-left-nav .options .nav .nav-container .list-switch-btn {
+  transition: 0.2s;
+}
+.Layout-main .Layout-container .Layout-left-nav .options .nav .nav-options {
   overflow: hidden;
   font-size: 16px;
   margin-top: 8px;
@@ -52,17 +72,14 @@
   display: flex;
   flex-direction: column;
   transition: 0.2s;
-  gap: 4px;
+  gap: 8px;
 }
-.teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options .nav .nav-options .nav-option-li {
+.Layout-main .Layout-container .Layout-left-nav .options .nav .nav-options .nav-option-li {
   display: flex;
-  position: relative;
+  align-items: center;
+  gap: 6px;
 }
-.teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options .nav .nav-options .nav-option-li .turn-right-icon {
-  top: -3px;
-  position: relative;
-}
-.teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options .nav .nav-options .link {
+.Layout-main .Layout-container .Layout-left-nav .options .nav .nav-options .link {
   overflow: hidden;
   width: 140px;
   display: block;
@@ -72,38 +89,39 @@
   font-size: 16px;
   color: black;
 }
-.teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options .nav .nav-options .link:hover {
+.Layout-main .Layout-container .Layout-left-nav .options .nav .nav-options .link:hover {
   font-size: 18px;
   color: rgb(87, 87, 87);
 }
-.teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options .nav .nav-options .option {
-  transition: 0.2s;
+.Layout-main .Layout-container .Layout-left-nav .options .nav .nav-options .option {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
   cursor: pointer;
+  padding-left: 4px;
+  transition: 0.2s;
+  gap: 6px;
+  font-size: 17px;
+  color: rgb(171, 98, 234);
 }
-.teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options .nav .nav-options .option:hover {
-  font-size: 18px;
-  color: rgb(87, 87, 87);
+.Layout-main .Layout-container .Layout-left-nav .options li {
+  display: flex;
 }
-.teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options .nav .icon {
-  position: relative;
-  overflow: hidden;
-  left: 4px;
-  width: 24px;
-  height: 24px;
-}
-.teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options li .title {
-  margin-left: 12px;
+.Layout-main .Layout-container .Layout-left-nav .options li .title {
+  color: rgb(171, 98, 234);
+  font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
   position: relative;
+  margin-left: 12px;
   transition: 0.2s;
-  font-size: 18px;
+  font-size: 22px;
 }
-.teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options li .title:hover {
-  color: #858585;
+.Layout-main .Layout-container .Layout-left-nav .options li .title:hover {
+  color: rgb(171, 98, 234);
 }
-.teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options li .title::after {
+.Layout-main .Layout-container .Layout-left-nav .options li .title::after {
   content: "";
   background-color: rgba(0, 0, 0, 0.5);
   width: 0;
@@ -113,10 +131,10 @@
   left: 0;
   transition: 0.2s;
 }
-.teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options li .title:hover::after {
+.Layout-main .Layout-container .Layout-left-nav .options li .title:hover::after {
   width: 100%;
 }
-.teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options .close-nav-left {
+.Layout-main .Layout-container .Layout-left-nav .options .close-nav-left {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -124,22 +142,18 @@
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
-  background-color: #ffffff;
-  border-top-right-radius: 12px;
+  background-color: #fff;
   width: 100%;
   height: 48px;
   transition: 0.2s;
 }
-.teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options .close-nav-left .close-nav-btn {
+.Layout-main .Layout-container .Layout-left-nav .options .close-nav-left .close-nav-btn {
   cursor: pointer;
   pointer-events: fill;
   width: 24px;
   height: 24px;
 }
-.teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options .close-nav-left:hover {
-  background-color: #f0f0f0;
-}
-.teacherLayout-main .teacherLayout-container .teacherLayout-left-nav .options .close-nav-left::after {
+.Layout-main .Layout-container .Layout-left-nav .options .close-nav-left::after {
   content: "";
   position: absolute;
   bottom: 0;
@@ -148,27 +162,18 @@
   background-color: rgba(0, 0, 0, 0.3098039216);
   left: 0;
 }
-.teacherLayout-main .teacherLayout-container .left-menu {
+.Layout-main .Layout-container .left-menu {
+  margin-right: 24px;
   z-index: 2;
   overflow: hidden;
   position: sticky;
   display: flex;
   align-items: center;
-  justify-content: end;
+  justify-content: center;
   cursor: pointer;
-  border: 1px solid gray;
   background-color: rgb(255, 255, 255);
-  border-top-right-radius: 64px;
-  border-bottom-right-radius: 64px;
+  border-top-right-radius: 24px;
+  border-bottom-right-radius: 24px;
   height: 50px;
-  margin-right: 12px;
-  padding-right: 24px;
-  min-width: 110px;
-  transition: 0.5s;
-}
-.teacherLayout-main .teacherLayout-container .right-nav {
-  position: relative;
-  top: 24px;
-  width: 100px;
-  background-color: rgba(0, 0, 0, 0);
+  transition: 0.2s;
 }/*# sourceMappingURL=teacherLayout.css.map */

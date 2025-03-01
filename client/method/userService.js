@@ -1,10 +1,12 @@
 // userService.js (純函式，不用 Hook)
 import axios from 'axios'
 
-const API_URL = 'http://localhost:8080'
-const COURSE_URL = `${API_URL}/course`
-const USER_URL = `${API_URL}/user`
-const QA_URL = `${API_URL}/course/question`
+// env
+const serverIp = process.env.NEXT_PUBLIC_SERVER_IP
+const API_URL = serverIp
+const COURSE_URL = `${serverIp}/course`
+const USER_URL = `${serverIp}/user`
+const QA_URL = `${serverIp}/course/question`
 
 const userService = {
   // 獲得使用者資料
@@ -73,7 +75,6 @@ const userService = {
         headers: authHeader,
         params: filter,
       })
-      console.log('msg', response.data)
       return response.data
     } catch (e) {
       console.log(e.response.data)
@@ -112,6 +113,7 @@ const userService = {
 
   // 新增新的QA給指定課程
   async createNewQuestion(token, questionParam) {
+    console.log(questionParam)
     // isPublic, course_ids, description, image, resourceCategories, hints
     try {
       // 將傳入的圖片修改為base64
@@ -130,20 +132,17 @@ const userService = {
       const response = await axios.post(QA_URL + '/modifyQA/postQuestion', questionParam, { headers: authHeader })
       return response.data
     } catch (e) {
+      console.log(e)
       return e.response.data
     }
   },
 
   // 獲得已公開(公開區)的QA
-  async getPublicQA(course_ids, description, image, resourceCategories, hints) {
+  async getPublicQA(token) {
     try {
+      const authHeader = token ? { Authorization: token } : {}
       const response = await axios.get(QA_URL + '/getPublicQAs', {
-        course_ids,
-        isPublic,
-        description,
-        image,
-        resourceCategories,
-        hints,
+        header: authHeader,
       })
       return response.data
     } catch (e) {
@@ -152,30 +151,28 @@ const userService = {
   },
 
   // 獲得課程的指定QA
-  async getCourseQA(course_id, description, image, resourceCategories, hints) {
+  async getCourseQA(token, course_id) {
     try {
+      console.log(QA_URL + `/getCourseQAs/${course_id}`)
+      const authHeader = token ? { Authorization: token } : {}
       const response = await axios.get(QA_URL + `/getCourseQAs/${course_id}`, {
-        params: course_id,
-        isPublic,
-        description,
-        image,
-        resourceCategories,
-        hints,
+        headers: authHeader,
       })
       return response.data
     } catch (e) {
-      return e.response.data
+      console.log(e)
+      return e
     }
   },
 
   // 獲得QA問題的詳細
   async getQaInfo(token, question_id) {
     try {
+      cosnole.log(question_id)
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.get(QA_URL + `/QAMethod/${question_id}`, {
         headers: authHeader,
       })
-      console.log(response.data)
       return response.data
     } catch (e) {
       return e
@@ -192,12 +189,14 @@ const userService = {
     }
   */
   async submitQaMessage(token, question_id, reqBody) {
+    console.log(question_id)
+    console.log(reqBody)
     try {
-      console.log(reqBody)
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.post(QA_URL + `/QAMethod/${question_id}/postNewComment`, reqBody, {
         headers: authHeader,
       })
+      console.log(response)
       return response.data
     } catch (e) {
       if (!e.response) {

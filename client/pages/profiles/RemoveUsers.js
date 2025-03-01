@@ -1,10 +1,10 @@
 // 組件庫
-import { useState, useEffect } from 'react'
-import { useUserToken } from '../methods/service/useUserToken'
+import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 // 導入method
-import adminService from '../methods/service/adminService'
-export default function removeUsers() {
+import { useUserToken } from '../../method/useUserToken'
+import adminService from '../../method/adminService'
+export default function RemoveUsers() {
   const token = useUserToken()
   const [getUsers, setGetUsers] = useState([])
   const [optionBorder, setOptionBorder] = useState('2px solid rgba(0, 0, 0, 0.2)')
@@ -13,19 +13,14 @@ export default function removeUsers() {
   const [realNameValue, setRealNameValue] = useState()
   const [phoneValue, setPhoneValue] = useState()
   const [choseRole, setChoseRole] = useState()
-  // 刷新渲染使用者資料
-  useEffect(() => {
-    if (token) {
-      getUsersFunction()
-    }
-  }, [token])
+  
   //請求獲取使用者
-  const getUsersFunction = () => {
+  const getUsersFunction = useCallback(() => {
     adminService.getMembers(token).then((res) => {
       setGetUsers(res.data)
       console.log(res)
     })
-  }
+  }, [token, getUsers])
   // 點擊選擇單個用戶
   const selectedUser = (e, _id) => {
     if (
@@ -76,6 +71,15 @@ export default function removeUsers() {
       setGetUsers(res.data)
     })
   }
+  
+  // 刷新渲染使用者資料
+  useEffect(() => {
+    if (token) {
+      adminService.getMembers(token).then((res) => {
+        setGetUsers(res.data)
+      })
+    }
+  }, [token])
   return (
     <div className="remove-users-page">
       <div className="remove-users-title">移除成員功能</div>
@@ -149,9 +153,10 @@ export default function removeUsers() {
       </div>
       <div className="user-list">
         {getUsers.map(
-          (item) =>
+          (item, index) =>
             item.role !== 'admin' && (
               <div
+                key={index}
                 onClick={(e) => {
                   selectedUser(e, item._id)
                 }}

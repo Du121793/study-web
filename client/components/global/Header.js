@@ -2,18 +2,23 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { useUserToken } from '../../pages/methods/service/useUserToken'
 // public
 import lineIcon from '../../public/imgs/line.png'
 import logo from '../../public/imgs/logo.jpg'
 // method
-import userService from '../../pages/methods/service/userService'
+import { useUserToken } from '../../method/useUserToken'
+import userService from '../../method/userService'
+
 export default function Header(loginState) {
+  // env
+  const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
+  const serverIp = process.env.NEXT_PUBLIC_SERVER_IP
   const [userInfo, setUserInfo] = useState(null)
   const token = useUserToken()
-  const loginURL = 'http://localhost:8080/auth/line'
-  const HomePageURL = 'http://localhost:3000'
-  const ProfilePageURL = 'http://localhost:3000/profiles/profile'
+  // 路由參數
+  const loginURL = `${serverIp}/auth/line`
+  const HomePageURL = clientIp
+  const ProfilePageURL = `${clientIp}/profiles/Profile`
   // 登出 刪除token
   const signOut = () => {
     localStorage.removeItem('token')
@@ -102,10 +107,12 @@ export default function Header(loginState) {
           {loginState.loginState === true && (
             <Link href={ProfilePageURL}>
               <div className="member-img">
-                <img
+                <Image
                   className="shot"
                   src={userInfo && userInfo.data.userinfo.pictureUrl}
                   alt="user's shot"
+                  width={100}
+                  height={100}
                 />
               </div>
             </Link>

@@ -26,6 +26,7 @@ router.get("/getPublicQAs", checkTeacherAccess, async (req, res) => {
 
 router.get("/getCourseQAs/:course_id", async (req, res) => {
   try {
+    console.log('123456789')
     // 只拿到 _id
     const courseQAs = await QA.find(
       { courses: req.params.course_id },

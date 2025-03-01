@@ -1,6 +1,6 @@
 // method
-import { useUserToken } from '../methods/service/useUserToken'
-import userService from '../methods/service/userService'
+import { useUserToken } from '../../method/useUserToken'
+import userService from '../../method/userService'
 // profile的組件
 import StudentLayout from '../../components/profile/StudentLayout'
 import TeacherLayout from '../../components/profile/TeacherLayout'

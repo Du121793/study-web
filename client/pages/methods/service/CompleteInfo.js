@@ -3,14 +3,18 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 // global組件
 import Header from '../../../components/global/Header'
-import userService from './userService'
-export default function myCourse() {
+// method
+import userService from '../../../method/userService'
+export default function ComplateInfo() {
+  // env
+  const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
+
   const [tempToken, setTempToken] = useState(null)
   const [realname, setRealname] = useState(null)
   const [phoneNumber, setPhoneNumber] = useState(null)
   const [message, setMessage] = useState('')
   const [hasMessage, setHasMessage] = useState(false)
-  const baseUrl = 'http://localhost:3000/'
+  const baseUrl = `${clientIp}/`
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search)

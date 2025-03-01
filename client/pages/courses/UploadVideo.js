@@ -1,7 +1,10 @@
+// 組件庫
 import React, { useState, useEffect } from 'react'
+// TSU
 import { Upload } from 'tus-js-client'
-import videoUploader from '../methods/service/videoUploader'
-import { useUserToken } from '../methods/service/useUserToken'
+import videoUploader from '../../method/videoUploader'
+// method
+import { useUserToken } from '../../method/useUserToken'
 
 export default function uploadVideoFc({ isShowVideoUpload, setIsShowVideoUpload, course_id, setUploadSuccess, uploadSuccess, uploadError, setUploadError }) {
   const token = useUserToken()
