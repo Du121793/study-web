@@ -3,6 +3,7 @@ const VideoInfo = require("../../models").courseVideoInfo;
 const QAmessage = require("../../models").QAmessage;
 const VimeoMethods = require("../../methods").vimeoMethods;
 const imageCompresser = require("../../methods/imageCompresser");
+const accessChecker = require("../routesMiddleware/accessChecker");
 
 router.get("/members", async (req, res) => {
   try {
@@ -84,7 +85,7 @@ router.get("/videoUri", async (req, res) => {
     //    我們在上傳時會將 [VIDEOID]={_id} 塞到 Vimeo description 中，
     //    所以只要把 videoId 傳給 VimeoMethods.find，應該就能找出該影片
     const vimeoSearch = await VimeoMethods.find({ videoId });
-    
+
     if (!vimeoSearch.success) {
       // 代表在呼叫 Vimeo API 過程中失敗
       return res.status(500).json({
@@ -129,7 +130,7 @@ router.get("/videoUri", async (req, res) => {
   }
 });
 
-router.post("/uploadVideo", async (req, res) => {
+router.post("/uploadVideo", accessChecker.teacher, async (req, res) => {
   try {
     const {
       title,
@@ -188,7 +189,7 @@ router.post("/uploadVideo", async (req, res) => {
   }
 });
 
-router.patch("/uploadVideoStatus", async (req, res) => {
+router.patch("/uploadVideoStatus", accessChecker.teacher, async (req, res) => {
   try {
     const { isUploadSuccess, videoId } = req.body;
     if (typeof isUploadSuccess !== "boolean" || !videoId)
@@ -222,7 +223,7 @@ router.patch("/uploadVideoStatus", async (req, res) => {
   }
 });
 
-router.delete("/deleteVideo", async (req, res) => {
+router.delete("/deleteVideo", accessChecker.teacher, async (req, res) => {
   try {
     const { videoId } = req.query;
     console.log(videoId);

@@ -1,11 +1,16 @@
 .msg-board {
   display: flex;
   padding: 12px;
-  width: 80%;
+  width: 90%;
   background-color: #fff;
   border: 1px solid #ccc;
   gap: 12px;
   margin-bottom: 24px;
+}
+@media (max-width: 576px) {
+  .msg-board {
+    flex-direction: column;
+  }
 }
 .msg-board .text-area {
   resize: none;

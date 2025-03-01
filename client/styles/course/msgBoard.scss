@@ -1,18 +1,22 @@
 .msg-board {
   display: flex;
   padding: 12px;
-  width: 80%;
+  width: 90%;
   background-color: #fff;
   border: 1px solid #ccc;
   gap: 12px;
-  // 畫面底部留白
   margin-bottom: 24px;
+  @media (max-width: 576px) {
+    flex-direction: column;
+  }
   .text-area {
     resize: none;
     outline: none;
     flex: 1;
     border: 1px solid #ccc;
     padding: 8px;
+    @media (max-width: 576px) {
+    }
   }
   .upload-video-btn-area {
     display: flex;
@@ -24,26 +28,26 @@
       width: 200px;
     }
   }
-  .is-private-checkbox-area{
+  .is-private-checkbox-area {
     margin-bottom: 128px;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 12px;
   }
-  .submit-btn-area{
+  .submit-btn-area {
     width: 100%;
     display: flex;
     justify-content: center;
-    button{
-        padding: 4px 8px 4px 8px;
-        background-color: #fff;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        transition: 0.2s;
+    button {
+      padding: 4px 8px 4px 8px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      transition: 0.2s;
     }
-    button:hover{
-        background-color: #e7e7e7;
+    button:hover {
+      background-color: #e7e7e7;
     }
   }
 }

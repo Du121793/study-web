@@ -72,10 +72,11 @@ const updateAndDeleteQuestion = async (req, res, next) => {
   try {
     const role = req.user.role;
     const updateFields = Object.keys(req.body);
-    const qaId = req.params.id; // 資源 ID 從路由參數取得
+    const qaId = req.body.question_id; // 資源 ID 從路由參數取得
 
     // 取得資源，若不存在則回傳 404
     const resource = await QA.findById(qaId);
+    req.question = resource;
     if (!resource) {
       return res.status(404).json({ success: false, msg: "資源不存在" });
     }
@@ -87,8 +88,14 @@ const updateAndDeleteQuestion = async (req, res, next) => {
 
     // ───────────── student ─────────────
     if (role === "student") {
+      if (resource.poster != req.user._id) {
+        return res.status(401).json({
+          success: false,
+          msg: `你沒有變更此問題的權限`,
+        });
+      }
       // 不允許修改的欄位
-      const forbiddenKeys = ["isPublic", "replied", "courses"];
+      const forbiddenKeys = ["isPublic", "replied", "courses", "poster"];
       const invalidKeys = updateFields.filter((key) =>
         forbiddenKeys.includes(key)
       );
@@ -128,8 +135,17 @@ const updateAndDeleteQuestion = async (req, res, next) => {
 
     // ───────────── teacher ─────────────
     if (role === "teacher") {
-      // 刪除動作 (DELETE)
+      if (
+        !req.question.courses.some((item) => req.user.courses.includes(item))
+      ) {
+        return res.status(401).json({
+          success: false,
+          msg: `你不屬於本課程`,
+        });
+      }
+
       if (req.method === "DELETE") {
+        // 刪除動作 (DELETE)
         // 若資源是公開的，檢查 resource.courses 是否都屬於此老師
         if (resource.isPublic) {
           const allCoursesIncluded = resource.courses.every((courseId) =>
@@ -146,7 +162,7 @@ const updateAndDeleteQuestion = async (req, res, next) => {
       }
 
       // 更新動作 (PUT)
-      if (req.method === "PUT") {
+      if (req.method === "PUT" || req.method === "PATCH") {
         // 教師允許修改的欄位
         const allowedKeys = [
           "isPublic",
@@ -250,4 +266,5 @@ module.exports = {
   teacher,
   admin,
   question,
+  updateAndDeleteQuestion,
 };

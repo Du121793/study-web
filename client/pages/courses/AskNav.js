@@ -22,7 +22,7 @@ import QaNav from './QaNav'
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
-export default function AskNav(course_id, courseName) {
+export default function AskNav({course_id, courseName}) {
   // 獲取資料
   const token = useUserToken()
   // 處理標籤狀態
@@ -148,7 +148,7 @@ export default function AskNav(course_id, courseName) {
   }
 
   const test = () => {
-    console.log(images)
+    console.log(course_id)
   }
 
   // 請求使用者資料

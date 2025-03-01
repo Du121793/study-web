@@ -3,6 +3,7 @@ const Course = require("../../../models").course;
 const User = require("../../../models").user;
 const QA = require("../../../models").QA;
 const imageCompresser = require("../../../methods/imageCompresser");
+const accessChecker = require("../../routesMiddleware/accessChecker");
 
 // 由於上傳權限不太一樣且權限劃分較簡單 故不拉出middleWare
 router.post("/postQuestion", async (req, res) => {
@@ -12,7 +13,7 @@ router.post("/postQuestion", async (req, res) => {
       course_ids,
       isPublic = false,
       description,
-      image =[],
+      image = [],
       resourceCategories = ["無特定主題"],
       hints = ["無特定知識點"],
     } = req.body;
@@ -77,6 +78,7 @@ router.post("/postQuestion", async (req, res) => {
       hints,
       isPublic,
       courses: course_ids,
+      poster: req.user._id,
     });
 
     const savedQA = await newQA.save();
@@ -92,5 +94,114 @@ router.post("/postQuestion", async (req, res) => {
       .json({ success: false, msg: "發生了不可預期的錯誤" });
   }
 });
+
+router.patch(
+  "/patchQuestion",
+  accessChecker.updateAndDeleteQuestion,
+  async (req, res) => {
+    try {
+      const {
+        question_id,
+        course_ids,
+        isPublic,
+        description,
+        image,
+        resourceCategories,
+        hints,
+      } = req.body;
+
+      // 檢查 course_ids 與 image 是否為有效的陣列
+      if (
+        !Array.isArray(course_ids) ||
+        course_ids.length === 0 ||
+        !Array.isArray(image)
+      ) {
+        return res
+          .status(400)
+          .json({ success: false, msg: "請提供有效的課程或image陣列" });
+      }
+
+      // 如果有圖片，先進行壓縮處理
+      let newImage = [];
+      if (image && image.length > 0) {
+        newImage = await Promise.all(
+          image.map(async (imgBase64) => {
+            return await imageCompresser.compressBase64Image(imgBase64);
+          })
+        );
+      }
+
+      // 找到舊的 QA 文件
+      const oldQA = await QA.findById(question_id);
+      if (!oldQA) {
+        return res
+          .status(404)
+          .json({ success: false, msg: "找不到對應的問題" });
+      }
+
+      // 準備要更新的欄位，只更新有提供值的部分
+      const updateFields = {
+        courses: course_ids,
+        isPublic,
+        description,
+        image: newImage,
+        resourceCategories,
+        hints,
+      };
+
+      Object.entries(updateFields).forEach(([key, value]) => {
+        if (value !== undefined) {
+          oldQA[key] = value;
+        }
+      });
+
+      // 儲存更新後的資料
+      const savedQA = await oldQA.save();
+
+      return res.json({
+        success: true,
+        msg: "問題修改成功",
+        data: { QA_id: savedQA._id },
+      });
+    } catch (error) {
+      console.error(error);
+      return res
+        .status(500)
+        .json({ success: false, msg: "發生了不可預期的錯誤" });
+    }
+  }
+);
+
+// DELETE: 刪除問題
+router.delete(
+  "/deleteQuestion",
+  accessChecker.updateAndDeleteQuestion,
+  async (req, res) => {
+    try {
+      const { question_id } = req.body;
+
+      // 查詢要刪除的 QA
+      const oldQA = await QA.findById(question_id);
+      if (!oldQA) {
+        return res
+          .status(404)
+          .json({ success: false, msg: "找不到對應的問題" });
+      }
+
+      // 執行刪除
+      await oldQA.remove();
+
+      return res.json({
+        success: true,
+        msg: "問題刪除成功",
+      });
+    } catch (error) {
+      console.error(error);
+      return res
+        .status(500)
+        .json({ success: false, msg: "發生了不可預期的錯誤" });
+    }
+  }
+);
 
 module.exports = router;

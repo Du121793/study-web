@@ -100,7 +100,7 @@ export default function PreRegister() {
         console.log('registerMember結果', res)
       })
     }
-  }, [chooseCourse, user_id, chooseCourse])
+  }, [token, chooseCourse, user_id, chooseCourse])
 
   // 切換身分組時更改State，用於控制年級選擇是否顯示
   const switchRoleOption = (value) => {
@@ -122,7 +122,7 @@ export default function PreRegister() {
 
   useEffect(() => {
     registerCourseToNewMember()
-  }, [user_id])
+  }, [user_id, registerCourseToNewMember])
 
   return (
     <div className="preRegister-main">

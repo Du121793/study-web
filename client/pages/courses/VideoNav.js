@@ -47,7 +47,7 @@ export default function VideoNav({ course_id, courseName }) {
   const test = () => {
     console.log(baseUrl)
   }
-  
+
   // 獲得影片資訊
   const getCourseVideos = useCallback(() => {
     if (token && course_id) {
@@ -64,7 +64,7 @@ export default function VideoNav({ course_id, courseName }) {
           setVideos(res.data)
         })
     }
-  }, [token, course_id])
+  }, [token, course_id, videosShowPage, videosPageSize, chooseType, chooseSortOrder])
 
   // 計算高度進行切換，用於transition
   const toggleVideoNav = () => {
@@ -143,7 +143,7 @@ export default function VideoNav({ course_id, courseName }) {
   // 若是任何一個有改變，重新發一次影片請求
   useEffect(() => {
     getCourseVideos()
-  }, [token, course_id, chooseType, chooseSortOrder, uploadSuccess, videosPageSize])
+  }, [token, course_id, chooseType, chooseSortOrder, uploadSuccess, videosPageSize, getCourseVideos])
 
   useEffect(() => {
     if (videoNavOpen && videoContentRef.current) {
@@ -203,6 +203,13 @@ export default function VideoNav({ course_id, courseName }) {
         }}>
         <div className="update-video-area">
           {userInfo && userInfo.role === 'teacher' && (
+            <div
+              className="button"
+              onClick={showVideoUploadComponent}>
+              上傳影片
+            </div>
+          )}
+          {userInfo && userInfo.role === 'admin' && (
             <div
               className="button"
               onClick={showVideoUploadComponent}>

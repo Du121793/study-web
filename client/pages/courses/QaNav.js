@@ -122,10 +122,10 @@ export default function QaNav({ course_id, courseName }) {
                 <h2>{type}</h2>
                 <ul className="qa-list">
                   {filteredQAs.map((qa) => (
-                    <Link href={`${clientIp}/courses/QaPage?qa_id=${qa._id}&courseName=${courseName}`}>
-                      <li
-                        key={qa._id}
-                        className="qa-item">
+                    <Link
+                      href={`${clientIp}/courses/QaPage?qa_id=${qa._id}&courseName=${courseName}`}
+                      key={qa._id}>
+                      <li className="qa-item">
                         <div className="image-area">
                           {qa.image && qa.image.length > 0 && (
                             <Image

@@ -8,7 +8,7 @@ const QASchema = new Schema({
   description: {
     required: true,
     type: String,
-    maxlength: 30,
+    maxlength: 300,
   },
   resourceCategories: {
     required: true,
@@ -34,6 +34,8 @@ const QASchema = new Schema({
     type: [String],
     default: [],
   },
+  poster: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+
   date: {
     type: Date,
     default: Date.now,

@@ -15,11 +15,10 @@ import userService from '../../method/userService'
 // import {startTusUpload} from '../methods/qaMsgUpload.js'
 import QAMsgUpload from '../methods/QaMsgUpload'
 
-export default function MessageBoard() {
+export default function MessageBoard({qa_id}) {
   // 從url獲取參數
   const router = useRouter()
   const { course_id } = router.query
-  const question_id = '67bd66c2032865bc616bf2cc'
 
   // 大部分api需要的token
   const token = useUserToken()
@@ -54,7 +53,7 @@ export default function MessageBoard() {
   // 67bb6569c646a56b343ed51c
   const submitMsg = () => {
     userService
-      .submitQaMessage(token, question_id, {
+      .submitQaMessage(token, qa_id, {
         content,
         image: images,
         fileSize: video.size,
@@ -70,7 +69,6 @@ export default function MessageBoard() {
   }
 
   const test = () => {
-    console.log(images)
   }
 
   return (
@@ -83,7 +81,7 @@ export default function MessageBoard() {
           setContent(e.target.value)
         }}></textarea>
       <div className="settings-area">
-        <div className="upload-video-btn-area">
+        <div className="upload-video-btn-area" onClick={test}>
           可傳送最多一部影片
           <input
             type="file"
@@ -120,7 +118,7 @@ export default function MessageBoard() {
           <QAMsgUpload
             token={token}
             file={video}
-            question_id={question_id}
+            question_id={qa_id}
             content={content}
             images={images}
             fileSize={video && video.size}

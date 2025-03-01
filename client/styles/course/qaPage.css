@@ -2,95 +2,131 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
+  gap: 16px;
 }
-.qaPage-main .qaPage-container {
-  width: 90%;
-  padding: 20px;
-  display: flex;
-  gap: 24px;
-  justify-content: center;
-}
-@media (max-width: 770px) {
-  .qaPage-main .qaPage-container {
-    flex-direction: column;
-    align-items: center;
-  }
-  .qaPage-main .qaPage-container .right-area {
-    width: 100%;
-  }
-}
-.qaPage-main .qaPage-container .left-area {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-@media (min-width: 770px) {
-  .qaPage-main .qaPage-container .left-area {
-    width: 40%;
-  }
-}
-.qaPage-main .qaPage-container .left-area .top {
-  width: 100%;
+.qaPage-main .qa-header {
   display: flex;
   align-items: center;
-  gap: 32px;
 }
-.qaPage-main .qaPage-container .left-area .top .back-btn {
-  padding: 6px 12px;
-  border: none;
-  background-color: #333;
-  color: #fff;
-  cursor: pointer;
-}
-.qaPage-main .qaPage-container .left-area .top .course-name-title {
-  font-size: 18px;
-  font-weight: bold;
-}
-.qaPage-main .qaPage-container .left-area .middle {
-  border: 1px solid black;
-}
-.qaPage-main .qaPage-container .left-area .middle .image-area {
-  width: 100%;
-  height: 100%;
-}
-.qaPage-main .qaPage-container .left-area .middle .image-area .no-image-icon {
-  width: 100%;
-  height: 100%;
-}
-.qaPage-main .qaPage-container .left-area .middle .image-area .images {
-  width: 100%;
-  height: 100%;
-}
-.qaPage-main .qaPage-container .left-area .bottom .qa-info-area {
-  background: #fafafa;
-  border: 1px solid #ccc;
-  padding: 10px;
-  height: 200px;
-}
-.qaPage-main .qaPage-container .right-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-.qaPage-main .qaPage-container .right-area .title {
-  width: 100%;
+.qaPage-main .qa-header .title {
   display: flex;
   justify-content: center;
-}
-.qaPage-main .qaPage-container .right-area .title .message-board-title {
-  display: flex;
-  justify-content: center;
-  width: 30%;
   font-size: 28px;
   padding: 6px 16px 6px 16px;
   border: 1px solid #ccc;
   background-color: #fff;
 }
-.qaPage-main .qaPage-container .right-area .message-board-area {
-  padding: 10px;
-  flex: 1;
-  background: #fff;
+.qaPage-main .qa-header .back-btn {
+  position: absolute;
+  left: 0;
+  padding: 6px 12px;
+  height: 36px;
+  border: none;
+  background-color: #333;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.qaPage-main .qa-header .back-btn:hover {
+  background-color: #545454;
+}
+.qaPage-main .images-videos-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 24px 12px 24px;
+  border-radius: 12px;
+  min-height: 128px;
   border: 1px solid #ccc;
-  overflow-y: auto;
+  background-color: #fff;
+  flex-wrap: wrap;
+}
+.qaPage-main .images-videos-area .image-container {
+  position: relative;
+  display: flex;
+}
+.qaPage-main .images-videos-area .image-container .title {
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 4px;
+}
+.qaPage-main .images-videos-area .image-container .image-video {
+  cursor: pointer;
+  position: relative;
+  width: 190px;
+  height: 128px;
+  -o-object-fit: fill;
+     object-fit: fill;
+  z-index: 0;
+  border: 1px solid #000000;
+}
+.qaPage-main .qa-info-area {
+  background: #fafafa;
+  border: 1px solid #ccc;
+  padding: 10px;
+  width: 70%;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.qaPage-main .qa-info-area .time {
+  font-size: 15px;
+  color: #656565;
+}
+.qaPage-main .qaPage-container {
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 24px;
+}
+.qaPage-main .qaPage-container .title {
+  display: flex;
+  justify-content: center;
+  font-size: 28px;
+  padding: 6px 16px 6px 16px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+}
+.qaPage-main .qaPage-container .comment-area {
+  width: 90%;
+  display: flex;
+  gap: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+}
+.qaPage-main .qaPage-container .comment-area .message-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.qaPage-main .qaPage-container .comment-area .message-info .message-top {
+  display: flex;
+  gap: 12px;
+}
+.qaPage-main .qaPage-container .comment-area .message-info .message-top .time {
+  font-size: 14px;
+}
+.qaPage-main .qaPage-container .comment-area .message-info .message-top .name {
+  font-size: 16px;
+}
+.qaPage-main .qaPage-container .comment-area .message-info .message-middle {
+  margin-left: 12px;
+  font-size: 15px;
+  min-height: 64px;
+}
+.qaPage-main .qaPage-container .comment-area .message-info .message-bottom {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.qaPage-main .qaPage-container .comment-area .message-info .message-bottom .file-preview {
+  border-radius: 6px;
 }/*# sourceMappingURL=qaPage.css.map */

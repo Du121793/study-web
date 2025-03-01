@@ -4,7 +4,7 @@ const User = require("../../../models").user;
 const QA = require("../../../models").QA;
 const QAmessage = require("../../../models").QAmessage;
 const imageCompresser = require("../../../methods/imageCompresser");
-const { question } = require("../../routesMiddleware/accessChecker");
+const accessChecker = require("../../routesMiddleware/accessChecker");
 const VimeoMethods = require("../../../methods").vimeoMethods;
 
 router.get("/", async (req, res) => {
@@ -43,7 +43,7 @@ router.get("/getComment", async (req, res) => {
         poster = {
           role: "匿名角色",
           username: "匿名",
-          pictureUrl: "data:image/jpeg;base64,/9j/2wBDAAUD",
+          pictureUrl: "",
         };
       }
       // 回傳轉換後的留言物件（將 mongoose 文件轉換成純 JS 物件）
@@ -181,6 +181,42 @@ router.patch("/uploadVideoStatus", async (req, res) => {
     return res
       .status(500)
       .json({ success: false, msg: "很抱歉，伺服器無法處理上傳" });
+  }
+});
+
+router.delete("/deleteComment", async (req, res) => {
+  try {
+    const { commentID } = req.body;
+
+    const foundComment = QAmessage.findById(commentID);
+
+    if (
+      !req.question.courses.some((item) => req.user.courses.includes(item)) &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(401).json({
+        success: false,
+        msg: `你不屬於本課程`,
+      });
+    }
+    if (req.user.role == "student" && foundComment._id != req.user._id) {
+      return res.status(401).json({
+        success: false,
+        msg: `你沒有刪除此留言的權限`,
+      });
+    }
+
+    await foundComment.remove();
+    return res.json({
+      success: true,
+      msg: `成功刪除留言`,
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      success: false,
+      msg: `發生了不可預期的錯誤`,
+    });
   }
 });
 

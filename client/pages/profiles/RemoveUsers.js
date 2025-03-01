@@ -13,14 +13,14 @@ export default function RemoveUsers() {
   const [realNameValue, setRealNameValue] = useState()
   const [phoneValue, setPhoneValue] = useState()
   const [choseRole, setChoseRole] = useState()
-  
+
   //請求獲取使用者
-  const getUsersFunction = useCallback(() => {
+  const getUsersFunction = () => {
     adminService.getMembers(token).then((res) => {
       setGetUsers(res.data)
       console.log(res)
     })
-  }, [token, getUsers])
+  }
   // 點擊選擇單個用戶
   const selectedUser = (e, _id) => {
     if (
@@ -71,7 +71,7 @@ export default function RemoveUsers() {
       setGetUsers(res.data)
     })
   }
-  
+
   // 刷新渲染使用者資料
   useEffect(() => {
     if (token) {

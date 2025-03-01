@@ -97,7 +97,7 @@ const userService = {
     }
   },
 
-  // 註冊使用
+  // 註冊使用者
   async registerUser(tempToken, realname, phoneNumber) {
     try {
       const response = await axios.post(API_URL + '/auth/completeRegistration', {
@@ -165,12 +165,12 @@ const userService = {
     }
   },
 
-  // 獲得QA問題的詳細
-  async getQaInfo(token, question_id) {
+  // 獲得QA問題的留言區
+  async getQaComment(token, question_id) {
     try {
-      cosnole.log(question_id)
+      console.log(QA_URL + `/QAMethod/getComment`)
       const authHeader = token ? { Authorization: token } : {}
-      const response = await axios.get(QA_URL + `/QAMethod/${question_id}`, {
+      const response = await axios.get(QA_URL + `/QAMethod/${question_id}/getComment`, {
         headers: authHeader,
       })
       return response.data
@@ -178,16 +178,8 @@ const userService = {
       return e
     }
   },
-  // 獲得QA問題的留言區
-  /*
-    reqBody{
-      content,
-      image = [],
-      fileSize,
-      isPrivate = false,
-      isBest = false,
-    }
-  */
+
+  // 新增新留言
   async submitQaMessage(token, question_id, reqBody) {
     console.log(question_id)
     console.log(reqBody)

@@ -101,7 +101,7 @@ export default function RemoveFromCourse() {
   // 當有成員被移除後再發一次請求用於刷新畫面
   useEffect(() => {
     if (token) SelectedCourseMembers(selectCourse)
-  }, [token, UnRegisterMemberedStatus, SelectedCourseMembers])
+  }, [token, UnRegisterMemberedStatus, SelectedCourseMembers, selectCourse])
 
   // 二次確認刪除
   const confirmDelete = (e) => {}

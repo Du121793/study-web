@@ -102,7 +102,7 @@
   transition: 0.2s;
   gap: 6px;
   font-size: 17px;
-  color: rgb(171, 98, 234);
+  color: rgb(36, 36, 36);
 }
 .Layout-main .Layout-container .Layout-left-nav .options li {
   display: flex;
