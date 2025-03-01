@@ -6,7 +6,7 @@ import videoUploader from '../../method/videoUploader'
 // method
 import { useUserToken } from '../../method/useUserToken'
 
-export default function uploadVideoFc({ isShowVideoUpload, setIsShowVideoUpload, course_id, setUploadSuccess, uploadSuccess, uploadError, setUploadError }) {
+export default function UploadVideoFc({ isShowVideoUpload, setIsShowVideoUpload, course_id, setUploadSuccess, uploadSuccess, uploadError, setUploadError }) {
   const token = useUserToken()
   const [videoFiles, setVideoFiles] = useState([])
 
