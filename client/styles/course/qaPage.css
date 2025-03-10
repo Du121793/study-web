@@ -31,6 +31,54 @@
 .qaPage-main .qa-header .back-btn:hover {
   background-color: #545454;
 }
+.qaPage-main .control-teacher-function {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background-color: #fff;
+  transition: 0.2s;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  padding: 6px;
+}
+.qaPage-main .control-teacher-function button {
+  font-weight: bold;
+  font-size: 20px;
+  padding: 4px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  background-color: #b5f3ad;
+  transition: 0.2s;
+  cursor: pointer;
+}
+.qaPage-main .control-teacher-function .teacher-function {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+}
+.qaPage-main .control-teacher-function .teacher-function .public-setting {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+}
+.qaPage-main .control-teacher-function .teacher-function .submit-btn {
+  display: flex;
+  justify-content: center;
+}
+.qaPage-main .control-teacher-function .teacher-function .submit-btn button {
+  padding: 4px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  background-color: #fff;
+  transition: 0.2s;
+}
+.qaPage-main .control-teacher-function .teacher-function .submit-btn button:hover {
+  background-color: #f5f5f5;
+}
 .qaPage-main .images-videos-area {
   display: flex;
   align-items: center;
@@ -46,6 +94,7 @@
 .qaPage-main .images-videos-area .image-container {
   position: relative;
   display: flex;
+  flex-wrap: wrap;
 }
 .qaPage-main .images-videos-area .image-container .title {
   pointer-events: none;
@@ -58,26 +107,32 @@
 .qaPage-main .images-videos-area .image-container .image-video {
   cursor: pointer;
   position: relative;
-  width: 190px;
-  height: 128px;
   -o-object-fit: fill;
      object-fit: fill;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
   z-index: 0;
-  border: 1px solid #000000;
+  border-radius: 12px;
 }
 .qaPage-main .qa-info-area {
   background: #fafafa;
   border: 1px solid #ccc;
   padding: 10px;
-  width: 70%;
+  width: 60%;
   height: 200px;
   display: flex;
+  flex-wrap: wrap;
   flex-direction: column;
   gap: 4px;
 }
 .qaPage-main .qa-info-area .time {
   font-size: 15px;
   color: #656565;
+}
+.qaPage-main .qa-info-area .description {
+  width: 100%;
+  word-wrap: break-word;
 }
 .qaPage-main .qaPage-container {
   width: 90%;
@@ -98,13 +153,20 @@
 .qaPage-main .qaPage-container .comment-area {
   width: 90%;
   display: flex;
-  gap: 12px;
+  gap: 16px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+}
+.qaPage-main .qaPage-container .comment-area .user-shot-area {
+  display: flex;
+}
+.qaPage-main .qaPage-container .comment-area .user-shot-area .user-shot {
+  border-radius: 64px;
 }
 .qaPage-main .qaPage-container .comment-area .message-info {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  margin-top: 14px;
+  gap: 18px;
 }
 .qaPage-main .qaPage-container .comment-area .message-info .message-top {
   display: flex;
@@ -112,8 +174,10 @@
 }
 .qaPage-main .qaPage-container .comment-area .message-info .message-top .time {
   font-size: 14px;
+  color: rgb(92, 92, 92);
 }
 .qaPage-main .qaPage-container .comment-area .message-info .message-top .name {
+  font-weight: bold;
   font-size: 16px;
 }
 .qaPage-main .qaPage-container .comment-area .message-info .message-middle {
@@ -128,5 +192,7 @@
   margin-bottom: 12px;
 }
 .qaPage-main .qaPage-container .comment-area .message-info .message-bottom .file-preview {
+  max-width: 200px;
+  max-height: 200px;
   border-radius: 6px;
 }/*# sourceMappingURL=qaPage.css.map */

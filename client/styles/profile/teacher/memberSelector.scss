@@ -164,4 +164,24 @@
       }
     }
   }
+  .page-switch {
+    display: flex;
+    gap: 12px;
+    .page-switcher {
+      cursor: pointer;
+      color: #525252;
+    }
+    .total-page {
+      display: flex;
+      color: #9a9a9a;
+      gap: 4px;
+      .active{
+        font-weight: bold;
+        color: rgb(0, 0, 0);
+      }
+      .page {
+        cursor: pointer;
+      }
+    }
+  }
 }

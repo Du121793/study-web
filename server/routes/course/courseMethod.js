@@ -5,13 +5,105 @@ const VimeoMethods = require("../../methods").vimeoMethods;
 const imageCompresser = require("../../methods/imageCompresser");
 const accessChecker = require("../routesMiddleware/accessChecker");
 
+/**
+ * GET /members
+ *
+ * 說明：
+ * 此路由用於取得課程成員資料，支援以下參數以進行過濾、排序與分頁：
+ *
+ * 查詢參數：
+ * - role: 指定角色，僅回傳該角色的成員資料（例如 "student", "teacher", "admin"），
+ *         若未指定則回傳所有成員。
+ *
+ * 分頁與排序參數：
+ * - page (預設: 1): 當前頁碼。
+ * - pageSize (預設: 10): 每頁回傳的成員數量。
+ * - sortBy (可選): 排序依據，可選 "grade" 或 "date"，
+ *       * "grade": 根據用戶的年級 (userinfo.grade) 排序；由於教師通常沒有年級，
+ *                  因此沒有年級的成員會排在最後；若年級相同，則以建立時間 (date) 作次排序。
+ *       * "date": 根據用戶建立時間 (date) 排序。
+ *       若未指定 sortBy，則使用資料庫原有順序。
+ * - sortOrder (預設: "asc"): 排序方向，"asc" 為升冪，"desc" 為降冪。
+ *
+ * 範例：
+ * GET /members?role=student&page=2&pageSize=5&sortBy=grade&sortOrder=desc
+ */
+
 router.get("/members", async (req, res) => {
   try {
-    return res.json({ success: true, data: req.course.members });
+    // 取得查詢參數（全部採絕對比對）
+    const { role, username, realname, phoneNumber, _id } = req.query;
+    const page = parseInt(req.query.page, 10) || 1;
+    const pageSize = parseInt(req.query.pageSize, 10) || 10;
+    const sortBy = req.query.sortBy; // 可選 "grade" 或 "date"
+    const sortOrder = req.query.sortOrder === "desc" ? "desc" : "asc";
+
+    // 確認 req.course.members 存在且為陣列（這裡假設該陣列存放的是用戶 ID）
+    if (!req.course || !Array.isArray(req.course.members)) {
+      return res.status(400).json({
+        success: false,
+        msg: "課程成員資料不存在或格式錯誤"
+      });
+    }
+
+    // 建立過濾條件，必須限制 _id 在 req.course.members 內
+    let filter = {};
+    if (_id) {
+      // 若同時提供 _id，則同時限制必須為指定 _id 與屬於該課程
+      filter.$and = [{ _id: { $in: req.course.members } }, { _id }];
+    } else {
+      filter._id = { $in: req.course.members };
+    }
+    if (username) {
+      filter["userinfo.username"] = username;
+    }
+    if (realname) {
+      filter["userinfo.realname"] = realname;
+    }
+    if (phoneNumber) {
+      filter["userinfo.phoneNumber"] = phoneNumber;
+    }
+    if (role) {
+      filter.role = role;
+    }
+
+    // 建立排序條件
+    let sortQuery = {};
+    if (sortBy === "grade") {
+      // 依據 userinfo.grade 及 date 排序
+      sortQuery = {
+        "userinfo.grade": sortOrder === "asc" ? 1 : -1,
+        date: sortOrder === "asc" ? 1 : -1
+      };
+    } else if (sortBy === "date") {
+      sortQuery = { date: sortOrder === "asc" ? 1 : -1 };
+    }
+    // 未指定 sortBy 則維持預設排序
+
+    // 先取得符合條件的記錄總數
+    const total = await User.countDocuments(filter);
+    const totalPage = Math.ceil(total / pageSize);
+
+    // 查詢符合條件的會員詳細資料，加入分頁與排序
+    const users = await User.find(filter)
+      .sort(sortQuery)
+      .skip((page - 1) * pageSize)
+      .limit(pageSize);
+
+    return res.json({
+      success: true,
+      data: users,
+      page,
+      pageSize,
+      total,
+      totalPage
+    });
   } catch (e) {
-    return res
-      .send(500)
-      .json({ success: false, msg: "很抱歉，伺服器目前無法處理您的要求" });
+    console.error(e);
+    return res.status(500).json({
+      success: false,
+      msg: "很抱歉，伺服器目前無法處理您的要求"
+    });
   }
 });
 
@@ -225,14 +317,14 @@ router.patch("/uploadVideoStatus", accessChecker.teacher, async (req, res) => {
 
 router.delete("/deleteVideo", accessChecker.teacher, async (req, res) => {
   try {
-    const { videoId } = req.query;
-    console.log(videoId);
+    const { videoId } = req.body;
+    console.log("video", videoId);
     let foundVideoInfo = await VideoInfo.findOne({ _id: videoId });
     if (!foundVideoInfo)
       return res.status(400).json({ success: false, msg: "找不到影片資料" });
     await VimeoMethods.delete({ videoId });
     await VideoInfo.findOneAndDelete({ _id: videoId });
-    return res.json({ success: false, msg: "已更新資料庫" });
+    return res.json({ success: true, msg: "已更新資料庫" });
   } catch (e) {
     return res.status(500).json({ success: false, msg: "伺服器處理失敗" });
   }

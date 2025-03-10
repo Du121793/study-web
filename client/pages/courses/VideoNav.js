@@ -15,6 +15,7 @@ import userService from '../../method/userService'
 
 // 子組件
 import VideoUploadComponent from './UploadVideo'
+import adminService from '../../method/adminService'
 
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
@@ -43,6 +44,12 @@ export default function VideoNav({ course_id, courseName }) {
   // 給video子組件的參數
   const [uploadSuccess, setUploadSuccess] = useState(false) // 用於上傳完成更新影片區域
   const [uploadError, setUploadError] = useState(false) // 存取是否上傳發生錯誤
+
+  // 控制移除影片的小圖案高度
+  const [videoDeleteBtnHeight, setVideoDeleteBtnHeight] = useState('0px')
+
+  //
+  const [hasChange, setHasChange] = useState(false)
 
   const test = () => {
     console.log(baseUrl)
@@ -82,6 +89,10 @@ export default function VideoNav({ course_id, courseName }) {
   // 點擊加載更多影片
   const showMoreVideos = () => {
     setVideosPageSize(videosPageSize + 8)
+    setVideoContentHeight(0)
+    // setVideoNavOpen(false)
+    // setVideoContentHeight(videoContentRef.current.scrollHeight)
+    // setVideoNavOpen(true)
   }
 
   // 切換排序的type
@@ -140,10 +151,42 @@ export default function VideoNav({ course_id, courseName }) {
     return `${minutesString}:${secsString}`
   }
 
+  // 開啟刪除影片的按鈕
+  const showDeleteBtn = () => {
+    if (videoDeleteBtnHeight === '0px') {
+      setVideoDeleteBtnHeight('24px')
+    } else {
+      setVideoDeleteBtnHeight('0px')
+    }
+    console.log(videoDeleteBtnHeight)
+  }
+
+  // 二次確認是否刪除該影片
+
+  const doubleCheckDelete = (e, item) => {
+    const deleteBtn = document.querySelectorAll('.delete-video-btn')
+    const from = Array.from(deleteBtn)
+    if (e.innerText === '在點擊一次確認刪除') {
+      adminService.deleteVideo(token, item._id, item.courseID).then((res) => {
+        console.log('刪除成功')
+        getCourseVideos()
+      })
+    } else {
+      from.map((item) => {
+        if ((item.innerText = '在點擊一次確認刪除')) {
+          item.innerText = 'x'
+        }
+      })
+      e.innerText = '在點擊一次確認刪除'
+      console.log(item)
+      console.log(e)
+    }
+  }
+
   // 若是任何一個有改變，重新發一次影片請求
   useEffect(() => {
     getCourseVideos()
-  }, [token, course_id, chooseType, chooseSortOrder, uploadSuccess, videosPageSize, getCourseVideos])
+  }, [token, course_id, chooseType, chooseSortOrder, uploadSuccess, videosPageSize, getCourseVideos, hasChange])
 
   useEffect(() => {
     if (videoNavOpen && videoContentRef.current) {
@@ -202,6 +245,7 @@ export default function VideoNav({ course_id, courseName }) {
           transition: 'height 0.3s ease',
         }}>
         <div className="update-video-area">
+          {/* 上傳影片 */}
           {userInfo && userInfo.role === 'teacher' && (
             <div
               className="button"
@@ -214,6 +258,21 @@ export default function VideoNav({ course_id, courseName }) {
               className="button"
               onClick={showVideoUploadComponent}>
               上傳影片
+            </div>
+          )}
+          {/* 移除影片 */}
+          {userInfo && userInfo.role === 'teacher' && (
+            <div
+              className="button"
+              onClick={showDeleteBtn}>
+              移除影片
+            </div>
+          )}
+          {userInfo && userInfo.role === 'admin' && (
+            <div
+              className="button"
+              onClick={showDeleteBtn}>
+              移除影片
             </div>
           )}
           <span onClick={test}>排序根據</span>
@@ -238,6 +297,16 @@ export default function VideoNav({ course_id, courseName }) {
                 key={item._id}
                 href={`${baseUrl}videoPlay/Player?course_name=${courseName}&video_id=${item._id}&course_id=${course_id}&info=${[item.description, item.title, item.date]}`}
                 className="video">
+                <div
+                  className="delete-video-btn"
+                  style={{ height: videoDeleteBtnHeight }}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    e.preventDefault()
+                    doubleCheckDelete(e.target, item)
+                  }}>
+                  x
+                </div>
                 <Image
                   src={item.thumbnail}
                   className="videos-shot"

@@ -12,18 +12,17 @@ require("./jobs/cleanUpDataBase");
 const authRoute = require("./routes").auth;
 const courseRoute = require("./routes").course;
 const userRoute = require("./routes").user;
+const resourceRoute = require("./resource");
 const cors = require("cors");
-
-const User = require("./models").user;
 
 app.use(
   cors({
-    origin: process.env.CLIENT_IP, // 或你的前端網域
+    origin: "http://localhost:3000", // 或你的前端網域
     credentials: true, // 允許附帶cookie
   })
 );
 mongoose
-  .connect(process.env.DB_IP)
+  .connect("mongodb://localhost:27017/StudyWebDBAlpha")
   .then(() => {
     console.log("Successful to mongodb");
   })
@@ -52,7 +51,7 @@ const tokenCheck = (req, res, next) => {
     }
     if (!user) {
       // 如果驗證失敗，回覆 401 或你想要的錯誤訊息
-      return res.status(401).json({ success: false, message: "Unauthorized" });
+      return res.status(401).json({ message: "Unauthorized" });
     }
     // 如果驗證成功，把 user 放到 req.user
     req.user = user;
@@ -65,6 +64,7 @@ const tokenCheck = (req, res, next) => {
 };
 
 app.use("/auth", authRoute);
+app.use("/resource", resourceRoute);
 app.use("/user", tokenCheck, userRoute);
 app.use("/course", tokenCheck, courseRoute);
 

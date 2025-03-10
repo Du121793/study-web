@@ -162,4 +162,24 @@
 }
 .member-select-area .member-area li .searched-info #grade {
   width: 80px;
+}
+.member-select-area .page-switch {
+  display: flex;
+  gap: 12px;
+}
+.member-select-area .page-switch .page-switcher {
+  cursor: pointer;
+  color: #525252;
+}
+.member-select-area .page-switch .total-page {
+  display: flex;
+  color: #9a9a9a;
+  gap: 4px;
+}
+.member-select-area .page-switch .total-page .active {
+  font-weight: bold;
+  color: rgb(0, 0, 0);
+}
+.member-select-area .page-switch .total-page .page {
+  cursor: pointer;
 }/*# sourceMappingURL=memberSelector.css.map */

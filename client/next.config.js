@@ -4,7 +4,7 @@ const nextConfig = {
   // 因為不支援
   // swcMinify: true,
   images: {
-    domains: ['profile.line-scdn.net'],
+    domains: ['profile.line-scdn.net', 'localhost'],
   },
 }
 

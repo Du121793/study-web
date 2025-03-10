@@ -38,10 +38,11 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    width: 80%;
-    background-color: #ececec;
+    width: 95%;
+    background-color: #FFFFFF;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); // 柔和陰影
+    border: 1px solid #E5E5E5;
     .selects-area {
       display: flex;
       align-items: center;
@@ -96,7 +97,7 @@
           gap: 12px;
           padding: 4px 0 4px 0;
           border: 2px solid rgba(0, 0, 0, 0);
-          width: 80%;
+          width: 90%;
           border-radius: 4px;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); // 柔和陰影
           .username {

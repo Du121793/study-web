@@ -1,10 +1,6 @@
-// QAMsgUpload.js (MyUploadComponent)
-// 組件庫
 import React, { use, useState } from 'react'
-// TSU
 import { Upload } from 'tus-js-client'
 import videoUploader from '../../method/videoUploader'
-// 外部method
 import userService from '../../method/userService'
 
 export default function QAMsgUpload({
@@ -16,7 +12,25 @@ export default function QAMsgUpload({
   fileSize,
   isPrivate,
   isBest,
+  submitSuccess,
+  setSubmitSuccess,
 }) {
+  // 組成 FormData
+  const formData = new FormData()
+  formData.append('content', content)
+  if (fileSize) {
+    formData.append('fileSize', fileSize)
+  }
+  formData.append('isPrivate', isPrivate)
+  formData.append('isBest', isBest)
+  // ★ 將多張圖片依序 append，key 皆為 "image" ★
+  if (images && images.length > 0) {
+    images.forEach((imgFile) => {
+      console.log(imgFile)
+      formData.append('image', imgFile)
+    })
+  }
+
   /* 控制上傳狀態 */
   const [uploads, setUploads] = useState([])
   const [uploadSuccess, setUploadSuccess] = useState(false)
@@ -26,58 +40,42 @@ export default function QAMsgUpload({
   const [uploadLink, setUploadLink] = useState(null)
   const [commentID, setCommentID] = useState(null)
 
-  // 這個函式就是「開始上傳」的按鈕點擊事件
+  // 「開始上傳」按鈕事件
   const handleTusUpload = async () => {
     if (uploading) return
     setUploading(true)
 
     try {
-      // 先轉成 base64
-      let base64Array = []
-      if (images && images.length > 0) {
-        base64Array = await Promise.all(
-          images.map((imgFile) => {
-            return new Promise((resolve, reject) => {
-              const reader = new FileReader()
-              reader.onload = (e) => resolve(e.target.result)
-              reader.onerror = (err) => reject(err)
-              reader.readAsDataURL(imgFile)
-            })
-          })
-        )
+      // (1) 送出留言並取得 uploadLink、commentID
+      console.log('即將送出 FormData:', formData)
+      const res = await userService.submitQaMessage(token, question_id, formData)
+      console.log(Object.keys(res.data.uploadLink).length)
+      if (res.success === true && Object.keys(res.data.uploadLink).length === 0) {
+        console.log('設定submitSuccess')
+        setSubmitSuccess(!submitSuccess)
       }
 
-      // (2) 送出留言並取得 uploadLink、commentID
-      const res = await userService.submitQaMessage(token, question_id, {
-        content,
-        image: base64Array,
-        fileSize,
-        isPrivate,
-        isBest,
-      })
-
+      // 檢查是否有上傳影片，與是否正常上傳留言
       const { uploadLink, commentID } = res.data
+
       setUploadLink(uploadLink)
       setCommentID(commentID)
 
-      console.log('submitQaMessage 結果:', res)
-      console.log('取得的 uploadLink:', uploadLink)
-
-      // (3) 若沒有要上傳影片，就結束
+      // (2) 若沒有要上傳影片，就結束
       if (!file) {
         console.log('沒有影片需要上傳，流程結束')
         setUploadSuccess(true)
         return
       }
 
-      // (4) 若沒有拿到 uploadLink，通知後端失敗
+      // (3) 若沒有拿到 uploadLink，通知後端失敗
       if (!uploadLink) {
         console.error('後端沒有回傳 uploadLink, 上傳影片失敗')
         await videoUploader.returnQuestionUploadStatus(token, question_id, commentID, false)
         return
       }
 
-      // (5) 開始 Tus 上傳
+      // (4) 開始 Tus 上傳
       const uploadId = Date.now() + '-' + file.name
       const tusUpload = new Upload(file, {
         uploadUrl: uploadLink,
@@ -100,7 +98,8 @@ export default function QAMsgUpload({
         },
 
         onSuccess: async () => {
-          console.log('TUS 上傳成功')
+          // 設定反狀態用於更新留言區
+          setSubmitSuccess(!submitSuccess)
           try {
             const response = await videoUploader.returnQuestionUploadStatus(token, question_id, commentID, true)
             console.log('回傳後端成功狀態:', response)

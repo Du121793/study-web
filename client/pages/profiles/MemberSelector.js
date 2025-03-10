@@ -6,38 +6,20 @@ import { useUserToken } from '../../method/useUserToken'
 export default function MemberSelector({ selectedStudentId, setSelectedStudentId }) {
   const [isSelectAllCheckbox, setIsSelectAllCheckbox] = useState(false)
   const token = useUserToken()
+
+  // 請求參數
+  const [page, setPage] = useState(1)
+  const [nameInput, setNameInput] = useState(null)
+  const [phoneInput, setPhoneInput] = useState(null)
+  const [gradeInput, setGradeInput] = useState(null)
+  const [roleInput, setRoleInput] = useState(null)
+  const [selectCourse, setSelectCourse] = useState(null)
+
   // 獲取資料
   const [members, setMembers] = useState([])
-  const [searchStudentOption, setSearchStudentOption] = useState({
-    username: '',
-    phoneNumber: '',
-    role: '',
-    grade: '',
-  })
-  const searchStudentOptionNameChange = (e) => {
-    setSearchStudentOption((prevState) => ({
-      ...prevState, // 保留其他屬性不變
-      username: e.target.value, // 更新 username
-    }))
-  }
-  const searchStudentOptionPhoneChange = (e) => {
-    setSearchStudentOption((prevState) => ({
-      ...prevState, // 保留其他屬性不變
-      phoneNumber: e.target.value, // 更新 username
-    }))
-  }
-  const searchStudentOptionRoleChange = (e) => {
-    setSearchStudentOption((prevState) => ({
-      ...prevState, // 保留其他屬性不變
-      role: e.target.value, // 更新 username
-    }))
-  }
-  const searchStudentOptionGradeChange = (e) => {
-    setSearchStudentOption((prevState) => ({
-      ...prevState, // 保留其他屬性不變
-      grade: e.target.value, // 更新 username
-    }))
-  }
+  const [totalPage, setTotalPage] = useState(null)
+  const [totalArray, setTotalArray] = useState([])
+
   // 全選按鈕
   const selectAllStudent = () => {
     const boxs = document.querySelectorAll('.student-checkbox')
@@ -55,6 +37,7 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
       }
     })
   }
+
   // 取消全選按鈕
   const clearSearch = () => {
     const boxs = document.querySelectorAll('.student-checkbox')
@@ -74,24 +57,25 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
       })
     }
   }
+
   // 搜尋按鈕
   const searchStudentButton = () => {
-    const boxs = document.querySelectorAll('.student-checkbox')
-    boxs.forEach((checkbox) => {
-      if (checkbox.checked === true) {
-        // 全部打勾
-        checkbox.click()
-      }
-    })
-    setIsSelectAllCheckbox(false)
     try {
-      adminService.getMembers(token, searchStudentOption).then((res) => {
+      adminService.getMembers(token, page, nameInput, phoneInput, gradeInput, roleInput, selectCourse).then((res) => {
         setMembers(res.data)
+        setTotalPage(res.totalPage)
+        let temp = []
+        for (let i = 1; i <= res.totalPage; i++) {
+          temp.push(i)
+        }
+        setTotalArray(temp)
+        console.log(res)
       })
     } catch (e) {
-      alert(e)
+      console.error(e)
     }
   }
+
   // 按下打勾變色
   const checkboxClickEvent = (e) => {
     if (e.parentNode.style.border === '2px solid rgb(124, 225, 180)') {
@@ -100,6 +84,7 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
       e.parentNode.style.border = '2px solid rgb(124, 225, 180)'
     }
   }
+
   // 點擊整片區域都能選取到
   const memberAreaClickEvent = (e) => {
     if (e.firstChild) {
@@ -107,20 +92,36 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
     }
     // rgb(124, 225, 141)
   }
+
+  // 獲得成員清單
   useEffect(() => {
     if (token) {
       try {
-        adminService.getMembers(token).then((res) => {
+        adminService.getMembers(token, page).then((res) => {
           setMembers(res.data)
+          setTotalPage(res.totalPage)
+          let temp = []
+          for (let i = 1; i <= res.totalPage; i++) {
+            temp.push(i)
+          }
+          setTotalArray(temp)
         })
       } catch (e) {
         alert(e)
       }
     }
-  }, [token])
+  }, [token, page])
+
+  const test = () => {
+    console.log(totalArray)
+  }
   return (
     <div className="member-select-area">
-      <div className="member-select-header">成員搜尋功能</div>
+      <div
+        className="member-select-header"
+        onClick={test}>
+        成員搜尋功能
+      </div>
       <div className="classification">
         <div className="search-inputs">
           {/* 姓名 */}
@@ -129,7 +130,8 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
             <input
               className="input-name"
               onChange={(e) => {
-                searchStudentOptionNameChange(e)
+                setNameInput(e.target.value)
+                console.log(e.target.value)
               }}
               type="text"
             />
@@ -140,7 +142,8 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
             <input
               className="input-phone"
               onChange={(e) => {
-                searchStudentOptionPhoneChange(e)
+                setPhoneInput(e.target.value)
+                console.log(e.target.value)
               }}
               type="text"
             />
@@ -151,7 +154,8 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
             <input
               className="input-grade"
               onChange={(e) => {
-                searchStudentOptionGradeChange(e)
+                setGradeInput(e.target.value)
+                console.log(e.target.value)
               }}
               type="text"
             />
@@ -161,7 +165,8 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
             身分組:
             <select
               onChange={(e) => {
-                searchStudentOptionRoleChange(e)
+                setRoleInput(e.target.value)
+                console.log(e.target.value)
               }}
               name=""
               id="">
@@ -185,6 +190,7 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
           </button>
           <button
             className="search-option-btn"
+            style={{ cursor: 'pointer' }}
             onClick={searchStudentButton}>
             搜尋
           </button>
@@ -216,28 +222,61 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
                   })
                 }}
               />
-              {!searchStudentOption && (
-                <div className="searched-info">
-                  <span id="username">{item.userinfo.username}</span>
-                  <span id="realname">{item.userinfo.realname}</span>
-                  <span id="phone-number">{item.userinfo.phoneNumber}</span>
-                  <span id="course-class">{item.userinfo.courseClass}</span>
-                  <span id="grade">{item.userinfo.grade}</span>
-                </div>
-              )}
-              {searchStudentOption && (
-                <div className="searched-info">
-                  <span id="username">{item.userinfo.username}</span>
-                  <span id="realname">{item.userinfo.realname}</span>
-                  <span id="phone-number">{item.userinfo.phoneNumber}</span>
-                  <span id="grade">{item.userinfo.grade}</span>
-                  {item.role === 'teacher' ? <span id="role">老師</span> : <span id="role">學生</span>}
-                </div>
-              )}
+              <div className="searched-info">
+                {item.userinfo.username === undefined && <span id="username">無</span>}
+                {item.userinfo.username !== undefined && <span id="username">{item.userinfo.username}</span>}
+                <span id="realname">{item.userinfo.realname}</span>
+                <span id="phone-number">{item.userinfo.phoneNumber}</span>
+                <span id="course-class">{item.userinfo.courseClass}</span>
+                <span id="grade">{item.userinfo.grade}</span>
+                {item.role === 'teacher' && <span id="role">教師</span>}
+                {item.role === 'student' && <span id="role">學生</span>}
+                {item.role === 'admin' && <span id="role">管理員</span>}
+              </div>
             </li>
           ))}
       </ul>
-      <div className="page-switch"></div>
+      <div className="page-switch">
+        <div
+          className="page-switcher"
+          onClick={() => {
+            if (page === 1) {
+              clearSearch()
+              return
+            } else {
+              setPage(page - 1)
+              clearSearch()
+            }
+          }}>
+          上一頁
+        </div>
+        <div className="total-page">
+          {totalArray.length < 6 &&
+            totalArray.map((item, index) => (
+              <div
+                key={index}
+                className={`page ${index + 1 === page && 'active'}`}
+                onClick={() => {
+                  setPage(index + 1)
+                }}>
+                {item}
+              </div>
+            ))}
+        </div>
+        <div
+          className="page-switcher"
+          onClick={() => {
+            if (page === totalPage) {
+              clearSearch()
+              return
+            } else {
+              clearSearch()
+              setPage(page + 1)
+            }
+          }}>
+          下一頁
+        </div>
+      </div>
     </div>
   )
 }

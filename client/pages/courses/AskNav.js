@@ -22,7 +22,9 @@ import QaNav from './QaNav'
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
-export default function AskNav({course_id, courseName}) {
+export default function AskNav({ course_id, courseName }) {
+  // count用於控制nav收合
+  const [count, setCount] = useState(0)
   // 獲取資料
   const token = useUserToken()
   // 處理標籤狀態
@@ -31,10 +33,8 @@ export default function AskNav({course_id, courseName}) {
   const fileInputRef = useRef(null)
   // 常用參數
   const baseUrl = `${clientIp}/`
-  const backToMyCoursePageUrl = `${clientIp}/profiles/profile`
   const [isLogined, setLogined] = useState(false)
   const [userInfo, setUserInfo] = useState(null)
-  const [isShowVideoUpload, setIsShowVideoUpload] = useState(false)
 
   // ask 區塊 - 同樣使用 ref 與 state 控制展開/收合
   const [qaAsk, setQaAsk] = useState(false)
@@ -43,6 +43,7 @@ export default function AskNav({course_id, courseName}) {
 
   // ask 區塊
   const [hintInput, setHintInput] = useState('')
+  const [themeInput, setThemeInput] = useState('')
 
   // ask 請求參數
   // 描述
@@ -54,7 +55,7 @@ export default function AskNav({course_id, courseName}) {
   // 圖片
   const [images, setImages] = useState([])
   // 主題
-  const [resourceCategoriesm, setResourceCategories] = useState('')
+  const [theme, setTheme] = useState(['主題'])
   // 標籤 陣列
   const [hints, setHints] = useState(['標籤'])
 
@@ -73,6 +74,41 @@ export default function AskNav({course_id, courseName}) {
         return index !== imageIndex
       })
     )
+  }
+
+  // ask，移除標籤功能
+  const removeTheme = (themes) => {
+    if (
+      theme.find((item) => {
+        return item === themes
+      })
+    ) {
+      console.log('刪除')
+      setTheme(
+        theme.filter((item) => {
+          return item !== themes
+        })
+      )
+    } else {
+      console.log('沒找到')
+    }
+  }
+
+  // ask，新增標籤功能
+  const addNewTheme = () => {
+    console.log(theme)
+    if (
+      theme.find((item) => {
+        return item === themeInput
+      }) ||
+      themeInput === ''
+    ) {
+      console.log('這個標籤已經有了')
+    } else {
+      console.log('進行增加')
+      setTheme(theme, theme.push(themeInput))
+      setRerander(!rerander)
+    }
   }
 
   // ask，移除標籤功能
@@ -112,18 +148,27 @@ export default function AskNav({course_id, courseName}) {
 
   // ask，新增提問給該課程
   const createNewQA = () => {
-    userService
-      .createNewQuestion(token, {
-        isPublic: isPublic,
-        course_ids: [course_id],
-        description: description,
-        image: images,
-        resourceCategoriesm: resourceCategoriesm,
-        hints: hints,
-      })
-      .then((res) => {
-        console.log(res)
-      })
+    const _idArray = [course_id]
+    const formData = new FormData()
+    formData.append('isPublic', isPublic)
+    _idArray.forEach((id) => {
+      formData.append('course_ids[]', id)
+    })
+    formData.append('description', description)
+    if (images.length) {
+      images.forEach((file) => formData.append('image', file))
+    }
+    theme.forEach((item) => {
+      formData.append('resourceCategories[]', item)
+    })
+
+    hints.forEach((item) => {
+      formData.append('hints[]', item)
+    })
+
+    userService.createNewQuestion(token, formData).then((res) => {
+      console.log(res)
+    })
   }
 
   // 切換ask的展示收回狀態
@@ -148,7 +193,8 @@ export default function AskNav({course_id, courseName}) {
   }
 
   const test = () => {
-    console.log(course_id)
+    console.log(hints)
+    console.log(theme)
   }
 
   // 請求使用者資料
@@ -163,6 +209,18 @@ export default function AskNav({course_id, courseName}) {
         .catch((err) => console.error('Error:', err.message))
     }
   }, [token])
+
+  // nav更新高度，count用來防止第一次渲染造成預設計算高度後直接開啟nav
+  useEffect(() => {
+    if (askContentRef.current && count > 0) {
+      askContentRef.current.style.height = 'auto'
+      // 延遲量測新高度（可使用 requestAnimationFrame 或 setTimeout）
+      setTimeout(() => {
+        const newHeight = askContentRef.current.scrollHeight
+        setAskContentHeight(newHeight)
+      }, 100)
+    }
+  }, [images, count])
 
   return (
     <div
@@ -196,6 +254,7 @@ export default function AskNav({course_id, courseName}) {
               className="upload-img-btn">
               選擇檔案
             </button>
+            {/* 處理上傳圖片 */}
             <input
               ref={fileInputRef}
               onChange={(e) => {
@@ -237,12 +296,29 @@ export default function AskNav({course_id, courseName}) {
             {/* 主題 */}
             <div className="resourceCategory-input-area">
               <span>主題:</span>
-              <select
+              <input
                 onChange={(e) => {
-                  setResourceCategories(e.target.value)
-                }}>
-                <option value="">無特定主題</option>
-              </select>
+                  setThemeInput(e.target.value)
+                }}
+                type="text"
+              />
+              <button onClick={addNewTheme}>新增</button>
+            </div>
+            <div className="themes-area">
+              {theme.map((item, index) => (
+                <div
+                  className="theme"
+                  key={index}>
+                  {item}
+                  <span
+                    className="delete-theme"
+                    onClick={() => {
+                      removeTheme(item)
+                    }}>
+                    x
+                  </span>
+                </div>
+              ))}
             </div>
             {/* 輸入標籤 */}
             <div className="hints-input-area">
@@ -265,6 +341,7 @@ export default function AskNav({course_id, courseName}) {
                     key={index}>
                     {item}
                     <span
+                      className="delete-hint"
                       onClick={() => {
                         removeHint(item)
                       }}>

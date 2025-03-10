@@ -1,5 +1,3 @@
-grades.json
-
 # Logs
 logs
 *.log
@@ -95,8 +93,7 @@ dist
 
 # Gatsby files
 .cache/
-# Comment in the public line in if your project uses Gatsby and not Next.js
-# https://nextjs.org/blog/next-9-1#public-directory-support
+# public  (Uncomment if using Gatsby instead of Next.js)
 # public
 
 # vuepress build output
@@ -106,15 +103,12 @@ dist
 .temp
 .cache
 
-<<<<<<< HEAD
-=======
 # vitepress build output
 **/.vitepress/dist
 
 # vitepress cache directory
 **/.vitepress/cache
 
->>>>>>> backend
 # Docusaurus cache and generated files
 .docusaurus
 
@@ -138,8 +132,30 @@ dist
 .yarn/unplugged
 .yarn/build-state.yml
 .yarn/install-state.gz
-<<<<<<< HEAD
 .pnp.*
-=======
-.pnp.*
->>>>>>> backend
+
+# ==========================
+# 以下為你所需要的關鍵規則
+# ==========================
+
+# 不上傳 .env 與 grades.json
+.env
+grades.json
+
+# 先忽略 resource 資料夾下所有內容
+resource/**
+
+# 但允許 (re-include) resource/public
+!resource/public
+
+# 再次忽略 resource/public 下所有內容
+resource/public/**
+
+# 但允許 (re-include) resource/public/carousel
+!resource/public/carousel
+
+# 最後忽略 resource/public/carousel 下所有內容
+resource/public/carousel/**
+
+# 但允許 (re-include) .gitkeep 或其他你需要保留的空檔案
+!resource/public/carousel/.gitkeep

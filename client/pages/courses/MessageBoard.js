@@ -2,8 +2,6 @@ import React from 'react'
 // 組件庫
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
 
 // global組件
 
@@ -15,7 +13,7 @@ import userService from '../../method/userService'
 // import {startTusUpload} from '../methods/qaMsgUpload.js'
 import QAMsgUpload from '../methods/QaMsgUpload'
 
-export default function MessageBoard({qa_id}) {
+export default function MessageBoard({ qa_id, submitSuccess, setSubmitSuccess }) {
   // 從url獲取參數
   const router = useRouter()
   const { course_id } = router.query
@@ -49,27 +47,7 @@ export default function MessageBoard({qa_id}) {
     }
   }, [token])
 
-  // 送出留言
-  // 67bb6569c646a56b343ed51c
-  const submitMsg = () => {
-    userService
-      .submitQaMessage(token, qa_id, {
-        content,
-        image: images,
-        fileSize: video.size,
-        isPrivate,
-        isBest,
-      })
-      .then((res) => {
-        console.log(res)
-
-        // 上傳影片
-        // startTusUpload(token,res.data.uploadLink,res.data.commentID,video)
-      })
-  }
-
-  const test = () => {
-  }
+  const test = () => {}
 
   return (
     <div className="msg-board">
@@ -81,7 +59,9 @@ export default function MessageBoard({qa_id}) {
           setContent(e.target.value)
         }}></textarea>
       <div className="settings-area">
-        <div className="upload-video-btn-area" onClick={test}>
+        <div
+          className="upload-video-btn-area"
+          onClick={test}>
           可傳送最多一部影片
           <input
             type="file"
@@ -123,7 +103,9 @@ export default function MessageBoard({qa_id}) {
             images={images}
             fileSize={video && video.size}
             isPrivate={isPrivate}
-            isBest={isBest}></QAMsgUpload>
+            isBest={isBest}
+            submitSuccess={submitSuccess}
+            setSubmitSuccess={setSubmitSuccess}></QAMsgUpload>
         </div>
       </div>
     </div>

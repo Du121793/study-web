@@ -80,6 +80,7 @@ export default function RemoveUsers() {
       })
     }
   }, [token])
+  
   return (
     <div className="remove-users-page">
       <div className="remove-users-title">移除成員功能</div>

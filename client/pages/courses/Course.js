@@ -32,6 +32,8 @@ export default function Course() {
   // rerander
   const [rerander, setRerander] = useState(true)
 
+  const [overFlow, serOverFlow] = useState('auto')
+
   // 參數
   const baseUrl = `${clientIp}/`
   const backToMyCoursePageUrl = `${clientIp}/profiles/Profile`
@@ -66,9 +68,8 @@ export default function Course() {
   }, [courseName, courseId])
 
   return (
-    <div className="course-main">
-      <button onClick={test}>測試按鈕</button>
-      <Link href={`${baseUrl}courses/QaPage?course_id=${course_id}`}>提問URL</Link>
+    <div
+      className="course-main">
       <Header loginState={isLogined} />
       <div className="container">
         <div className="header-title-area">

@@ -61,7 +61,7 @@ router.get(
     // 導向前端的「填寫真實姓名與電話」頁面
     return res.redirect(
       301,
-      `${process.env.CLIENT_IP}/methods/service/completeInfo?token=${tempToken}`
+      `${process.env.CLIENT_IP}/methods/service/CompleteInfo?token=${tempToken}`
     );
   }
 );

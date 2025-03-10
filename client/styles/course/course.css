@@ -1,6 +1,10 @@
 @charset "UTF-8";
 .course-main {
   min-width: 1250px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .course-main .background {
   display: none;
@@ -17,10 +21,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
+  width: 90%;
 }
 .course-main .container .header-title-area {
-  width: 1200px;
+  width: 100%;
   display: flex;
   align-items: center;
   position: relative;
@@ -51,11 +55,8 @@
 .course-main .container .nav {
   position: relative;
   top: 0;
-  min-width: 1005px;
-  width: 1200px;
-  /* 移除 max-height: 80px */
+  width: 100%;
   border-radius: 8px;
-  transition: height 0.3s ease;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   background-color: rgba(0, 0, 0, 0.6);
@@ -89,6 +90,7 @@
 .course-main .container .nav .update-video-area {
   display: flex;
   align-items: center;
+  justify-content: start;
   gap: 24px;
   padding-top: 24px;
   width: 100%;
@@ -137,11 +139,9 @@
   background-color: #f6f6f6;
 }
 .course-main .container .nav .video-area {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 24px;
-  width: 100%;
-  max-width: 1176px; /* 可自行調整，或乾脆不寫 */
   padding: 24px;
   background-color: rgb(255, 255, 255);
 }
@@ -154,6 +154,24 @@
   background-color: #b7b7b7;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  transition: 0.2s;
+}
+.course-main .container .nav .video-area .video .delete-video-btn {
+  z-index: 999;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: black;
+  font-weight: bold;
+  background-color: rgb(255, 85, 85);
+  border-bottom-right-radius: 6px;
+  border-bottom-left-radius: 6px;
+  top: 0;
+  left: 4px;
+  font-size: 18px;
+  padding: 0 6px 0 6px;
   transition: 0.2s;
 }
 .course-main .container .nav .video-area .video .videos-shot {
@@ -210,73 +228,153 @@
   display: flex;
   flex-direction: column;
   gap: 24px; /* 區塊間距 */
-  padding-left: 24px;
   background-color: #f5f5f5;
 }
-.course-main .container .nav .QA-area .QA-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 32px;
-  padding-bottom: 24px;
-}
-.course-main .container .nav .QA-area .QA-grid .type-section {
-  background-color: #fff;
-  border-radius: 8px;
-  padding: 12px;
-  width: 240px; /* 固定寬度，效果類似卡片 */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  /* QA 卡片 */
-}
-.course-main .container .nav .QA-area .QA-grid .type-section h2 {
-  margin: 0 0 12px 0;
-  font-size: 18px;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 6px;
-}
-.course-main .container .nav .QA-area .QA-grid .type-section .qa-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.course-main .container .nav .QA-area .QA-grid .type-section .qa-item {
-  cursor: pointer;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  margin-bottom: 12px;
-  overflow: hidden;
-  padding-bottom: 12px;
-  transition: 0.3s;
-}
-.course-main .container .nav .QA-area .QA-grid .type-section .qa-item .image-area {
-  max-width: 100%;
-  max-height: 160px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  background-color: rgb(171, 171, 171);
-}
-.course-main .container .nav .QA-area .QA-grid .type-section .qa-item .image-area .image {
-  width: 100%;
-}
-.course-main .container .nav .QA-area .QA-grid .type-section .qa-item .qa-title {
-  margin-bottom: 4px;
-  margin-top: 12px;
-  margin-left: 12px;
-}
-.course-main .container .nav .QA-area .QA-grid .type-section .qa-item .qa-dateTime {
-  font-size: 14px;
-  color: #666;
-  margin-left: 12px;
-}
-.course-main .container .nav .QA-area .QA-grid .type-section .qa-item:hover {
-  border: 1px solid #373737;
-}
-.course-main .container .nav .QA-header {
+.course-main .container .nav .QA-area .QA-header {
   align-items: center;
   padding-top: 16px;
   display: flex;
   gap: 24px;
+}
+.course-main .container .nav .QA-area .QA-header .show-public-QA {
+  cursor: pointer;
+  font-weight: bold;
+  padding: 4px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  background-color: #cbf6ff;
+  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
+  transition: 0.2s;
+}
+.course-main .container .nav .QA-area .QA-header .show-public-QA:hover {
+  background-color: #bae1e9;
+}
+.course-main .container .nav .QA-area .QA-header .show-delete-btn {
+  cursor: pointer;
+  font-weight: bold;
+  padding: 4px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  background-color: #ffb7b7;
+  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
+  transition: 0.2s;
+}
+.course-main .container .nav .QA-area .QA-header .show-delete-btn:hover {
+  background-color: #e7a5a5;
+}
+.course-main .container .nav .QA-area .sort-title {
+  margin-left: 24px;
+}
+.course-main .container .nav .QA-area .QA-grid .QA-container {
+  display: flex;
+  justify-content: flex-start;
+  padding: 0 32px 24px 32px; /* 上:0, 右:32px, 下:24px, 左:32px */
+  gap: 12px;
+}
+.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list {
+  margin-bottom: 32px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #bebebe;
+  border-radius: 2px;
+  gap: 18px;
+  background-color: rgb(235, 235, 235);
+}
+.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .QA-tag {
+  display: flex;
+}
+.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .QA-tag .content {
+  font-weight: bold;
+  font-size: 18px;
+  padding: 4px;
+  background-color: #f0c2fc;
+  border-radius: 4px;
+  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
+}
+.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 90%;
+  border: 1px solid #ababab;
+  padding: 12px;
+  border-radius: 4px;
+  gap: 12px;
+  background-color: #ffffff;
+}
+.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .btn-area {
+  display: flex;
+  gap: 12px;
+}
+.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .btn-area .into-qa-btn {
+  color: black;
+  flex: 1;
+  padding: 4px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  background-color: #ffffff;
+  transition: 0.2s;
+}
+.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .btn-area .into-qa-btn:hover {
+  background-color: #e1e1e1;
+}
+.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .btn-area .remove-btn {
+  color: black;
+  padding: 4px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  background-color: #ffdada;
+  transition: 0.2s;
+  cursor: pointer;
+}
+.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .btn-area .remove-btn:hover {
+  background-color: #ebc1c1;
+}
+.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .qa-info-title {
+  display: flex;
+}
+.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .qa-info-title .content {
+  font-weight: bold;
+  font-size: 18px;
+  padding: 4px;
+  background-color: #b9cdf9;
+  border-radius: 4px;
+  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
+  color: black;
+}
+.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .qa-image-area {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .qa-image-area .qa-image {
+  width: 100%;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .qa-image-area .qa-images {
+  width: 33%;
+}
+.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .time-area {
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 15px;
+}
+.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .qa-description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: black;
+}
+.course-main .container .nav .QA-area .QA-grid .QA-container .load-more-btn {
+  cursor: pointer;
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  background-color: white;
 }
 .course-main .container .nav .ask-area {
   background-color: #f5f5f5;
@@ -319,6 +417,7 @@
   min-height: 40px;
   border: 1px solid #ccc;
   border-radius: 8px;
+  gap: 24px;
 }
 .course-main .container .nav .ask-area .ask-form .upload-img-area .preview-img .preview-images-container {
   position: relative;
@@ -361,11 +460,42 @@
 .course-main .container .nav .ask-area .ask-form .qa-info-area .resourceCategory-input-area span {
   font-size: 18px;
 }
-.course-main .container .nav .ask-area .ask-form .qa-info-area .resourceCategory-input-area select {
+.course-main .container .nav .ask-area .ask-form .qa-info-area .resourceCategory-input-area input {
   padding: 2px 4px 2px 4px;
-  border-radius: 4px;
   border: 1px solid #ccc;
-  background-color: #fff;
+  border-radius: 4px;
+  width: 200px;
+}
+.course-main .container .nav .ask-area .ask-form .qa-info-area .resourceCategory-input-area button {
+  padding: 0.3rem 0.6rem;
+  border: none;
+  background-color: #0070f3;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.course-main .container .nav .ask-area .ask-form .qa-info-area .resourceCategory-input-area button:hover {
+  background-color: #005bb5;
+}
+.course-main .container .nav .ask-area .ask-form .qa-info-area .themes-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.course-main .container .nav .ask-area .ask-form .qa-info-area .themes-area .theme {
+  display: flex;
+  align-items: center;
+  background-color: #eee;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  font-size: 15px;
+  gap: 0.3rem;
+  border: 1px solid #ccc;
+}
+.course-main .container .nav .ask-area .ask-form .qa-info-area .themes-area .delete-theme {
+  font-weight: bold;
+  font-size: 16px;
   cursor: pointer;
 }
 .course-main .container .nav .ask-area .ask-form .qa-info-area .hints-area {

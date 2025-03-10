@@ -29,13 +29,9 @@ export default function Profile() {
     }
   }, [token])
 
-  const test = () => {
-    console.log(userInfo)
-  }
 
   return (
     <div className="profile-main">
-      {/* <button onClick={test}>測試按鈕</button> */}
       <Head></Head>
       <Header loginState={isLogined}></Header>
       {userInfo && userInfo.data.role === 'student' && <StudentLayout></StudentLayout>}

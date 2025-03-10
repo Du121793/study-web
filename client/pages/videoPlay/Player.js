@@ -100,11 +100,13 @@ export default function Player() {
   return (
     <div className="video-player-main">
       <div className="header">
-        <Link
+        <div
           className="back-to-course-btn"
-          href={`${baseUrl}courses/course?courseName=${course_name}&courseId=${course_id}`}>
+          onClick={() => {
+            window.history.back()
+          }}>
           回到課程
-        </Link>
+        </div>
         <Image
           onClick={test}
           src={logo}

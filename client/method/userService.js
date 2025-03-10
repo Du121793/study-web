@@ -112,24 +112,14 @@ const userService = {
   },
 
   // 新增新的QA給指定課程
-  async createNewQuestion(token, questionParam) {
-    console.log(questionParam)
+  async createNewQuestion(token, formData) {
+    formData.forEach((value, key) => {
+      console.log(key, value)
+    })
     // isPublic, course_ids, description, image, resourceCategories, hints
     try {
-      // 將傳入的圖片修改為base64
-      const base64Array = await Promise.all(
-        questionParam.image.map((file) => {
-          return new Promise((resolve, reject) => {
-            const reader = new FileReader()
-            reader.onload = (e) => resolve(e.target.result)
-            reader.onerror = (err) => reject(err)
-            reader.readAsDataURL(file)
-          })
-        })
-      )
-      questionParam.image = base64Array
       const authHeader = token ? { Authorization: token } : {}
-      const response = await axios.post(QA_URL + '/modifyQA/postQuestion', questionParam, { headers: authHeader })
+      const response = await axios.post(QA_URL + '/modifyQA/postQuestion', formData, { headers: authHeader, 'Content-Type': 'multipart/form-data' })
       return response.data
     } catch (e) {
       console.log(e)
@@ -150,18 +140,43 @@ const userService = {
     }
   },
 
-  // 獲得課程的指定QA
-  async getCourseQA(token, course_id) {
+  // 獲得課程的所有QA
+  async getCourseQAs(token, course_id, sortBy, pageSize) {
     try {
-      console.log(QA_URL + `/getCourseQAs/${course_id}`)
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.get(QA_URL + `/getCourseQAs/${course_id}`, {
         headers: authHeader,
+        params: {
+          sortType: sortBy,
+          pageSize: pageSize || null,
+        },
       })
       return response.data
     } catch (e) {
       console.log(e)
       return e
+    }
+  },
+
+  // 獲得Tag的QA
+  async getCourseQAsFromTag(token, course_id, pageSize, resourceCategory, hint) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+
+      const data = {
+        resourceCategory: resourceCategory || null,
+        hint: hint || null,
+        pageSize: pageSize || null,
+      }
+      console.log(data.resourceCategory)
+      console.log(data.hint)
+      const response = await axios.get(QA_URL + `/getCourseQAsByTag/${course_id}`, {
+        headers: authHeader,
+        params: data,
+      })
+      return response.data
+    } catch (err) {
+      return err.response.data
     }
   },
 
@@ -181,21 +196,19 @@ const userService = {
 
   // 新增新留言
   async submitQaMessage(token, question_id, reqBody) {
-    console.log(question_id)
-    console.log(reqBody)
+    console.log('即將送出 reqBody(FormData):', reqBody)
+    const authHeader = token ? { Authorization: token } : {}
     try {
-      const authHeader = token ? { Authorization: token } : {}
-      const response = await axios.post(QA_URL + `/QAMethod/${question_id}/postNewComment`, reqBody, {
-        headers: authHeader,
-      })
+      const response = await axios.post(
+        QA_URL + `/QAMethod/${question_id}/postNewComment`,
+        reqBody, // 直接傳入 FormData
+        { headers: authHeader } // 不要手動設定 Content-Type
+      )
       console.log(response)
       return response.data
     } catch (e) {
       if (!e.response) {
-        return (e.response = {
-          success: false,
-          msg: '前端沒有接收到訊息',
-        })
+        return { success: false, msg: '前端沒有接收到訊息' }
       }
       return e.response.data
     }

@@ -22,6 +22,9 @@ import "../styles/course/course.css";
 import "../styles/course/videoUpload.css";
 import "../styles/course/qaPage.css";
 import "../styles/course/msgBoard.css";
+import "../styles/course/imageZoom.css";
+import "../styles/course/showMoreQA.css";
+import "../styles/course/showPublicQA.css";
 // videoPlay
 import "../styles/videoPlay/player.css";
 //method的layout
