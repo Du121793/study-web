@@ -25,8 +25,13 @@ export default function QaPage() {
   const router = useRouter()
   const { qa_id, courseName } = router.query
 
+  // const userToeken = window.localStorage.getItem('token').split(' ')[1]
   // 大部分api需要的token
   const token = useUserToken()
+
+  const [userToken, setUserToeken] = useState('')
+  // 請求參數
+  const [isReplied, setIsReplied] = useState(false)
 
   // 請求取得的資料
   const [isLogined, setLogined] = useState(false)
@@ -85,6 +90,9 @@ export default function QaPage() {
           console.error(err)
         })
     }
+    if (typeof window !== 'undefined') {
+      setUserToeken(window.localStorage.getItem('token').split(' ')[1])
+    }
   }, [token, qa_id])
 
   // 子組件留言成功後，重新請求QA的留言資料
@@ -93,6 +101,7 @@ export default function QaPage() {
       userService
         .getQaComment(token, qa_id)
         .then((res) => {
+          console.log(res)
           setComments(res.data)
         })
         .catch((err) => {
@@ -107,14 +116,34 @@ export default function QaPage() {
     setImageIsZoom(true)
   }
 
-  const test = () => {
-    console.log(qaInfo)
+  const deleteComment = (_id) => {
+    userService.deleteComment(token, qa_id, _id).then(() => {
+      userService
+        .getQaComment(token, qa_id)
+        .then((res) => {
+          setComments(res.data)
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+    })
   }
 
+  const test = () => {
+    console.log(1234)
+    comments.map((item) => {
+      console.log(item)
+      item.map((item) => {
+        console.log(item)
+      })
+    })
+  }
+
+  // 請求修改問題設定
   const submitTeacherSetting = () => {
     if (qaInfo) {
       adminService
-        .commentPublicSetting(token, qaInfo.courses, qaInfo._id, publicComment)
+        .commentPublicSetting(token, qaInfo.courses, qaInfo._id, publicComment, isReplied)
         .then((res) => {
           console.log(res)
         })
@@ -158,7 +187,7 @@ export default function QaPage() {
               <div className="title">附件{index + 1}</div>
               <Image
                 className="image-video"
-                src={`${getImageUrl}/${item}`}
+                src={`${getImageUrl}/${item}?token=${userToken}`}
                 onClick={() => {
                   clickZoomImage(`${getImageUrl}/${item}`)
                 }}
@@ -194,6 +223,16 @@ export default function QaPage() {
                 type="checkbox"
                 onChange={(e) => {
                   setPublicComment(e.target.checked)
+                }}
+              />
+            </div>
+            <div className="replied-setting">
+              <div>此問題是否已回覆</div>
+              <input
+                className="checkbox"
+                type="checkbox"
+                onChange={(e) => {
+                  setIsReplied(e.target.checked)
                 }}
               />
             </div>
@@ -239,6 +278,15 @@ export default function QaPage() {
                   <div className="name">{item.poster.username}</div>
                   <div className="time">{new Date(item.date).toLocaleString()}</div>
                   <div className="isBest">{item.isBest === true && '最佳留言'}</div>
+                  {(item.poster._id === userInfo._id || userInfo.role === 'teacher' || userInfo.role === 'admin') && (
+                    <div
+                      onClick={() => {
+                        deleteComment(item._id)
+                      }}
+                      className="delete-comment">
+                      刪除留言
+                    </div>
+                  )}
                 </div>
                 <div className="message-middle">{item.content}</div>
                 <div className="message-bottom">

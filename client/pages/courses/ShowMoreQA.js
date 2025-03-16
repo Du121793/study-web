@@ -47,7 +47,7 @@ export default function ShowMoreQA({ courseName, showMoreQA, setShowMoreQA, toke
         setQaInfo(res.data)
       })
     }
-  }, [token, course_id])
+  }, [token, course_id, resourceCategory, hint])
 
   // 控制頁面scroll狀態
   useEffect(() => {

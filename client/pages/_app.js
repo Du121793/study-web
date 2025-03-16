@@ -16,6 +16,8 @@ import "../styles/profile/teacher/registerCourse.css";
 import "../styles/profile/teacher/userProfile.css";
 import "../styles/profile/teacher/deleteCourse.css";
 import "../styles/profile/teacher/removeFromCourse.css";
+import "../styles/profile/teacher/editCourse.css";
+import "../styles/profile/teacher/editMembers.css";
 import "../styles/profile/admin/removeUsers.css";
 // course
 import "../styles/course/course.css";
@@ -25,6 +27,9 @@ import "../styles/course/msgBoard.css";
 import "../styles/course/imageZoom.css";
 import "../styles/course/showMoreQA.css";
 import "../styles/course/showPublicQA.css";
+import "../styles/course/accessSetting.css";
+import "../styles/course/studentSelector.css";
+import "../styles/course/videoSelector.css";
 // videoPlay
 import "../styles/videoPlay/player.css";
 //method的layout

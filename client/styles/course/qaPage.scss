@@ -62,6 +62,13 @@
         gap: 8px;
         font-size: 16px;
       }
+      .replied-setting {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
       .submit-btn {
         display: flex;
         justify-content: center;
@@ -172,6 +179,12 @@
           .name {
             font-weight: bold;
             font-size: 16px;
+          }
+          .delete-comment{
+            cursor: pointer;
+            font-weight: bold;
+            color: rgb(148, 0, 0);
+            font-size: 14px;
           }
         }
         .message-middle {

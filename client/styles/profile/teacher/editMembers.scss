@@ -1,0 +1,118 @@
+.edit-members-main {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fefefe; // 淡色背景
+  width: 100%;
+  padding: 24px 0;
+  gap: 12px;
+  .title {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  .input-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .member-selector-area {
+    display: flex;
+    flex-direction: column;
+    .option-area {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      font-weight: bold;
+      .button {
+        cursor: pointer;
+        transition: 0.2s;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        border-radius: 2px;
+        padding: 4px 6px;
+      }
+      .button:hover{
+        background-color: #f0f0f0;
+      }
+    }
+    .member-area {
+      margin-top: 12px;
+      width: 100%;
+      .title-area {
+        margin-bottom: -8px;
+        display: flex;
+        width: 100%;
+        #username {
+          margin-left: 50px;
+          width: 120px;
+          text-align: left;
+        }
+        #realname {
+          width: 80px;
+        }
+        #phone-number {
+          width: 120px;
+        }
+        #grade {
+          width: 80px;
+        }
+        #role {
+          width: 80px;
+        }
+        span {
+          pointer-events: none;
+          display: flex;
+          align-items: flex-end;
+        }
+      }
+      li {
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        margin-top: 12px;
+        width: 97.5%;
+        display: flex;
+        align-items: center;
+        position: relative;
+        padding: 4px 8px;
+        border: 2px solid rgb(0, 0, 0, 0.2);
+        border-radius: 12px;
+        height: 40px;
+        background-color: #fafafa;
+        transition: 0.2s;
+
+        .student-checkbox {
+          width: 16px;
+          height: 16px;
+        }
+        .searched-info {
+          display: flex;
+          pointer-events: none;
+          span {
+            pointer-events: none;
+            display: flex;
+            align-items: flex-end;
+          }
+          #username {
+            margin-left: 24px;
+            width: 120px;
+            text-align: left;
+          }
+          #realname {
+            width: 80px;
+          }
+          #phone-number {
+            width: 120px;
+          }
+          #role {
+            width: 80px;
+          }
+          #grade {
+            width: 80px;
+          }
+        }
+      }
+      .select-active {
+        border: 2px solid rgb(124, 225, 180);
+      }
+    }
+  }
+}

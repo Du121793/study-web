@@ -1,0 +1,127 @@
+.access-setting-main {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  .main-container {
+    display: flex;
+    flex-direction: column;
+    margin: 64px;
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    gap: 12px;
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      .back-btn {
+        cursor: pointer;
+        color: rgb(0, 0, 0);
+        background-color: #bebebe;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 8px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        transition: 0.2s;
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .back-btn:hover {
+        background-color: #ffffff;
+      }
+      .title {
+        font-size: 24px;
+        font-weight: bold;
+      }
+      .btn {
+        cursor: pointer;
+        color: rgb(0, 0, 0);
+        background-color: #b7f7bd;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 8px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        transition: 0.2s;
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .btn:hover {
+        background-color: #9fefa7;
+      }
+    }
+    .add-area {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      border: 1px solid rgba(0, 0, 0, 0.6);
+      padding: 12px;
+      gap: 12px;
+      .name-area {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        max-width: 242px;
+      }
+      .studen-area {
+        display: flex;
+        align-items: center;
+        max-width: 200px;
+        gap: 4px;
+        .button {
+          cursor: pointer;
+          transition: 0.2s;
+          padding: 4px 6px;
+          border: 1px solid rgba(0, 0, 0, 0.4);
+          border-radius: 4px;
+          background-color: #fff;
+        }
+        .button:hover {
+          background-color: #eeeeee;
+        }
+      }
+      .video-area {
+        display: flex;
+        align-items: center;
+        max-width: 200px;
+        gap: 4px;
+        .button {
+          cursor: pointer;
+          transition: 0.2s;
+          padding: 4px 6px;
+          border: 1px solid rgba(0, 0, 0, 0.4);
+          border-radius: 4px;
+          background-color: #fff;
+        }
+        .button:hover {
+          background-color: #eeeeee;
+        }
+      }
+      .dateSetting-area {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        // max-width: 310px;
+        .video-record-date{
+          width: 210px;
+        }
+      }
+      .content {
+        font-size: 18px;
+      }
+      .submit-btn{
+        padding: 4px 6px;
+        border-radius: 4px;
+        border: 2px solid rgba(0, 0, 0, 0.2);
+        background-color: #fff;
+        transition: 0.2s;
+        cursor: pointer;
+      }
+      .submit-btn:hover{
+        
+        background-color: #e8e8e8;
+      }
+    }
+  }
+}

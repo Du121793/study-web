@@ -72,8 +72,8 @@ const updateAndDeleteQuestion = async (req, res, next) => {
   try {
     const role = req.user.role;
     const updateFields = Object.keys(req.body);
-    const qaId = req.body.question_id; // 資源 ID 從路由參數取得
-
+    const qaId = req.body.question_id?req.body.question_id:req.query.question_id; // 資源 ID 從路由參數取得
+  
     // 取得資源，若不存在則回傳 404
     const resource = await QA.findById(qaId);
     req.question = resource;

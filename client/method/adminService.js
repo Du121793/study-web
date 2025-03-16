@@ -36,7 +36,7 @@ const adminService = {
       })
       return response.data
     } catch (e) {
-      return e.response
+      return e.response.data
     }
   },
 
@@ -65,35 +65,36 @@ const adminService = {
   },
 
   // 獲得課程內的成員
-  async getMembers(token, page, nameInput, phoneInput, gradeInput, roleInput, selectCourse) {
-    const data = {
-      realname: nameInput || null,
-      phoneNumber: phoneInput || null,
-      gradeInput: gradeInput || null,
-      role: roleInput || null,
-      page: page,
-      courses: selectCourse || null,
-    }
-    console.log(data)
+  /* const data = {
+        realname: nameInput,
+        phoneNumber: phoneInput,
+        gradeInput: gradeInput,
+        role: roleInput,
+        courses: selectCourse,
+        page: page,
+        pageSize: pageSize,
+    }*/
+  async getMembers(token, data) {
     const authHeader = token ? { Authorization: token } : {}
     const response = await axios.get(USER_URL + '/getMembers', {
       headers: authHeader,
       params: data,
     })
-    console.log(response)
     return response.data
   },
+  /*
+  const data = {
+    courseName: courseNameInput,
+    grade: gradeInput,
+    subject: subjectInput,
+    courseClass: classInput,
+    page,
+    pageSize,
+  }
+  */
 
   // 獲得課程
-  async getCourses(token, page, pageSize, gradeInput, subjectInput, classInput, courseNameInput) {
-    const data = {
-      page,
-      pageSize,
-      grade: gradeInput || null,
-      subject: subjectInput || null,
-      courseClass: classInput || null,
-      courseName: courseNameInput || null,
-    }
+  async getCourses(token, data) {
     /* filter需要是物件
      { courseName, subject, grade, courseClass, members, _id, page, pageSize}*/
     const authHeader = token ? { Authorization: token } : {}
@@ -163,7 +164,7 @@ const adminService = {
     try {
       // 設定 Authorization 標頭，若 token 存在則加入
       const authHeader = token ? { Authorization: token } : {}
-
+      console.log(BASE_COURSE_URL + `/${courseID}/deleteVideo`)
       const response = await axios.delete(BASE_COURSE_URL + `/${courseID}/deleteVideo`, {
         headers: authHeader,
         data: { videoId },
@@ -175,11 +176,10 @@ const adminService = {
   },
 
   // 設定問題的公開狀態
-  async commentPublicSetting(token, course_ids, question_id, isPublic) {
+  async commentPublicSetting(token, course_ids, question_id, isPublic, replied) {
     try {
       const authHeader = token ? { Authorization: token } : {}
-      console.log(question_id)
-      const payload = { course_ids, question_id, isPublic }
+      const payload = { course_ids, question_id, isPublic, replied }
       console.log(QA_URL + `/patchQuestion`)
       const response = await axios.patch(QA_URL + `/patchQuestion`, payload, {
         headers: authHeader,
@@ -194,13 +194,15 @@ const adminService = {
   async removeQuestion(token, question_id) {
     try {
       const authHeader = token ? { Authorization: token } : {}
-      const payload = { commentID }
+      const payload = { question_id }
       console.log(QA_URL + `/deleteQuestion`)
-      const response = await axios.delete(QA_URL + `/deleteQuestion`, payload, {
+      const response = await axios.delete(QA_URL + `/deleteQuestion`, {
         headers: authHeader,
+        params: payload,
       })
       return response.data
     } catch (err) {
+      console.log(err.response)
       console.error(err.response.data)
     }
   },
@@ -214,6 +216,36 @@ const adminService = {
       const response = await axios.get(INDEX_URL + `/getPublicQAs`, {
         headers: authHeader,
         params: payload,
+      })
+      return response.data
+    } catch (err) {
+      console.error(err.response.data)
+    }
+  },
+
+  // 編輯修改course
+  // data = { courseId, courseName, subject, grade, courseClass }
+  async editCourse(token, data) {
+    try {
+      console.log(data)
+      const authHeader = token ? { Authorization: token } : {}
+      console.log(COURSE_URL + `/patchCourse`)
+      const response = await axios.patch(COURSE_URL + `/patchCourse`, data, {
+        headers: authHeader,
+      })
+      return response.data
+    } catch (err) {
+      console.error(err.response.data)
+    }
+  },
+
+  // { accessName, videoIDs, studentIDs, accessDate, unlimited }
+  async addNewVideoAccess(token, course_id, data) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      console.log(BASE_COURSE_URL + `/${course_id}/videoAccess/postNewAccess`)
+      const response = await axios.post(BASE_COURSE_URL + `/${course_id}/videoAccess/postNewAccess`, data, {
+        headers: authHeader,
       })
       return response.data
     } catch (err) {

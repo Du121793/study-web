@@ -1,0 +1,262 @@
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.edit-course-main {
+  position: relative;
+  display: flex;
+  background-color: #fefefe; // 淡色背景
+  width: 100%;
+  padding: 24px 0;
+  .title {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  .edit-course-function-area {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    .double-check-area {
+      position: fixed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.6);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 99999;
+      .double-check-background {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 24px;
+        background-color: #cccccc96;
+        border-radius: 8px;
+      }
+      .double-check-course-name {
+        color: rgb(215, 0, 0);
+        font-weight: bold;
+      }
+      .btns-area {
+        display: flex;
+        gap: 32px;
+        .confirm {
+          cursor: pointer;
+          padding: 4px 6px;
+          border: 1px solid black;
+          border-radius: 2px;
+          background-color: #fff;
+          transition: 0.2s;
+        }
+        .confirm:hover {
+          background-color: #daffbf;
+        }
+        .cancle {
+          cursor: pointer;
+          padding: 4px 6px;
+          border: 1px solid black;
+          border-radius: 2px;
+          background-color: #fff;
+          transition: 0.2s;
+        }
+        .cancle:hover {
+          background-color: #ffbfbf;
+        }
+      }
+    }
+    .loading-area {
+      position: fixed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.6);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      .loading {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-top: 4px solid #333;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+    }
+    .input-area {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      gap: 6px;
+      .grade-input {
+        width: 10%;
+      }
+      .subject-input {
+        width: 10%;
+      }
+      .class-input {
+        width: 10%;
+      }
+      .course-name-input {
+        width: 20%;
+      }
+      .button {
+        cursor: pointer;
+        transition: 0.2s;
+        padding: 5px 6px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        background-color: #ffffff;
+        border-radius: 4px;
+      }
+      .button:hover {
+        background-color: #dedede;
+      }
+    }
+    .checkbox-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      div {
+        gap: 4px;
+        align-items: center;
+        display: flex;
+      }
+    }
+    .courses-info-list {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: column;
+      align-items: center;
+      width: 80%;
+      min-width: 870px;
+      padding: 24px 0;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); // 柔和陰影
+      gap: 12px;
+      .courses-info-area {
+        width: 80%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 12px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); // 柔和陰影
+        border-radius: 6px;
+        .count {
+          font-weight: bold;
+          width: 32px;
+        }
+        .course-name {
+          display: flex;
+          align-items: center;
+          height: 100%;
+          width: 200px;
+          border-left: 1px solid rgba(0, 0, 0, 0.2);
+          padding-left: 4px;
+        }
+        .course-grade {
+          display: flex;
+          align-items: center;
+          height: 100%;
+          width: 128px;
+          border-left: 1px solid rgba(0, 0, 0, 0.2);
+          padding-left: 4px;
+        }
+        .course-subject {
+          display: flex;
+          align-items: center;
+          height: 100%;
+          width: 128px;
+          border-left: 1px solid rgba(0, 0, 0, 0.2);
+          padding-left: 4px;
+        }
+        .course-class {
+          display: flex;
+          align-items: center;
+          height: 100%;
+          width: 128px;
+          border-left: 1px solid rgba(0, 0, 0, 0.2);
+          padding-left: 4px;
+        }
+        .course-name-input {
+          margin-left: 38px;
+          width: 186px;
+          border-left: 1px solid rgba(0, 0, 0, 0.2);
+        }
+        .course-grade-input {
+          width: 118px;
+          border-left: 1px solid rgba(0, 0, 0, 0.2);
+          margin-left: 4px;
+        }
+        .course-subject-input {
+          width: 118px;
+          border-left: 1px solid rgba(0, 0, 0, 0.2);
+          margin-left: 4px;
+        }
+        .course-class-input {
+          width: 118px;
+          border-left: 1px solid rgba(0, 0, 0, 0.2);
+          margin-left: 4px;
+        }
+        .image-area {
+          display: flex;
+          gap: 12px;
+
+          .complate-course-button {
+            cursor: pointer;
+            border-radius: 64px;
+            padding: 2px;
+            transition: 0.2s;
+          }
+          .complate-course-button:hover {
+            background-color: #cfcfcf;
+          }
+          .edit-course-button {
+            cursor: pointer;
+            border-radius: 64px;
+            padding: 2px;
+            transition: 0.2s;
+          }
+          .edit-course-button:hover {
+            background-color: #cfcfcf;
+          }
+          .delete-course-button {
+            cursor: pointer;
+            border-radius: 64px;
+            padding: 2px;
+            transition: 0.2s;
+          }
+          .delete-course-button:hover {
+            background-color: #cfcfcf;
+          }
+        }
+      }
+      #title-area {
+        border: none;
+        box-shadow: none;
+        flex-wrap: nowrap;
+        margin-left: -12px;
+        div {
+          font-weight: bold;
+          font-size: 18px;
+          border: none;
+        }
+        .image {
+          opacity: 0;
+          pointer-events: none;
+        }
+      }
+    }
+  }
+}

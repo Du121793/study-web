@@ -9,6 +9,7 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
 
   // 請求參數
   const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(9999)
   const [nameInput, setNameInput] = useState(null)
   const [phoneInput, setPhoneInput] = useState(null)
   const [gradeInput, setGradeInput] = useState(null)
@@ -61,7 +62,16 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
   // 搜尋按鈕
   const searchStudentButton = () => {
     try {
-      adminService.getMembers(token, page, nameInput, phoneInput, gradeInput, roleInput, selectCourse).then((res) => {
+      let data = {
+        realname: nameInput,
+        phoneNumber: phoneInput,
+        gradeInput: gradeInput,
+        role: roleInput,
+        courses: selectCourse,
+        page: page,
+        pageSize: pageSize,
+      }
+      adminService.getMembers(token, data).then((res) => {
         setMembers(res.data)
         setTotalPage(res.totalPage)
         let temp = []
@@ -90,14 +100,17 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
     if (e.firstChild) {
       e.firstChild.click()
     }
-    // rgb(124, 225, 141)
   }
 
   // 獲得成員清單
   useEffect(() => {
     if (token) {
+      let data = {
+        page: page,
+        pageSize: pageSize,
+      }
       try {
-        adminService.getMembers(token, page).then((res) => {
+        adminService.getMembers(token, data).then((res) => {
           setMembers(res.data)
           setTotalPage(res.totalPage)
           let temp = []
@@ -110,7 +123,7 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
         alert(e)
       }
     }
-  }, [token, page])
+  }, [token, page, pageSize])
 
   const test = () => {
     console.log(totalArray)

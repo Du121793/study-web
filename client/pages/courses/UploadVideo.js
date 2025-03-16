@@ -9,6 +9,7 @@ import { useUserToken } from '../../method/useUserToken'
 export default function UploadVideoFc({ isShowVideoUpload, setIsShowVideoUpload, course_id, setUploadSuccess, uploadSuccess, uploadError, setUploadError }) {
   const token = useUserToken()
   const [videoFiles, setVideoFiles] = useState([])
+  const [isPublic, setIsPublic] = useState(false)
 
   // 每個 uploads item:
   // {
@@ -19,7 +20,7 @@ export default function UploadVideoFc({ isShowVideoUpload, setIsShowVideoUpload,
   //   tusInstance: object | null,
   //   videoId: string,
   // }
-  
+
   const [uploads, setUploads] = useState([])
 
   // ★ 第一次載入：從 localStorage 讀取先前的上傳狀態
@@ -176,6 +177,7 @@ export default function UploadVideoFc({ isShowVideoUpload, setIsShowVideoUpload,
         thumbnail: finalThumbnail,
         recordDate,
         type,
+        isPrivate: isPublic ? true : false,
       }
 
       try {
@@ -449,6 +451,31 @@ export default function UploadVideoFc({ isShowVideoUpload, setIsShowVideoUpload,
             className="textarea"></textarea>
         </div>
 
+        <div className="public-setting">
+          <div className="content">是否為公開此影片:</div>
+          <div className="confirm">
+            <label>是</label>
+            <input
+              type="radio"
+              name="contact"
+              value="confirm"
+              onClick={() => {
+                setIsPublic(false)
+              }}
+            />
+          </div>
+          <div className="reject">
+            <label>否</label>
+            <input
+              type="radio"
+              name="contact"
+              value="reject"
+              onClick={() => {
+                setIsPublic(true)
+              }}
+            />
+          </div>
+        </div>
         <div className="section">
           <p>
             <strong>影片時長:</strong> {duration.toFixed(2)} 秒

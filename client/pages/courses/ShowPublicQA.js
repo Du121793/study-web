@@ -103,9 +103,8 @@ export default function ShowPublicQA({ courseName, token, course_id, showPublicQ
                 </div>
                 <div className="image-area">
                   {item.image.map((url, index) => (
-                    <div>
+                    <div key={index}>
                       <Image
-                        key={index}
                         src={`${url}`}
                         className="image"
                         alt="qa image"

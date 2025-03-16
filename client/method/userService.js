@@ -70,7 +70,6 @@ const userService = {
     // sortOrder  排序順序 'asc'(正序) 或 'desc'(倒序)
     try {
       const authHeader = token ? { Authorization: token } : {}
-      console.log(COURSE_URL + `/${course_id}/videoInfo`)
       const response = await axios.get(COURSE_URL + `/${course_id}/videoInfo`, {
         headers: authHeader,
         params: filter,
@@ -183,11 +182,11 @@ const userService = {
   // 獲得QA問題的留言區
   async getQaComment(token, question_id) {
     try {
-      console.log(QA_URL + `/QAMethod/getComment`)
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.get(QA_URL + `/QAMethod/${question_id}/getComment`, {
         headers: authHeader,
       })
+      console.log(response.data)
       return response.data
     } catch (e) {
       return e
@@ -196,15 +195,10 @@ const userService = {
 
   // 新增新留言
   async submitQaMessage(token, question_id, reqBody) {
-    console.log('即將送出 reqBody(FormData):', reqBody)
+    console.log(reqBody.get('content'))
     const authHeader = token ? { Authorization: token } : {}
     try {
-      const response = await axios.post(
-        QA_URL + `/QAMethod/${question_id}/postNewComment`,
-        reqBody, // 直接傳入 FormData
-        { headers: authHeader } // 不要手動設定 Content-Type
-      )
-      console.log(response)
+      const response = await axios.post(QA_URL + `/QAMethod/${question_id}/postNewComment`, reqBody, { headers: authHeader })
       return response.data
     } catch (e) {
       if (!e.response) {
@@ -224,6 +218,24 @@ const userService = {
       return response.data
     } catch (e) {
       return e
+    }
+  },
+
+  // 刪除留言
+  async deleteComment(token, question_id, comment_id) {
+    try {
+      console.log(comment_id)
+      const payload = {
+        comment_id,
+      }
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.delete(QA_URL + `/QAMethod/${question_id}/deleteComment`, {
+        headers: authHeader,
+        params: payload,
+      })
+      return response.data
+    } catch (e) {
+      return e.response.data
     }
   },
 }

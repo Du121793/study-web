@@ -7,12 +7,16 @@ import adminService from '../../method/adminService'
 export default function RemoveUsers() {
   const token = useUserToken()
   const [getUsers, setGetUsers] = useState([])
-  const [optionBorder, setOptionBorder] = useState('2px solid rgba(0, 0, 0, 0.2)')
+  // 請求用餐數
   const [selectedUserId, setSelectedUserId] = useState([])
-  const [isDeleted, setIsDeleted] = useState(false)
-  const [realNameValue, setRealNameValue] = useState()
-  const [phoneValue, setPhoneValue] = useState()
-  const [choseRole, setChoseRole] = useState()
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(9999)
+  const [realNameValue, setRealNameValue] = useState(null)
+  const [phoneValue, setPhoneValue] = useState(null)
+  const [choseRole, setChoseRole] = useState(null)
+  const [memberId, setMemberId] = useState(null)
+  // 初始化所有資料的邊框
+  const [optionBorder, setOptionBorder] = useState('1px solid rgba(0, 0, 0, 0.2)')
 
   //請求獲取使用者
   const getUsersFunction = () => {
@@ -37,10 +41,10 @@ export default function RemoveUsers() {
       setSelectedUserId([...selectedUserId, _id])
     }
 
-    if (e.target.style.border != '2px solid rgb(113, 231, 63)') {
-      e.target.style.border = '2px solid rgb(113, 231, 63)'
+    if (e.target.style.border != '1px solid rgb(113, 231, 63)') {
+      e.target.style.border = '1px solid rgb(113, 231, 63)'
     } else {
-      e.target.style.border = '2px solid rgba(0, 0, 0, 0.2)'
+      e.target.style.border = '1px solid rgba(0, 0, 0, 0.2)'
     }
   }
   // 點擊刪除發送請求
@@ -61,12 +65,20 @@ export default function RemoveUsers() {
     setSelectedUserId([])
     const element = Array.from(document.querySelectorAll('.member-info'))
     element.map((item) => {
-      item.style.border = '2px solid rgba(0, 0, 0, 0.2)'
+      item.style.border = '1px solid rgba(0, 0, 0, 0.2)'
     })
   }
   // 搜尋使用者資料
   const searchMemebers = () => {
-    adminService.getMembers(token, { realname: realNameValue, phoneNumber: phoneValue, role: choseRole }).then((res) => {
+    let data = {
+      realname: realNameValue,
+      phoneNumber: phoneValue,
+      role: choseRole,
+      _id: memberId,
+      page: page,
+      pageSize: pageSize,
+    }
+    adminService.getMembers(token, data).then((res) => {
       console.log(res.data)
       setGetUsers(res.data)
     })
@@ -80,7 +92,7 @@ export default function RemoveUsers() {
       })
     }
   }, [token])
-  
+
   return (
     <div className="remove-users-page">
       <div className="remove-users-title">移除成員功能</div>
@@ -88,40 +100,50 @@ export default function RemoveUsers() {
       <div className="remove-user-header">
         {/* 輸入姓名 */}
         <div>
-          <div className="title">真實姓名</div>
+          <div className="title">真實姓名:</div>
           <input
             onChange={(e) => {
               setRealNameValue(e.target.value)
             }}
             className="name-input"
             type="text"
-            placeholder="請輸入"
+            placeholder="可不填寫"
           />
         </div>
         {/* 輸入電話 */}
         <div>
-          <div className="title">電話</div>
+          <div className="title">電話:</div>
           <input
             onChange={(e) => {
               setPhoneValue(e.target.value)
             }}
             className="phone-input"
             type="text"
-            placeholder="請輸入"
+            placeholder="可不填寫"
           />
         </div>
-        <div>
-          <div className="title">身分組</div>
-          <select
-            onChange={(e) => {
-              setChoseRole(e.target.value)
-              clearSelectedMemebers()
-            }}>
-            <option value="">全部</option>
-            <option value="teacher">教師</option>
-            <option value="student">學生</option>
-          </select>
-        </div>
+      </div>
+      {/* 輸入電話 */}
+      <div className="container-line">
+        <div className="title">用戶ID:</div>
+        <input
+          onChange={(e) => {
+            setMemberId(e.target.value)
+          }}
+          className="member-id-input"
+          type="text"
+          placeholder="可不填寫"
+        />
+        <div className="title">身分組</div>
+        <select
+          onChange={(e) => {
+            setChoseRole(e.target.value)
+            clearSelectedMemebers()
+          }}>
+          <option value="">全部</option>
+          <option value="teacher">教師</option>
+          <option value="student">學生</option>
+        </select>
       </div>
       {/* 按鈕區域 */}
       <div className="header-btns">

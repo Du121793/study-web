@@ -1,6 +1,7 @@
 .image-zoom-area {
   position: fixed;
   top: 0;
+  left: 0;
   z-index: 999;
   background-color: rgba(0, 0, 0, 0.281);
   width: 100%;
@@ -11,4 +12,10 @@
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
+}
+.image-zoom-area .container {
+  width: 90%;
+}
+.image-zoom-area .container .image {
+  border-radius: 8px;
 }/*# sourceMappingURL=imageZoom.css.map */

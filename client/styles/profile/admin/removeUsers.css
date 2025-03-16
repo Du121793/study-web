@@ -1,18 +1,19 @@
 .remove-users-page {
-  min-width: 620px;
-  max-width: 950px;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   background-color: #fefefe;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  top: 24px;
   padding: 24px;
-  width: 60vw;
   gap: 8px;
+}
+.remove-users-page .container-line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.remove-users-page .container-line .member-id-input {
+  width: 240px;
 }
 .remove-users-page .remove-users-title {
   font-size: 28px;
@@ -20,6 +21,8 @@
 .remove-users-page .remove-user-header {
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 100%;
   gap: 12px;
 }
 .remove-users-page .remove-user-header div {

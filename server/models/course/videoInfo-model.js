@@ -33,6 +33,13 @@ const videoInfoSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  isPrivate: {
+    type: Boolean,
+    default: false,
+  },
+  videoURL: {
+    type: String,
+  },
   date: {
     type: Date,
     default: Date.now,

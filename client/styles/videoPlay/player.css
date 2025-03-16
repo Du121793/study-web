@@ -25,15 +25,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
 }
 .video-player-main .header .back-to-course-btn {
   font-size: 18px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 12px 12px 12px;
+  padding: 6px;
   background-color: #ffffff;
   color: rgb(0, 0, 0);
   font-weight: bold;
@@ -41,7 +42,7 @@
   transition: 0.2s;
 }
 .video-player-main .header .back-to-course-btn:hover {
-  background-color: #e3e3e3;
+  background-color: #c8c8c8;
 }
 .video-player-main .player-area {
   max-width: 100%;
@@ -64,7 +65,6 @@
   overflow-x: hidden;
 }
 .video-player-main .player-area .player .video-info {
-  border-radius: 12px;
   width: 100%;
   padding: 16px 0 16px 0;
   display: flex;
@@ -72,8 +72,10 @@
   align-items: center;
   gap: 16px;
   background-color: #fff;
+  transition: 0.2s;
 }
 .video-player-main .player-area .player .video-info .title {
+  justify-content: center;
   width: 80%;
   padding-left: 40px;
   font-size: 24px;
@@ -126,81 +128,64 @@
   right: 0px;
 }
 .video-player-main .player-area .video-info-list {
-  overflow-y: scroll;
-  overflow-x: hidden;
-  border-top: 1px solid rgba(0, 0, 0, 0.2);
-  background-color: #f6f6f6;
   display: flex;
   flex-direction: column;
   align-items: center;
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+  background-color: #f6f6f6;
   transition: 0.3s;
   position: sticky;
   top: 60px;
   right: 0;
 }
 .video-player-main .player-area .video-info-list .title {
-  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 12px;
-  width: 100%;
-  font-size: 20px;
   text-align: center;
+  font-weight: bold;
+  width: 100%;
+  gap: 12px;
+  font-size: 20px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
   padding: 8px 0;
 }
 .video-player-main .player-area .video-info-list .title .hidden-info-btn {
-  cursor: pointer;
-  font-size: 24px;
-}
-.video-player-main .player-area .video-info-list .selections {
-  width: 100%;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.video-player-main .player-area .video-info-list .selections .option-lv1 {
-  position: relative;
-  border-bottom: 1px solid #ccc;
-}
-.video-player-main .player-area .video-info-list .selections .option-lv1 .episodes {
-  overflow: hidden;
-  width: 100%;
-  max-height: 0;
-  transition: 0.2s;
-}
-.video-player-main .player-area .video-info-list .selections .option-lv1 .episodes li {
-  cursor: pointer;
-  background-color: #dcdcdc;
   display: flex;
   align-items: center;
-  padding-left: 8px;
-  height: 60px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  transition: 0.2s;
+  width: 24px;
+  border-radius: 64px;
 }
-.video-player-main .player-area .video-info-list .selections .option-lv1 .episodes li .Link {
+.video-player-main .player-area .video-info-list .title .hidden-info-btn:hover {
+  background-color: #c8c8c8;
+}
+.video-player-main .player-area .video-info-list .videos-area {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.video-player-main .player-area .video-info-list .videos-area .video {
+  justify-content: center;
+  align-items: center;
+  display: flex;
   color: black;
   width: 100%;
+  height: 64px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  transition: 0.2s;
 }
-.video-player-main .player-area .video-info-list .selections .option-lv1 .option-header {
-  cursor: pointer;
-  padding-left: 6px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.video-player-main .player-area .video-info-list .videos-area .video:hover {
+  background-color: #e7e7e7;
 }
-.video-player-main .player-area .video-info-list .selections .option-lv1 .option-header .open-list-arrow {
-  pointer-events: none;
-  margin-right: 12px;
+.video-player-main .player-area .video-info-list .videos-area .active {
+  background-color: #ccc;
+  box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2);
 }
-.video-player-main .player-area .video-info-list .selections .option-lv1 .option-header .video-list-title {
-  pointer-events: none;
-  height: 60px;
-  display: flex;
-  align-items: center;
-}
-.video-player-main .player-area .video-info-list .selections .option-header.active {
-  border: 2px solid rgb(191, 243, 149);
+.video-player-main .player-area .video-info-list .videos-area .active:hover {
+  background-color: #ccc;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }/*# sourceMappingURL=player.css.map */

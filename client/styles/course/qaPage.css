@@ -65,6 +65,13 @@
   gap: 8px;
   font-size: 16px;
 }
+.qaPage-main .control-teacher-function .teacher-function .replied-setting {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+}
 .qaPage-main .control-teacher-function .teacher-function .submit-btn {
   display: flex;
   justify-content: center;
@@ -179,6 +186,12 @@
 .qaPage-main .qaPage-container .comment-area .message-info .message-top .name {
   font-weight: bold;
   font-size: 16px;
+}
+.qaPage-main .qaPage-container .comment-area .message-info .message-top .delete-comment {
+  cursor: pointer;
+  font-weight: bold;
+  color: rgb(148, 0, 0);
+  font-size: 14px;
 }
 .qaPage-main .qaPage-container .comment-area .message-info .message-middle {
   margin-left: 12px;

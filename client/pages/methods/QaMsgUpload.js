@@ -18,9 +18,7 @@ export default function QAMsgUpload({
   // 組成 FormData
   const formData = new FormData()
   formData.append('content', content)
-  if (fileSize) {
-    formData.append('fileSize', fileSize)
-  }
+  if (fileSize) formData.append('fileSize', fileSize)
   formData.append('isPrivate', isPrivate)
   formData.append('isBest', isBest)
   // ★ 將多張圖片依序 append，key 皆為 "image" ★
@@ -30,6 +28,8 @@ export default function QAMsgUpload({
       formData.append('image', imgFile)
     })
   }
+
+  // console.log(formData.get('content'))
 
   /* 控制上傳狀態 */
   const [uploads, setUploads] = useState([])
@@ -42,14 +42,14 @@ export default function QAMsgUpload({
 
   // 「開始上傳」按鈕事件
   const handleTusUpload = async () => {
+    // console.log(question_id)
     if (uploading) return
     setUploading(true)
 
     try {
       // (1) 送出留言並取得 uploadLink、commentID
-      console.log('即將送出 FormData:', formData)
       const res = await userService.submitQaMessage(token, question_id, formData)
-      console.log(Object.keys(res.data.uploadLink).length)
+      console.log(res)
       if (res.success === true && Object.keys(res.data.uploadLink).length === 0) {
         console.log('設定submitSuccess')
         setSubmitSuccess(!submitSuccess)

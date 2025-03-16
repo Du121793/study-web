@@ -203,13 +203,14 @@ router.patch(
         resourceCategories,
         hints,
         rmIMG,
+        replied,
       } = req.body;
-      
+
       // 必須提供有效的 question_id
       if (!mongoose.Types.ObjectId.isValid(question_id)) {
         return res.status(400).json({ success: false, msg: "無效的問題ID" });
       }
-      
+
       // 若前端有傳入 course_ids 且非 null，則需為非空陣列
       if (req.body.hasOwnProperty("course_ids") && course_ids !== null) {
         if (!Array.isArray(course_ids) || course_ids.length === 0) {
@@ -218,7 +219,7 @@ router.patch(
             .json({ success: false, msg: "請提供有效的課程陣列" });
         }
       }
-      
+
       const oldQA = await QA.findById(question_id);
       if (!oldQA) {
         return res
@@ -269,6 +270,9 @@ router.patch(
       if (req.body.hasOwnProperty("hints")) {
         oldQA.hints = hints;
       }
+      if (req.body.hasOwnProperty("replied")) {
+        oldQA.replied = replied;
+      }
 
       const savedQA = await oldQA.save();
       return res.json({
@@ -295,23 +299,19 @@ router.delete(
   accessChecker.updateAndDeleteQuestion,
   async (req, res) => {
     try {
-      const { question_id } = req.body;
+      const { question_id } = req.query;
+      console.log(question_id);
       if (!mongoose.Types.ObjectId.isValid(question_id)) {
         return res.status(400).json({ success: false, msg: "無效的問題ID" });
       }
-      const oldQA = await QA.findById(question_id);
-      if (!oldQA) {
-        return res
-          .status(404)
-          .json({ success: false, msg: "找不到對應的問題" });
-      }
-      await oldQA.remove();
 
-      const baseImagePath = getBaseImagePath();
       const questionFolder = getQuestionFolder(question_id);
       if (fs.existsSync(questionFolder)) {
         fs.rmSync(questionFolder, { recursive: true, force: true });
       }
+
+      await QA.findByIdAndDelete(question_id);
+
       return res.json({ success: true, msg: "問題刪除成功" });
     } catch (error) {
       console.error(error);
@@ -334,9 +334,9 @@ router.get("/getQuestion", async (req, res) => {
     const pageSize = parseInt(req.query.pageSize, 10) || 10;
     const sortByParam = req.query.sortBy || "lastUpdate"; // 若為 "createDate"，以 date 排序
     const sortOrder = req.query.sortOrder || "asc";
-     // 可選 "resourceCategories" 或 "hints"
+    // 可選 "resourceCategories" 或 "hints"
     const sortType = req.query.sortType || "resourceCategories";
-    
+
     // 決定排序欄位與排序方向
     const sortField = sortByParam === "createDate" ? "date" : "lastUpdate";
     const sortDirection = sortOrder === "asc" ? 1 : -1;
@@ -400,7 +400,7 @@ router.get("/getQuestion", async (req, res) => {
       });
       return { tag, docs };
     });
-    
+
     return res.json({
       success: true,
       data: transformedGroups,

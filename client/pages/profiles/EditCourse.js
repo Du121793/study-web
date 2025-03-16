@@ -1,0 +1,388 @@
+import { useEffect, useState } from 'react'
+import { useUserToken } from '../../method/useUserToken'
+import Image from 'next/image'
+// methods
+import userService from '../../method/userService'
+import adminService from '../../method/adminService'
+// public
+import searchIcon from '../../public/global/search.png'
+import addIcon from '../../public/global/add.png'
+import editIcon from '../../public/global/edit.png'
+import deleteIcon from '../../public/global/delete.png'
+import complateIcon from '../../public/global/complate.png'
+// 子組件
+import MemberSelector from './MemberSelector'
+export default function EditCourse() {
+  const token = useUserToken()
+  const [editStatusIndex, setEditStatusIndex] = useState(null)
+  const [doubleCheck, setDoubleCheck] = useState(false)
+  const [doubleCheckCourseName, setDoubleCheckCourseName] = useState('無')
+  const [loading, setLoading] = useState(false)
+  // 子組件參數
+  const [selectedStudentId, setSelectedStudentId] = useState([])
+  // 搜尋請求參數
+  const [gradeInput, setGradeInput] = useState('')
+  const [subjectInput, setSubjectInput] = useState('')
+  const [classInput, setClassInput] = useState('')
+  const [courseNameInput, setCourseNameInput] = useState('')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(9999)
+  // 更新課程參數
+  const [editCourseName, setEditCourseName] = useState(null)
+  const [editGrade, setEditGrade] = useState(null)
+  const [editClass, setEditClass] = useState(null)
+  const [editSubject, setEditSubject] = useState(null)
+  let courseInfo = {}
+  let registerInfo = {}
+  const [needToDeleteCourseId, setNeedToDeleteCourseId] = useState('')
+  // 獲得參數
+  const [userInfo, setUserInfo] = useState(null)
+  const [coursesInfo, setCoursesInfo] = useState(null)
+  const [createdCourseId, setCreatedCourseId] = useState(null)
+  // 是否要在新增課程時也將選擇的成員加入課程
+  const [addThenRegister, setAddThenRegister] = useState(false)
+
+  // 搜尋課程功能
+  const searchCourse = () => {
+    const data = {
+      grade: gradeInput,
+      subject: subjectInput,
+      courseClass: classInput,
+      page: page,
+      pageSize: pageSize,
+    }
+    adminService.getCourses(token, data).then((res) => setCoursesInfo(res.data))
+  }
+
+  // 1. 新增課程
+  // 2. 當addThenRegister為true，將學生註冊到新增的課程
+  const addNewCourse = () => {
+    if (courseNameInput !== '') {
+      courseInfo = {
+        grade: gradeInput.trim(),
+        subject: subjectInput.trim(),
+        courseClass: classInput.trim(),
+        courseName: courseNameInput.trim(),
+      }
+      adminService.createANewCourse(token, courseInfo).then((res) => {
+        let data = {
+          page: page,
+          pageSize: pageSize,
+        }
+        // 如果有選擇學生，並且registerInfo為true
+        if (selectedStudentId.length && addThenRegister) {
+          registerInfo = {
+            user_ids: selectedStudentId,
+            course_id: res.data._id,
+          }
+          adminService.registerMember(token, registerInfo).then((res) => {
+            registerInfo = {}
+          })
+        }
+        adminService.getCourses(token, data).then((res) => {
+          setCoursesInfo(res.data)
+          setGradeInput('')
+          setSubjectInput('')
+          setClassInput('')
+          setCourseNameInput('')
+        })
+      })
+    }
+  }
+
+  // 垃圾桶icon ， 刪除課程
+  const deleteCourse = () => {
+    if (needToDeleteCourseId !== '') {
+      let data = {
+        page: page,
+        pageSize: pageSize,
+      }
+      setLoading(true)
+      adminService.deleteCourse(token, needToDeleteCourseId).then((res) => {
+        setNeedToDeleteCourseId('')
+        adminService.getCourses(token, data).then((res) => {
+          setCoursesInfo(res.data)
+          setLoading(false)
+        })
+      })
+    }
+  }
+
+  // 小鉛筆icon ， 編輯課程
+  const editCourse = (_id, courseName, grade, subject, courseClass) => {
+    const data = {
+      courseId: _id,
+      courseName: editCourseName ? editCourseName : courseName,
+      subject: editSubject ? editSubject : subject,
+      grade: editGrade ? editGrade : grade,
+      courseClass: editClass ? editClass : courseClass,
+    }
+    adminService.editCourse(token, data).then((res) => {
+      const secData = {
+        page: page,
+        pageSize: pageSize,
+        grade: gradeInput,
+        subject: subjectInput,
+        courseClass: classInput,
+      }
+      adminService.getCourses(token, secData).then((res) => setCoursesInfo(res.data))
+    })
+  }
+
+  const test = () => {
+    console.log(addThenRegister)
+  }
+
+  // 1. 獲取使用者資料
+  // 2. 獲取課程資料，page:1, pageSize:10
+  useEffect(() => {
+    if (token) {
+      let data = {
+        page: page,
+        pageSize: pageSize,
+      }
+      userService.getUserInfo(token).then((res) => {
+        setUserInfo(res.data)
+      })
+      adminService.getCourses(token, data).then((res) => {
+        setCoursesInfo(res.data)
+      })
+    }
+  }, [token, page, pageSize])
+
+  // 當年級、科目、班級更改時也會更改課名
+  useEffect(() => {
+    setCourseNameInput(gradeInput + subjectInput + classInput)
+  }, [gradeInput, subjectInput, classInput])
+
+  return (
+    <div className="edit-course-main">
+      <div className="edit-course-function-area">
+        {doubleCheck && (
+          <div className="double-check-area">
+            <div className="double-check-background">
+              <div className="content">確定要刪除該課程嗎? </div>
+              <div className="double-check-course-name">{doubleCheckCourseName}</div>
+              <div className="btns-area">
+                <div
+                  className="confirm"
+                  onClick={() => {
+                    setDoubleCheck(false)
+                    deleteCourse()
+                  }}>
+                  確定
+                </div>
+                <div
+                  className="cancle"
+                  onClick={() => {
+                    setDoubleCheck(false)
+                    setNeedToDeleteCourseId('')
+                  }}>
+                  取消
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {loading && (
+          <div className="loading-area">
+            <div className="loading"></div>
+          </div>
+        )}
+        {/* 標題 編輯課程 */}
+        <div
+          className="title"
+          onClick={test}>
+          編輯課程
+        </div>
+        <div className="input-area">
+          <div className="grade-title">年級:</div>
+          <input
+            type="text"
+            className="grade-input"
+            onChange={(e) => {
+              setGradeInput(e.target.value)
+            }}
+            value={gradeInput}
+          />
+          <div className="subject-title">科目:</div>
+          <input
+            type="text"
+            className="subject-input"
+            onChange={(e) => {
+              setSubjectInput(e.target.value)
+            }}
+            value={subjectInput}
+          />
+          <div className="class-title">班級:</div>
+          <input
+            type="text"
+            className="class-input"
+            onChange={(e) => {
+              setClassInput(e.target.value)
+            }}
+            value={classInput}
+          />
+          <div className="course-name-title">課名:</div>
+          <input
+            style={{ pointerEvents: 'none' }}
+            type="text"
+            className="course-name-input"
+            readOnly
+            value={courseNameInput}
+          />
+          <Image
+            onClick={searchCourse}
+            className="button"
+            src={searchIcon}
+            alt="search button"
+            width={20}
+            height={20}></Image>
+          <Image
+            className="button"
+            src={addIcon}
+            onClick={() => {
+              addNewCourse()
+            }}
+            alt="search button"
+            width={20}
+            height={20}></Image>
+        </div>
+        <div className="checkbox-area">
+          <div>
+            是否要在新增課程時也將選擇的成員加入課程
+            <input
+              onChange={(e) => {
+                setAddThenRegister(e.target.checked)
+              }}
+              type="checkbox"
+            />
+          </div>
+        </div>
+        <div className="courses-info-list">
+          <div
+            className="courses-info-area"
+            id="title-area">
+            <div className="count"></div>
+            <div className="course-name">課程名稱</div>
+            <div className="course-grade">年級</div>
+            <div className="course-subject">科目</div>
+            <div className="course-class">班級</div>
+            <div className="image-area">
+              <Image
+                src={editIcon}
+                className="image"
+                alt=""
+                width={24}
+                height={24}></Image>
+              <Image
+                src={deleteIcon}
+                className="image"
+                alt=""
+                width={24}
+                height={24}></Image>
+            </div>
+          </div>
+          {coursesInfo &&
+            coursesInfo.courses.map((item, index) => (
+              <div
+                className="courses-info-area"
+                key={index}>
+                {index === editStatusIndex ? (
+                  <>
+                    <input
+                      className="course-name-input"
+                      defaultValue={item.courseName}
+                      onChange={(e) => {
+                        setEditCourseName(e.target.value)
+                      }}
+                    />
+                    <input
+                      className="course-grade-input"
+                      defaultValue={item.grade}
+                      onChange={(e) => {
+                        setEditGrade(e.target.value)
+                      }}
+                    />
+                    <input
+                      className="course-subject-input"
+                      defaultValue={item.subject}
+                      onChange={(e) => {
+                        setEditSubject(e.target.value)
+                      }}
+                    />
+                    <input
+                      className="course-class-input"
+                      defaultValue={item.courseClass}
+                      onChange={(e) => {
+                        setEditClass(e.target.value)
+                      }}
+                    />
+                    <div className="image-area">
+                      <Image
+                        src={complateIcon}
+                        className="complate-course-button"
+                        alt="complete course button"
+                        width={24}
+                        height={24}
+                        onClick={() => {
+                          setEditStatusIndex(null)
+                          editCourse(item._id, item.courseName, item.grade, item.subject, item.courseClass)
+                        }}
+                      />
+                      <Image
+                        src={deleteIcon}
+                        className="delete-course-button"
+                        alt="delete course button"
+                        width={24}
+                        height={24}
+                        onClick={() => {
+                          setDoubleCheck(true)
+                          setNeedToDeleteCourseId(item_id)
+                        }}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="count">{index + 1}</div>
+                    <div className="course-name">{item.courseName}</div>
+                    <div className="course-grade">{item.grade}</div>
+                    <div className="course-subject">{item.subject}</div>
+                    <div className="course-class">{item.courseClass}</div>
+                    <div className="image-area">
+                      <Image
+                        src={editIcon}
+                        className="edit-course-button"
+                        alt="edit course button"
+                        width={24}
+                        height={24}
+                        onClick={() => {
+                          setEditStatusIndex(index)
+                        }}
+                      />
+                      <Image
+                        src={deleteIcon}
+                        className="delete-course-button"
+                        alt="delete course button"
+                        width={24}
+                        height={24}
+                        onClick={() => {
+                          setDoubleCheck(true)
+                          setNeedToDeleteCourseId(item._id)
+                          setDoubleCheckCourseName(item.courseName)
+                        }}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+        </div>
+        <MemberSelector
+          selectedStudentId={selectedStudentId}
+          setSelectedStudentId={setSelectedStudentId}></MemberSelector>
+      </div>
+    </div>
+  )
+}

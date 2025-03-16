@@ -48,11 +48,10 @@ export default function VideoNav({ course_id, courseName }) {
   // 控制移除影片的小圖案高度
   const [videoDeleteBtnHeight, setVideoDeleteBtnHeight] = useState('0px')
 
-  //
   const [hasChange, setHasChange] = useState(false)
 
   const test = () => {
-    console.log(baseUrl)
+    console.log(videos)
   }
 
   // 獲得影片資訊
@@ -121,7 +120,7 @@ export default function VideoNav({ course_id, courseName }) {
     if (!isShowVideoUpload) {
       let videoUpload = document.querySelector('.upload-vidoe-main')
       let background = document.querySelector('.background')
-      videoUpload.style.height = '720px'
+      videoUpload.style.height = '800px'
       background.style.display = 'block'
       setIsShowVideoUpload(true)
     } else {
@@ -167,8 +166,8 @@ export default function VideoNav({ course_id, courseName }) {
     const deleteBtn = document.querySelectorAll('.delete-video-btn')
     const from = Array.from(deleteBtn)
     if (e.innerText === '在點擊一次確認刪除') {
-      adminService.deleteVideo(token, item._id, item.courseID).then((res) => {
-        console.log('刪除成功')
+      adminService.deleteVideo(token, item._id, course_id).then((res) => {
+        console.log(res)
         getCourseVideos()
       })
     } else {
@@ -178,8 +177,6 @@ export default function VideoNav({ course_id, courseName }) {
         }
       })
       e.innerText = '在點擊一次確認刪除'
-      console.log(item)
-      console.log(e)
     }
   }
 
@@ -289,48 +286,143 @@ export default function VideoNav({ course_id, courseName }) {
               <option value="asc">正序</option>
             </select>
           </div>
+          {userInfo && userInfo.role === 'teacher' && (
+            <Link
+              href={{ pathname: `${clientIp}/courses/AccessSetting`, query: { course_name: courseName, course_id: course_id } }}
+              className="button">
+              編輯權限
+            </Link>
+          )}
+          {userInfo && userInfo.role === 'admin' && (
+            <Link
+              href={{ pathname: `${clientIp}/courses/AccessSetting`, query: { course_name: courseName, course_id: course_id } }}
+              className="button">
+              編輯權限
+            </Link>
+          )}
         </div>
         <div className="video-area">
           {videos &&
-            videos.map((item) => (
-              <Link
-                key={item._id}
-                href={`${baseUrl}videoPlay/Player?course_name=${courseName}&video_id=${item._id}&course_id=${course_id}&info=${[item.description, item.title, item.date]}`}
-                className="video">
-                <div
-                  className="delete-video-btn"
-                  style={{ height: videoDeleteBtnHeight }}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    e.preventDefault()
-                    doubleCheckDelete(e.target, item)
-                  }}>
-                  x
-                </div>
-                <Image
-                  src={item.thumbnail}
-                  className="videos-shot"
-                  alt={item.title}
-                  width={142}
-                  height={142}
-                />
-                <div className="video-length">{formatSecondsToHMS(item.length)}</div>
-                <div className="info">
-                  <div className="title">{item.title}</div>
-                  <div className="time">
-                    <div className="day">
-                      <div>{item.date.split(/[-T:.]/)[0]}/</div>
-                      <div>{item.date.split(/[-T:.]/)[1]}/</div>
-                      <div>{item.date.split(/[-T:.]/)[2]}</div>
+            videos.map((item) => {
+              if (userInfo && userInfo.role === 'sutdent' && item.access.isAccess === true) {
+                return (
+                  <Link
+                    key={item._id}
+                    href={{
+                      pathname: `${clientIp}/videoPlay/Player`,
+                      query: {
+                        course_name: courseName,
+                        video_id: item._id,
+                        course_id: course_id,
+                        info: JSON.stringify({ description: item.description, title: item.title, time: item.date }),
+                      },
+                    }}
+                    className="video">
+                    <div
+                      className="delete-video-btn"
+                      style={{ height: videoDeleteBtnHeight }}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        e.preventDefault()
+                        doubleCheckDelete(e.target, item)
+                      }}>
+                      x
                     </div>
-                    <div className="clock">
-                      {item.date.split(/[-T:.]/)[3] >= 0 && item.date.split(/[-T:.]/)[3] && <div>{Number(item.date.split(/[-T:.]/)[3]) + 8}點</div>}
-                      <div>{item.date.split(/[-T:.]/)[4]}分</div>
+                    <Image
+                      src={item.thumbnail}
+                      className="videos-shot"
+                      alt={item.title}
+                      width={142}
+                      height={142}
+                    />
+                    <div className="video-length">{formatSecondsToHMS(item.length)}</div>
+                    <div className="info">
+                      <div className="title">{item.title}</div>
+                      <div className="time">
+                        <div className="day">
+                          <div>{item.date.split(/[-T:.]/)[0]}/</div>
+                          <div>{item.date.split(/[-T:.]/)[1]}/</div>
+                          <div>{item.date.split(/[-T:.]/)[2]}</div>
+                        </div>
+                        <div className="clock">
+                          {item.date.split(/[-T:.]/)[3] >= 0 && item.date.split(/[-T:.]/)[3] && <div>{Number(item.date.split(/[-T:.]/)[3]) + 8}點</div>}
+                          <div>{item.date.split(/[-T:.]/)[4]}分</div>
+                        </div>
+                      </div>
+
+                      {item.isPrivate === true && (
+                        <div className="isPublic">
+                          <div className="content unprivate">未公開影片</div>
+                        </div>
+                      )}
+                      {item.isPrivate === false && (
+                        <div className="isPublic">
+                          <div className="content private">公開影片</div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </div>
-              </Link>
-            ))}
+                  </Link>
+                )
+              } else if ((userInfo && userInfo.role === 'teacher') || (userInfo && userInfo.role === 'admin')) {
+                return (
+                  <Link
+                    key={item._id}
+                    href={{
+                      pathname: `${clientIp}/videoPlay/Player`,
+                      query: {
+                        course_name: courseName,
+                        video_id: item._id,
+                        course_id: course_id,
+                        info: JSON.stringify({ description: item.description, title: item.title, time: item.date }),
+                      },
+                    }}
+                    className="video">
+                    <div
+                      className="delete-video-btn"
+                      style={{ height: videoDeleteBtnHeight }}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        e.preventDefault()
+                        doubleCheckDelete(e.target, item)
+                      }}>
+                      x
+                    </div>
+                    <Image
+                      src={item.thumbnail}
+                      className="videos-shot"
+                      alt={item.title}
+                      width={142}
+                      height={142}
+                    />
+                    <div className="video-length">{formatSecondsToHMS(item.length)}</div>
+                    <div className="info">
+                      <div className="title">{item.title}</div>
+                      <div className="time">
+                        <div className="day">
+                          <div>{item.date.split(/[-T:.]/)[0]}/</div>
+                          <div>{item.date.split(/[-T:.]/)[1]}/</div>
+                          <div>{item.date.split(/[-T:.]/)[2]}</div>
+                        </div>
+                        <div className="clock">
+                          {item.date.split(/[-T:.]/)[3] >= 0 && item.date.split(/[-T:.]/)[3] && <div>{Number(item.date.split(/[-T:.]/)[3]) + 8}點</div>}
+                          <div>{item.date.split(/[-T:.]/)[4]}分</div>
+                        </div>
+                      </div>
+                      {item.isPrivate === true && (
+                        <div className="isPublic">
+                          <div className="content unprivate">未公開影片</div>
+                        </div>
+                      )}
+                      {item.isPrivate === false && (
+                        <div className="isPublic">
+                          <div className="content private">公開影片</div>
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                )
+              }
+            })}
         </div>
         <div className="bottom-area">
           <div

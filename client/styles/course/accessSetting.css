@@ -1,0 +1,125 @@
+.access-setting-main {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.access-setting-main .main-container {
+  display: flex;
+  flex-direction: column;
+  margin: 64px;
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  gap: 12px;
+}
+.access-setting-main .main-container .header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.access-setting-main .main-container .header .back-btn {
+  cursor: pointer;
+  color: rgb(0, 0, 0);
+  background-color: #bebebe;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  transition: 0.2s;
+  font-size: 18px;
+  font-weight: bold;
+}
+.access-setting-main .main-container .header .back-btn:hover {
+  background-color: #ffffff;
+}
+.access-setting-main .main-container .header .title {
+  font-size: 24px;
+  font-weight: bold;
+}
+.access-setting-main .main-container .header .btn {
+  cursor: pointer;
+  color: rgb(0, 0, 0);
+  background-color: #b7f7bd;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  transition: 0.2s;
+  font-size: 18px;
+  font-weight: bold;
+}
+.access-setting-main .main-container .header .btn:hover {
+  background-color: #9fefa7;
+}
+.access-setting-main .main-container .add-area {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.6);
+  padding: 12px;
+  gap: 12px;
+}
+.access-setting-main .main-container .add-area .name-area {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 242px;
+}
+.access-setting-main .main-container .add-area .studen-area {
+  display: flex;
+  align-items: center;
+  max-width: 200px;
+  gap: 4px;
+}
+.access-setting-main .main-container .add-area .studen-area .button {
+  cursor: pointer;
+  transition: 0.2s;
+  padding: 4px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  background-color: #fff;
+}
+.access-setting-main .main-container .add-area .studen-area .button:hover {
+  background-color: #eeeeee;
+}
+.access-setting-main .main-container .add-area .video-area {
+  display: flex;
+  align-items: center;
+  max-width: 200px;
+  gap: 4px;
+}
+.access-setting-main .main-container .add-area .video-area .button {
+  cursor: pointer;
+  transition: 0.2s;
+  padding: 4px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  background-color: #fff;
+}
+.access-setting-main .main-container .add-area .video-area .button:hover {
+  background-color: #eeeeee;
+}
+.access-setting-main .main-container .add-area .dateSetting-area {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.access-setting-main .main-container .add-area .dateSetting-area .video-record-date {
+  width: 210px;
+}
+.access-setting-main .main-container .add-area .content {
+  font-size: 18px;
+}
+.access-setting-main .main-container .add-area .submit-btn {
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  background-color: #fff;
+  transition: 0.2s;
+  cursor: pointer;
+}
+.access-setting-main .main-container .add-area .submit-btn:hover {
+  background-color: #e8e8e8;
+}/*# sourceMappingURL=accessSetting.css.map */

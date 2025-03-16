@@ -1,9 +1,13 @@
 const router = require("express").Router();
 const VideoInfo = require("../../models").courseVideoInfo;
-const QAmessage = require("../../models").QAmessage;
+const VideoAccess = require("../../models").courseVideoAccess;
 const VimeoMethods = require("../../methods").vimeoMethods;
+const vimeoSchedule = require("../../models").vimeoSchedule;
 const imageCompresser = require("../../methods/imageCompresser");
 const accessChecker = require("../routesMiddleware/accessChecker");
+const videoAccessRoute = require("./videoAccess");
+
+router.use("/videoAccess", accessChecker.teacher, videoAccessRoute);
 
 /**
  * GET /members
@@ -31,78 +35,78 @@ const accessChecker = require("../routesMiddleware/accessChecker");
 
 router.get("/members", async (req, res) => {
   try {
-    // 取得查詢參數（全部採絕對比對）
-    const { role, username, realname, phoneNumber, _id } = req.query;
+    // 取得查詢參數
+    const { role } = req.query;
     const page = parseInt(req.query.page, 10) || 1;
     const pageSize = parseInt(req.query.pageSize, 10) || 10;
     const sortBy = req.query.sortBy; // 可選 "grade" 或 "date"
     const sortOrder = req.query.sortOrder === "desc" ? "desc" : "asc";
 
-    // 確認 req.course.members 存在且為陣列（這裡假設該陣列存放的是用戶 ID）
-    if (!req.course || !Array.isArray(req.course.members)) {
-      return res.status(400).json({
-        success: false,
-        msg: "課程成員資料不存在或格式錯誤"
+    // 取得課程成員，假設 req.course.members 為已填充的成員陣列
+    let members = req.course.members || [];
+
+    // 過濾：若指定角色，則僅回傳該角色成員
+    if (role) {
+      members = members.filter((member) => member.role === role);
+    }
+
+    // 排序：依據 sortBy 參數排序
+    if (sortBy === "grade") {
+      members.sort((a, b) => {
+        // 取得年級，若不存在則視為 null
+        const gradeA = a.userinfo && a.userinfo.grade ? a.userinfo.grade : null;
+        const gradeB = b.userinfo && b.userinfo.grade ? b.userinfo.grade : null;
+        // 假設 grade 為數值型態或數值字串，若非數值可用字串比較
+        const numA = gradeA !== null ? parseInt(gradeA, 10) : null;
+        const numB = gradeB !== null ? parseInt(gradeB, 10) : null;
+
+        // 排序規則：
+        // - 若兩者皆有年級，則依據數值大小比較
+        // - 若一方沒有年級，則該成員排在後面
+        if (numA === null && numB === null) {
+          // 都沒有年級，則以 date 排序
+          const dateA = new Date(a.date).getTime();
+          const dateB = new Date(b.date).getTime();
+          return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+        } else if (numA === null) {
+          return 1;
+        } else if (numB === null) {
+          return -1;
+        } else if (numA !== numB) {
+          return sortOrder === "asc" ? numA - numB : numB - numA;
+        } else {
+          // 若年級相同，則以 date 排序
+          const dateA = new Date(a.date).getTime();
+          const dateB = new Date(b.date).getTime();
+          return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+        }
+      });
+    } else if (sortBy === "date") {
+      members.sort((a, b) => {
+        const dateA = new Date(a.date).getTime();
+        const dateB = new Date(b.date).getTime();
+        return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
       });
     }
+    // 若未指定 sortBy，則保留原有順序
 
-    // 建立過濾條件，必須限制 _id 在 req.course.members 內
-    let filter = {};
-    if (_id) {
-      // 若同時提供 _id，則同時限制必須為指定 _id 與屬於該課程
-      filter.$and = [{ _id: { $in: req.course.members } }, { _id }];
-    } else {
-      filter._id = { $in: req.course.members };
-    }
-    if (username) {
-      filter["userinfo.username"] = username;
-    }
-    if (realname) {
-      filter["userinfo.realname"] = realname;
-    }
-    if (phoneNumber) {
-      filter["userinfo.phoneNumber"] = phoneNumber;
-    }
-    if (role) {
-      filter.role = role;
-    }
-
-    // 建立排序條件
-    let sortQuery = {};
-    if (sortBy === "grade") {
-      // 依據 userinfo.grade 及 date 排序
-      sortQuery = {
-        "userinfo.grade": sortOrder === "asc" ? 1 : -1,
-        date: sortOrder === "asc" ? 1 : -1
-      };
-    } else if (sortBy === "date") {
-      sortQuery = { date: sortOrder === "asc" ? 1 : -1 };
-    }
-    // 未指定 sortBy 則維持預設排序
-
-    // 先取得符合條件的記錄總數
-    const total = await User.countDocuments(filter);
-    const totalPage = Math.ceil(total / pageSize);
-
-    // 查詢符合條件的會員詳細資料，加入分頁與排序
-    const users = await User.find(filter)
-      .sort(sortQuery)
-      .skip((page - 1) * pageSize)
-      .limit(pageSize);
+    // 分頁：依據 page 與 pageSize 計算起始與結束索引
+    const total = members.length;
+    const startIndex = (page - 1) * pageSize;
+    const paginatedMembers = members.slice(startIndex, startIndex + pageSize);
 
     return res.json({
       success: true,
-      data: users,
+      data: paginatedMembers,
       page,
       pageSize,
       total,
-      totalPage
     });
   } catch (e) {
     console.error(e);
     return res.status(500).json({
       success: false,
-      msg: "很抱歉，伺服器目前無法處理您的要求"
+      msg: "很抱歉，伺服器目前無法處理您的要求",
     });
   }
 });
@@ -133,15 +137,15 @@ router.get("/videoInfo", async (req, res) => {
     const sortDirection = sortOrder === "desc" ? -1 : 1;
     const sortOptions = { [sortField]: sortDirection };
 
-    console.log(sortField);
-
-    // 建立查詢，先依據條件及排序
-    let query = VideoInfo.find(filter).sort(sortOptions);
-
-    // 若傳入 noImg 參數，則不傳送縮圖 (假設縮圖欄位為 thumbnail)
+    // 預設只回傳這些欄位 (mongoose 會預設包含 _id)
+    let fields = "title description thumbnail length recordDate date isPrivate";
+    // 若傳入 noImg，則不回傳 thumbnail
     if (noImg == true) {
-      query = query.select("-thumbnail");
+      fields = "title description length recordDate date isPrivate";
     }
+
+    // 建立查詢，並依據條件、選取欄位與排序
+    let query = VideoInfo.find(filter).select(fields).sort(sortOptions);
 
     // 若有傳入 pageSize，則進行分頁，否則回傳所有符合條件的資料
     if (typeof pageSize !== "undefined") {
@@ -151,7 +155,50 @@ router.get("/videoInfo", async (req, res) => {
       query = query.skip(skip).limit(pageSizeNum);
     }
 
-    const foundVideoInfo = await query;
+    let foundVideoInfo = await query;
+    foundVideoInfo = await Promise.all(
+      foundVideoInfo.map(async (item) => {
+        // 將 Mongoose document 轉成純物件
+        let plainItem = item.toObject();
+        let hasAccess = true;
+        let accessRecord = null;
+        if (plainItem.isPrivate) {
+          const records = await VideoAccess.aggregate([
+            {
+              $match: {
+                courseID: req.course._id,
+                videoIDs: { $in: [plainItem._id] },
+                studentIDs: { $in: [req.user._id] },
+              },
+            },
+            {
+              // 若 accessDate 為 null 或不存在，則用一個極大的日期（表示「無限期」）代替
+              $addFields: {
+                effectiveAccessDate: {
+                  $ifNull: ["$accessDate", new Date(8640000000000000)],
+                },
+              },
+            },
+            {
+              $sort: { effectiveAccessDate: -1 },
+            },
+            {
+              $limit: 1,
+            },
+          ]);
+
+          accessRecord = records[0] || null;
+
+          hasAccess = !!accessRecord;
+        }
+        plainItem.access = {};
+        plainItem.access.isAccess = hasAccess;
+        plainItem.access.accessDate = accessRecord
+          ? accessRecord.accessDate
+          : null;
+        return plainItem;
+      })
+    );
     return res.json({ success: true, data: foundVideoInfo });
   } catch (e) {
     console.log(e);
@@ -167,48 +214,28 @@ router.get("/videoUri", async (req, res) => {
       return res.status(400).json({ success: false, msg: "videoId 必須提供" });
     }
 
-    // 2. 先從資料庫中確認是否存在該筆 VideoInfo
+    // 2. 先從資料庫中確認是否存在該筆 VideoInfo 與是否擁有觀看權限
     const foundVideo = await VideoInfo.findOne({ _id: videoId });
     if (!foundVideo) {
       return res.status(404).json({ success: false, msg: "找不到該影片資料" });
     }
 
-    // 3. 呼叫 VimeoMethods.find，依照我們的慣例：
-    //    我們在上傳時會將 [VIDEOID]={_id} 塞到 Vimeo description 中，
-    //    所以只要把 videoId 傳給 VimeoMethods.find，應該就能找出該影片
-    const vimeoSearch = await VimeoMethods.find({ videoId });
-
-    if (!vimeoSearch.success) {
-      // 代表在呼叫 Vimeo API 過程中失敗
-      return res.status(500).json({
-        success: false,
-        msg: "Vimeo 搜尋失敗",
-        error: vimeoSearch.error,
-      });
+    if (foundVideo.isPrivate) {
+      const access = !!(await VideoAccess.findOne({
+        courseID: req.course._id,
+        videoIDs, // 依需求這邊也可以改成其他查詢條件
+        studentIDs: { $in: [req.user._id] },
+      }));
+      if (!access) {
+        return res
+          .status(401)
+          .json({ success: false, msg: "你沒有觀看此影片的權限" });
+      }
     }
 
-    // 如果 total = 0 表示 Vimeo 上沒有符合描述的影片
-    if (vimeoSearch.total === 0) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Vimeo 上未找到對應的影片" });
-    }
-
-    // 4. 這裡假設只會有一支影片符合 [VIDEOID]，取第一筆即可
-    const vimeoData = vimeoSearch.data[0];
-
-    // Vimeo 的 response data 中常見欄位：
-    // - uri: 形如 "/videos/123456789"
-    // - link: 形如 "https://vimeo.com/123456789"
-    // - player_embed_url: 形如 "https://player.vimeo.com/video/123456789"
-    // 你可以依需求自訂回傳內容。
     const result = {
       success: true,
-      title: vimeoData.name,
-      description: vimeoData.description,
-      link: vimeoData.link, // 直接觀看的連結
-      uri: vimeoData.uri,
-      embedLink: vimeoData.player_embed_url || "", // 若需要前端用 iframe embed
+      embedLink: foundVideo.videoURL, // 若需要前端用 iframe embed
     };
 
     return res.json({ success: true, data: result });
@@ -232,10 +259,17 @@ router.post("/uploadVideo", accessChecker.teacher, async (req, res) => {
       thumbnail,
       length,
       recordDate,
+      isPrivate = false,
     } = req.body;
 
     if (!title || !fileSize)
       return res.status(400).json({ success: false, msg: "上傳資料缺少" });
+
+    if (isPrivate != undefined && typeof isPrivate !== "boolean") {
+      return res
+        .status(400)
+        .json({ success: false, msg: "isPrivate必須是布林值" });
+    }
 
     const { subject, grade, courseClass } = req.course;
 
@@ -248,6 +282,7 @@ router.post("/uploadVideo", accessChecker.teacher, async (req, res) => {
           description: description || "",
           thumbnail: returnImg || "",
           length: length || 0,
+          isPrivate,
           recordDate,
         }
       : {
@@ -256,6 +291,7 @@ router.post("/uploadVideo", accessChecker.teacher, async (req, res) => {
           type,
           description: description || "",
           thumbnail: returnImg || "",
+          isPrivate,
           length: length || 0,
         };
     const newVideoInfo = new VideoInfo(newVideoInfoParams);
@@ -270,8 +306,10 @@ router.post("/uploadVideo", accessChecker.teacher, async (req, res) => {
     };
     // reqBody必須包含{ title, fileSize, description, type }
     const uploadUri = await VimeoMethods.upload(req.body, videoIndex);
-    if (!uploadUri.success) throw { uploadUri };
-    console.log(uploadUri);
+    if (!uploadUri.success)
+      return res
+        .status(500)
+        .json({ success: false, msg: "目前請求繁忙請稍等一分鐘後再進行請求" });
     return res.json({ success: true, data: uploadUri });
   } catch (e) {
     console.log(e);
@@ -294,19 +332,41 @@ router.patch("/uploadVideoStatus", accessChecker.teacher, async (req, res) => {
         .status(400)
         .json({ success: false, msg: "伺服器無法找到此資源" });
 
-    // if (isUploadSuccess) {
-    //   await VideoInfo.findByIdAndUpdate(
-    //     videoId,
-    //     { $set: { isUploadSuccess: true } },
-    //     { new: true }
-    //   );
-    // }
+    if (!isUploadSuccess) {
+      const newSchedule = new vimeoSchedule({
+        method: "delete",
+        videoIndex: { videoId: videoId },
+      });
+      newSchedule.save();
+      await VideoInfo.findByIdAndDelete(videoId);
+      return res.json({ success: true, msg: "已將此資源刪除" });
+    }
 
     foundItem.isUploadSuccess = true;
 
-    await foundItem.save();
+    let foundVideo = await VimeoMethods.find({ videoId });
 
-    return res.json({ success: true, msg: "已收到您的回傳結果" });
+    foundVideo.success = false;
+    if (foundVideo.success && foundVideo.total !== 0) {
+      foundItem.videoURL = foundVideo.data[0].player_embed_url;
+    } else {
+      const newSchedule = new vimeoSchedule({
+        method: "get",
+        videoIndex: { videoId: videoId },
+        takeTo: {
+          schema: "VideoInfo",
+          id: foundItem._id,
+          key: "videoURL",
+        },
+      });
+      newSchedule.save();
+      return res.json({
+        success: true,
+        msg: "已收到您的回傳結果，15分鐘後若無看到影片表示上傳失敗",
+      });
+    }
+    await foundItem.save();
+    return res.json({ success: true, msg: "已收到您的回傳結果，影片已就緒" });
   } catch (e) {
     console.error(e);
     return res
@@ -322,7 +382,11 @@ router.delete("/deleteVideo", accessChecker.teacher, async (req, res) => {
     let foundVideoInfo = await VideoInfo.findOne({ _id: videoId });
     if (!foundVideoInfo)
       return res.status(400).json({ success: false, msg: "找不到影片資料" });
-    await VimeoMethods.delete({ videoId });
+    const newSchedule = new vimeoSchedule({
+      method: "delete",
+      videoIndex: { videoId: videoId },
+    });
+    await newSchedule.save();
     await VideoInfo.findOneAndDelete({ _id: videoId });
     return res.json({ success: true, msg: "已更新資料庫" });
   } catch (e) {

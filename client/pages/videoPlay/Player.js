@@ -15,19 +15,17 @@ import userService from '../../method/userService'
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
 export default function Player() {
-  const test = () => {
-    console.log(course_id)
-    console.log(video_id)
-  }
   const baseUrl = `${clientIp}/`
   const token = useUserToken()
   // 路由初始化
   const router = useRouter()
   const { course_name, video_id, course_id, info } = router.query
+  // 解析info的JSON將其轉為真正物件
+  const [parsedInfo, setParsedInfo] = useState({})
   // 控制右側列表開關
-  const [videoListIsOpen, setVideoListIsOpen] = useState(true)
-  const [playerHeight, setPlayerHeight] = useState(600)
-  const [videoListWidth, setVideoListWidth] = useState(300)
+  const [videoListIsOpen, setVideoListIsOpen] = useState(false)
+  const [playerHeight, setPlayerHeight] = useState(700)
+  const [videoListWidth, setVideoListWidth] = useState(0)
   const [videoListMarginRight, setVideoListMarginRight] = useState('#fff')
   // 播放器需要的影片url
   const [videoUrl, setVideoUrl] = useState()
@@ -35,19 +33,19 @@ export default function Player() {
   const [VideosList, setVideosList] = useState([])
   // 用戶資料
   const [userInfo, setUserInfo] = useState([])
+  const [userToken, setUserToeken] = useState('')
   // 根據是否打開清單決定影片資訊部分是否為置中
   const [isAlignCenter, setIsAlignCenter] = useState('flex-start')
+
   //   開關右邊列表
   const listSwitch = (e) => {
     if (e === 'close-button') {
-      console.log(isAlignCenter)
       setIsAlignCenter('center')
       setVideoListIsOpen(false)
       setVideoListWidth(0)
       setVideoListMarginRight('-300px')
       setPlayerHeight(700)
     } else if (e === 'open-button') {
-      console.log(isAlignCenter)
       setIsAlignCenter('flex-start')
       setVideoListIsOpen(true)
       setVideoListWidth(300)
@@ -56,20 +54,17 @@ export default function Player() {
     }
   }
 
-  // 打開小列表功能
-  const openEpisodeBtn = (e) => {
-    let episodes = e.target.parentNode.querySelector('.episodes')
-    if (episodes.style.maxHeight != '9999px') {
-      episodes.style.maxHeight = '9999px'
-    } else {
-      episodes.style.maxHeight = '0'
+  // 解析query的JSON
+  useEffect(() => {
+    if (info) {
+      setParsedInfo(JSON.parse(info))
     }
-  }
+  }, [info])
 
   /*
-  請求獲得影片路徑
-  請求獲得影片資訊
-  請求獲得使用者資料
+  1. 請求獲得影片路徑
+  2. 請求獲得影片資訊
+  3. 請求獲得使用者資料
  */
   useEffect(() => {
     if (token && course_id && video_id) {
@@ -95,7 +90,15 @@ export default function Player() {
         setUserInfo(res.data)
       })
     }
+    if (typeof window !== 'undefined') {
+      setUserToeken(window.localStorage.getItem('token').split(' ')[1])
+    }
   }, [token, course_id, video_id])
+
+  const test = () => {
+    
+    console.log(VideosList)
+  }
 
   return (
     <div className="video-player-main">
@@ -103,7 +106,7 @@ export default function Player() {
         <div
           className="back-to-course-btn"
           onClick={() => {
-            window.history.back()
+            window.location = `${clientIp}/courses/Course?courseName=${course_name}&courseId=${course_id}`
           }}>
           回到課程
         </div>
@@ -130,7 +133,6 @@ export default function Player() {
             id="iframe"
             src={videoUrl}
             title="Video Player"
-            frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           />
@@ -139,18 +141,11 @@ export default function Player() {
           <div
             className="video-info"
             style={{ alignItems: isAlignCenter }}>
-            {info && <div className="title">{info.split(',')[1]}</div>}
-            {info && (
+            {parsedInfo && <div className="title">{parsedInfo.title}</div>}
+            {parsedInfo && (
               <div className="introduce">
-                <div className="time">
-                  <div>{info && info.split(',')[2].split(/[-T:.]/)[0]}年</div>
-                  <div>{info && info.split(',')[2].split(/[-T:.]/)[1]}月</div>
-                  <div>{info && info.split(',')[2].split(/[-T:.]/)[2]}日</div>
-                  {info && info.split(',')[2].split(/[-T:.]/)[3] >= 0 && info.split(',')[2].split(/[-T:.]/)[3] <= 11 && <div>上午{info.split(',')[2].split(/[-T:.]/)[3]}點</div>}
-                  {info && info.split(',')[2].split(/[-T:.]/)[3] >= 13 && info.split(',')[2].split(/[-T:.]/)[3] <= 23 && <div>下午{info.split(',')[2].split(/[-T:.]/)[3] - 12}點</div>}
-                  {info && <div>{info.split(',')[2].split(/[-T:.]/)[4]}分</div>}
-                </div>
-                {info.split(',')[0]}
+                <div className="time">{new Date(parsedInfo.time).toLocaleString()}</div>
+                <div className="description">{parsedInfo.description}</div>
               </div>
             )}
           </div>
@@ -180,7 +175,9 @@ export default function Player() {
             marginRight: `${videoListMarginRight}`,
           }}>
           {/* 開關按鈕 */}
-          <div className="title">
+          <div
+            className="title"
+            style={{ opacity: !videoListIsOpen ? 0 : 1 }}>
             影片列表
             <div
               id="close-button"
@@ -188,73 +185,50 @@ export default function Player() {
               onClick={(e) => {
                 listSwitch(e.target.id)
               }}>
-              x
+              X
             </div>
           </div>
-          <ul className="selections">
+          <ul
+            className="videos-area"
+            style={{ opacity: !videoListIsOpen ? 0 : 1 }}>
             {VideosList &&
-              VideosList.map(
-                /* 第二代 */
-                (item, index) =>
-                  // 判斷是否為目前影片
-                  item._id === video_id ? (
-                    // 有active
-                    <li
+              VideosList.map((item, index) => {
+                if (item._id === video_id && item.access.isAccess === true) {
+                  return (
+                    <Link
+                      className="video active"
                       key={index}
-                      className="option-lv1">
-                      <div
-                        className="active option-header"
-                        onClick={(e) => {
-                          openEpisodeBtn(e)
-                        }}>
-                        <div className="video-list-title">{item.title}</div>
-                        <Image
-                          src={downArrow}
-                          className="open-list-arrow"
-                          alt="open video's list of arrow button"
-                          width={32}
-                          height={32}></Image>
-                      </div>
-                      <ul className="episodes">
-                        <li className="option-lv2 episodes-list">
-                          <Link
-                            className="Link"
-                            href={`${baseUrl}videoPlay/player?course_name=${course_name}&video_id=${item._id}&course_id=${course_id}&info=${[item.description, item.title, item.date]}`}>
-                            第1集
-                          </Link>
-                        </li>
-                      </ul>
-                    </li>
-                  ) : (
-                    // 非active
-                    <li
-                      key={index}
-                      className="option-lv1">
-                      <div
-                        className="option-header"
-                        onClick={(e) => {
-                          openEpisodeBtn(e)
-                        }}>
-                        <div className="video-list-title">{item.title}</div>
-                        <Image
-                          src={downArrow}
-                          className="open-list-arrow"
-                          alt="open video's list of arrow button"
-                          width={32}
-                          height={32}></Image>
-                      </div>
-                      <ul className="episodes">
-                        <li className="option-lv2 episodes-list">
-                          <Link
-                            className="Link"
-                            href={`${baseUrl}videoPlay/player?course_name=${course_name}&video_id=${item._id}&course_id=${course_id}&info=${[item.description, item.title, item.date]}`}>
-                            第1集
-                          </Link>
-                        </li>
-                      </ul>
-                    </li>
+                      href={{
+                        pathname: `${clientIp}/videoPlay/Player`,
+                        query: {
+                          course_name: course_name,
+                          video_id: item._id,
+                          course_id: course_id,
+                          info: JSON.stringify({ description: item.description, title: item.title, time: item.recordDate }),
+                        },
+                      }}>
+                      {item.title}
+                    </Link>
                   )
-              )}
+                } else {
+                  return (
+                    <Link
+                      className="video"
+                      key={index}
+                      href={{
+                        pathname: `${clientIp}/videoPlay/Player`,
+                        query: {
+                          course_name: course_name,
+                          video_id: item._id,
+                          course_id: course_id,
+                          info: JSON.stringify({ description: item.description, title: item.title, time: item.recordDate }),
+                        },
+                      }}>
+                      {item.title}
+                    </Link>
+                  )
+                }
+              })}
           </ul>
         </div>
       </div>

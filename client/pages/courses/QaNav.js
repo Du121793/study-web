@@ -16,6 +16,7 @@ import client from 'react-dom/client'
 import ShowMoreQA from './ShowMoreQA'
 import ShowPublicQA from './ShowPublicQA'
 import adminService from '../../method/adminService'
+import ImageZoom from './ImageZoom'
 
 // env
 const client_URL = process.env.NEXT_PUBLIC_CLIENT_IP
@@ -23,11 +24,22 @@ const client_URL = process.env.NEXT_PUBLIC_CLIENT_IP
 export default function QaNav({ course_id, courseName }) {
   const token = useUserToken()
   const [courseQas, setCourseQas] = useState([])
+  const [userToken, setUserToken] = useState('')
+
+  setTimeout(() => {
+    if (typeof window !== 'undefined') {
+      setUserToken(window.localStorage.getItem('token').split(' ')[1])
+    }
+  }, 100)
 
   // 響應式斷點
   const breakpointColumnsObj = {
     default: 4,
   }
+
+  // 控制圖片放大狀態
+  const [imageIsZoom, setImageIsZoom] = useState(false)
+  const [zoomImage, setZoomImage] = useState()
 
   // nav 展開/收合
   const [qaOpen, setQaOpen] = useState(false)
@@ -55,6 +67,7 @@ export default function QaNav({ course_id, courseName }) {
   // 控制刪除按鈕的狀態
   const [showRemoveBtn, setShowRemoveBtn] = useState(false)
   const [doubleCheck, setDoubleCheck] = useState(false)
+
   // 切換整個 nav 區域的展開/收合
   const toggleQA = () => {
     console.log('收合')
@@ -69,12 +82,17 @@ export default function QaNav({ course_id, courseName }) {
     }
   }
 
+  // 將值傳給放大圖片功能
+  const clickZoomImage = (imageUrl) => {
+    setZoomImage(imageUrl)
+    setImageIsZoom(true)
+  }
+
   const test = () => {
-    userService.getCourseQAs(token, course_id).then((res) => {
-      console.log(res)
-    })
     courseQas.map((item) => {
-      console.log(item)
+      item.qas.map((item) => {
+        console.log(item)
+      })
     })
   }
 
@@ -89,7 +107,12 @@ export default function QaNav({ course_id, courseName }) {
   // 刪除問題
   const removeQuestion = (question_id) => {
     adminService.removeQuestion(token, question_id).then((res) => {
-      console.log(res)
+      userService
+        .getCourseQAs(token, course_id, sortBy)
+        .then((res) => {
+          setCourseQas(res.data)
+        })
+        .catch((err) => console.error('Error:', err.message))
     })
   }
 
@@ -125,7 +148,11 @@ export default function QaNav({ course_id, courseName }) {
         />
         <span>Q & A</span>
       </div>
-
+      {imageIsZoom && (
+        <ImageZoom
+          setImageIsZoom={setImageIsZoom}
+          imageUrl={zoomImage}></ImageZoom>
+      )}
       {/* nav 內容區域 */}
       <div
         className="QA-area"
@@ -273,31 +300,25 @@ export default function QaNav({ course_id, courseName }) {
                     )}
                     {/* 圖片處理 */}
                     <div className="qa-image-area">
-                      {qaInfo.image.length &&
-                        qaInfo.image.length === 1 &&
-                        qaInfo.image.map((url, index) => (
-                          <Image
-                            key={index}
-                            className="qa-image"
-                            src={url}
-                            width={200}
-                            height={240}
-                            alt="qa-image"></Image>
-                        ))}
-                      {qaInfo.image.length &&
-                        qaInfo.image.length !== 1 &&
-                        qaInfo.image.map((url, index) => (
-                          <Image
-                            key={index}
-                            className="qa-images"
-                            src={url}
-                            width={200}
-                            height={80}
-                            alt="qa-image"></Image>
-                        ))}
+                      {qaInfo.image.length && userToken.length && (
+                        <Image
+                          key={index}
+                          className="qa-image"
+                          src={`${qaInfo.image[0]}?token=${userToken}`}
+                          width={200}
+                          height={240}
+                          alt="qa-image"
+                          onClick={() => {
+                            clickZoomImage(`${qaInfo.image[0]}`)
+                          }}></Image>
+                      )}
                     </div>
                     {/* 時間處理 */}
-                    <div className="time-area">{new Date(qaInfo.date).toLocaleString()}</div>
+                    <div className="time-replied-area">
+                      <div className="time">{new Date(qaInfo.date).toLocaleString()}</div>
+                      <div className="not-replied">{qaInfo.replied === false && '未回覆'}</div>
+                      <div className="is-replied">{qaInfo.replied === true && '已回覆'}</div>
+                    </div>
                     {/* 簡易的提問內容處理 */}
                     <div className="qa-description">{qaInfo.description}</div>
                   </div>

@@ -29,15 +29,10 @@ export default function Course() {
   const router = useRouter()
   const { courseName, courseId } = router.query
 
-  // rerander
-  const [rerander, setRerander] = useState(true)
-
-  const [overFlow, serOverFlow] = useState('auto')
-
   // 參數
+  let course_id = ''
   const baseUrl = `${clientIp}/`
   const backToMyCoursePageUrl = `${clientIp}/profiles/Profile`
-  const [course_id, setCourse_id] = useState('')
   const [isLogined, setLogined] = useState(false)
   const [userInfo, setUserInfo] = useState(null)
   const [isShowVideoUpload, setIsShowVideoUpload] = useState(false)
@@ -63,13 +58,12 @@ export default function Course() {
   // 透過query拿到的courseName來更改course_id的狀態
   useEffect(() => {
     if (courseName) {
-      setCourse_id(courseId)
+      course_id = courseId
     }
-  }, [courseName, courseId])
+  }, [courseName])
 
   return (
-    <div
-      className="course-main">
+    <div className="course-main">
       <Header loginState={isLogined} />
       <div className="container">
         <div className="header-title-area">
@@ -88,20 +82,20 @@ export default function Course() {
         </div>
 
         {/* 影片組件 */}
-        {course_id && (
+        {courseId !== null && (
           <VideoNav
-            course_id={course_id}
+            course_id={courseId}
             courseName={courseName}></VideoNav>
         )}
         {/* Q&A 組件 */}
-        {course_id && (
+        {courseId !== null && (
           <QaNav
-            course_id={course_id}
+            course_id={courseId}
             courseName={courseName}></QaNav>
         )}
         {/* Ask 組件 */}
         <AskNav
-          course_id={course_id}
+          course_id={courseId}
           courseName={courseName}></AskNav>
       </div>
     </div>

@@ -6,13 +6,13 @@ const modifyCourseRouter = require("./modifyCourse");
 const QARouter = require("./QA");
 
 const accessChecker = require("../routesMiddleware/accessChecker");
-router.use(function (req, res, next) {
-  console.log("doing this router");
-  next();
-});
 
 const checkTeacherAccess = accessChecker.teacher;
 const checkCourseAccess = accessChecker.course;
+
+router.use("/question", QARouter);
+
+router.use("/modifyCourse", checkTeacherAccess, modifyCourseRouter);
 
 router.get("/getCourses", checkTeacherAccess, async (req, res) => {
   try {
@@ -96,10 +96,6 @@ router.get("/getCourses", checkTeacherAccess, async (req, res) => {
       .json({ success: false, msg: "發生了不可預期的錯誤" });
   }
 });
-
-router.use("/question", QARouter);
-
-router.use("/modifyCourse", checkTeacherAccess, modifyCourseRouter);
 
 router.use("/:course_id", checkCourseAccess, courseMethodRouter);
 

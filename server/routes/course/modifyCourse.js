@@ -2,11 +2,14 @@ const router = require("express").Router();
 const Course = require("../../models").course;
 const User = require("../../models").user;
 const modifyCourse = require("../../methods/").modifyCourse;
-const VimeoMethods = require("../../methods").vimeoMethods;
+const vimeoSchedule = require("../../models").vimeoSchedule;
 const VideoInfo = require("../../models").courseVideoInfo;
-
+const QAmessage = require("../../models").QAmessage;
+const QA = require("../../models").QA;
+const videoAccessRoute = require("./videoAccess");
 const accessChecker = require("../routesMiddleware/accessChecker");
-const checkCourseAccess = accessChecker.course;
+
+router.use("/videoAccess", accessChecker.teacher, videoAccessRoute);
 
 router.post("/createNewCourse", async (req, res) => {
   try {
@@ -205,6 +208,78 @@ router.get("/findJoinedSubject", (req, res) => {
   }
 });
 
+router.patch("/patchCourse", async (req, res) => {
+  try {
+    const { courseId, courseName, subject, grade, courseClass } = req.body;
+    console.log(courseId);
+    console.log(courseName);
+    console.log(subject);
+    console.log(grade);
+    console.log(courseClass);
+    // 檢查是否提供 courseId
+    if (!courseId)
+      return res.status(400).json({ success: false, msg: "缺少課程ID" });
+
+    if (
+      req.user.role !== "admin" &&
+      !req.user.courses.find((n) => n === course_id)
+    ) {
+      return res
+        .status(401)
+        .json({ success: false, msg: "你沒有修改此課程的權限" });
+    }
+
+    let foundCourse = await Course.findById(courseId).exec();
+    if (!foundCourse)
+      return res.status(404).json({ success: false, msg: "找不到課程" });
+
+    // 僅取提供的欄位，若未提供則使用原始資料
+    const newCourseName =
+      courseName !== undefined ? courseName : foundCourse.courseName;
+    const newSubject = subject !== undefined ? subject : foundCourse.subject;
+    const newGrade = grade !== undefined ? grade : foundCourse.grade;
+    const newCourseClass =
+      courseClass !== undefined ? courseClass : foundCourse.courseClass;
+
+    // 檢查更新後是否會與其他課程重複（排除當前課程）
+    let duplicateCourse = await Course.findOne({
+      courseName: newCourseName,
+      subject: newSubject,
+      grade: newGrade,
+      courseClass: newCourseClass,
+      _id: { $ne: courseId },
+    }).exec();
+
+    if (duplicateCourse)
+      return res.status(400).json({
+        success: false,
+        msg: "已有其他課程具有相同名稱、科目、年級及班級",
+      });
+
+    // 更新 modifyCourse 中的相關科目資料
+    modifyCourse.addSubject(newGrade, newSubject, newCourseClass);
+
+    // 僅更新提供的部分
+    foundCourse.courseName = newCourseName;
+    foundCourse.subject = newSubject;
+    foundCourse.grade = newGrade;
+    foundCourse.courseClass = newCourseClass;
+    let savedCourse = await foundCourse.save();
+    console.log(savedCourse);
+    return res.json({
+      success: true,
+      msg: "課程更新成功",
+      data: savedCourse,
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      success: false,
+      msg: "很抱歉，伺服器更新失敗",
+    });
+  }
+});
+
 router.delete("/deleteCourse", async (req, res) => {
   try {
     let { course_id } = req.body;
@@ -216,13 +291,19 @@ router.delete("/deleteCourse", async (req, res) => {
     if (
       req.user.role !== "admin" &&
       !req.user.courses.find((n) => n === course_id)
-    )
-      console.log(await VimeoMethods.delete({ course_id }));
-    console.log(
-      await VideoInfo.deleteMany({
-        courseID: course_id,
-      })
-    );
+    ) {
+      return res
+        .status(401)
+        .json({ success: false, msg: "你沒有刪除此課程的權限" });
+    }
+    const newSchedule = new vimeoSchedule({
+      method: "delete",
+      videoIndex: { COURSEID: course_id },
+    });
+    await newSchedule.save();
+    await VideoInfo.deleteMany({
+      courseID: course_id,
+    });
     for (userID of foundCourse.members) {
       let foundRegistedUser = await User.findOne({ _id: userID });
       console.log(foundRegistedUser);

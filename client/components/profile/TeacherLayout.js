@@ -1,11 +1,9 @@
 // 引用page/profiles下的組件
-import DeleteCourse from '../../pages/profiles/DeleteCourse'
-import AddCourse from '../../pages/profiles/AddCourse'
 import MyCourse from '../../pages/profiles/MyCourse'
-import RegisterCourse from '../../pages/profiles/RegisterCourse'
 import UserProfile from '../../pages/profiles/UserProfile'
 import PreRegister from '../../pages/profiles/PreRegister'
-import RemoveFromCourse from '../../pages/profiles/RemoveFromCourse'
+import EditCourse from '../../pages/profiles/EditCourse'
+import EditMembers from '../../pages/profiles/EditMembers.js'
 // 引用組件庫
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
@@ -54,25 +52,13 @@ export default function AdminLayout() {
     },
     // 教師功能
     TeacherFunction: {
-      AddCourse: {
-        component: <AddCourse />,
-        className: 'add-course-container',
+      EditCourse: {
+        component: <EditCourse />,
+        className: 'right-item',
       },
-      RegisterCourse: {
-        component: <RegisterCourse />,
-        className: '',
-      },
-      DeleteCourse: {
-        component: <DeleteCourse />,
-        className: 'delete-course-container',
-      },
-      PreRegister: {
-        component: <PreRegister />,
-        className: '',
-      },
-      RemoveFromCourse: {
-        component: <RemoveFromCourse />,
-        className: '',
+      EditMembers: {
+        component: <EditMembers />,
+        className: 'right-item',
       },
       className: '',
     },
@@ -286,57 +272,31 @@ export default function AdminLayout() {
               <div
                 style={{ height: teacherFuntionNavListSwitcher }}
                 className="nav-options">
-                {/* 創建新課程 */}
+                {/* 編輯課程 */}
                 <div
                   className="option"
                   onClick={(e) => {
-                    setNavSelecter(['TeacherFunction', 'AddCourse'])
+                    setNavSelecter(['TeacherFunction', 'EditCourse'])
                     switchNavActive(e.target)
                   }}>
                   <Image
                     className="turn-right-icon"
                     src={dotIcon}
                     alt="nav option icon"></Image>
-                  創建新課程
+                  編輯課程
                 </div>
-                {/* 加人至課程 */}
+                {/* 成員編輯 */}
                 <div
                   className="option"
                   onClick={(e) => {
-                    setNavSelecter(['TeacherFunction', 'RegisterCourse'])
+                    setNavSelecter(['TeacherFunction', 'EditMembers'])
                     switchNavActive(e.target)
                   }}>
                   <Image
                     className="turn-right-icon"
                     src={dotIcon}
                     alt="nav option icon"></Image>
-                  加人至課程
-                </div>
-                {/* 移除出課程 */}
-                <div
-                  className="option"
-                  onClick={(e) => {
-                    setNavSelecter(['TeacherFunction', 'RemoveFromCourse'])
-                    switchNavActive(e.target)
-                  }}>
-                  <Image
-                    className="turn-right-icon"
-                    src={dotIcon}
-                    alt="nav option icon"></Image>
-                  移除出課程
-                </div>
-                {/* 刪除課程 */}
-                <div
-                  className="option"
-                  onClick={(e) => {
-                    setNavSelecter(['TeacherFunction', 'DeleteCourse'])
-                    switchNavActive(e.target)
-                  }}>
-                  <Image
-                    className="turn-right-icon"
-                    src={dotIcon}
-                    alt="nav option icon"></Image>
-                  刪除課程
+                  成員編輯
                 </div>
               </div>
             </li>
