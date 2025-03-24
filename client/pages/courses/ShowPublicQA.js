@@ -13,6 +13,18 @@ const server_base_URL = process.env.NEXT_PUBLIC_SERVER_IP
 export default function ShowPublicQA({ courseName, token, course_id, showPublicQA, setShowPublicQA, publicQAInfo, resourceCategory, hint }) {
   const image_base_url = `${server_base_URL}/resource/questionIMG/`
   const [page_body, setPage_body] = useState([])
+  const [userInfo, setUserInfo] = useState({})
+
+  const addQAtoCourse = () => {}
+
+  // get使用者資料
+  useEffect(() => {
+    if (token) {
+      userService.getUserInfo(token).then((res) => {
+        setUserInfo(res.data)
+      })
+    }
+  }, [token])
 
   // 控制頁面scroll狀態
   useEffect(() => {
@@ -24,9 +36,7 @@ export default function ShowPublicQA({ courseName, token, course_id, showPublicQ
     }
   }, [page_body])
 
-  const test = () => {
-    console.log(publicQAInfo)
-  }
+  const test = () => {}
 
   return (
     <div
@@ -105,11 +115,12 @@ export default function ShowPublicQA({ courseName, token, course_id, showPublicQ
                   {item.image.map((url, index) => (
                     <div key={index}>
                       <Image
-                        src={`${url}`}
+                        src={`${url}?token=${token.split(' ')[1]}`}
                         className="image"
                         alt="qa image"
                         width={200}
-                        height={200}></Image>
+                        height={200}
+                        style={{ width: 'auto' }}></Image>
                     </div>
                   ))}
                 </div>
@@ -121,12 +132,23 @@ export default function ShowPublicQA({ courseName, token, course_id, showPublicQ
                   <div className="into-qustion-page-btn">
                     <Link
                       className="link"
+                      // 恢復滑條
                       onClick={() => {
                         page_body.style.overflow = 'scroll'
                       }}
                       href={`${client_base_URL}/courses/QaPage?qa_id=${item._id}&courseName=${courseName}`}>
                       進到問題頁面
                     </Link>
+                    {userInfo.role === 'teacher' ||
+                      (userInfo.role === 'admin' && (
+                        <div
+                          className="add-to-course-btn"
+                          onClick={() => {
+                            addQAtoCourse()
+                          }}>
+                          將此QA加進此課程
+                        </div>
+                      ))}
                   </div>
                 </div>
               </div>

@@ -15,8 +15,31 @@ export default function RemoveUsers() {
   const [phoneValue, setPhoneValue] = useState(null)
   const [choseRole, setChoseRole] = useState(null)
   const [memberId, setMemberId] = useState(null)
+  const [grade, setGrade] = useState(null)
   // 初始化所有資料的邊框
   const [optionBorder, setOptionBorder] = useState('1px solid rgba(0, 0, 0, 0.2)')
+  // 控制訊息
+  const [message, setMessage] = useState('無訊息')
+  const [messageStatus, setMessageStatus] = useState(false)
+  const [messageColor, setMessageColor] = useState('')
+
+  // 控制訊息
+  const messageControl = (info, isSuccess) => {
+    setMessage(info)
+    setMessageStatus(true)
+    if (isSuccess) {
+      setMessageColor('rgba(195, 240, 178, 0.8)')
+    } else {
+      setMessageColor('rgba(240, 178, 178, 0.8)')
+    }
+    setTimeout(() => {
+      setMessageStatus(false)
+      setTimeout(() => {
+        setMessage('無訊息')
+        setMessageColor('')
+      }, 200)
+    }, 2000)
+  }
 
   //請求獲取使用者
   const getUsersFunction = () => {
@@ -56,6 +79,10 @@ export default function RemoveUsers() {
           setSelectedUserId([])
           getUsersFunction()
           clearSelectedMemebers()
+          messageControl(res.msg, true)
+        } else {
+          messageControl('發生錯誤', false)
+          console.error(res)
         }
       })
     }
@@ -77,9 +104,9 @@ export default function RemoveUsers() {
       _id: memberId,
       page: page,
       pageSize: pageSize,
+      grade: grade,
     }
     adminService.getMembers(token, data).then((res) => {
-      console.log(res.data)
       setGetUsers(res.data)
     })
   }
@@ -96,7 +123,12 @@ export default function RemoveUsers() {
   return (
     <div className="remove-users-page">
       <div className="remove-users-title">移除成員功能</div>
-      {/* 搜尋選項 */}
+      <div
+        style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
+        className="message">
+        {message}
+      </div>
+      {/* 搜尋選項: 姓名，電話，年級*/}
       <div className="remove-user-header">
         {/* 輸入姓名 */}
         <div>
@@ -107,7 +139,7 @@ export default function RemoveUsers() {
             }}
             className="name-input"
             type="text"
-            placeholder="可不填寫"
+            placeholder="選填"
           />
         </div>
         {/* 輸入電話 */}
@@ -119,11 +151,23 @@ export default function RemoveUsers() {
             }}
             className="phone-input"
             type="text"
-            placeholder="可不填寫"
+            placeholder="選填"
+          />
+        </div>
+        {/* 輸入年級 */}
+        <div>
+          <div className="title">年級 :</div>
+          <input
+            onChange={(e) => {
+              setGrade(e.target.value)
+            }}
+            className="grade-input"
+            type="text"
+            placeholder="選填"
           />
         </div>
       </div>
-      {/* 輸入電話 */}
+      {/* 搜尋選項: 用戶ID，身分組 */}
       <div className="container-line">
         <div className="title">用戶ID:</div>
         <input
@@ -132,7 +176,7 @@ export default function RemoveUsers() {
           }}
           className="member-id-input"
           type="text"
-          placeholder="可不填寫"
+          placeholder="選填"
         />
         <div className="title">身分組</div>
         <select
@@ -169,11 +213,13 @@ export default function RemoveUsers() {
         <div className="container">
           <div className="username">暱稱</div>
           <div className="realname">真實性名</div>
+          <div className="grade">年級</div>
           <div className="phone">電話號碼</div>
           <div className="userid">用戶ID</div>
           <div className="role">身分組</div>
         </div>
       </div>
+      {/* list內容 */}
       <div className="user-list">
         {getUsers.map(
           (item, index) =>
@@ -185,8 +231,9 @@ export default function RemoveUsers() {
                 }}
                 className="container member-info"
                 style={{ border: optionBorder }}>
-                <div className="username">{item.userinfo.username}</div>
+                <div className="username">{!item.userinfo.username ? '無' : item.userinfo.username}</div>
                 <div className="realname">{item.userinfo.realname}</div>
+                <div className="grade">{item.userinfo.grade}</div>
                 <div className="phone">{item.userinfo.phoneNumber}</div>
                 <div className="userid">{item._id}</div>
                 {item.role === 'admin' && <div className="role">管理員</div>}

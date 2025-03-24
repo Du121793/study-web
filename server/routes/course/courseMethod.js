@@ -6,32 +6,41 @@ const vimeoSchedule = require("../../models").vimeoSchedule;
 const imageCompresser = require("../../methods/imageCompresser");
 const accessChecker = require("../routesMiddleware/accessChecker");
 const videoAccessRoute = require("./videoAccess");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
 router.use("/videoAccess", accessChecker.teacher, videoAccessRoute);
 
+// 改用 memoryStorage，接收到的檔案將保留在 req.file.buffer 中
+const upload = multer({ storage: multer.memoryStorage() });
+
 /**
- * GET /members
- *
- * 說明：
- * 此路由用於取得課程成員資料，支援以下參數以進行過濾、排序與分頁：
- *
- * 查詢參數：
- * - role: 指定角色，僅回傳該角色的成員資料（例如 "student", "teacher", "admin"），
- *         若未指定則回傳所有成員。
- *
- * 分頁與排序參數：
- * - page (預設: 1): 當前頁碼。
- * - pageSize (預設: 10): 每頁回傳的成員數量。
- * - sortBy (可選): 排序依據，可選 "grade" 或 "date"，
- *       * "grade": 根據用戶的年級 (userinfo.grade) 排序；由於教師通常沒有年級，
- *                  因此沒有年級的成員會排在最後；若年級相同，則以建立時間 (date) 作次排序。
- *       * "date": 根據用戶建立時間 (date) 排序。
- *       若未指定 sortBy，則使用資料庫原有順序。
- * - sortOrder (預設: "asc"): 排序方向，"asc" 為升冪，"desc" 為降冪。
- *
- * 範例：
- * GET /members?role=student&page=2&pageSize=5&sortBy=grade&sortOrder=desc
+ * 處理上傳的 thumbnail 圖片，直接使用 fs 寫入檔案
+ * 檔案最終存放在 resource/videoIMG/ 目錄下，檔名為 videoId + 原始副檔名
+ * @param {Object} file - 透過 multer 處理後的單一檔案
+ * @param {string|ObjectId} videoId - 影片的 _id
+ * @returns {Promise<string>} - 回傳寫入檔案的路徑
  */
+async function processThumbnailImage(file, videoId) {
+  return new Promise((resolve, reject) => {
+    const fileExt = path.extname(file.originalname);
+    const newFilename = videoId + fileExt;
+    // 最終檔案存放在 resource/videoIMG/ 下（與文件1原本的存放規則相同）
+    const newPath = path.join("resource/videoIMG/", newFilename);
+
+    // 若有需要可在此加入圖片壓縮的邏輯，類似文件2 的 compressImageBuffer
+
+    // 直接寫入 buffer 到指定路徑
+    fs.writeFile(newPath, file.buffer, (err) => {
+      if (err) {
+        console.error("寫入圖片檔案錯誤:", err);
+        return reject(err);
+      }
+      resolve(newPath);
+    });
+  });
+}
 
 router.get("/members", async (req, res) => {
   try {
@@ -146,7 +155,6 @@ router.get("/videoInfo", async (req, res) => {
 
     // 建立查詢，並依據條件、選取欄位與排序
     let query = VideoInfo.find(filter).select(fields).sort(sortOptions);
-
     // 若有傳入 pageSize，則進行分頁，否則回傳所有符合條件的資料
     if (typeof pageSize !== "undefined") {
       const pageSizeNum = parseInt(pageSize);
@@ -196,6 +204,11 @@ router.get("/videoInfo", async (req, res) => {
         plainItem.access.accessDate = accessRecord
           ? accessRecord.accessDate
           : null;
+
+        if (plainItem.thumbnail) {
+          plainItem.thumbnail =
+            `${process.env.SERVER_IP}/` + plainItem.thumbnail;
+        }
         return plainItem;
       })
     );
@@ -249,75 +262,105 @@ router.get("/videoUri", async (req, res) => {
   }
 });
 
-router.post("/uploadVideo", accessChecker.teacher, async (req, res) => {
-  try {
-    const {
-      title,
-      fileSize,
-      description,
-      type,
-      thumbnail,
-      length,
-      recordDate,
-      isPrivate = false,
-    } = req.body;
+router.post(
+  "/uploadVideo",
+  [accessChecker.teacher, upload.single("thumbnail")],
+  // 使用 upload.single('thumbnail') 代表只處理單一檔案，且該欄位名稱為 thumbnail
+  
+  async (req, res) => {
+    try {
+      // 由 formData 取得文字欄位
+      const {
+        title,
+        fileSize,
+        description,
+        type,
+        length,
+        recordDate,
+        isPrivate,
+      } = req.body;
 
-    if (!title || !fileSize)
-      return res.status(400).json({ success: false, msg: "上傳資料缺少" });
+      console.log(req.body)
+      
+      // 檢查必要欄位
+      if (!title || !fileSize)
+        return res.status(400).json({ success: false, msg: "上傳資料缺少" });
 
-    if (isPrivate != undefined && typeof isPrivate !== "boolean") {
-      return res
-        .status(400)
-        .json({ success: false, msg: "isPrivate必須是布林值" });
-    }
-
-    const { subject, grade, courseClass } = req.course;
-
-    const returnImg = await imageCompresser.compressBase64Image(thumbnail);
-    const newVideoInfoParams = recordDate
-      ? {
-          title,
-          courseID: req.course._id,
-          type,
-          description: description || "",
-          thumbnail: returnImg || "",
-          length: length || 0,
-          isPrivate,
-          recordDate,
+      // 由於 formData 傳送的布林值為字串，需轉換
+      let isPrivateBool = false;
+      if (isPrivate !== undefined) {
+        if (isPrivate === "true") {
+          isPrivateBool = true;
+        } else if (isPrivate === "false") {
+          isPrivateBool = false;
+        } else {
+          return res
+            .status(400)
+            .json({ success: false, msg: "isPrivate必須是布林值" });
         }
-      : {
-          title,
-          courseID: req.course._id,
-          type,
-          description: description || "",
-          thumbnail: returnImg || "",
-          isPrivate,
-          length: length || 0,
-        };
-    const newVideoInfo = new VideoInfo(newVideoInfoParams);
-    const savedVideoInfo = await newVideoInfo.save();
+      }
 
-    let videoIndex = {
-      videoID: savedVideoInfo._id,
-      courseID: req.course._id,
-      subject,
-      grade,
-      courseClass,
-    };
-    // reqBody必須包含{ title, fileSize, description, type }
-    const uploadUri = await VimeoMethods.upload(req.body, videoIndex);
-    if (!uploadUri.success)
+      const { subject, grade, courseClass } = req.course;
+
+      // 建立新影片資料，不先加入 thumbnail 欄位
+      const newVideoInfoParams = recordDate
+        ? {
+            title,
+            courseID: req.course._id,
+            type,
+            description: description || "",
+            length: length || 0,
+            isPrivate: isPrivateBool,
+            recordDate,
+          }
+        : {
+            title,
+            courseID: req.course._id,
+            type,
+            description: description || "",
+            isPrivate: isPrivateBool,
+            length: length || 0,
+          };
+
+      const newVideoInfo = new VideoInfo(newVideoInfoParams);
+      const savedVideoInfo = await newVideoInfo.save();
+
+      // 若有上傳 thumbnail，則呼叫獨立的函式進行檔案處理
+      if (req.file) {
+        const thumbnailPath = await processThumbnailImage(
+          req.file,
+          savedVideoInfo._id
+        );
+        savedVideoInfo.thumbnail = thumbnailPath;
+        await savedVideoInfo.save();
+      }
+
+      // 準備影片上傳所需的 videoIndex 物件
+      let videoIndex = {
+        videoID: savedVideoInfo._id,
+        courseID: req.course._id,
+        subject,
+        grade,
+        courseClass,
+      };
+
+      // 呼叫 VimeoMethods.upload 進行影片上傳
+      const uploadUri = await VimeoMethods.upload(req.body, videoIndex);
+      if (!uploadUri.success)
+        return res.status(500).json({
+          success: false,
+          msg: "目前請求繁忙請稍等一分鐘後再進行請求",
+        });
+
+      return res.json({ success: true, data: uploadUri });
+    } catch (e) {
+      console.error(e);
       return res
         .status(500)
-        .json({ success: false, msg: "目前請求繁忙請稍等一分鐘後再進行請求" });
-    return res.json({ success: true, data: uploadUri });
-  } catch (e) {
-    console.log(e);
-    return res
-      .status(500)
-      .json({ success: false, msg: "很抱歉，伺服器無法處理上傳" });
+        .json({ success: false, msg: "很抱歉，伺服器無法處理上傳" });
+    }
   }
-});
+);
 
 router.patch("/uploadVideoStatus", accessChecker.teacher, async (req, res) => {
   try {
@@ -346,7 +389,6 @@ router.patch("/uploadVideoStatus", accessChecker.teacher, async (req, res) => {
 
     let foundVideo = await VimeoMethods.find({ videoId });
 
-    foundVideo.success = false;
     if (foundVideo.success && foundVideo.total !== 0) {
       foundItem.videoURL = foundVideo.data[0].player_embed_url;
     } else {
@@ -375,23 +417,142 @@ router.patch("/uploadVideoStatus", accessChecker.teacher, async (req, res) => {
   }
 });
 
+/* 
+payload={
+  videoID = videoID
+  thumbnail = null
+  title = ''
+  description = null
+  isPrivate = true || false
+}
+ */
+router.patch(
+  "/patchVideo",
+  accessChecker.teacher,
+  upload.single("thumbnail"), // 處理 thumbnail 的檔案更新
+  async (req, res) => {
+    try {
+      console.log(req.body)
+      const { videoID } = req.body;
+      if (!videoID)
+        return res.status(400).json({ success: false, msg: "缺少 videoID" });
+
+      // 先取出資料庫中的原始影片資料，方便檢查舊的 thumbnail 是否存在
+      const video = await VideoInfo.findById(videoID);
+      if (!video)
+        return res.status(404).json({ success: false, msg: "找不到該影片" });
+
+      // 只允許更新 title、description、isPrivate 與 thumbnail
+      const updateFields = {};
+
+      // 處理 title：若有傳送，必須是字串且不能為 null
+      if (req.body.hasOwnProperty("title")) {
+        const title = req.body.title;
+        if (title === null || title === "null")
+          return res
+            .status(400)
+            .json({ success: false, msg: "title 不能傳入 null" });
+        if (typeof title !== "string")
+          return res
+            .status(400)
+            .json({ success: false, msg: "title 必須是字串" });
+        updateFields.title = title;
+      }
+
+      // 處理 description：若傳入 null 則轉成空字串；型別必須為字串
+      if (req.body.hasOwnProperty("description")) {
+        let description = req.body.description;
+        if (description === null || description === "null") {
+          description = "";
+        }
+        if (typeof description !== "string")
+          return res
+            .status(400)
+            .json({ success: false, msg: "description 必須是字串" });
+        updateFields.description = description;
+      }
+
+      // 處理 isPrivate：若有傳送，不能為 null，且僅接受 "true" 或 "false" 字串
+      if (req.body.hasOwnProperty("isPrivate")) {
+        const isPrivate = req.body.isPrivate;
+        if (isPrivate === null || isPrivate === "null")
+          return res
+            .status(400)
+            .json({ success: false, msg: "isPrivate 不能傳入 null" });
+        let isPrivateBool;
+        if (isPrivate === true) {
+          isPrivateBool = true;
+        } else if (isPrivate === false) {
+          isPrivateBool = false;
+        } else {
+          return res
+            .status(400)
+            .json({ success: false, msg: "isPrivate 必須是布林值" });
+        }
+        updateFields.isPrivate = isPrivateBool;
+      }
+
+      // 處理 thumbnail：若有上傳新的檔案，先刪除舊圖片，再重新命名上傳的檔案
+      if (req.file) {
+        // 若原本有舊的圖片，且檔案存在，先刪除掉
+        if (video.thumbnail && fs.existsSync(video.thumbnail)) {
+          fs.unlinkSync(video.thumbnail);
+        }
+        const fileExt = path.extname(req.file.originalname);
+        // 新的檔案命名格式： resource/videoIMG/<courseID>/<videoID><副檔名>
+        const newPath = path.join(
+          `resource/videoIMG/${req.course._id}`,
+          `${videoID}${fileExt}`
+        );
+
+        fs.renameSync(req.file.path, newPath);
+        updateFields.thumbnail = newPath;
+      }
+
+      // 執行資料庫更新（忽略不允許更新的欄位）
+      const updatedVideo = await VideoInfo.findByIdAndUpdate(
+        videoID,
+        updateFields,
+        { new: true }
+      );
+      if (!updatedVideo)
+        return res.status(404).json({ success: false, msg: "找不到該影片" });
+
+      return res.json({ success: true, data: updatedVideo });
+    } catch (e) {
+      console.error(e);
+      return res.status(500).json({ success: false, msg: "伺服器錯誤" });
+    }
+  }
+);
+
 router.delete("/deleteVideo", accessChecker.teacher, async (req, res) => {
   try {
     const { videoId } = req.body;
     console.log("video", videoId);
+
+    // 取得影片資料
     let foundVideoInfo = await VideoInfo.findOne({ _id: videoId });
     if (!foundVideoInfo)
       return res.status(400).json({ success: false, msg: "找不到影片資料" });
+
+    // 若影片已有 thumbnail，且檔案存在，則刪除該圖片檔案
+    if (foundVideoInfo.thumbnail && fs.existsSync(foundVideoInfo.thumbnail)) {
+      fs.unlinkSync(foundVideoInfo.thumbnail);
+    }
+
     const newSchedule = new vimeoSchedule({
       method: "delete",
       videoIndex: { videoId: videoId },
     });
     await newSchedule.save();
+
     await VideoInfo.findOneAndDelete({ _id: videoId });
+
     return res.json({ success: true, msg: "已更新資料庫" });
   } catch (e) {
+    console.error(e);
     return res.status(500).json({ success: false, msg: "伺服器處理失敗" });
   }
 });
-
 module.exports = router;

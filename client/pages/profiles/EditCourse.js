@@ -39,8 +39,32 @@ export default function EditCourse() {
   const [userInfo, setUserInfo] = useState(null)
   const [coursesInfo, setCoursesInfo] = useState(null)
   const [createdCourseId, setCreatedCourseId] = useState(null)
+  // 將成員新增到新課程，參數
+  const [courses, setCourses] = useState([])
   // 是否要在新增課程時也將選擇的成員加入課程
   const [addThenRegister, setAddThenRegister] = useState(false)
+  // 控制訊息
+  const [message, setMessage] = useState('無訊息')
+  const [messageStatus, setMessageStatus] = useState(false)
+  const [messageColor, setMessageColor] = useState('')
+
+  // 控制訊息
+  const messageControl = (info, isSuccess) => {
+    setMessage(info)
+    setMessageStatus(true)
+    if (isSuccess) {
+      setMessageColor('rgba(195, 240, 178, 0.8)')
+    } else {
+      setMessageColor('rgba(240, 178, 178, 0.8)')
+    }
+    setTimeout(() => {
+      setMessageStatus(false)
+      setTimeout(() => {
+        setMessage('無訊息')
+        setMessageColor('')
+      }, 200)
+    }, 2000)
+  }
 
   // 搜尋課程功能
   const searchCourse = () => {
@@ -69,16 +93,27 @@ export default function EditCourse() {
           page: page,
           pageSize: pageSize,
         }
-        // 如果有選擇學生，並且registerInfo為true
+        if (res.success && !addThenRegister) {
+          messageControl(res.msg, true)
+        }
+        // 如果有選擇學生，並且addThenRegister為true，
+        // (有勾選是否要在新增課程時也將選擇的成員加入課程)
         if (selectedStudentId.length && addThenRegister) {
-          registerInfo = {
+          data = {
             user_ids: selectedStudentId,
-            course_id: res.data._id,
+            // 將已選取的舊課程，以及新課程的都放在同一個陣列內
+            course_ids: [...courses, res.data._id],
           }
-          adminService.registerMember(token, registerInfo).then((res) => {
-            registerInfo = {}
+          adminService.registerMember(token, data).then((res) => {
+            if (res.success) {
+              messageControl(`${res.msg}`, true)
+              return
+            } else {
+              messageControl(`發生錯誤`, false)
+            }
           })
         }
+        // 初始化: 課程list，input欄位
         adminService.getCourses(token, data).then((res) => {
           setCoursesInfo(res.data)
           setGradeInput('')
@@ -130,7 +165,7 @@ export default function EditCourse() {
   }
 
   const test = () => {
-    console.log(addThenRegister)
+    console.log([...courses])
   }
 
   // 1. 獲取使用者資料
@@ -158,6 +193,11 @@ export default function EditCourse() {
   return (
     <div className="edit-course-main">
       <div className="edit-course-function-area">
+        <div
+          style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
+          className="message">
+          {message}
+        </div>
         {doubleCheck && (
           <div className="double-check-area">
             <div className="double-check-background">
@@ -248,6 +288,7 @@ export default function EditCourse() {
             width={20}
             height={20}></Image>
         </div>
+        {/* 是否要在新增課程時也將選擇的成員加入課程 */}
         <div className="checkbox-area">
           <div>
             是否要在新增課程時也將選擇的成員加入課程
@@ -260,6 +301,7 @@ export default function EditCourse() {
           </div>
         </div>
         <div className="courses-info-list">
+          {/* list title */}
           <div
             className="courses-info-area"
             id="title-area">
@@ -283,11 +325,13 @@ export default function EditCourse() {
                 height={24}></Image>
             </div>
           </div>
+          {/* list info */}
           {coursesInfo &&
             coursesInfo.courses.map((item, index) => (
               <div
                 className="courses-info-area"
                 key={index}>
+                {/* 若true，則將內部元素改為input，用於編輯 */}
                 {index === editStatusIndex ? (
                   <>
                     <input
@@ -338,7 +382,21 @@ export default function EditCourse() {
                         height={24}
                         onClick={() => {
                           setDoubleCheck(true)
-                          setNeedToDeleteCourseId(item_id)
+                          setNeedToDeleteCourseId(item._id)
+                        }}
+                      />
+                      <input
+                        type="checkbox"
+                        onChange={(e) => {
+                          if (e.target.checked === true) {
+                            setCourses([...courses, item._id])
+                          } else {
+                            setCourses(
+                              courses.filter((value) => {
+                                return value === item._id
+                              })
+                            )
+                          }
                         }}
                       />
                     </div>
@@ -371,6 +429,21 @@ export default function EditCourse() {
                           setDoubleCheck(true)
                           setNeedToDeleteCourseId(item._id)
                           setDoubleCheckCourseName(item.courseName)
+                        }}
+                      />
+
+                      <input
+                        type="checkbox"
+                        onChange={(e) => {
+                          if (e.target.checked === true) {
+                            setCourses([...courses, item._id])
+                          } else {
+                            setCourses(
+                              courses.filter((value) => {
+                                return value === item._id
+                              })
+                            )
+                          }
                         }}
                       />
                     </div>

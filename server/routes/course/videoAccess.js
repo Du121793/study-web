@@ -23,30 +23,48 @@ const User = require("../../models").User;
 // ------------------------------
 router.get("/", async (req, res) => {
   try {
-    let queryCondition = {};
-    // 若非 admin，只查詢該課程的 VideoAccess 紀錄
-    queryCondition.courseID = req.course._id;
+    let queryCondition = { courseID: req.course._id };
 
-    const records = await VideoAccess.find(queryCondition)
-      .populate({
-        path: "studentIDs",
-        select: "_id userinfo role",
-      })
-      .populate({
-        path: "videoIDs",
-        select: "_id title",
-      })
-      .populate({
-        path: "creater",
-        select: "_id userinfo",
-      });
-
-    return res.json({ success: true, data: records });
+    if (req.query.access_id) {
+      // 當用戶傳入 access_id 時，僅回傳這一筆記錄
+      queryCondition._id = req.query.access_id;
+      const record = await VideoAccess.findOne(queryCondition)
+        .populate({
+          path: "studentIDs",
+          select: "_id userinfo role",
+        })
+        .populate({
+          path: "videoIDs",
+          select: "_id title",
+        })
+        .populate({
+          path: "creater",
+          select: "_id userinfo",
+        });
+      if (!record) {
+        return res.status(404).json({ success: false, msg: "找不到對應的存取紀錄" });
+      }
+      return res.json({ success: true, data: record });
+    } else {
+      // 未傳入 access_id，回傳該課程所有記錄
+      const records = await VideoAccess.find(queryCondition)
+        .populate({
+          path: "studentIDs",
+          select: "_id userinfo role",
+        })
+        .populate({
+          path: "videoIDs",
+          select: "_id title",
+        })
+        .populate({
+          path: "creater",
+          select: "_id userinfo",
+        });
+      return res.json({ success: true, data: records });
+    }
   } catch (err) {
     console.error(err);
-    return res
-      .status(500)
-      .json({ success: false, msg: "取得 video access 紀錄失敗" });
+    return res.status(500).json({ success: false, msg: "取得 video access 紀錄失敗" });
   }
 });
 
@@ -118,7 +136,7 @@ router.post("/postNewAccess", async (req, res) => {
 // ------------------------------
 // PATCH /videoAccess/patchAccess/:id
 // 更新指定的 VideoAccess 紀錄
-// Body 參數: { videoIDs, studentIDs, accessDate, unlimited }
+// Body 參數:{ accessName, videoIDs, studentIDs, accessDate, unlimited }
 // - studentIDs 需在 req.course.members
 // - videoIDs 需屬於該課程
 // - 若 unlimited = true，accessDate = null
@@ -136,7 +154,7 @@ router.patch("/patchAccess/:id", async (req, res) => {
     // 構建更新物件
     const updateObj = {
       creater: req.user._id,
-      date: date.now(),
+      date: Date.now(),
     };
     if (accessName !== undefined) updateObj.accessName = accessName;
     if (videoIDs !== undefined) updateObj.videoIDs = videoIDs;

@@ -44,3 +44,68 @@ a {
 .relative {
   position: relative;
 }
+h1 {
+  font-size: 2em;
+}
+h2 {
+  font-size: 1.5em;
+}
+h3 {
+  font-size: 1.17em;
+}
+h4 {
+  font-size: 1em;
+}
+h5 {
+  font-size: 0.83em;
+}
+h6 {
+  font-size: 0.67em;
+}
+// 客制化
+/*
+// 控制訊息
+const [message, setMessage] = useState('無訊息')
+const [messageStatus, setMessageStatus] = useState(false)
+const [messageColor, setMessageColor] = useState('')
+
+// 控制訊息
+const messageControl = (info, isSuccess) => {
+    setMessage(info)
+    setMessageStatus(true)
+    if (isSuccess) {
+      setMessageColor('rgba(195, 240, 178, 0.8)')
+    } else {
+      setMessageColor('rgba(240, 178, 178, 0.8)')
+    }
+    setTimeout(() => {
+      setMessageStatus(false)
+      setTimeout(() => {
+        setMessage('無訊息')
+        setMessageColor('')
+      }, 200)
+    }, 2000)
+  }
+
+  <div
+        style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
+        className="message">
+        {message}
+      </div>
+*/
+.message {
+  z-index: 99999;
+  background-color: #e2e2e2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  overflow: hidden;
+  left: 50%;
+  top: 45px;
+  transform: translate(-50%, 0);
+  transition: 0.2s;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 18px;
+}

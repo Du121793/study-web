@@ -48,6 +48,7 @@ export default function QaNav({ course_id, courseName }) {
 
   // 請求參數的狀態
   const [sortBy, setSortBy] = useState('resourceCategories')
+  const [timeSort, setTimeSort] = useState('desc')
 
   // 用戶資料
   const [userInfo, setUserInfo] = useState({})
@@ -67,6 +68,11 @@ export default function QaNav({ course_id, courseName }) {
   // 控制刪除按鈕的狀態
   const [showRemoveBtn, setShowRemoveBtn] = useState(false)
   const [doubleCheck, setDoubleCheck] = useState(false)
+
+  // 控制訊息
+  const [message, setMessage] = useState('無訊息')
+  const [messageStatus, setMessageStatus] = useState(false)
+  const [messageColor, setMessageColor] = useState('')
 
   // 切換整個 nav 區域的展開/收合
   const toggleQA = () => {
@@ -89,11 +95,7 @@ export default function QaNav({ course_id, courseName }) {
   }
 
   const test = () => {
-    courseQas.map((item) => {
-      item.qas.map((item) => {
-        console.log(item)
-      })
-    })
+    console.log(courseQas)
   }
 
   const showPublicQAClick = () => {
@@ -104,12 +106,33 @@ export default function QaNav({ course_id, courseName }) {
     })
   }
 
+  // 控制訊息
+  const messageControl = (info, isSuccess) => {
+    setMessage(info)
+    setMessageStatus(true)
+    if (isSuccess) {
+      setMessageColor('rgba(195, 240, 178, 0.8)')
+    } else {
+      setMessageColor('rgba(240, 178, 178, 0.8)')
+    }
+    setTimeout(() => {
+      setMessageStatus(false)
+      setTimeout(() => {
+        setMessage('無訊息')
+        setMessageColor('')
+      }, 200)
+    }, 2000)
+  }
+
   // 刪除問題
   const removeQuestion = (question_id) => {
     adminService.removeQuestion(token, question_id).then((res) => {
       userService
         .getCourseQAs(token, course_id, sortBy)
         .then((res) => {
+          if (res.success) {
+            messageControl('刪除成功', true)
+          }
           setCourseQas(res.data)
         })
         .catch((err) => console.error('Error:', err.message))
@@ -118,9 +141,9 @@ export default function QaNav({ course_id, courseName }) {
 
   // 取得 QA 資料
   useEffect(() => {
-    if (token && course_id && sortBy) {
+    if (token && course_id && sortBy && timeSort) {
       userService
-        .getCourseQAs(token, course_id, sortBy)
+        .getCourseQAs(token, course_id, sortBy, timeSort)
         .then((res) => {
           setCourseQas(res.data)
         })
@@ -131,7 +154,7 @@ export default function QaNav({ course_id, courseName }) {
         setUserInfo(res.data)
       })
     }
-  }, [token, course_id, sortBy])
+  }, [token, course_id, sortBy, timeSort])
 
   return (
     <div
@@ -148,6 +171,11 @@ export default function QaNav({ course_id, courseName }) {
         />
         <span>Q & A</span>
       </div>
+      <div
+        style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
+        className="message">
+        {message}
+      </div>
       {imageIsZoom && (
         <ImageZoom
           setImageIsZoom={setImageIsZoom}
@@ -159,13 +187,14 @@ export default function QaNav({ course_id, courseName }) {
         ref={qaContentRef}
         style={{ height: qaOpen ? qaContentHeight + 'px' : '0px', transition: '0.3s' }}>
         <div className="QA-header">
-          <span
-            className="sort-title"
-            onClick={test}>
-            排序根據
-          </span>
-          <div className="select">
+          <div className="sort-by-area">
+            <span
+              className="sort-title"
+              onClick={test}>
+              排序根據
+            </span>
             <select
+              className="select"
               onChange={(e) => {
                 setSortBy(e.target.value)
               }}>
@@ -173,6 +202,18 @@ export default function QaNav({ course_id, courseName }) {
               <option value="hints">標籤排序</option>
             </select>
           </div>
+          <div className="time-sort-area">
+            <div>時間</div>
+            <select
+              className="select"
+              onChange={(e) => {
+                setTimeSort(e.target.value)
+              }}>
+              <option value="desc">降序</option>
+              <option value="asc">升序</option>
+            </select>
+          </div>
+
           {userInfo.role === 'teacher' ||
             ('admin' && (
               <div
@@ -255,12 +296,46 @@ export default function QaNav({ course_id, courseName }) {
                   <div
                     key={index}
                     className="qa-info">
+                    {/* 處理小標題 */}
+                    {qaInfo.hints[0] === '' && sortBy === 'resourceCategories' && (
+                      <div className="qa-info-title">
+                        <div className="content">無標籤</div>
+                      </div>
+                    )}
+                    {qaInfo.resourceCategories[0] === '' && sortBy === 'hints' && (
+                      <div className="qa-info-title">
+                        <div className="content">無主題</div>
+                      </div>
+                    )}
+                    {qaInfo.hints[0] !== '' && sortBy === 'resourceCategories' && (
+                      <div className="qa-info-title">
+                        {qaInfo.hints.slice().map((content, index) => (
+                          <div
+                            className="content"
+                            key={index}>
+                            {content}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {qaInfo.resourceCategories[0] !== '' && sortBy === 'hints' && (
+                      <div className="qa-info-title">
+                        {qaInfo.resourceCategories.slice().map((content, index) => (
+                          <div
+                            className="content"
+                            key={index}>
+                            {content}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                     <div className="btn-area">
                       <Link
                         className="into-qa-btn"
-                        href={`${client_URL}/courses/QaPage?qa_id=${qaInfo._id}&courseName=${courseName}`}>
+                        href={`${client_URL}/courses/QaPage?qa_id=${qaInfo._id}&courseName=${courseName}&course_id=${course_id}`}>
                         問題頁面
                       </Link>
+                      {/* 刪除按鈕 */}
                       {showRemoveBtn && (
                         <div
                           className="remove-btn"
@@ -277,38 +352,19 @@ export default function QaNav({ course_id, courseName }) {
                         </div>
                       )}
                     </div>
-                    {/* 處理title */}
-                    {qaInfo.hints[0] === '' && sortBy === 'resourceCategories' && (
-                      <div className="qa-info-title">
-                        <div className="content">無標籤</div>
-                      </div>
-                    )}
-                    {qaInfo.resourceCategories[0] === '' && sortBy === 'hints' && (
-                      <div className="qa-info-title">
-                        <div className="content">無主題</div>
-                      </div>
-                    )}
-                    {qaInfo.hints[0] !== '' && sortBy === 'resourceCategories' && (
-                      <div className="qa-info-title">
-                        <div className="content">{qaInfo.hints}</div>
-                      </div>
-                    )}
-                    {qaInfo.resourceCategories[0] !== '' && sortBy === 'hints' && (
-                      <div className="qa-info-title">
-                        <div className="content">{qaInfo.resourceCategories}</div>
-                      </div>
-                    )}
                     {/* 圖片處理 */}
                     <div className="qa-image-area">
-                      {qaInfo.image.length && userToken.length && (
+                      {qaInfo.image.length > 0 && userToken.length && (
                         <Image
                           key={index}
                           className="qa-image"
                           src={`${qaInfo.image[0]}?token=${userToken}`}
                           width={200}
-                          height={240}
+                          height={0}
+                          style={{ height: 'auto' }}
                           alt="qa-image"
                           onClick={() => {
+                            console.log(`${qaInfo.image[0]}?token=${userToken}`)
                             clickZoomImage(`${qaInfo.image[0]}`)
                           }}></Image>
                       )}

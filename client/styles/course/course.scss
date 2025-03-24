@@ -93,6 +93,7 @@
         margin-left: 24px;
         background-color: #fff;
         .button {
+          color: black;
           width: 120px;
           display: flex;
           justify-content: center;
@@ -114,7 +115,7 @@
       }
 
       .bottom-area {
-        width: 1224px;
+        width: 100%;
         display: flex;
         justify-content: center;
         user-select: none;
@@ -133,20 +134,28 @@
       .show-more-video-btn:hover {
         background-color: #f6f6f6;
       }
+      .video-area-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding-top: 24px;
+        padding-bottom: 24px;
+      }
       .video-area {
+        width: 90%;
         display: flex;
         flex-wrap: wrap;
         gap: 24px;
-        padding: 24px;
+        margin-left: 24px;
         background-color: rgb(255, 255, 255);
         .video {
+          width: 23%;
+          max-width: 240px;
           cursor: pointer;
           position: relative;
           border-radius: 4px;
-          width: 250px;
-          min-height: 221px;
+          height: 221px;
           background-color: #b7b7b7;
-          // border: 1px solid rgba(0, 0, 0, 0.2);
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
           overflow: hidden;
           transition: 0.2s;
@@ -201,23 +210,39 @@
               margin-top: 6px;
               width: 95%;
             }
-            .isPublic {
+            .public-and-edit-btn {
+              width: 100%;
               display: flex;
-              width: 95%;
-              justify-content: start;
-              .content {
+              align-items: center;
+              justify-content: space-around;
+              .edit-btn {
                 padding: 4px 6px;
                 border-radius: 4px;
                 border: 1px solid rgba(0, 0, 0, 0.4);
                 color: #292929;
+                transition: 0.2s;
               }
-              .unprivate{
-                color: rgb(123, 123, 123);
+              .edit-btn:hover {
+                background-color: #eeeeee;
               }
-              .private{
-                color: rgb(0, 0, 0);
+              .isPublic {
+                display: flex;
+                justify-content: start;
+                .content {
+                  padding: 4px 6px;
+                  border-radius: 4px;
+                  border: 1px solid rgba(0, 0, 0, 0.4);
+                  color: #292929;
+                }
+                .unprivate {
+                  color: rgb(123, 123, 123);
+                }
+                .private {
+                  color: rgb(0, 0, 0);
+                }
               }
             }
+
             .time {
               width: 95%;
               color: rgba(0, 0, 0, 0.574);
@@ -241,10 +266,23 @@
         gap: 24px; /* 區塊間距 */
         background-color: #f5f5f5;
         .QA-header {
-          align-items: center;
           padding-top: 16px;
           display: flex;
           gap: 24px;
+          .sort-by-area {
+            align-items: center;
+            display: flex;
+            gap: 8px;
+          }
+          .time-sort-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+          .select {
+            height: 32px;
+          }
+
           .show-public-QA {
             cursor: pointer;
             font-weight: bold;
@@ -279,9 +317,9 @@
           .QA-container {
             display: flex;
             justify-content: flex-start;
-            // flex-wrap: wrap;
-            padding: 0 32px 24px 32px; /* 上:0, 右:32px, 下:24px, 左:32px */
+            padding: 0 32px 24px 32px;
             gap: 12px;
+            margin-right: 24px;
             .QA-list {
               margin-bottom: 32px;
               padding: 16px;
@@ -296,9 +334,9 @@
                 display: flex;
                 .content {
                   font-weight: bold;
-                  font-size: 18px;
+                  font-size: 22px;
                   padding: 4px;
-                  background-color: #f0c2fc;
+                  background-color: #f6b594;
                   border-radius: 4px;
                   box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
                 }
@@ -345,6 +383,8 @@
                 }
                 .qa-info-title {
                   display: flex;
+                  flex-wrap: wrap;
+                  gap: 4px;
                   .content {
                     font-weight: bold;
                     font-size: 18px;
@@ -369,6 +409,7 @@
                 }
                 .time-replied-area {
                   display: flex;
+                  flex-wrap: wrap;
                   align-items: center;
                   justify-content: space-between;
                   font-size: 15px;
@@ -387,6 +428,13 @@
                   text-overflow: ellipsis;
                   white-space: nowrap;
                   color: black;
+                  width: 90%;
+                  border: 1px solid rgba(0, 0, 0, 0.4);
+                  border-radius: 4px;
+                  background-color: #f1f1f1;
+                  box-shadow: inset 1px 1px 4px rgba(0, 0, 0, 0.15);
+                  padding: 0 4px;
+                  margin-top: -6px;
                 }
               }
             }
@@ -473,7 +521,7 @@
             margin-top: 24px;
             display: flex;
             flex-direction: column;
-            gap: 0.6rem;
+            gap: 4px;
 
             /* 主題選擇 */
             .resourceCategory-input-area {
@@ -481,9 +529,6 @@
               align-items: center;
               gap: 0.5rem;
 
-              span {
-                font-size: 18px;
-              }
               input {
                 padding: 2px 4px 2px 4px;
                 border: 1px solid #ccc;
@@ -498,7 +543,7 @@
                 border-radius: 4px;
                 cursor: pointer;
                 transition: background-color 0.3s ease;
-
+                color: black;
                 &:hover {
                   background-color: #005bb5;
                 }
@@ -572,6 +617,7 @@
                 border-radius: 4px;
                 cursor: pointer;
                 transition: background-color 0.3s ease;
+                color: black;
 
                 &:hover {
                   background-color: #005bb5;

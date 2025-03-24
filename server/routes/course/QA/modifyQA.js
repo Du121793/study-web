@@ -8,6 +8,7 @@ const compressImageBuffer =
   require("../../../methods/imageCompresser").compressImageBuffer;
 const accessChecker = require("../../routesMiddleware/accessChecker");
 const multer = require("multer");
+const { QAmessage } = require("../../../models");
 
 // 設定 multer：指定欄位名稱 "image"，最多上傳 10 張圖片
 const upload = multer().fields([{ name: "image", maxCount: 10 }]);
@@ -78,6 +79,100 @@ async function saveUploadedImages(
   );
   return savedPaths;
 }
+
+/* -------------------------------
+   GET: 取得問題資訊 (並修正圖片 URL)
+   將 DB 中存的相對路徑改成完整 URL，
+   例如：process.env.SERVER_IP/resource/questionIMG/【相對路徑】
+---------------------------------*/
+router.get("/getQuestion", async (req, res) => {
+  try {
+    // 取得分頁與排序參數
+    const page = parseInt(req.query.page, 10) || 1;
+    const pageSize = parseInt(req.query.pageSize, 10) || 10;
+    const sortByParam = req.query.sortBy || "lastUpdate"; // 若為 "createDate"，以 date 排序
+    const sortOrder = req.query.sortOrder || "asc";
+    // 可選 "resourceCategories" 或 "hints"
+    const sortType = req.query.sortType || "resourceCategories";
+
+    // 決定排序欄位與排序方向
+    const sortField = sortByParam === "createDate" ? "date" : "lastUpdate";
+    const sortDirection = sortOrder === "asc" ? 1 : -1;
+
+    // 建立 aggregation pipeline
+    const pipeline = [
+      {
+        // 新增一個欄位 sortField，依據所選欄位
+        $addFields: {
+          sortField: `$${sortField}`,
+        },
+      },
+      {
+        // 針對 sortType 欄位 (陣列) 做展開，產生單筆文件，每筆文件會包含一個 tag 值
+        $unwind: `$${sortType}`,
+      },
+      {
+        // 依據 sortField 排序
+        $sort: { sortField: sortDirection },
+      },
+      {
+        // 依照展開後的 tag 分組，每組收集符合條件的 QA 文件
+        $group: {
+          _id: `$${sortType}`, // 分組依據的標籤
+          docs: { $push: "$$ROOT" },
+          representative: { $first: "$sortField" }, // 以第一筆作為代表排序值
+        },
+      },
+      {
+        // 每組僅取最多 3 筆 QA 文件
+        $addFields: {
+          docs: { $slice: ["$docs", 3] },
+        },
+      },
+      {
+        // 依據代表排序值，再次排序各組
+        $sort: { representative: sortDirection },
+      },
+      {
+        // 分頁處理：跳過前面 (page - 1)*pageSize 筆組，再取 pageSize 筆
+        $skip: (page - 1) * pageSize,
+      },
+      {
+        $limit: pageSize,
+      },
+    ];
+
+    // 執行聚合查詢
+    const groups = await QA.aggregate(pipeline);
+
+    // 處理每個 QA 文件的 image 欄位，補上 SERVER_IP 前綴
+    const transformedGroups = groups.map((group) => {
+      const tag = group._id;
+      const docs = group.docs.map((doc) => {
+        if (Array.isArray(doc.image)) {
+          doc.image = doc.image.map((relPath) => {
+            return `${process.env.SERVER_IP}/resource/questionIMG/${relPath}`;
+          });
+        }
+        return doc;
+      });
+      return { tag, docs };
+    });
+
+    return res.json({
+      success: true,
+      data: transformedGroups,
+      page, // 回傳目前頁碼
+      pageSize, // 回傳每頁分組數量
+      sortBy: sortByParam,
+      sortOrder,
+      sortType,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, msg: "取得資源時發生錯誤" });
+  }
+});
 
 /* -------------------------------
    POST: 建立新問題
@@ -202,9 +297,10 @@ router.patch(
         description,
         resourceCategories,
         hints,
-        rmIMG,
+        rmIMG,  // array(index)
         replied,
       } = req.body;
+      console.log(req.body)
 
       // 必須提供有效的 question_id
       if (!mongoose.Types.ObjectId.isValid(question_id)) {
@@ -212,7 +308,7 @@ router.patch(
       }
 
       // 若前端有傳入 course_ids 且非 null，則需為非空陣列
-      if (req.body.hasOwnProperty("course_ids") && course_ids !== null) {
+      if (course_ids !== null) {
         if (!Array.isArray(course_ids) || course_ids.length === 0) {
           return res
             .status(400)
@@ -255,22 +351,22 @@ router.patch(
       }
 
       // 僅更新前端有傳入的欄位（即使值為 null）
-      if (req.body.hasOwnProperty("course_ids")) {
+      if (course_ids !== undefined) {
         oldQA.courses = course_ids;
       }
-      if (req.body.hasOwnProperty("isPublic")) {
+      if (isPublic!== undefined) {
         oldQA.isPublic = isPublic;
       }
-      if (req.body.hasOwnProperty("description")) {
+      if (description!== undefined) {
         oldQA.description = description;
       }
-      if (req.body.hasOwnProperty("resourceCategories")) {
+      if (resourceCategories!== undefined) {
         oldQA.resourceCategories = resourceCategories;
       }
-      if (req.body.hasOwnProperty("hints")) {
+      if (hints!== undefined) {
         oldQA.hints = hints;
       }
-      if (req.body.hasOwnProperty("replied")) {
+      if (replied!== undefined) {
         oldQA.replied = replied;
       }
 
@@ -300,16 +396,36 @@ router.delete(
   async (req, res) => {
     try {
       const { question_id } = req.query;
-      console.log(question_id);
       if (!mongoose.Types.ObjectId.isValid(question_id)) {
         return res.status(400).json({ success: false, msg: "無效的問題ID" });
       }
 
+      // 刪除對應的圖片資料夾（包含所有子檔案與子資料夾）
       const questionFolder = getQuestionFolder(question_id);
       if (fs.existsSync(questionFolder)) {
         fs.rmSync(questionFolder, { recursive: true, force: true });
       }
 
+      // 找出所有關聯此問題的留言（pointTo 為該問題ID）
+      const comments = await QAmessage.find({ pointTo: question_id });
+      for (const comment of comments) {
+        // 若留言中有影片（videoURL 陣列不為空），則加入 Vimeo 刪除排程
+        if (
+          comment.videoURL &&
+          Array.isArray(comment.videoURL) &&
+          comment.videoURL.length > 0
+        ) {
+          const newSchedule = new vimeoSchedule({
+            method: "delete",
+            videoIndex: { commentID: comment._id },
+          });
+          await newSchedule.save();
+        }
+        // 刪除留言，留言內的圖片不需額外刪除（因為父資料夾已被移除）
+        await QAmessage.findByIdAndDelete(comment._id);
+      }
+
+      // 刪除問題資料
       await QA.findByIdAndDelete(question_id);
 
       return res.json({ success: true, msg: "問題刪除成功" });
@@ -322,97 +438,4 @@ router.delete(
   }
 );
 
-/* -------------------------------
-   GET: 取得問題資訊 (並修正圖片 URL)
-   將 DB 中存的相對路徑改成完整 URL，
-   例如：process.env.SERVER_IP/resource/questionIMG/【相對路徑】
----------------------------------*/
-router.get("/getQuestion", async (req, res) => {
-  try {
-    // 取得分頁與排序參數
-    const page = parseInt(req.query.page, 10) || 1;
-    const pageSize = parseInt(req.query.pageSize, 10) || 10;
-    const sortByParam = req.query.sortBy || "lastUpdate"; // 若為 "createDate"，以 date 排序
-    const sortOrder = req.query.sortOrder || "asc";
-    // 可選 "resourceCategories" 或 "hints"
-    const sortType = req.query.sortType || "resourceCategories";
-
-    // 決定排序欄位與排序方向
-    const sortField = sortByParam === "createDate" ? "date" : "lastUpdate";
-    const sortDirection = sortOrder === "asc" ? 1 : -1;
-
-    // 建立 aggregation pipeline
-    const pipeline = [
-      {
-        // 新增一個欄位 sortField，依據所選欄位
-        $addFields: {
-          sortField: `$${sortField}`,
-        },
-      },
-      {
-        // 針對 sortType 欄位 (陣列) 做展開，產生單筆文件，每筆文件會包含一個 tag 值
-        $unwind: `$${sortType}`,
-      },
-      {
-        // 依據 sortField 排序
-        $sort: { sortField: sortDirection },
-      },
-      {
-        // 依照展開後的 tag 分組，每組收集符合條件的 QA 文件
-        $group: {
-          _id: `$${sortType}`, // 分組依據的標籤
-          docs: { $push: "$$ROOT" },
-          representative: { $first: "$sortField" }, // 以第一筆作為代表排序值
-        },
-      },
-      {
-        // 每組僅取最多 3 筆 QA 文件
-        $addFields: {
-          docs: { $slice: ["$docs", 3] },
-        },
-      },
-      {
-        // 依據代表排序值，再次排序各組
-        $sort: { representative: sortDirection },
-      },
-      {
-        // 分頁處理：跳過前面 (page - 1)*pageSize 筆組，再取 pageSize 筆
-        $skip: (page - 1) * pageSize,
-      },
-      {
-        $limit: pageSize,
-      },
-    ];
-
-    // 執行聚合查詢
-    const groups = await QA.aggregate(pipeline);
-
-    // 處理每個 QA 文件的 image 欄位，補上 SERVER_IP 前綴
-    const transformedGroups = groups.map((group) => {
-      const tag = group._id;
-      const docs = group.docs.map((doc) => {
-        if (Array.isArray(doc.image)) {
-          doc.image = doc.image.map((relPath) => {
-            return `${process.env.SERVER_IP}/resource/questionIMG/${relPath}`;
-          });
-        }
-        return doc;
-      });
-      return { tag, docs };
-    });
-
-    return res.json({
-      success: true,
-      data: transformedGroups,
-      page, // 回傳目前頁碼
-      pageSize, // 回傳每頁分組數量
-      sortBy: sortByParam,
-      sortOrder,
-      sortType,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ success: false, msg: "取得資源時發生錯誤" });
-  }
-});
 module.exports = router;

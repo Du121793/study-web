@@ -28,9 +28,9 @@ export default function Course() {
   const token = useUserToken()
   const router = useRouter()
   const { courseName, courseId } = router.query
+  const course_id = useRef(null);
 
-  // 參數
-  let course_id = ''
+  // 請求參數
   const baseUrl = `${clientIp}/`
   const backToMyCoursePageUrl = `${clientIp}/profiles/Profile`
   const [isLogined, setLogined] = useState(false)
@@ -58,9 +58,9 @@ export default function Course() {
   // 透過query拿到的courseName來更改course_id的狀態
   useEffect(() => {
     if (courseName) {
-      course_id = courseId
+      course_id.current = courseId;
     }
-  }, [courseName])
+  }, [courseName, courseId]);
 
   return (
     <div className="course-main">

@@ -3,6 +3,7 @@
   flex-direction: column;
   width: 100%;
   .main-container {
+    background-color: #fff;
     display: flex;
     flex-direction: column;
     margin: 64px;
@@ -10,6 +11,20 @@
     border-radius: 12px;
     border: 1px solid rgba(0, 0, 0, 0.2);
     gap: 12px;
+    .message {
+      background-color: #e2e2e2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      overflow: hidden;
+      left: 50%;
+      transform: translate(-50%, 0);
+      transition: 0.2s;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 18px;
+    }
     .header {
       display: flex;
       align-items: center;
@@ -55,16 +70,20 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      border: 1px solid rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
       padding: 12px;
       gap: 12px;
+      background-color: rgba(208, 208, 208, 0.411);
       .name-area {
+        font-weight: bold;
         display: flex;
         align-items: center;
         gap: 4px;
         max-width: 242px;
       }
       .studen-area {
+        font-weight: bold;
         display: flex;
         align-items: center;
         max-width: 200px;
@@ -73,15 +92,16 @@
           cursor: pointer;
           transition: 0.2s;
           padding: 4px 6px;
-          border: 1px solid rgba(0, 0, 0, 0.4);
+          border: 2px solid rgba(0, 0, 0, 0.2);
           border-radius: 4px;
-          background-color: #fff;
+          background-color: #f8c39a;
         }
         .button:hover {
-          background-color: #eeeeee;
+          background-color: #e1b08a;
         }
       }
       .video-area {
+        font-weight: bold;
         display: flex;
         align-items: center;
         max-width: 200px;
@@ -90,12 +110,12 @@
           cursor: pointer;
           transition: 0.2s;
           padding: 4px 6px;
-          border: 1px solid rgba(0, 0, 0, 0.4);
+          border: 2px solid rgba(0, 0, 0, 0.2);
           border-radius: 4px;
-          background-color: #fff;
+          background-color: #f8c39a;
         }
         .button:hover {
-          background-color: #eeeeee;
+          background-color: #e1b08a;
         }
       }
       .dateSetting-area {
@@ -103,24 +123,148 @@
         align-items: center;
         gap: 4px;
         // max-width: 310px;
-        .video-record-date{
+        .video-record-date {
           width: 210px;
         }
       }
       .content {
+        font-weight: bold;
         font-size: 18px;
       }
-      .submit-btn{
+      .submit-btn {
         padding: 4px 6px;
         border-radius: 4px;
         border: 2px solid rgba(0, 0, 0, 0.2);
         background-color: #fff;
         transition: 0.2s;
         cursor: pointer;
+        background-color: #f8c39a;
       }
-      .submit-btn:hover{
-        
-        background-color: #e8e8e8;
+      .submit-btn:hover {
+        background-color: #e1b08a;
+      }
+    }
+    .access-info {
+      background: linear-gradient(60deg, #a7c4ec, #c1f8f6);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+      padding: 12px;
+      gap: 24px;
+      align-items: center;
+      .name-area {
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .date-area {
+        display: flex;
+        align-items: center;
+        font-weight: bold;
+        gap: 4px;
+      }
+      .checkbox {
+        margin-left: 4px;
+      }
+      .input-area {
+        width: 140px;
+      }
+      .student {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-weight: bold;
+      }
+      .video {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-weight: bold;
+      }
+      .list-btn {
+        font-weight: 500;
+        cursor: pointer;
+        border: 1px solid rgba(0, 0, 0, 0.4);
+        border-radius: 4px;
+        background-color: #f4f4f4;
+        padding: 4px;
+        transition: 0.2s;
+      }
+      .list-btn:hover {
+        background-color: #e7e7e7;
+      }
+      .date {
+        font-weight: bold;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        background-color: #fff;
+        padding: 4px 8px;
+      }
+      .image-area {
+        max-height: 32px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        .complate-btn{
+          cursor: pointer;
+          padding: 4px 6px;
+          border-radius: 4px;
+          border: 0.5px solid rgba(0, 0, 0, 0.4);
+          background-color: #c2f8b1;
+          transition: 0.2s;
+        }
+        .complate-btn:hover{
+          background-color: #aedf9f;
+        }
+        .image {
+          cursor: pointer;
+          border-radius: 64px;
+          transition: 0.2s;
+          padding: 4px;
+        }
+        .image:hover {
+          background-color: #ffffff;
+        }
+        .double-check-area {
+          display: flex;
+          overflow: hidden;
+          align-items: center;
+          gap: 4px;
+          transition: 0.2s;
+          .content {
+            font-weight: bold;
+            padding: 4px 6px;
+            border-radius: 4px;
+            border: 0.5px solid rgba(0, 0, 0, 0.4);
+            background-color: #fff;
+          }
+          .confirm-btn {
+            cursor: pointer;
+            font-weight: bold;
+            padding: 4px 6px;
+            border-radius: 4px;
+            border: 0.5px solid rgba(0, 0, 0, 0.4);
+            background-color: #c2f8b1;
+            transition: 0.2s;
+          }
+          .confirm-btn:hover {
+            background-color: #b3e6a4;
+          }
+          .cancel-btn {
+            cursor: pointer;
+            font-weight: bold;
+            padding: 4px 6px;
+            border-radius: 4px;
+            border: 0.5px solid rgba(0, 0, 0, 0.4);
+            background-color: #f59f9f;
+            transition: 0.2s;
+          }
+          .cancel-btn:hover {
+            background-color: #e49393;
+          }
+        }
       }
     }
   }

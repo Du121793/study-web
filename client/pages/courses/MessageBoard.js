@@ -74,7 +74,7 @@ export default function MessageBoard({ qa_id, submitSuccess, setSubmitSuccess })
         </div>
         <div className="upload-video-btn-area">
           可傳送多張圖片
-          {files.map((index) => (
+          {files.map((item, index) => (
             <input
               key={index}
               type="file"

@@ -11,16 +11,40 @@ export default function PreRegister() {
   // 選擇身分組
   const [chooseRole, setChooseRole] = useState('')
   // 選擇年級
-  const [chooseGrade, setChooseGrade] = useState('')
+  const [chooseGrade, setChooseGrade] = useState('111')
   // 選擇課程
-  const [chooseCourse, setChooseCourse] = useState('')
+  const [chooseCourses, setChooseCourses] = useState([])
+  const [chooseCoursesName, setChooseCoursesName] = useState([])
   // 使用 state 儲存所有使用者輸入的行資料
   const [inputRows, setInputRows] = useState([{ name: '', grade: '', phone: '' }])
   // 存儲user_id
   const [user_id, setUser_id] = useState([])
+  // 控制訊息
+  const [message, setMessage] = useState('無訊息')
+  const [messageStatus, setMessageStatus] = useState(false)
+  const [messageColor, setMessageColor] = useState('')
+
   // 儲存最後要提交的使用者資料
   let users = []
   let Busers = []
+
+  // 控制訊息
+  const messageControl = (info, isSuccess) => {
+    setMessage(info)
+    setMessageStatus(true)
+    if (isSuccess) {
+      setMessageColor('rgba(195, 240, 178, 0.8)')
+    } else {
+      setMessageColor('rgba(240, 178, 178, 0.8)')
+    }
+    setTimeout(() => {
+      setMessageStatus(false)
+      setTimeout(() => {
+        setMessage('無訊息')
+        setMessageColor('')
+      }, 200)
+    }, 2000)
+  }
 
   // 處理各欄位輸入
   const handleInputChange = (index, field, value) => {
@@ -34,11 +58,39 @@ export default function PreRegister() {
     }
   }
 
+  // 將新的成員註冊到所選課程內
+  const registerCourseToNewMember = useCallback(
+    (members_id, hasAlreadyRegister) => {
+      // 註冊課程請求
+      if (members_id.length > 0 && chooseCourses.length > 0) {
+        let data = {
+          user_ids: members_id,
+          course_ids: chooseCourses,
+        }
+        adminService.registerMember(token, data).then((res) => {
+          if (!hasAlreadyRegister) {
+            if (res.success) {
+              messageControl('註冊成功', true)
+            } else {
+              messageControl(`發生錯誤`, false)
+              console.error(res)
+            }
+          }
+        })
+      }
+    },
+    [token, chooseCourses]
+  )
+
   // 提交按鈕
   const submitBtnClick = () => {
     // 檢查是否選擇身分組
     if (!chooseRole) {
-      alert('請先選擇身分組')
+      messageControl(`請選擇身分組`, false)
+      return
+    }
+    if (!inputRows) {
+      messageControl(`請輸入預註冊學生資訊`, false)
       return
     }
 
@@ -48,11 +100,15 @@ export default function PreRegister() {
       .map((row) => ({
         realname: row.name.trim(),
         phoneNumber: row.phone.trim(),
+        // 這兩個值是在過濾後才加進userArray
         grade: chooseGrade,
         role: chooseRole,
       }))
-
-    // 檢查重複
+    if (userArray.length === 0) {
+      messageControl('請輸入欲註冊學生的資訊', false)
+      return
+    }
+    // 用some檢查物件內是否有重複資料
     const duplicateFound = userArray.some((newUser) => users.some((existingUser) => existingUser.realname === newUser.realname && existingUser.phoneNumber === newUser.phoneNumber && existingUser.role === newUser.role))
     if (duplicateFound) {
       alert('警告：已有相同的使用者資料')
@@ -61,8 +117,6 @@ export default function PreRegister() {
 
     // 將新資料加入 users 陣列
     userArray.forEach((user) => users.push(user))
-    console.log('收集到的資料：', userArray)
-    console.log('目前的所有資料：', users)
 
     // 組裝要送出的資料格式
     userArray.forEach((item) => {
@@ -83,28 +137,50 @@ export default function PreRegister() {
     })
 
     // 預註冊請求
-    adminService.preRegisterUser(token, Busers).then((res) => {
-      console.log(res)
-      setUser_id(res.successStudentId)
-    })
+    adminService
+      .preRegisterUser(token, Busers)
+      .then((res) => {
+        console.log(res)
+        // 如果有成員是被註冊過的
+        if (res.data.successMsg.alreadyRegistered !== '') {
+          let content = res.data.successMsg.alreadyRegistered
+          messageControl(`新增成員成功，${content}`, true)
+          return res
+        } else if (res.data.successMsg.successStudentId.length > 0 && chooseCourses.length === 0) {
+          messageControl('新增成員成功', true)
+          return res
+        }
+        return res
+      })
+      .then((res) => {
+        if (chooseCourses.length > 0 && res.data.successMsg.alreadyRegistered !== '') {
+          registerCourseToNewMember(res.data.successMsg.successStudentId, res.data.successMsg.alreadyRegistered)
+        } else {
+          registerCourseToNewMember(res.data.successMsg.successStudentId)
+        }
+      })
     // 重置 state，用於清空欄位
     setInputRows([{ name: '', phone: '' }])
     setChooseRole('')
   }
 
-  // 將新的成員註冊到所選課程內
-  const registerCourseToNewMember = useCallback(() => {
-    // 註冊課程請求
-    if (chooseCourse) {
-      adminService.registerMember(token, { user_ids: user_id, course_id: chooseCourse }).then((res) => {
-        console.log('registerMember結果', res)
-      })
-    }
-  }, [token, chooseCourse, user_id])
-
   // 切換身分組時更改State，用於控制年級選擇是否顯示
   const switchRoleOption = (value) => {
     setChooseRole(value)
+  }
+
+  // 移除選擇的課程
+  const removeChoseCourse = (index) => {
+    setChooseCourses(
+      chooseCourses.filter((item) => {
+        return item !== chooseCourses[index]
+      })
+    )
+    setChooseCoursesName(
+      chooseCoursesName.filter((item) => {
+        return item !== chooseCoursesName[index]
+      })
+    )
   }
 
   // 獲取課程給select
@@ -115,19 +191,38 @@ export default function PreRegister() {
           setGetCourses(res.data.courses)
         })
       } catch (e) {
-        console.log(e)
+        console.error(e)
       }
     }
   }, [token])
 
-  useEffect(() => {
-    registerCourseToNewMember()
-  }, [user_id, registerCourseToNewMember])
-
   return (
     <div className="preRegister-main">
+      {/* message */}
+      <div
+        style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
+        className="message">
+        {message}
+      </div>
       <div className="header">
         <div className="title">預註冊系統</div>
+      </div>
+      <div className="chose-courses-card-area">
+        {chooseCoursesName.length > 0 &&
+          chooseCoursesName.map((item, index) => (
+            <div
+              key={index}
+              className="course-card">
+              {item}
+              <div
+                className="delete-btn"
+                onClick={() => {
+                  removeChoseCourse(index)
+                }}>
+                X
+              </div>
+            </div>
+          ))}
       </div>
       <div className="form">
         <div className="form-line">
@@ -151,7 +246,6 @@ export default function PreRegister() {
                   <div className="form-title">年級</div>
                   <select
                     onChange={(e) => {
-                      console.log(e.target.value)
                       setChooseGrade(e.target.value)
                     }}>
                     <option value="111">111</option>
@@ -165,14 +259,34 @@ export default function PreRegister() {
               <select
                 className="chose-course"
                 onChange={(e) => {
-                  setChooseCourse(e.target.value)
+                  if (e.target.value === '') return
+                  if (
+                    chooseCourses.find((item) => {
+                      return item === e.target.value.split(',')[0]
+                    })
+                  ) {
+                    // 檢查是否已有存course_id
+                    return
+                  } else {
+                    setChooseCourses([...chooseCourses, e.target.value.split(',')[0]])
+                  }
+                  // 檢查是否已有存course_name
+                  if (
+                    chooseCoursesName.find((item) => {
+                      return item === e.target.value.split(',')[1]
+                    })
+                  ) {
+                    return
+                  } else {
+                    setChooseCoursesName([...chooseCoursesName, e.target.value.split(',')[1]])
+                  }
                 }}>
                 <option value="">請選擇</option>
                 {getCourses &&
                   getCourses.map((item, index) => (
                     <option
                       key={index}
-                      value={item._id}>
+                      value={[item._id, item.courseName]}>
                       {item.courseName}
                     </option>
                   ))}

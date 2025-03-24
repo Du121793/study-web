@@ -6,11 +6,11 @@
   background-color: #fefefe; // 淡色背景
   padding: 24px;
   gap: 8px;
-  .container-line{
+  .container-line {
     display: flex;
     align-items: center;
     gap: 4px;
-    .member-id-input{
+    .member-id-input {
       width: 240px;
     }
   }
@@ -28,6 +28,9 @@
       align-items: center;
       gap: 4px;
       .name-input {
+        width: 100px;
+      }
+      .grade-input {
         width: 100px;
       }
     }
@@ -57,16 +60,22 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    width: 80%;
     .container {
       cursor: pointer;
       display: flex;
       align-items: center;
       border-radius: 4px;
       padding: 4px 0 4px 0;
+      gap: 12px;
       .username {
         pointer-events: none;
         width: 80px;
         margin-left: 6px;
+      }
+      .grade {
+        pointer-events: none;
+        width: 70px;
       }
       .realname {
         pointer-events: none;
@@ -78,7 +87,9 @@
       }
       .userid {
         pointer-events: none;
-        width: 240px;
+        width: 30%;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .role {
         pointer-events: none;
@@ -90,14 +101,20 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    width: 80%;
     .container {
       display: flex;
       align-items: center;
       border-radius: 4px;
       padding: 4px 0 4px 0;
+      gap: 12px;
       .username {
         width: 80px;
         margin-left: 6px;
+      }
+      .grade {
+        pointer-events: none;
+        width: 70px;
       }
       .realname {
         width: 70px;
@@ -106,7 +123,7 @@
         width: 140px;
       }
       .userid {
-        width: 240px;
+        width: 30%;
       }
       .role {
         width: 70px;

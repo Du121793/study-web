@@ -2,25 +2,15 @@
 import React, { useState, useEffect } from 'react'
 // TSU
 import { Upload } from 'tus-js-client'
-import videoUploader from '../../method/videoUploader'
 // method
+import videoUploader from '../../method/videoUploader'
 import { useUserToken } from '../../method/useUserToken'
+import userService from '../../method/userService'
 
-export default function UploadVideoFc({ isShowVideoUpload, setIsShowVideoUpload, course_id, setUploadSuccess, uploadSuccess, uploadError, setUploadError }) {
+export default function UploadVideoFc({ messageControl, getCourseVideos, isShowVideoUpload, setIsShowVideoUpload, course_id, setUploadSuccess, uploadSuccess, uploadError, setUploadError }) {
   const token = useUserToken()
   const [videoFiles, setVideoFiles] = useState([])
   const [isPublic, setIsPublic] = useState(false)
-
-  // 每個 uploads item:
-  // {
-  //   id: string,
-  //   fileName: string,
-  //   progress: number,
-  //   message: '等待上傳' | '上傳中' | '上傳失敗' | '建立連結失敗' | '已暫停' | ...,
-  //   tusInstance: object | null,
-  //   videoId: string,
-  // }
-
   const [uploads, setUploads] = useState([])
 
   // ★ 第一次載入：從 localStorage 讀取先前的上傳狀態
@@ -37,7 +27,8 @@ export default function UploadVideoFc({ isShowVideoUpload, setIsShowVideoUpload,
   // 單檔顯示用
   const [videoFile, setVideoFile] = useState(null)
   const [thumbFile, setThumbFile] = useState(null)
-  const [thumbnailBase64, setThumbnailBase64] = useState('')
+  // 不再使用 base64，故移除 thumbnailBase64
+  // const [thumbnailBase64, setThumbnailBase64] = useState('')
   const [recordDate, setRecordDate] = useState(null)
 
   const [title, setTitle] = useState('此處輸入影片標題')
@@ -67,20 +58,15 @@ export default function UploadVideoFc({ isShowVideoUpload, setIsShowVideoUpload,
     videoEl.src = fileURL
   }
 
-  // STEP 2: 若用戶有選擇自訂縮圖
-  const handleThumbSelect = async (e) => {
+  // STEP 2: 若用戶有選擇自訂縮圖（改為直接存檔案或 Blob）
+  const handleThumbSelect = (e) => {
     const file = e.target.files?.[0]
     if (!file) return
     setThumbFile(file)
-
-    const reader = new FileReader()
-    reader.onload = (ev) => {
-      setThumbnailBase64(ev.target.result)
-    }
-    reader.readAsDataURL(file)
+    // 不再用 base64 讀檔
   }
 
-  // (可選) 從影片自動擷取指定時間的畫面 (預設第1秒)
+  // (可選) 從影片自動擷取指定時間的畫面 (預設第1秒) → 回傳 Blob
   const autoExtractFrame = (file, captureTimeSec = 1) => {
     return new Promise((resolve) => {
       const fileURL = URL.createObjectURL(file)
@@ -89,6 +75,7 @@ export default function UploadVideoFc({ isShowVideoUpload, setIsShowVideoUpload,
       video.src = fileURL
 
       video.addEventListener('loadedmetadata', () => {
+        // 確保擷取時間不要超過影片長度
         video.currentTime = Math.min(video.duration, captureTimeSec)
       })
 
@@ -99,20 +86,23 @@ export default function UploadVideoFc({ isShowVideoUpload, setIsShowVideoUpload,
           canvas.height = video.videoHeight
           const ctx = canvas.getContext('2d')
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
-          const base64 = canvas.toDataURL('image/png')
-          URL.revokeObjectURL(fileURL)
-          resolve(base64)
+
+          // 不再用 toDataURL，而是用 toBlob 取得 Blob
+          canvas.toBlob((blob) => {
+            URL.revokeObjectURL(fileURL)
+            resolve(blob) // 回傳 Blob
+          }, 'image/png')
         } catch (err) {
           console.error(err)
           URL.revokeObjectURL(fileURL)
-          resolve('')
+          resolve(null)
         }
       })
 
       video.addEventListener('error', (err) => {
         console.error('video load error: ', err)
         URL.revokeObjectURL(fileURL)
-        resolve('')
+        resolve(null)
       })
     })
   }
@@ -146,10 +136,10 @@ export default function UploadVideoFc({ isShowVideoUpload, setIsShowVideoUpload,
       return
     }
 
-    // 若沒選縮圖，則自動擷取第一秒畫面
-    let finalThumbnail = thumbnailBase64
-    if (!finalThumbnail && videoFiles.length > 0) {
-      finalThumbnail = await autoExtractFrame(videoFiles[0])
+    // ★ 若沒有手動選縮圖，就自動擷取影片第一秒
+    let finalThumbnailBlob = thumbFile
+    if (!finalThumbnailBlob && videoFiles.length > 0) {
+      finalThumbnailBlob = await autoExtractFrame(videoFiles[0]) // 回傳 Blob
     }
 
     // 逐一為每部影片建立上傳任務
@@ -169,19 +159,24 @@ export default function UploadVideoFc({ isShowVideoUpload, setIsShowVideoUpload,
         },
       ])
 
-      const reqBody = {
-        title,
-        description,
-        fileSize: file.size,
-        length: duration,
-        thumbnail: finalThumbnail,
-        recordDate,
-        type,
-        isPrivate: isPublic ? true : false,
-      }
-
       try {
-        const data = await videoUploader.requestUploadLink(token, course_id, reqBody)
+        // 若後端支援 multipart/form-data，這裡直接做一個 FormData 帶參數和封面檔案。
+        const formData = new FormData()
+        formData.append('title', title)
+        formData.append('description', description)
+        formData.append('fileSize', file.size)
+        formData.append('length', duration)
+        formData.append('recordDate', recordDate || '')
+        formData.append('type', type)
+        formData.append('isPrivate', isPublic ? 'true' : 'false')
+
+        // 如果有縮圖，就帶上去。finalThumbnailBlob 可能是 Blob 或 File
+        if (finalThumbnailBlob) {
+          formData.append('thumbnail', finalThumbnailBlob)
+        }
+        // 送到後端，讓後端建立 TUS 上傳連結（假設後端可以處理 FormData）
+        const data = await videoUploader.requestUploadLink(token, course_id, formData)
+
         if (!data.success) {
           throw new Error(data.message || '後端建立上傳連結失敗')
         }
@@ -220,7 +215,7 @@ export default function UploadVideoFc({ isShowVideoUpload, setIsShowVideoUpload,
 
       // 上傳失敗
       onError: async (error) => {
-        console.error('TUS 上傳失敗:', error)
+        messageControl(`上傳失敗:${error}`, false)
         setUploads((prev) => prev.map((u) => (u.id === uploadId ? { ...u, message: '上傳失敗', progress: 0 } : u)))
         if (vidId && course_id) {
           try {
@@ -239,15 +234,13 @@ export default function UploadVideoFc({ isShowVideoUpload, setIsShowVideoUpload,
 
       // 上傳完成
       onSuccess: () => {
-        console.log('TUS 上傳成功')
-        ;(async () => {
-          const res = await videoUploader.returnUploadStatus(token, course_id, vidId, true)
-          console.log('後端返回訊息:', res)
-        })()
-
-        // 上傳完就從進度列表中移除
-        setUploads((prev) => prev.filter((u) => u.id !== uploadId))
-        setUploadSuccess(!uploadSuccess)
+        videoUploader.returnUploadStatus(token, course_id, vidId, true).then((res) => {
+          getCourseVideos(false)
+          messageControl('上傳完成', true)
+          // 上傳完就從進度列表中移除
+          setUploads((prev) => prev.filter((u) => u.id !== uploadId))
+          setUploadSuccess(!uploadSuccess)
+        })
       },
     })
 
@@ -273,7 +266,6 @@ export default function UploadVideoFc({ isShowVideoUpload, setIsShowVideoUpload,
             u.tusInstance.abort()
             return { ...u, message: '已暫停' }
           } else {
-            // tusInstance 已失效，無法暫停
             console.log('無有效的 tusInstance，無法暫停。')
           }
         }
@@ -452,7 +444,7 @@ export default function UploadVideoFc({ isShowVideoUpload, setIsShowVideoUpload,
         </div>
 
         <div className="public-setting">
-          <div className="content">是否為公開此影片:</div>
+          <div className="content">是否公開此影片:</div>
           <div className="confirm">
             <label>是</label>
             <input

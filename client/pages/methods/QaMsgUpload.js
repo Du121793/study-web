@@ -24,12 +24,9 @@ export default function QAMsgUpload({
   // ★ 將多張圖片依序 append，key 皆為 "image" ★
   if (images && images.length > 0) {
     images.forEach((imgFile) => {
-      console.log(imgFile)
       formData.append('image', imgFile)
     })
   }
-
-  // console.log(formData.get('content'))
 
   /* 控制上傳狀態 */
   const [uploads, setUploads] = useState([])
@@ -49,17 +46,19 @@ export default function QAMsgUpload({
     try {
       // (1) 送出留言並取得 uploadLink、commentID
       const res = await userService.submitQaMessage(token, question_id, formData)
+
       console.log(res)
+
       if (res.success === true && Object.keys(res.data.uploadLink).length === 0) {
         console.log('設定submitSuccess')
         setSubmitSuccess(!submitSuccess)
       }
-
-      // 檢查是否有上傳影片，與是否正常上傳留言
-      const { uploadLink, commentID } = res.data
-
-      setUploadLink(uploadLink)
-      setCommentID(commentID)
+      if (res) {
+        // 檢查是否有上傳影片，與是否正常上傳留言
+        const { uploadLink, commentID } = res.data
+        setUploadLink(uploadLink)
+        setCommentID(commentID)
+      }
 
       // (2) 若沒有要上傳影片，就結束
       if (!file) {

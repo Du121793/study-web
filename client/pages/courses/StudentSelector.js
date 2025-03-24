@@ -48,9 +48,7 @@ export default function StudentSelector({ course_id, selectedStudent, setSelecte
   useEffect(() => {
     console.log(selectedStudent)
   }, [selectedStudent])
-  const test = () => {
-    console.log(userInfo)
-  }
+
   return (
     <div className="student-selector-main">
       <div className="student-selector-container">

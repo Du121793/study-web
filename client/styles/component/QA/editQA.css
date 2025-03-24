@@ -1,0 +1,181 @@
+.edit-QA-main {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 9;
+}
+.edit-QA-main .form-area {
+  max-width: 80%;
+  max-height: 90%;
+  overflow-y: scroll;
+  padding: 24px 64px;
+  background-color: #fff;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.edit-QA-main .form-area .add-icon {
+  cursor: pointer;
+  padding: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  color: rgba(0, 0, 0, 0.6);
+  transition: 0.2s;
+}
+.edit-QA-main .form-area .add-icon:hover {
+  background-color: #ececec;
+}
+.edit-QA-main .form-area .title {
+  font-size: 24px;
+  font-weight: bold;
+}
+.edit-QA-main .form-area .theme-area {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.edit-QA-main .form-area .themes {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  padding: 8px;
+  min-width: 80%;
+}
+.edit-QA-main .form-area .themes .theme {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}
+.edit-QA-main .form-area .hints-area {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.edit-QA-main .form-area .hints {
+  display: flex;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  padding: 8px;
+  gap: 8px;
+  min-width: 80%;
+  flex-wrap: wrap;
+}
+.edit-QA-main .form-area .hints .hint {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}
+.edit-QA-main .form-area .image-area {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+.edit-QA-main .form-area .image-area .image-container {
+  position: relative;
+  overflow: hidden;
+}
+.edit-QA-main .form-area .image-area .image-container .image {
+  border-radius: 8px;
+}
+.edit-QA-main .form-area .image-area .image-container .content {
+  font-weight: bold;
+  color: rgb(172, 3, 3);
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  cursor: pointer;
+  background-color: rgba(234, 234, 234, 0.5450980392);
+  border-bottom-left-radius: 8px;
+  border-top-right-radius: 8px;
+  width: 48px;
+  height: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  transition: 0.2s;
+  top: 0;
+  right: 0;
+}
+.edit-QA-main .form-area .image-area .image-container .content:hover {
+  background-color: rgba(212, 212, 212, 0.5450980392);
+}
+.edit-QA-main .form-area .image-area .image-container .active {
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+  background-color: rgba(212, 212, 212, 0.5450980392);
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+.edit-QA-main .form-area .description-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 4px;
+}
+.edit-QA-main .form-area .description-area .content {
+  width: 102%;
+}
+.edit-QA-main .form-area .description-area .description-input {
+  outline: none;
+  resize: none;
+  padding: 6px;
+  width: 100%;
+  height: 120px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+.edit-QA-main .form-area .react-quill {
+  width: 100%;
+}
+.edit-QA-main .form-area .react-quill .ql-editor {
+  min-height: 120px;
+}
+.edit-QA-main .form-area .btns-area {
+  display: flex;
+  gap: 12px;
+}
+.edit-QA-main .form-area .btns-area button {
+  cursor: pointer;
+  padding: 4px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  background-color: #fff;
+  border-radius: 4px;
+  transition: 0.2s;
+}
+.edit-QA-main .form-area .btns-area .submit:hover {
+  background-color: #c6ffc0;
+}
+.edit-QA-main .form-area .btns-area .cancel:hover {
+  background-color: #febebe;
+}/*# sourceMappingURL=editQA.css.map */

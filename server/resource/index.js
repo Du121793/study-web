@@ -37,10 +37,26 @@ router.use(
   }
 );
 
+router.use(
+  "/videoIMG/:courseId",
+  // [tokenCheckFromQuery,accessChecker.course],
+  (req, res, next) => {
+    const folderPath = path.join(__dirname, "videoIMG", req.params.courseId);
+    express.static(folderPath)(req, res, next);
+  }
+);
+
 router.use("/questionIMG", (req, res) => {
   return res.status(403).json({
     success: false,
     msg: "不允許直接存取 questionIMG 資料夾",
+  });
+});
+
+router.use("/videoIMG", (req, res) => {
+  return res.status(403).json({
+    success: false,
+    msg: "不允許直接存取 videoIMG 資料夾",
   });
 });
 

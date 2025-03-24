@@ -34,10 +34,11 @@ const videoUploader = {
     isPrivate = false,
   }
   */
-  async requestUploadLink(token, course_id, videoInfo) {
+  async requestUploadLink(token, course_id, formData) {
     try {
-      const authHeader = token ? { 'Content-Type': 'application/json', Authorization: token } : {}
-      const response = await axios.post(COURSE_URL + `/${course_id}/uploadVideo`, videoInfo, {
+      console.log(formData.get('thumbnail'))
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.post(COURSE_URL + `/${course_id}/uploadVideo`, formData, {
         headers: authHeader,
       })
       return response.data.data

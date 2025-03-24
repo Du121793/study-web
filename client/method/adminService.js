@@ -26,12 +26,13 @@ const adminService = {
   },
 
   // 註冊該課程給成員
-  async registerMember(token, registerInfo) {
-    // console.log(registerInfo)
+  // let { user_ids, course_ids } = req.body;
+  async registerMember(token, data) {
+    console.log(data)
     // registeInfo 內存放 學生id陣列與課程id { user_ids, course_id }
     const authHeader = token ? { Authorization: token } : {}
     try {
-      const response = await axios.post(COURSE_URL + '/register', registerInfo, {
+      const response = await axios.post(COURSE_URL + '/register', data, {
         headers: authHeader,
       })
       return response.data
@@ -127,13 +128,14 @@ const adminService = {
 
   // 預註冊
   async preRegisterUser(token, users) {
-    // users 是一個陣列 裝著物件 [{{userinfo} , role},...]
     console.log(users)
+    // users 是一個陣列 裝著物件 [{{userinfo} , role},...]
     const authHeader = token ? { Authorization: token } : {}
     try {
       const response = await axios.post(USER_URL + '/preRegisterUser', users, {
         headers: authHeader,
       })
+      console.log(response)
       return response.data
     } catch (e) {
       return e
@@ -212,7 +214,6 @@ const adminService = {
     try {
       const authHeader = token ? { Authorization: token } : {}
       const payload = { pageSize }
-      console.log(INDEX_URL + `/getPublicQAs`)
       const response = await axios.get(INDEX_URL + `/getPublicQAs`, {
         headers: authHeader,
         params: payload,
@@ -239,17 +240,112 @@ const adminService = {
     }
   },
 
+  // 新增權杖
   // { accessName, videoIDs, studentIDs, accessDate, unlimited }
   async addNewVideoAccess(token, course_id, data) {
     try {
+      console.log(data)
       const authHeader = token ? { Authorization: token } : {}
-      console.log(BASE_COURSE_URL + `/${course_id}/videoAccess/postNewAccess`)
       const response = await axios.post(BASE_COURSE_URL + `/${course_id}/videoAccess/postNewAccess`, data, {
         headers: authHeader,
       })
       return response.data
     } catch (err) {
       console.error(err.response.data)
+    }
+  },
+
+  // 獲取所有權杖
+  async getAccessAllInfo(token, course_id, choseAccessId) {
+    try {
+      const data = {
+        access_id: choseAccessId || undefined,
+      }
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.get(BASE_COURSE_URL + `/${course_id}/videoAccess`, {
+        headers: authHeader,
+        params: data,
+      })
+      return response.data
+    } catch (err) {
+      console.error(err.response.data)
+    }
+  },
+
+  // 編輯權杖
+  // Body 參數: { accessName, videoIDs, studentIDs, accessDate, unlimited }
+  async editAccessInfo(token, course_id, choseAccessId, data) {
+    try {
+      console.log(data)
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.patch(BASE_COURSE_URL + `/${course_id}/videoAccess/patchAccess/${choseAccessId}`, data, {
+        headers: authHeader,
+      })
+      return response.data
+    } catch (err) {
+      console.error(err.response.data)
+    }
+  },
+
+  // 刪除權杖
+  async deleteAccess(token, course_id, choseAccessId) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.delete(BASE_COURSE_URL + `/${course_id}/videoAccess/deleteAccess/${choseAccessId}`, {
+        headers: authHeader,
+      })
+      return response.data
+    } catch (err) {
+      console.error(err)
+    }
+  },
+
+  // 編輯影片
+  /* 
+  data={
+    videoID = videoID
+    thumbnail = null
+    title = ''
+    description = null
+    isPrivate = true || false
+  }
+ */
+  async editVideoInfo(token, courseID, data) {
+    try {
+      // 設定 Authorization 標頭，若 token 存在則加入
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.patch(BASE_COURSE_URL + `/${courseID}/patchVideo`, data, {
+        headers: authHeader,
+      })
+      return response.data
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  // 編輯QA
+  /* 
+  data =  {
+        question_id,
+        course_ids,
+        isPublic,
+        description,
+        resourceCategories,
+        hints,
+        rmIMG,
+        replied,
+      } = req.body;
+  */
+  async editQAInfo(token, data, courseID) {
+    try {
+      // 設定 Authorization 標頭，若 token 存在則加入
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.patch(QA_URL + `/patchQuestion`, data, {
+        headers: authHeader,
+      })
+      return response.data
+    } catch (error) {
+      console.error(error)
     }
   },
 }

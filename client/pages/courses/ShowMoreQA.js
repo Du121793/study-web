@@ -59,7 +59,12 @@ export default function ShowMoreQA({ courseName, showMoreQA, setShowMoreQA, toke
     }
   }, [page_body])
 
-  const test = () => {}
+  const test = () => {
+    qaInfo.map((item) => {
+      console.log(`${image_base_url}${item.image}?token=${token.split(' ')[1]}`)
+    })
+  }
+
   return (
     <div
       className="show-more-qa-main"
@@ -136,11 +141,12 @@ export default function ShowMoreQA({ courseName, showMoreQA, setShowMoreQA, toke
                   {item.image.map((url, index) => (
                     <Image
                       key={index}
-                      src={`${image_base_url}${url}`}
+                      src={`${image_base_url}${url}?token=${token.split(' ')[1]}`}
                       className="image"
                       alt="qa image"
                       width={200}
-                      height={200}></Image>
+                      height={200}
+                      style={{ width: 'auto' }}></Image>
                   ))}
                 </div>
                 <div className="content-area">

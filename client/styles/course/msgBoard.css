@@ -6,6 +6,12 @@
   border: 1px solid #ccc;
   gap: 12px;
   margin-bottom: 24px;
+  transition: 0.2s;
+}
+@media screen and (max-width: 1000px) {
+  .msg-board {
+    width: 90%;
+  }
 }
 @media (max-width: 576px) {
   .msg-board {
@@ -15,9 +21,15 @@
 .msg-board .text-area {
   resize: none;
   outline: none;
-  flex: 1;
+  width: 90%;
   border: 1px solid #ccc;
   padding: 8px;
+  transition: 0.2s;
+}
+@media (max-width: 576px) {
+  .msg-board .text-area {
+    height: 320px;
+  }
 }
 .msg-board .upload-video-btn-area {
   display: flex;

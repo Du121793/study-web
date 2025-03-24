@@ -33,6 +33,9 @@
 .remove-users-page .remove-user-header div .name-input {
   width: 100px;
 }
+.remove-users-page .remove-user-header div .grade-input {
+  width: 100px;
+}
 .remove-users-page .header-btns {
   display: flex;
   align-items: center;
@@ -58,6 +61,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 80%;
 }
 .remove-users-page .user-list .container {
   cursor: pointer;
@@ -65,11 +69,16 @@
   align-items: center;
   border-radius: 4px;
   padding: 4px 0 4px 0;
+  gap: 12px;
 }
 .remove-users-page .user-list .container .username {
   pointer-events: none;
   width: 80px;
   margin-left: 6px;
+}
+.remove-users-page .user-list .container .grade {
+  pointer-events: none;
+  width: 70px;
 }
 .remove-users-page .user-list .container .realname {
   pointer-events: none;
@@ -81,7 +90,9 @@
 }
 .remove-users-page .user-list .container .userid {
   pointer-events: none;
-  width: 240px;
+  width: 30%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .remove-users-page .user-list .container .role {
   pointer-events: none;
@@ -91,16 +102,22 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 80%;
 }
 .remove-users-page .user-list-title .container {
   display: flex;
   align-items: center;
   border-radius: 4px;
   padding: 4px 0 4px 0;
+  gap: 12px;
 }
 .remove-users-page .user-list-title .container .username {
   width: 80px;
   margin-left: 6px;
+}
+.remove-users-page .user-list-title .container .grade {
+  pointer-events: none;
+  width: 70px;
 }
 .remove-users-page .user-list-title .container .realname {
   width: 70px;
@@ -109,7 +126,7 @@
   width: 140px;
 }
 .remove-users-page .user-list-title .container .userid {
-  width: 240px;
+  width: 30%;
 }
 .remove-users-page .user-list-title .container .role {
   width: 70px;

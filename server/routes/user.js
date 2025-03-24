@@ -284,30 +284,32 @@ router.post("/preRegisterUser", checkAdminAccess, async (req, res) => {
       }
     }
 
-    // 組合回應訊息
-    let responseMessage = `成功預註冊 ${successCount} 位使用者\n`;
-
-    if (alreadyRegisteredUsers.length > 0) {
-      responseMessage += `以下使用者已經註冊過：${alreadyRegisteredUsers.join(
-        ", "
-      )}。\n`;
+    // 組合全域訊息：若所有使用者皆成功則顯示「全部」，否則顯示成功筆數
+    let globalMsg = "";
+    if (successCount === users.length) {
+      globalMsg = "成功預註冊全部使用者";
+    } else {
+      globalMsg = `成功預註冊 ${successCount} 位使用者`;
     }
 
-    if (invalidUsers.length > 0) {
-      responseMessage += `以下使用者資訊提供不完整：${invalidUsers.join(
-        ", "
-      )}。\n`;
-    }
-
-    if (serverSavedErrorUsers.length > 0) {
-      responseMessage += `以下使用者由於伺服器錯誤註冊失敗：${serverSavedErrorUsers.join(
-        ", "
-      )}。\n`;
-    }
+    // 組成詳細訊息物件
+    const detailedMsg = {
+      preRegisterSuccess: globalMsg,
+      alreadyRegistered: alreadyRegisteredUsers.length > 0
+        ? `以下使用者已經註冊過：${alreadyRegisteredUsers.join(", ")}。`
+        : "",
+      invalidUsers: invalidUsers.length > 0
+        ? `以下使用者資訊提供不完整：${invalidUsers.join(", ")}。`
+        : "",
+      serverError: serverSavedErrorUsers.length > 0
+        ? `以下使用者由於伺服器錯誤註冊失敗：${serverSavedErrorUsers.join(", ")}。`
+        : "",
+      successStudentId, // 將成功預註冊的使用者 id 一併回傳
+    };
 
     return res
       .status(200)
-      .json({ success: true, msg: responseMessage, successStudentId });
+      .json({ success: true, msg: globalMsg, data: { successMsg: detailedMsg } });
   } catch (error) {
     return res.status(500).json({
       success: false,

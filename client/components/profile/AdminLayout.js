@@ -47,7 +47,7 @@ export default function AdminLayout() {
     MyCourse: {
       index: {
         component: <MyCourse />,
-        className: 'my-course-container',
+        className: 'right-item',
       },
       className: '',
     },
@@ -76,7 +76,7 @@ export default function AdminLayout() {
     UserProfile: {
       index: {
         component: <UserProfile />,
-        className: 'user-profile-main',
+        className: 'right-item',
       },
       className: '',
     },

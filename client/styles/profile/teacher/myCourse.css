@@ -1,12 +1,9 @@
-.Layout-main .Layout-container .my-course-container {
-  width: 100%;
+.Layout-main .Layout-container {
   position: relative;
   justify-content: center;
   display: flex;
-  z-index: 9;
 }
-.Layout-main .Layout-container .my-course-container .myCourse-main {
-  width: 90%;
+.Layout-main .Layout-container .myCourse-main {
   z-index: 999;
   gap: 12px;
   z-index: 99;
@@ -17,24 +14,24 @@
   border-radius: 8px;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
 }
-.Layout-main .Layout-container .my-course-container .myCourse-main .courses-container {
+.Layout-main .Layout-container .myCourse-main .courses-container {
   width: 100%;
   padding: 24px 0 32px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-.Layout-main .Layout-container .my-course-container .myCourse-main .courses-container .course-page-header {
+.Layout-main .Layout-container .myCourse-main .courses-container .course-page-header {
   font-size: 28px;
 }
-.Layout-main .Layout-container .my-course-container .myCourse-main .courses-container .courses {
+.Layout-main .Layout-container .myCourse-main .courses-container .courses {
   display: flex;
   flex-direction: column;
   margin-top: 12px;
   width: 95%;
   gap: 24px;
 }
-.Layout-main .Layout-container .my-course-container .myCourse-main .courses-container .courses .course {
+.Layout-main .Layout-container .myCourse-main .courses-container .courses .course {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
   pointer-events: none;
   overflow: hidden;
@@ -44,10 +41,10 @@
   position: relative;
   transition: 0.2s;
 }
-.Layout-main .Layout-container .my-course-container .myCourse-main .courses-container .courses .course .link {
+.Layout-main .Layout-container .myCourse-main .courses-container .courses .course .link {
   color: #181818;
 }
-.Layout-main .Layout-container .my-course-container .myCourse-main .courses-container .courses .course .course-header {
+.Layout-main .Layout-container .myCourse-main .courses-container .courses .course .course-header {
   pointer-events: fill;
   cursor: pointer;
   position: relative;
@@ -57,13 +54,13 @@
   background-color: #323232;
   z-index: 99;
 }
-.Layout-main .Layout-container .my-course-container .myCourse-main .courses-container .courses .course .course-header .course-name {
+.Layout-main .Layout-container .myCourse-main .courses-container .courses .course .course-header .course-name {
   color: #fff;
   font-weight: bold;
   pointer-events: none;
   font-size: 20px;
 }
-.Layout-main .Layout-container .my-course-container .myCourse-main .courses-container .courses .course .course-header .class-number {
+.Layout-main .Layout-container .myCourse-main .courses-container .courses .course .course-header .class-number {
   color: white;
   pointer-events: none;
   font-weight: 500;
@@ -71,7 +68,7 @@
   position: absolute;
   right: 24px;
 }
-.Layout-main .Layout-container .my-course-container .myCourse-main .courses-container .courses .course .course-header .course-fake-shot {
+.Layout-main .Layout-container .myCourse-main .courses-container .courses .course .course-header .course-fake-shot {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -84,16 +81,16 @@
   margin: 0 12px 0 12px;
   z-index: 9;
 }
-.Layout-main .Layout-container .my-course-container .myCourse-main .courses-container .courses .course .course-header .course-fake-shot .shot {
+.Layout-main .Layout-container .myCourse-main .courses-container .courses .course .course-header .course-fake-shot .shot {
   opacity: 0.8;
 }
-.Layout-main .Layout-container .my-course-container .myCourse-main .courses-container .courses .course .course-header .course-title {
+.Layout-main .Layout-container .myCourse-main .courses-container .courses .course .course-header .course-title {
   pointer-events: none;
   font-size: 20px;
   color: black;
   font-weight: bold;
 }
-.Layout-main .Layout-container .my-course-container .myCourse-main .courses-container .courses .course .course-info {
+.Layout-main .Layout-container .myCourse-main .courses-container .courses .course .course-info {
   pointer-events: none;
   display: flex;
   flex-direction: column;
@@ -102,9 +99,9 @@
   padding-left: 48px;
   font-size: 18px;
 }
-.Layout-main .Layout-container .my-course-container .myCourse-main .courses-container .courses .course .course-info .introduce span {
+.Layout-main .Layout-container .myCourse-main .courses-container .courses .course .course-info .introduce span {
   font-weight: bold;
 }
-.Layout-main .Layout-container .my-course-container .myCourse-main .courses-container .courses .course .course-info .max-member span {
+.Layout-main .Layout-container .myCourse-main .courses-container .courses .course .course-info .max-member span {
   font-weight: bold;
 }/*# sourceMappingURL=myCourse.css.map */

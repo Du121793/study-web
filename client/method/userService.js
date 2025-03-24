@@ -140,7 +140,7 @@ const userService = {
   },
 
   // 獲得課程的所有QA
-  async getCourseQAs(token, course_id, sortBy, pageSize) {
+  async getCourseQAs(token, course_id, sortBy, sortOrder, pageSize) {
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.get(QA_URL + `/getCourseQAs/${course_id}`, {
@@ -148,6 +148,7 @@ const userService = {
         params: {
           sortType: sortBy,
           pageSize: pageSize || null,
+          sortOrder,
         },
       })
       return response.data
@@ -195,7 +196,6 @@ const userService = {
 
   // 新增新留言
   async submitQaMessage(token, question_id, reqBody) {
-    console.log(reqBody.get('content'))
     const authHeader = token ? { Authorization: token } : {}
     try {
       const response = await axios.post(QA_URL + `/QAMethod/${question_id}/postNewComment`, reqBody, { headers: authHeader })
@@ -207,6 +207,7 @@ const userService = {
       return e.response.data
     }
   },
+
   // 獲得QA問題的詳細
   async getQaInfo(token, question_id) {
     try {
@@ -214,7 +215,6 @@ const userService = {
       const response = await axios.get(QA_URL + `/QAMethod/${question_id}`, {
         headers: authHeader,
       })
-      console.log(response.data)
       return response.data
     } catch (e) {
       return e
@@ -224,9 +224,8 @@ const userService = {
   // 刪除留言
   async deleteComment(token, question_id, comment_id) {
     try {
-      console.log(comment_id)
       const payload = {
-        comment_id,
+        commentID: comment_id,
       }
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.delete(QA_URL + `/QAMethod/${question_id}/deleteComment`, {

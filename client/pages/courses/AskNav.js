@@ -59,8 +59,31 @@ export default function AskNav({ course_id, courseName }) {
   // 標籤 陣列
   const [hints, setHints] = useState(['標籤'])
 
+  // 控制訊息
+  const [message, setMessage] = useState('無訊息')
+  const [messageStatus, setMessageStatus] = useState(false)
+  const [messageColor, setMessageColor] = useState('')
+
   // 用於預覽圖片
   const [previewUrl, setPreviewUrl] = useState([])
+
+  // 控制訊息
+  const messageControl = (info, isSuccess) => {
+    setMessage(info)
+    setMessageStatus(true)
+    if (isSuccess) {
+      setMessageColor('rgba(195, 240, 178, 0.8)')
+    } else {
+      setMessageColor('rgba(240, 178, 178, 0.8)')
+    }
+    setTimeout(() => {
+      setMessageStatus(false)
+      setTimeout(() => {
+        setMessage('無訊息')
+        setMessageColor('')
+      }, 200)
+    }, 2000)
+  }
 
   // 點擊刪除移除圖片功能
   const removeChoseImage = (imageIndex) => {
@@ -146,6 +169,13 @@ export default function AskNav({ course_id, courseName }) {
     }
   }
 
+  const initInput = () => {
+    setDescription('')
+    setImages([])
+    setTheme(['主題'])
+    setHints(['標籤'])
+  }
+
   // ask，新增提問給該課程
   const createNewQA = () => {
     const _idArray = [course_id]
@@ -165,9 +195,12 @@ export default function AskNav({ course_id, courseName }) {
     hints.forEach((item) => {
       formData.append('hints[]', item)
     })
-
+    initInput()
     userService.createNewQuestion(token, formData).then((res) => {
       console.log(res)
+      if (res.success) {
+        messageControl('新增成功', true)
+      }
     })
   }
 
@@ -187,7 +220,6 @@ export default function AskNav({ course_id, courseName }) {
   // 初始化askNav高度
   const initToggle = () => {}
 
-  //
   const handleButtonClick = () => {
     fileInputRef.current.click()
   }
@@ -236,6 +268,11 @@ export default function AskNav({ course_id, courseName }) {
           height={40}
         />
         <span>提問區</span>
+      </div>
+      <div
+        style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
+        className="message">
+        {message}
       </div>
       {/* 打開部分 */}
       <div

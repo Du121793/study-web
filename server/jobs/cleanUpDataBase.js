@@ -28,7 +28,7 @@ async function processExpiredVideos() {
       try {
         const newSchedule = new vimeoSchedule({
           method: "delete",
-          videoIndex: doc.videoIndex,
+          videoIndex: { videoid: doc._id },
         });
         await newSchedule.save();
         await VideoInfo.findByIdAndDelete(doc._id);
@@ -59,7 +59,7 @@ async function processExpiredVideos() {
       try {
         const newSchedule = new vimeoSchedule({
           method: "delete",
-          videoIndex: doc.videoIndex,
+          videoIndex: { commentid: doc._id },
         });
         await newSchedule.save();
         await QAmessage.findByIdAndDelete(doc._id);

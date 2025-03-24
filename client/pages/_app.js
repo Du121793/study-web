@@ -30,6 +30,9 @@ import "../styles/course/showPublicQA.css";
 import "../styles/course/accessSetting.css";
 import "../styles/course/studentSelector.css";
 import "../styles/course/videoSelector.css";
+// course/component
+import "../styles/course/component/editVideoInfo.css"
+import "../styles/component/QA/editQA.css"
 // videoPlay
 import "../styles/videoPlay/player.css";
 //method的layout
