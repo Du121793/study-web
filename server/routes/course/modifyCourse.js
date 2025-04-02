@@ -1,13 +1,18 @@
 const router = require("express").Router();
+const path = require("path");
+const fs = require("fs");
 const Course = require("../../models").course;
 const User = require("../../models").user;
-const modifyCourse = require("../../methods/").modifyCourse;
-const vimeoSchedule = require("../../models").vimeoSchedule;
-const VideoInfo = require("../../models").courseVideoInfo;
-const QAmessage = require("../../models").QAmessage;
-const QA = require("../../models").QA;
 const videoAccessRoute = require("./videoAccess");
 const accessChecker = require("../routesMiddleware/accessChecker");
+
+function getBaseImagePath() {
+  return path.join(__dirname, "../../../resource/questionIMG");
+}
+
+function getQuestionFolder(questionId) {
+  return path.join(getBaseImagePath(), questionId.toString());
+}
 
 router.use("/videoAccess", accessChecker.teacher, videoAccessRoute);
 
@@ -31,16 +36,13 @@ router.post("/createNewCourse", async (req, res) => {
         msg: "你已經有一樣名稱，科目，年級，班級的課程了",
       });
 
-    modifyCourse.addSubject(grade, subject, courseClass);
 
     let newCourse = new Course({
       courseName,
       subject,
       grade,
       courseClass,
-      members: [],
     });
-    newCourse.members.push(req.user._id);
     let savedCourse = await newCourse.save();
     req.user.courses.push(savedCourse._id);
     await req.user.save();
@@ -62,18 +64,19 @@ router.post("/createNewCourse", async (req, res) => {
 router.post("/register", async (req, res) => {
   try {
     let { user_ids, course_ids } = req.body;
-
+console.log(user_ids)
+console.log(course_ids)
     // 驗證 course_ids 與 user_ids 是否為合法陣列
     if (!Array.isArray(course_ids) || course_ids.length === 0) {
       return res.status(400).json({
         success: false,
-        msg: "請提供有效的課程 ID 陣列 (course_ids)"
+        msg: "請提供有效的課程 ID 陣列 (course_ids)",
       });
     }
     if (!Array.isArray(user_ids) || user_ids.length === 0) {
       return res.status(400).json({
         success: false,
-        msg: "請提供有效的學生 ID 陣列 (user_ids)"
+        msg: "請提供有效的學生 ID 陣列 (user_ids)",
       });
     }
 
@@ -93,7 +96,7 @@ router.post("/register", async (req, res) => {
       ) {
         return res.status(400).json({
           success: false,
-          msg: `你沒有為課程 ${course_id} 註冊成員的權限`
+          msg: `你沒有為課程 ${course_id} 註冊成員的權限`,
         });
       }
 
@@ -102,7 +105,7 @@ router.post("/register", async (req, res) => {
       if (!foundCourse) {
         return res.status(400).json({
           success: false,
-          msg: `課程 ID ${course_id} 錯誤`
+          msg: `課程 ID ${course_id} 錯誤`,
         });
       }
 
@@ -117,29 +120,29 @@ router.post("/register", async (req, res) => {
           invalidUsers.push(user_id);
           continue;
         }
-        if (foundCourse.members.includes(user_id)) {
+        if (foundStudent.courses.includes(foundCourse._id)) {
           alreadyRegistered.push(user_id);
           continue;
         }
         // 加入課程成員，並更新學生的課程資料
-        foundCourse.members.push(user_id);
         foundStudent.courses.push(course_id);
         await foundStudent.save();
         successCount++;
       }
-      await foundCourse.save();
 
       globalSuccessCount += successCount;
 
       // 組成此門課程的狀態訊息
       successMsg[course_id] = {
         registerSuccess: `成功註冊 ${successCount} 位學生到課程 ${foundCourse.courseName}。`,
-        alreadyRegistered: alreadyRegistered.length > 0
-          ? `以下學生已經註冊過：${alreadyRegistered.join(", ")}。`
-          : "",
-        invalidUsers: invalidUsers.length > 0
-          ? `以下學生 ID 無效：${invalidUsers.join(", ")}。`
-          : ""
+        alreadyRegistered:
+          alreadyRegistered.length > 0
+            ? `以下學生已經註冊過：${alreadyRegistered.join(", ")}。`
+            : "",
+        invalidUsers:
+          invalidUsers.length > 0
+            ? `以下學生 ID 無效：${invalidUsers.join(", ")}。`
+            : "",
       };
     }
 
@@ -158,7 +161,7 @@ router.post("/register", async (req, res) => {
     console.log(e);
     return res.status(500).json({
       success: false,
-      msg: "伺服器發生問題，無法成功註冊"
+      msg: "伺服器發生問題，無法成功註冊",
     });
   }
 });
@@ -171,13 +174,13 @@ router.post("/unRegister", async (req, res) => {
     if (!Array.isArray(course_ids) || course_ids.length === 0) {
       return res.status(400).json({
         success: false,
-        msg: "請提供有效的課程 ID 陣列 (course_ids)"
+        msg: "請提供有效的課程 ID 陣列 (course_ids)",
       });
     }
     if (!Array.isArray(user_ids) || user_ids.length === 0) {
       return res.status(400).json({
         success: false,
-        msg: "請提供有效的學生 ID 陣列 (user_ids)"
+        msg: "請提供有效的學生 ID 陣列 (user_ids)",
       });
     }
 
@@ -194,7 +197,7 @@ router.post("/unRegister", async (req, res) => {
       ) {
         return res.status(400).json({
           success: false,
-          msg: `你沒有為課程 ${course_id} 註銷成員的權限`
+          msg: `你沒有為課程 ${course_id} 註銷成員的權限`,
         });
       }
 
@@ -203,7 +206,7 @@ router.post("/unRegister", async (req, res) => {
       if (!foundCourse) {
         return res.status(400).json({
           success: false,
-          msg: `課程 ID ${course_id} 錯誤`
+          msg: `課程 ID ${course_id} 錯誤`,
         });
       }
 
@@ -218,13 +221,14 @@ router.post("/unRegister", async (req, res) => {
           invalidUsers.push(user_id);
           continue;
         }
-        if (!foundCourse.members.includes(user_id)) {
+        if (!foundStudent.courses.includes(foundCourse._id)) {
           notRegistered.push(user_id);
           continue;
         }
         // 從學生資料中移除該課程，同時更新課程成員
-        foundStudent.courses = foundStudent.courses.filter((n) => n != course_id);
-        foundCourse.members = foundCourse.members.filter((n) => n != user_id);
+        foundStudent.courses = foundStudent.courses.filter(
+          (n) => n != course_id
+        );
         await foundStudent.save();
         successCount++;
       }
@@ -235,12 +239,14 @@ router.post("/unRegister", async (req, res) => {
       // 組成此門課程的狀態訊息
       successMsg[course_id] = {
         unregisterSuccess: `成功註銷 ${successCount} 位學生從課程 ${foundCourse.courseName}。`,
-        notRegistered: notRegistered.length > 0
-          ? `以下學生未註冊過：${notRegistered.join(", ")}。`
-          : "",
-        invalidUsers: invalidUsers.length > 0
-          ? `以下學生 ID 無效：${invalidUsers.join(", ")}。`
-          : ""
+        notRegistered:
+          notRegistered.length > 0
+            ? `以下學生未註冊過：${notRegistered.join(", ")}。`
+            : "",
+        invalidUsers:
+          invalidUsers.length > 0
+            ? `以下學生 ID 無效：${invalidUsers.join(", ")}。`
+            : "",
       };
     }
 
@@ -258,7 +264,7 @@ router.post("/unRegister", async (req, res) => {
   } catch (e) {
     return res.status(500).json({
       success: false,
-      msg: "很抱歉，註銷發生問題"
+      msg: "很抱歉，註銷發生問題",
     });
   }
 });
@@ -268,7 +274,6 @@ router.get("/findJoinedSubject", (req, res) => {
     const { grade, subject } = req.query;
     // 或者 const { grade, subject } = req.params; 看你如何設定路由
 
-    const foundSubject = modifyCourse.findSubject(grade, subject);
     console.log(foundSubject); // 這裡會在後端 console 印出純陣列
     return res.json({ success: true, data: foundSubject }); // 回傳 JSON 給前端
   } catch (e) {
@@ -324,8 +329,6 @@ router.patch("/patchCourse", async (req, res) => {
         msg: "已有其他課程具有相同名稱、科目、年級及班級",
       });
 
-    // 更新 modifyCourse 中的相關科目資料
-    modifyCourse.addSubject(newGrade, newSubject, newCourseClass);
 
     // 僅更新提供的部分
     foundCourse.courseName = newCourseName;
@@ -351,10 +354,10 @@ router.patch("/patchCourse", async (req, res) => {
 router.delete("/deleteCourse", async (req, res) => {
   try {
     const { course_id } = req.body;
-    let foundCourse = await Course.findOne({ _id: course_id }).exec();
+    const foundCourse = await Course.findOne({ _id: course_id }).exec();
     if (!foundCourse)
       return res.status(400).json({ success: false, msg: "沒有找到所屬課程" });
-    let courseName = foundCourse.courseName;
+    const courseName = foundCourse.courseName;
 
     // 權限檢查：若使用者既非 admin 且不屬於此課程，拒絕操作
     if (
@@ -366,73 +369,8 @@ router.delete("/deleteCourse", async (req, res) => {
         .json({ success: false, msg: "你沒有刪除此課程的權限" });
     }
 
-    // Step 1: 針對此課程的影片建立 Vimeo 刪除排程，並刪除 VideoInfo 資料
-    const newSchedule = new vimeoSchedule({
-      method: "delete",
-      videoIndex: { COURSEID: course_id },
-    });
-    await newSchedule.save();
-    await VideoInfo.deleteMany({ courseID: course_id });
-
-    // Step 2: 處理屬於此課程的 QA 資料
-    const qas = await QA.find({ courses: course_id });
-    for (let qa of qas) {
-      // 從 QA 的 courses 陣列中移除該課程 ID
-      qa.courses = qa.courses.filter(
-        (id) => id.toString() !== course_id.toString()
-      );
-      // 若移除後 courses 為空，且此 QA 為非公開（isPublic 為 false）
-      if (qa.courses.length === 0 && qa.isPublic === false) {
-        // 刪除該 QA 的圖片資料夾
-        const questionFolder = getQuestionFolder(qa._id);
-        if (fs.existsSync(questionFolder)) {
-          fs.rmSync(questionFolder, { recursive: true, force: true });
-        }
-        // 找出該 QA 之所有留言
-        const comments = await QAmessage.find({ pointTo: qa._id });
-        for (let comment of comments) {
-          // 若留言有影片，建立 Vimeo 刪除排程
-          if (
-            comment.videoURL &&
-            Array.isArray(comment.videoURL) &&
-            comment.videoURL.length > 0
-          ) {
-            const newCommentSchedule = new vimeoSchedule({
-              method: "delete",
-              videoIndex: { commentID: comment._id },
-            });
-            await newCommentSchedule.save();
-          }
-          // 刪除留言（留言圖片已隨 QA 圖片資料夾刪除）
-          await QAmessage.findByIdAndDelete(comment._id);
-        }
-        // 刪除該 QA 文件
-        await QA.findByIdAndDelete(qa._id);
-      } else {
-        // 若 QA 仍與其他課程關聯，則僅更新 courses 欄位
-        await QA.findByIdAndDelete(qa._id);
-      }
-    }
-
-    // Step 3: 更新所有該課程成員，從其 courses 陣列中移除此課程
-    for (const userID of foundCourse.members) {
-      let foundStudent = await User.findOne({ _id: userID });
-      if (!foundStudent) continue;
-      foundStudent.courses = foundStudent.courses.filter(
-        (n) => n.toString() !== course_id.toString()
-      );
-      await foundStudent.save();
-    }
-
-    // Step 4: 刪除課程資料
-    await Course.deleteOne({ _id: course_id });
-
-    // 更新 modifyCourse 中的科目資料
-    modifyCourse.deleteSubject(
-      foundCourse.grade,
-      foundCourse.subject,
-      foundCourse.courseClass
-    );
+    // 刪除課程，所有與該課程相關的資源清理皆由 Course 模型的 hook 處理
+    await Course.findByIdAndDelete(course_id);
 
     res.json({ success: true, msg: `課程 ${courseName} 已成功刪除` });
   } catch (e) {

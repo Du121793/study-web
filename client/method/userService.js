@@ -8,12 +8,36 @@ const COURSE_URL = `${serverIp}/course`
 const USER_URL = `${serverIp}/user`
 const QA_URL = `${serverIp}/course/question`
 
+// 登出函式
+const signOut = () => {
+  if (sessionStorage.getItem('user_lineID')) {
+    sessionStorage.removeItem('user_lineID')
+  }
+  if (sessionStorage.getItem('user_role')) {
+    sessionStorage.removeItem('user_role')
+  }
+  if (sessionStorage.getItem('user_id')) {
+    sessionStorage.removeItem('user_id')
+  }
+  if (sessionStorage.getItem('user_role')) {
+    sessionStorage.removeItem('user_role')
+  }
+  localStorage.removeItem('token')
+  window.location.replace('/')
+}
+
 const userService = {
   // 獲得使用者資料
   async getUserInfo(token) {
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.get(USER_URL, { headers: authHeader })
+
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+
       return response.data
     } catch (error) {
       console.log(error)
@@ -53,7 +77,10 @@ const userService = {
         headers: authHeader,
         params,
       })
-
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       // 回傳 API 回應的完整資料 (包含查詢結果與分頁資訊)
       return response.data
     } catch (e) {
@@ -74,6 +101,10 @@ const userService = {
         headers: authHeader,
         params: filter,
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (e) {
       console.log(e.response.data)
@@ -90,6 +121,10 @@ const userService = {
         headers: authHeader,
         params: { videoId: video_id },
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (e) {
       console.log(e)
@@ -101,9 +136,14 @@ const userService = {
     try {
       const response = await axios.post(API_URL + '/auth/completeRegistration', {
         tempToken,
+
         realname,
         phoneNumber,
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (e) {
       return e.response.data
@@ -119,6 +159,10 @@ const userService = {
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.post(QA_URL + '/modifyQA/postQuestion', formData, { headers: authHeader, 'Content-Type': 'multipart/form-data' })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (e) {
       console.log(e)
@@ -133,6 +177,10 @@ const userService = {
       const response = await axios.get(QA_URL + '/getPublicQAs', {
         header: authHeader,
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (e) {
       return e.response.data
@@ -151,6 +199,10 @@ const userService = {
           sortOrder,
         },
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (e) {
       console.log(e)
@@ -168,12 +220,14 @@ const userService = {
         hint: hint || null,
         pageSize: pageSize || null,
       }
-      console.log(data.resourceCategory)
-      console.log(data.hint)
       const response = await axios.get(QA_URL + `/getCourseQAsByTag/${course_id}`, {
         headers: authHeader,
         params: data,
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (err) {
       return err.response.data
@@ -187,7 +241,10 @@ const userService = {
       const response = await axios.get(QA_URL + `/QAMethod/${question_id}/getComment`, {
         headers: authHeader,
       })
-      console.log(response.data)
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (e) {
       return e
@@ -199,6 +256,10 @@ const userService = {
     const authHeader = token ? { Authorization: token } : {}
     try {
       const response = await axios.post(QA_URL + `/QAMethod/${question_id}/postNewComment`, reqBody, { headers: authHeader })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (e) {
       if (!e.response) {
@@ -215,6 +276,10 @@ const userService = {
       const response = await axios.get(QA_URL + `/QAMethod/${question_id}`, {
         headers: authHeader,
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (e) {
       return e
@@ -232,11 +297,33 @@ const userService = {
         headers: authHeader,
         params: payload,
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (e) {
       return e.response.data
     }
   },
+
+  async getCarousels(token) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.get(API_URL + `/publicResource/carousel/all`, {
+        headers: authHeader,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (e) {
+      return e.response.data
+    }
+  },
+
+  
 }
 
 export default userService

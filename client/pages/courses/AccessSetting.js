@@ -5,14 +5,13 @@ import Link from 'next/link'
 
 // method
 import { useUserToken } from '../../method/useUserToken'
-import userService from '../../method/userService'
 import adminService from '../../method/adminService'
 
 // 子組件
-import StudentSelector from './StudentSelector'
-import VideoSelector from './VideoSelector'
-import AccessStudentList from './AccessStudentList'
-import AccessVideoList from './AccessVideoList'
+import StudentSelector from './component/StudentSelector'
+import VideoSelector from './component/VideoSelector'
+import AccessStudentList from './component/AccessStudentList'
+import AccessVideoList from './component/AccessVideoList'
 
 // public
 import editIcon from '../../public/global/edit.png'
@@ -25,7 +24,6 @@ export default function AccessSetting() {
   const token = useUserToken()
   const router = useRouter()
   const { course_name, course_id } = router.query
-  const [userInfo, setUserInfo] = useState({})
   // 獲得所有權杖狀態
   const [accessInfo, setAccessInfo] = useState(null)
   // 控制新增權杖狀態
@@ -62,13 +60,8 @@ export default function AccessSetting() {
   const [editAccessDate, setEditAccessDate] = useState('')
   const [editisInfiniite, setEditIsInfiniite] = useState(false)
 
-  // 使用者資料
+  // 獲得該課程的成員資料
   useEffect(() => {
-    if (token) {
-      userService.getUserInfo(token).then((res) => {
-        setUserInfo(res.data)
-      })
-    }
     if (token && course_id) {
       adminService.getAccessAllInfo(token, course_id).then((res) => {
         if (res.success === true) {
@@ -234,17 +227,7 @@ export default function AccessSetting() {
             新增權杖
           </div>
         </div>
-<<<<<<< HEAD
         {/* 新增UI */}
-=======
-
-        <div
-          style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
-          className="message">
-          {messageInfo}
-        </div>
-
->>>>>>> front-end-dev
         {isClickAdd && (
           <div className="add-area">
             <div className="name-area">
@@ -308,134 +291,7 @@ export default function AccessSetting() {
             </div>
           </div>
         )}
-<<<<<<< HEAD
         {/* 顯示權杖UI */}
-=======
-
-        {accessInfo &&
-          accessInfo.map((item, index) => (
-            <div
-              className="access-info"
-              key={index}>
-              <div className="name-area">
-                權杖名稱 :
-                {editAccessId === item._id ? (
-                  <input
-                    className="input-area"
-                    placeholder={item.accessName}
-                    onChange={(e) => {
-                      setEditAccessName(e.target.value)
-                    }}></input>
-                ) : (
-                  <div className="name">{item.accessName}</div>
-                )}
-              </div>
-
-              <div className="date-area">
-                期限 :
-                {editAccessId === item._id ? (
-                  <div>
-                    {!editisInfiniite && (
-                      <input
-                        className="input-area"
-                        type="datetime-local"
-                        placeholder="輸入時間"
-                        onChange={(e) => {
-                          setEditAccessDate(e.target.value)
-                        }}></input>
-                    )}
-                    無期限
-                    <input
-                      type="checkbox"
-                      onClick={(e) => {
-                        setEditIsInfiniite(e.target.checked)
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <div className="time">{item.accessDate === null ? '永久' : new Date(item.accessDate).toLocaleString()}</div>
-                )}
-              </div>
-              <div className="student">
-                <div className="content">學生人數 : {item.studentIDs.length}</div>
-              </div>
-              <div className="video">
-                <div className="content">影片數量 : {item.videoIDs.length}</div>
-              </div>
-              <div
-                className="list-btn"
-                onClick={() => {
-                  setShowAccessStudentList(true)
-                  setChoseAccessId(item._id)
-                }}>
-                授權學生清單
-              </div>
-              <div
-                className="list-btn"
-                onClick={() => {
-                  setShowAccessVideoList(true)
-                  setChoseAccessId(item._id)
-                }}>
-                授權影片清單
-              </div>
-              <div className="image-area">
-                {editAccessId === item._id && (
-                  <div
-                    className="complate-btn"
-                    onClick={() => {
-                      setEditAccessId('')
-                      submitEditAccess()
-                    }}>
-                    完成
-                  </div>
-                )}
-                {editAccessId !== item._id && (
-                  <Image
-                    src={editIcon}
-                    className="image"
-                    alt="edit icon"
-                    width={20}
-                    height={20}
-                    onClick={() => {
-                      setEditAccessId(item._id)
-                    }}></Image>
-                )}
-                {deleteDoubleCheck !== item._id && (
-                  <Image
-                    src={removeIcon}
-                    className="image"
-                    alt="delete icon"
-                    width={20}
-                    height={20}
-                    onClick={() => {
-                      setDeleteDoubleCheck(item._id)
-                    }}></Image>
-                )}
-                {deleteDoubleCheck === item._id && (
-                  <div className="double-check-area">
-                    <div className="content">確定刪除嗎?</div>
-                    <div
-                      className="confirm-btn"
-                      onClick={() => {
-                        setDeleteDoubleCheck(null)
-                        setChoseAccessId(item._id)
-                        deleteAccess(item._id)
-                      }}>
-                      確定
-                    </div>
-                    <div
-                      className="cancel-btn"
-                      onClick={() => {
-                        setDeleteDoubleCheck(null)
-                      }}>
-                      取消
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
->>>>>>> front-end-dev
       </div>
     </div>
   )

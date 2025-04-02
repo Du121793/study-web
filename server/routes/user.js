@@ -2,6 +2,7 @@ const router = require("express").Router();
 const mongoose = require("mongoose");
 const Course = require("../models").course;
 const User = require("../models/").user;
+const { Parser } = require("json2csv");
 
 const accessChecker = require("./routesMiddleware/accessChecker");
 
@@ -29,7 +30,6 @@ router.get("/registedCourse", async (req, res) => {
       "subject",
       "grade",
       "courseClass",
-      "members",
       "date",
     ];
 
@@ -78,7 +78,15 @@ router.get("/registedCourse", async (req, res) => {
       if (!foundCourse) {
         return res.status(404).json({ success: false, msg: "找不到該課程" });
       }
-      return res.json({ success: true, data: foundCourse });
+      // 取得該課程的成員數，透過查詢 User 模型中 courses 陣列包含此課程的使用者數量
+      const memberCount = await User.countDocuments({ courses: course_id });
+      // 若 foundCourse 為 mongoose 文件，轉成純物件以便加入新欄位
+      const courseData =
+        typeof foundCourse.toObject === "function"
+          ? foundCourse.toObject()
+          : foundCourse;
+      courseData.members = memberCount;
+      return res.json({ success: true, data: courseData });
     } else {
       // 未指定 course_id，回傳使用者所有已註冊課程的資料
       let courseIds = req.user.courses;
@@ -91,18 +99,37 @@ router.get("/registedCourse", async (req, res) => {
         courseIds = courseIds.slice(start, start + pageSize);
       }
 
+      // 取得每筆課程資料並附加成員數
       const coursesInfo = await Promise.all(
         courseIds.map(async (courseID) => {
-          return Object.keys(projection).length > 0
-            ? await Course.findOne({ _id: courseID }, projection)
-            : await Course.findOne({ _id: courseID });
+          const courseInfo =
+            Object.keys(projection).length > 0
+              ? await Course.findOne({ _id: courseID }, projection)
+              : await Course.findOne({ _id: courseID });
+          if (courseInfo) {
+            const memberCount = await User.countDocuments({
+              courses: courseID,
+            });
+            const courseData =
+              typeof courseInfo.toObject === "function"
+                ? courseInfo.toObject()
+                : courseInfo;
+            courseData.members = memberCount;
+            return courseData;
+          } else {
+            return null;
+          }
         })
+      );
+      // 移除可能查不到的課程資料（null）
+      const filteredCoursesInfo = coursesInfo.filter(
+        (course) => course !== null
       );
 
       if (pageSize) {
         return res.json({
           success: true,
-          data: coursesInfo,
+          data: filteredCoursesInfo,
           pagination: {
             total: totalCourses,
             page: page || 1,
@@ -110,7 +137,7 @@ router.get("/registedCourse", async (req, res) => {
           },
         });
       } else {
-        return res.json({ success: true, data: coursesInfo });
+        return res.json({ success: true, data: filteredCoursesInfo });
       }
     }
   } catch (error) {
@@ -150,9 +177,8 @@ router.get("/registedCourse", async (req, res) => {
 
 router.get("/getMembers", checkTeacherAccess, async (req, res) => {
   try {
-    // 從 query 中取得各種篩選條件，其中新增 grade
-    const { username, realname, phoneNumber, _id, role, courses, grade } = req.query;
-    // 新增分頁與排序參數，page 與 pageSize 預設分別為 1 與 10
+    const { username, realname, phoneNumber, _id, role, courses, grade } =
+      req.query;
     const { page = 1, pageSize = 10, sortBy, sortOrder = "asc" } = req.query;
     const parsedPage = parseInt(page);
     const parsedPageSize = parseInt(pageSize);
@@ -171,25 +197,18 @@ router.get("/getMembers", checkTeacherAccess, async (req, res) => {
     if (_id) {
       filter._id = _id;
     }
-    // 指定腳色，若 role 有傳值，則只回傳該腳色的用戶資料；否則回傳全部
     if (role) {
       filter.role = role;
     }
     if (courses) {
       filter.courses = courses;
     }
-    // 新增依據年級的查詢條件 (對 userinfo.grade 進行模糊查詢)
     if (grade) {
       filter["userinfo.grade"] = new RegExp(grade, "i");
     }
 
     let sortQuery = {};
-    // 若 sortBy 未提供，則不做額外排序（MongoDB 的預設輸出順序）
     if (sortBy === "grade") {
-      // 依據用戶的年級排序。由於教師沒有年級，預期這類記錄會是 null，
-      // 我們藉由設定排序方向使得有數值的年級排在前面，
-      // 同時以 date 作次排序。注意：若 sortOrder 為 "asc"，通常 null 值會排在前，
-      // 這裡我們用 "asc" 時反向處理年級 (以 -1 排序) 讓 null 值出現在最後；若為 "desc" 則反之。
       if (sortOrder === "asc") {
         sortQuery = { "userinfo.grade": -1, date: 1 };
       } else {
@@ -198,14 +217,14 @@ router.get("/getMembers", checkTeacherAccess, async (req, res) => {
     } else if (sortBy === "date") {
       sortQuery = { date: sortOrder === "asc" ? 1 : -1 };
     }
-    // 若未指定 sortBy，則不加入排序條件，維持 MongoDB 的預設輸出順序
 
-    // 先取得符合條件的總筆數，用於計算總頁數
+    // 先取得符合條件的總筆數
     const totalCount = await User.countDocuments(filter);
     const totalPage = Math.ceil(totalCount / parsedPageSize);
 
-    // 查詢符合條件的用戶，並加入分頁與排序
-    const users = await User.find(filter)
+    // 查詢符合條件的用戶，並在投影 (projection) 中排除 lineID
+    // - "lineID" 代表排除該欄位
+    const users = await User.find(filter, { lineID: 0 })
       .sort(sortQuery)
       .skip((parsedPage - 1) * parsedPageSize)
       .limit(parsedPageSize);
@@ -222,6 +241,93 @@ router.get("/getMembers", checkTeacherAccess, async (req, res) => {
     return res
       .status(500)
       .json({ success: false, msg: "發生了不可預期的錯誤" });
+  }
+});
+
+router.get("/exportMembers", checkTeacherAccess, async (req, res) => {
+  try {
+    let filter = {};
+
+    // 如果前端有提供 selected_members 的陣列，就以此為主要篩選條件
+    if (req.query.selected_members) {
+      let selected = req.query.selected_members;
+      // 如果 selected_members 為字串，嘗試解析成陣列
+      if (typeof selected === "string") {
+        try {
+          selected = JSON.parse(selected);
+        } catch (e) {
+          // 若解析失敗，假設是以逗號分隔的字串
+          selected = selected.split(",").map((s) => s.trim());
+        }
+      }
+      filter = { _id: { $in: selected } };
+    } else {
+      // 否則根據其他查詢參數建立過濾條件（不使用分頁）
+      const { username, realname, phoneNumber, _id, role, courses, grade } = req.query;
+      if (username) {
+        filter["userinfo.username"] = new RegExp(username, "i");
+      }
+      if (realname) {
+        filter["userinfo.realname"] = new RegExp(realname, "i");
+      }
+      if (phoneNumber) {
+        filter["userinfo.phoneNumber"] = new RegExp(phoneNumber, "i");
+      }
+      if (_id) {
+        filter._id = _id;
+      }
+      if (role) {
+        filter.role = role;
+      }
+      if (courses) {
+        filter.courses = courses;
+      }
+      if (grade) {
+        filter["userinfo.grade"] = new RegExp(grade, "i");
+      }
+    }
+
+    // 取得所有符合條件的使用者（不進行分頁）
+    const users = await User.find(filter)
+      .populate("courses", "courseName")
+      .sort({ date: 1 }) // 可自行調整預設排序
+      .lean();
+
+    // 整理成 CSV 所需的結構，每列依序為：
+    // lineID, 用戶名稱, 真實姓名, 電話號碼, 年級, 已註冊的課程, 身份, 創建日期
+    const dataForCSV = users.map(user => {
+      const courseNames = Array.isArray(user.courses)
+        ? user.courses.map(c => c.courseName).join(",")
+        : "";
+      // 將電話號碼包裝成 ="xxxx" 格式，讓 Excel 當作文字顯示保留前導零
+      const phone = user.userinfo && user.userinfo.phoneNumber 
+        ? `="${user.userinfo.phoneNumber}"`
+        : "";
+      return {
+        lineID: user.lineID || "",
+        "用戶名稱": user.userinfo?.username || "",
+        "真實姓名": user.userinfo?.realname || "",
+        "電話號碼": phone,
+        "年級": user.userinfo?.grade || "",
+        "已註冊課程": courseNames,
+        "身分": user.role || "",
+        "創建日期": user.date ? user.date.toISOString().slice(0, 10) : ""
+      };
+    });
+
+    const fields = ["lineID", "用戶名稱", "真實姓名", "電話號碼", "年級", "已註冊課程", "身分", "創建日期"];
+    const json2csvParser = new Parser({ fields });
+    const csvData = json2csvParser.parse(dataForCSV);
+    const csvDataWithBOM = "\ufeff" + csvData; // 加入 BOM 以確保 Excel 正確辨識 UTF-8
+
+    // 設定 header 以附件形式下載 CSV
+    res.status(200)
+      .set("Content-Type", "text/csv; charset=utf-8")
+      .set("Content-Disposition", 'attachment; filename="members.csv"')
+      .send(Buffer.from(csvDataWithBOM, "utf8"));
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, msg: "發生了不可預期的錯誤" });
   }
 });
 
@@ -295,21 +401,28 @@ router.post("/preRegisterUser", checkAdminAccess, async (req, res) => {
     // 組成詳細訊息物件
     const detailedMsg = {
       preRegisterSuccess: globalMsg,
-      alreadyRegistered: alreadyRegisteredUsers.length > 0
-        ? `以下使用者已經註冊過：${alreadyRegisteredUsers.join(", ")}。`
-        : "",
-      invalidUsers: invalidUsers.length > 0
-        ? `以下使用者資訊提供不完整：${invalidUsers.join(", ")}。`
-        : "",
-      serverError: serverSavedErrorUsers.length > 0
-        ? `以下使用者由於伺服器錯誤註冊失敗：${serverSavedErrorUsers.join(", ")}。`
-        : "",
+      alreadyRegistered:
+        alreadyRegisteredUsers.length > 0
+          ? `以下使用者已經註冊過：${alreadyRegisteredUsers.join(", ")}。`
+          : "",
+      invalidUsers:
+        invalidUsers.length > 0
+          ? `以下使用者資訊提供不完整：${invalidUsers.join(", ")}。`
+          : "",
+      serverError:
+        serverSavedErrorUsers.length > 0
+          ? `以下使用者由於伺服器錯誤註冊失敗：${serverSavedErrorUsers.join(
+              ", "
+            )}。`
+          : "",
       successStudentId, // 將成功預註冊的使用者 id 一併回傳
     };
 
-    return res
-      .status(200)
-      .json({ success: true, msg: globalMsg, data: { successMsg: detailedMsg } });
+    return res.status(200).json({
+      success: true,
+      msg: globalMsg,
+      data: { successMsg: detailedMsg },
+    });
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -319,8 +432,11 @@ router.post("/preRegisterUser", checkAdminAccess, async (req, res) => {
   }
 });
 
-// 刪除使用者，並從該使用者所註冊的課程中移除該使用者的 _id
-// 直接將 req.body 當作陣列來處理，每個元素應為使用者的 _id
+/**
+ * 刪除使用者，直接將 req.body 當作陣列來處理，每個元素應為使用者的 _id。
+ * 刪除時不再需要從該使用者所註冊的課程中移除該使用者的 _id，
+ * 因為課程資料結構中已不包含 members 欄位。
+ */
 router.delete("/deleteMember", checkAdminAccess, async (req, res) => {
   // 取得前端傳入的使用者 _id 陣列
   const users = req.body;
@@ -338,6 +454,7 @@ router.delete("/deleteMember", checkAdminAccess, async (req, res) => {
   let serverErrorUsers = []; // 伺服器錯誤導致無法刪除的使用者
 
   const mongoose = require("mongoose");
+
   // 逐一處理每個使用者 _id
   for (const userId of users) {
     // 檢查 userId 是否存在且格式正確
@@ -354,20 +471,10 @@ router.delete("/deleteMember", checkAdminAccess, async (req, res) => {
         continue;
       }
 
-      // 針對該使用者已註冊的每個課程，從對應課程的 members 陣列中移除該使用者的 _id
-      for (const courseId of user.courses) {
-        try {
-          await Course.findByIdAndUpdate(courseId, {
-            $pull: { members: userId },
-          });
-        } catch (err) {
-          // 若更新課程時發生錯誤，將該 userId 記錄為伺服器錯誤，並跳過後續動作
-          serverErrorUsers.push(userId);
-          continue;
-        }
-      }
+      // 由於課程不再有 members 欄位，
+      // 因此不需要從每個課程中移除該使用者的 _id，
+      // 只需直接刪除使用者即可
 
-      // 刪除該使用者
       await User.findByIdAndDelete(userId);
       successCount++;
       successUserIds.push(userId);

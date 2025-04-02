@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useUserToken } from '../../method/useUserToken'
 import Image from 'next/image'
 // methods
@@ -12,7 +12,8 @@ import deleteIcon from '../../public/global/delete.png'
 import complateIcon from '../../public/global/complate.png'
 // 子組件
 import MemberSelector from './MemberSelector'
-export default function EditCourse() {
+
+export default function EditCourse({ onRefresh }) {
   const token = useUserToken()
   const [editStatusIndex, setEditStatusIndex] = useState(null)
   const [doubleCheck, setDoubleCheck] = useState(false)
@@ -36,17 +37,19 @@ export default function EditCourse() {
   let registerInfo = {}
   const [needToDeleteCourseId, setNeedToDeleteCourseId] = useState('')
   // 獲得參數
-  const [userInfo, setUserInfo] = useState(null)
   const [coursesInfo, setCoursesInfo] = useState(null)
-  const [createdCourseId, setCreatedCourseId] = useState(null)
   // 將成員新增到新課程，參數
   const [courses, setCourses] = useState([])
   // 是否要在新增課程時也將選擇的成員加入課程
   const [addThenRegister, setAddThenRegister] = useState(false)
   // 控制訊息
+  // 控制訊息
   const [message, setMessage] = useState('無訊息')
   const [messageStatus, setMessageStatus] = useState(false)
   const [messageColor, setMessageColor] = useState('')
+  // 綁定timeout，用於重計
+  const messageTimer = useRef(null)
+  const resetTimer = useRef(null)
 
   // 控制訊息
   const messageControl = (info, isSuccess) => {
@@ -57,9 +60,14 @@ export default function EditCourse() {
     } else {
       setMessageColor('rgba(240, 178, 178, 0.8)')
     }
-    setTimeout(() => {
+
+    // 清除之前的 timer
+    if (messageTimer.current) clearTimeout(messageTimer.current)
+    if (resetTimer.current) clearTimeout(resetTimer.current)
+
+    messageTimer.current = setTimeout(() => {
       setMessageStatus(false)
-      setTimeout(() => {
+      resetTimer.current = setTimeout(() => {
         setMessage('無訊息')
         setMessageColor('')
       }, 200)
@@ -94,7 +102,10 @@ export default function EditCourse() {
           pageSize: pageSize,
         }
         if (res.success && !addThenRegister) {
+          onRefresh()
           messageControl(res.msg, true)
+        } else {
+          messageControl(res.data.msg, false)
         }
         // 如果有選擇學生，並且addThenRegister為true，
         // (有勾選是否要在新增課程時也將選擇的成員加入課程)
@@ -134,10 +145,17 @@ export default function EditCourse() {
       }
       setLoading(true)
       adminService.deleteCourse(token, needToDeleteCourseId).then((res) => {
+        if (res.success) {
+          onRefresh()
+          messageControl('移除成功', true)
+        } else {
+          messageControl('移除失敗', false)
+        }
         setNeedToDeleteCourseId('')
         adminService.getCourses(token, data).then((res) => {
-          setCoursesInfo(res.data)
           setLoading(false)
+
+          setCoursesInfo(res.data)
         })
       })
     }
@@ -160,7 +178,13 @@ export default function EditCourse() {
         subject: subjectInput,
         courseClass: classInput,
       }
-      adminService.getCourses(token, secData).then((res) => setCoursesInfo(res.data))
+      if (res.success && !addThenRegister) {
+        adminService.getCourses(token, secData).then((res) => setCoursesInfo(res.data))
+        messageControl('編輯完成', true)
+        onRefresh()
+      } else {
+        messageControl(res.data.msg, false)
+      }
     })
   }
 
@@ -168,22 +192,18 @@ export default function EditCourse() {
     console.log([...courses])
   }
 
-  // 1. 獲取使用者資料
-  // 2. 獲取課程資料，page:1, pageSize:10
+  // 獲取課程資料，page:1, pageSize:10
   useEffect(() => {
     if (token) {
       let data = {
         page: page,
         pageSize: pageSize,
       }
-      userService.getUserInfo(token).then((res) => {
-        setUserInfo(res.data)
-      })
       adminService.getCourses(token, data).then((res) => {
         setCoursesInfo(res.data)
       })
     }
-  }, [token, page, pageSize])
+  }, [token])
 
   // 當年級、科目、班級更改時也會更改課名
   useEffect(() => {

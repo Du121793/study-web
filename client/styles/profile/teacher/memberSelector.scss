@@ -9,7 +9,7 @@
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  width: 90%;
+  // width: 90%;
   background-color: #fff; // 讓清單區域白底
 
   .member-select-header {
@@ -171,14 +171,19 @@
       cursor: pointer;
       color: #525252;
     }
-    .total-page {
+    .content{
+      font-weight: bold;
+      color: #525252;
+    }
+    .pointer{
+      cursor: pointer;
+    }
+    .now-page {
       display: flex;
       color: #9a9a9a;
       gap: 4px;
-      .active{
-        font-weight: bold;
-        color: rgb(0, 0, 0);
-      }
+      font-weight: bold;
+      color: rgb(0, 0, 0);
       .page {
         cursor: pointer;
       }

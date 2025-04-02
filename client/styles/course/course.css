@@ -1,6 +1,7 @@
 @charset "UTF-8";
 .course-main {
   min-width: 1250px;
+  min-height: 100vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -18,6 +19,7 @@
   transition: 0.3s;
 }
 .course-main .container {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -70,7 +72,7 @@
      -moz-user-select: none;
           user-select: none;
   border-radius: 8px;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: var(--main-color);
   display: flex;
   cursor: pointer;
   align-items: center;
@@ -90,7 +92,7 @@
 .course-main .container .nav .update-video-area {
   display: flex;
   align-items: center;
-  justify-content: start;
+  justify-content: flex-start;
   gap: 24px;
   padding-top: 24px;
   width: 100%;
@@ -98,7 +100,7 @@
   background-color: #fff;
 }
 .course-main .container .nav .update-video-area .button {
-  color: black;
+  color: rgb(0, 0, 0);
   width: 120px;
   display: flex;
   justify-content: center;
@@ -109,13 +111,13 @@
   padding: 8px 10px;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 4px;
-  background-color: #f7f7f7;
+  background-color: var(--button-white);
   transition: border-color 0.2s;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   transition: 0.2s;
 }
 .course-main .container .nav .update-video-area .button:hover {
-  background-color: #ededed;
+  background-color: var(--botton-white-hover);
 }
 .course-main .container .nav .bottom-area {
   width: 100%;
@@ -128,7 +130,7 @@
 }
 .course-main .container .nav .show-more-video-btn {
   margin-bottom: 12px;
-  background-color: #fff;
+  background-color: var(--button-white);
   cursor: pointer;
   padding: 12px;
   border: 1px solid rgba(0, 0, 0, 0.2);
@@ -137,7 +139,7 @@
   transition: 0.2s;
 }
 .course-main .container .nav .show-more-video-btn:hover {
-  background-color: #f6f6f6;
+  background-color: var(--botton-white-hover);
 }
 .course-main .container .nav .video-area-container {
   width: 100%;
@@ -237,7 +239,7 @@
 }
 .course-main .container .nav .video-area .video .info .public-and-edit-btn .isPublic {
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
 }
 .course-main .container .nav .video-area .video .info .public-and-edit-btn .isPublic .content {
   padding: 4px 6px;
@@ -291,7 +293,6 @@
 }
 .course-main .container .nav .QA-area .QA-header .show-public-QA {
   cursor: pointer;
-  font-weight: bold;
   padding: 4px 6px;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 2px;
@@ -304,7 +305,6 @@
 }
 .course-main .container .nav .QA-area .QA-header .show-delete-btn {
   cursor: pointer;
-  font-weight: bold;
   padding: 4px 6px;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 2px;
@@ -369,11 +369,11 @@
   border: 1px solid rgba(0, 0, 0, 0.2);
   display: flex;
   justify-content: center;
-  background-color: #ffffff;
+  background-color: var(--button-white);
   transition: 0.2s;
 }
 .course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .btn-area .into-qa-btn:hover {
-  background-color: #e1e1e1;
+  background-color: var(--botton-white-hover);
 }
 .course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .btn-area .remove-btn {
   color: black;
@@ -462,6 +462,7 @@
   /* 圖片區域 */
 }
 .course-main .container .nav .ask-area .ask-form .upload-img-area {
+  flex: 0.3;
   margin-top: 24px;
   display: flex;
   flex-direction: column;
@@ -540,15 +541,18 @@
 .course-main .container .nav .ask-area .ask-form .qa-info-area .resourceCategory-input-area button {
   padding: 0.3rem 0.6rem;
   border: none;
-  background-color: #0070f3;
-  color: #fff;
+  background-color: #eeeeee;
   border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
   cursor: pointer;
   transition: background-color 0.3s ease;
   color: black;
 }
+.course-main .container .nav .ask-area .ask-form .qa-info-area .resourceCategory-input-area button .content {
+  color: black;
+}
 .course-main .container .nav .ask-area .ask-form .qa-info-area .resourceCategory-input-area button:hover {
-  background-color: #005bb5;
+  background-color: rgb(224, 224, 224);
 }
 .course-main .container .nav .ask-area .ask-form .qa-info-area .themes-area {
   display: flex;
@@ -607,15 +611,18 @@
 .course-main .container .nav .ask-area .ask-form .qa-info-area .hints-input-area button {
   padding: 0.3rem 0.6rem;
   border: none;
-  background-color: #0070f3;
-  color: #fff;
+  background-color: #eeeeee;
   border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
   cursor: pointer;
   transition: background-color 0.3s ease;
   color: black;
 }
+.course-main .container .nav .ask-area .ask-form .qa-info-area .hints-input-area button .content {
+  color: black;
+}
 .course-main .container .nav .ask-area .ask-form .qa-info-area .hints-input-area button:hover {
-  background-color: #005bb5;
+  background-color: rgb(224, 224, 224);
 }
 .course-main .container .nav .ask-area .ask-form .qa-info-area .description-input-area {
   display: flex;

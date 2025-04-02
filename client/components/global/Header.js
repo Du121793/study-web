@@ -1,44 +1,45 @@
 // 組件庫
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
 // public
 import lineIcon from '../../public/imgs/line.png'
 import logo from '../../public/imgs/logo.jpg'
-// method
-import { useUserToken } from '../../method/useUserToken'
-import userService from '../../method/userService'
+import { useEffect, useState } from 'react'
 
-export default function Header(loginState) {
+export default function Header({ loginState, user_line_shot }) {
   // env
   const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
   const serverIp = process.env.NEXT_PUBLIC_SERVER_IP
-  const [userInfo, setUserInfo] = useState(null)
-  const token = useUserToken()
   // 路由參數
   const loginURL = `${serverIp}/auth/line`
   const HomePageURL = clientIp
   const ProfilePageURL = `${clientIp}/profiles/Profile`
+
+  const [userShot, setUserShot] = useState(null)
+
   // 登出 刪除token
   const signOut = () => {
+    if (sessionStorage.getItem('user_lineID')) {
+      sessionStorage.removeItem('user_lineID')
+    }
+    if (sessionStorage.getItem('user_role')) {
+      sessionStorage.removeItem('user_role')
+    }
+    if (sessionStorage.getItem('user_id')) {
+      sessionStorage.removeItem('user_id')
+    }
+    if (sessionStorage.getItem('user_line_shot')) {
+      sessionStorage.removeItem('user_line_shot')
+    }
     localStorage.removeItem('token')
     window.location.replace('/')
   }
-  // 回傳用戶資料到 userInfo
-  useEffect(() => {
-    if (token) {
-      userService
-        .getUserInfo(token)
-        .then((data) => {
-          setUserInfo(data)
-        })
-        .catch((err) => console.error('Error:', err))
-    }
-  }, [token])
 
-  const test = () => {
-    console.log(userInfo)
-  }
+  useEffect(() => {
+    const user_line_shot_temp = sessionStorage.getItem('user_line_shot')
+    setUserShot(user_line_shot_temp)
+  }, [])
+
   // Layout
   return (
     <div className="header-container">
@@ -55,7 +56,6 @@ export default function Header(loginState) {
         </Link>
         <div className="header-middle">
           <div
-            onClick={test}
             className="header-middle-nav-area"
             id="newest">
             <div className="line"></div>
@@ -86,7 +86,7 @@ export default function Header(loginState) {
             <span>關於我們</span>
           </div>
           {/* Not logined show line login's Link */}
-          {!loginState.loginState && (
+          {!loginState && (
             <Link
               target=""
               className="login-area"
@@ -104,12 +104,14 @@ export default function Header(loginState) {
         </div>
         <div className="header-right">
           {/* user shot */}
-          {loginState.loginState === true && (
+          {loginState === true && (
             <Link href={ProfilePageURL}>
               <div className="member-img">
                 <Image
+                  loading="lazy"
                   className="shot"
-                  src={userInfo && userInfo.data.userinfo.pictureUrl}
+                  // 由於userShot在index頁面會來不及加載，因此會改為使用index傳過來的user_line_shot
+                  src={userShot !== null ? userShot : user_line_shot}
                   alt="user's shot"
                   width={100}
                   height={100}
@@ -118,7 +120,7 @@ export default function Header(loginState) {
             </Link>
           )}
           {/* Sign out */}
-          {loginState.loginState === true && (
+          {loginState === true && (
             <div
               className="sign-out-area btn-area"
               onClick={signOut}>

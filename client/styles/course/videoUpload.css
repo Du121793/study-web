@@ -45,7 +45,7 @@
 .upload-vidoe-main .public-setting {
   width: 426px;
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
   margin-bottom: 20px;
   gap: 16px;
   align-items: center;

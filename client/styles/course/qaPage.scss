@@ -215,7 +215,7 @@
         width: 100%;
         .message-top {
           display: flex;
-          align-items: end;
+          align-items: flex-end;
           gap: 6px;
           .time {
             font-size: 14px;
@@ -239,7 +239,7 @@
         }
         .message-bottom {
           display: flex;
-          align-items: end;
+          align-items: flex-end;
           gap: 12px;
           .file-preview {
             max-width: 200px;

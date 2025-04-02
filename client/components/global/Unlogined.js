@@ -8,8 +8,6 @@ export default function Unlogined() {
   
   // 路由參數
   const loginURL = `${serverIp}/auth/line`
-  const HomePageURL = clientIp
-  const ProfilePageURL = `${clientIp}/profiles/profile`
   return (
     <div className="unlogined-main">
       <div className="content">請先進行登錄</div>

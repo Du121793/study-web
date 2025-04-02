@@ -14,8 +14,8 @@ import { useUserToken } from '../../method/useUserToken'
 import userService from '../../method/userService'
 
 // course component
-import QaMessageBoard from './MessageBoard'
-import ImageZoom from './ImageZoom'
+import QaMessageBoard from './component/MessageBoard'
+import ImageZoom from './component/ImageZoom'
 import adminService from '../../method/adminService'
 import EditQA from './QA/EditQA'
 
@@ -73,6 +73,28 @@ export default function QaPage() {
   const [showEditQAUI, setShowEditQAUI] = useState(false)
   const [hadEdit, setHadEdit] = useState(false)
 
+  const [userRole, setUserRole] = useState(null)
+  const [userId, setUserId] = useState(null)
+
+  useEffect(() => {
+    if (!sessionStorage.getItem('user_role') || !sessionStorage.getItem('user_id')) {
+      userService.getUserInfo(token).then((res) => {
+        sessionStorage.setItem('user_lineID', res.data.lineID)
+        sessionStorage.setItem('user_id', res.data._id)
+        sessionStorage.setItem('user_line_shot', res.data.userinfo.pictureUrl)
+        sessionStorage.setItem('user_role', res.data.role)
+      })
+    }
+    const role = localStorage.getItem('user_role')
+    const user_id = localStorage.getItem('user_role')
+    if (role) {
+      setUserRole(role)
+    }
+    if (user_id) {
+      setUserId(user_id)
+    }
+  }, [])
+
   // 控制訊息
   const messageControl = (info, isSuccess) => {
     setMessage(info)
@@ -91,12 +113,60 @@ export default function QaPage() {
     }, 2000)
   }
 
+  // 將值傳給放大圖片功能
+  const clickZoomImage = (imageUrl) => {
+    setZoomImage(imageUrl)
+    setImageIsZoom(true)
+  }
+
+  const deleteComment = (_id) => {
+    userService.deleteComment(token, qa_id, _id).then(() => {
+      userService
+        .getQaComment(token, qa_id)
+        .then((res) => {
+          setComments(res.data)
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+    })
+  }
+
+  const test = () => {}
+
+  // 請求修改問題設定
+  const submitTeacherSetting = () => {
+    if (qaInfo) {
+      adminService
+        .commentPublicSetting(token, qaInfo.courses, qaInfo._id, publicComment, isReplied)
+        .then((res) => {
+          console.log(res)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    }
+  }
+
+  // 渲染html元素
+  const HtmlRenderer = ({ htmlString }) => {
+    // sanitize() 會自動移除 <script>、事件屬性（如 onclick）等不安全標籤／屬性。
+    const clean = DOMPurify.sanitize(htmlString)
+    return (
+      <div
+        className="description"
+        dangerouslySetInnerHTML={{ __html: clean }}
+      />
+    )
+  }
+
   // 請求
   // 1. 使用者資料
   // 2. QA的資料
   // 3. QA的留言區
   useEffect(() => {
     if (token && qa_id) {
+      console.log('跑一次')
       userService
         .getUserInfo(token)
         .then((res) => {
@@ -134,7 +204,6 @@ export default function QaPage() {
       userService
         .getQaComment(token, qa_id)
         .then((res) => {
-          console.log(res)
           setComments(res.data)
         })
         .catch((err) => {
@@ -142,52 +211,6 @@ export default function QaPage() {
         })
     }
   }, [submitSuccess, token, qa_id])
-
-  // 將值傳給放大圖片功能
-  const clickZoomImage = (imageUrl) => {
-    setZoomImage(imageUrl)
-    setImageIsZoom(true)
-  }
-
-  const deleteComment = (_id) => {
-    userService.deleteComment(token, qa_id, _id).then(() => {
-      userService
-        .getQaComment(token, qa_id)
-        .then((res) => {
-          setComments(res.data)
-        })
-        .catch((err) => {
-          console.error(err)
-        })
-    })
-  }
-
-  const test = () => {}
-
-  // 請求修改問題設定
-  const submitTeacherSetting = () => {
-    if (qaInfo) {
-      adminService
-        .commentPublicSetting(token, qaInfo.courses, qaInfo._id, publicComment, isReplied)
-        .then((res) => {
-          console.log(res)
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    }
-  }
-
-  const HtmlRenderer = ({ htmlString }) => {
-    // sanitize() 會自動移除 <script>、事件屬性（如 onclick）等不安全標籤／屬性。
-    const clean = DOMPurify.sanitize(htmlString)
-    return (
-      <div
-        className="description"
-        dangerouslySetInnerHTML={{ __html: clean }}
-      />
-    )
-  }
 
   return (
     <div className="qaPage-main">
@@ -243,6 +266,7 @@ export default function QaPage() {
                   <Image
                     crossOrigin="anonymous"
                     className="image-video"
+                    loading="lazy"
                     src={`${getImageUrl}/${item}?token=${userToken}`}
                     onClick={() => {
                       clickZoomImage(`${getImageUrl}/${item}`)
@@ -305,7 +329,9 @@ export default function QaPage() {
           )}
         </div>
         {/* 編輯qa功能 */}
-        {userInfo && ((userInfo && userInfo.role === 'teacher') || userInfo.role === 'admin' || (userInfo.role === 'student' && new Date(qaInfo.date).getTime() >= thirtyMinutes)) && (
+        {/* 老師可以在任何時間修改QA */}
+        {/* 若是學生只有在30分鐘內可以編輯QA */}
+        {userRole && (userRole === 'teacher' || userRole === 'admin' || (userRole === 'student' && new Date(qaInfo.date).getTime() >= thirtyMinutes)) && (
           <div className="edit-qa-function-area">
             <div className="form-area">
               <div
@@ -344,6 +370,7 @@ export default function QaPage() {
               key={index}>
               <div className="user-shot-area">
                 <Image
+                  loading="lazy"
                   className="user-shot"
                   src={item.poster.pictureUrl}
                   width={50}
@@ -355,7 +382,7 @@ export default function QaPage() {
                   <div className="name">{item.poster.username}</div>
                   <div className="time">{new Date(item.date).toLocaleString()}</div>
                   <div className="isBest">{item.isBest === true && '最佳留言'}</div>
-                  {(item.poster._id === userInfo._id || userInfo.role === 'teacher' || userInfo.role === 'admin') && (
+                  {(item.poster._id === userId || userRole === 'teacher' || userRole === 'admin') && (
                     <div
                       onClick={() => {
                         deleteComment(item._id)
@@ -387,6 +414,7 @@ export default function QaPage() {
                       onClick={() => {
                         clickZoomImage(item)
                       }}
+                      loading="lazy"
                       className="file-preview"
                       src={`${item}?token=${token.split(' ')[1]}`}
                       alt="Attached image of the commenter"

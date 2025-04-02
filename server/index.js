@@ -15,6 +15,8 @@ const authRoute = require("./routes").auth;
 const courseRoute = require("./routes").course;
 const userRoute = require("./routes").user;
 const resourceRoute = require("./resource");
+const publicResourceRoute = require("./routes").publicResource;
+const modifyResourceRoute = require("./routes").modifyResource;
 
 app.use(
   cors({
@@ -68,6 +70,8 @@ const tokenCheck = (req, res, next) => {
 // 設定路由
 app.use("/auth", authRoute);
 app.use("/resource", resourceRoute);
+app.use("/publicResource", publicResourceRoute);
+app.use("/modifyResource", tokenCheck, modifyResourceRoute);
 app.use("/user", tokenCheck, userRoute);
 app.use("/course", tokenCheck, courseRoute);
 

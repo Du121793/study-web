@@ -6,4 +6,5 @@ module.exports = {
   QA: require("./course/QA-model"),
   QAmessage: require("./course/QAmessage-model"),
   vimeoSchedule: require("./gc/vimeoSchedule-model"),
+  board: require("./homepage/board-model"),
 };

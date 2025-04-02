@@ -17,26 +17,43 @@ export default function Profile() {
   const token = useUserToken()
   const [userInfo, setUserInfo] = useState(null)
   const [isLogined, setLogined] = useState(false)
+
+  const [userRole, setUserRole] = useState(null)
+
+  useEffect(() => {
+    if (!sessionStorage.getItem('user_role') || !sessionStorage.getItem('user_id')) {
+      userService.getUserInfo(token).then((res) => {
+        sessionStorage.setItem('user_lineID', res.data.lineID)
+        sessionStorage.setItem('user_id', res.data._id)
+        sessionStorage.setItem('user_line_shot', res.data.userinfo.pictureUrl)
+        sessionStorage.setItem('user_role', res.data.role)
+      })
+    }
+    const role = sessionStorage.getItem('user_role')
+    if (role) {
+      setUserRole(role)
+    }
+  }, [])
+
   useEffect(() => {
     if (token) {
       userService
         .getUserInfo(token)
-        .then((data) => {
-          setUserInfo(data)
+        .then((res) => {
+          setUserInfo(res.data)
           setLogined(true)
         })
         .catch((err) => console.error('Error:', err))
     }
   }, [token])
 
-
   return (
     <div className="profile-main">
       <Head></Head>
       <Header loginState={isLogined}></Header>
-      {userInfo && userInfo.data.role === 'student' && <StudentLayout></StudentLayout>}
-      {userInfo && userInfo.data.role === 'teacher' && <TeacherLayout></TeacherLayout>}
-      {userInfo && userInfo.data.role === 'admin' && <AdminLayout></AdminLayout>}
+      {userRole && userRole === 'student' && <StudentLayout user_role={userRole}></StudentLayout>}
+      {userRole && userRole === 'teacher' && <TeacherLayout user_role={userRole}></TeacherLayout>}
+      {userRole && userRole === 'admin' && <AdminLayout user_role={userRole}></AdminLayout>}
       {!isLogined && <Unlogined></Unlogined>}
       <span></span>
     </div>

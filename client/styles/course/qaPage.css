@@ -222,7 +222,7 @@
 }
 .qaPage-main .qaPage-container .comment-area .message-info .message-top {
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   gap: 6px;
 }
 .qaPage-main .qaPage-container .comment-area .message-info .message-top .time {
@@ -246,7 +246,7 @@
 }
 .qaPage-main .qaPage-container .comment-area .message-info .message-bottom {
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   gap: 12px;
   margin-bottom: 12px;
 }

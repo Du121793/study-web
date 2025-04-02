@@ -1,9 +1,9 @@
 .Layout-main .Layout-container {
   position: relative;
   display: flex;
-  width: 100%;
-  height: 100%;
   position: absolute;
+  width: 100%;
+  min-height: calc(100vh - 115px);
 }
 .Layout-main .Layout-container .Layout-left-nav {
   position: relative;
@@ -24,7 +24,16 @@
   border-right: 1px solid #ccc;
   border-bottom: 1px solid #ccc;
   background-color: #ffffff;
+  height: 100%;
+}
+.Layout-main .Layout-container .Layout-left-nav .options .innerElement {
   gap: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  position: sticky;
+  top: 0;
 }
 .Layout-main .Layout-container .Layout-left-nav .options .active {
   background-color: rgba(119, 164, 240, 0.5);
@@ -136,6 +145,7 @@
 }
 .Layout-main .Layout-container .Layout-left-nav .options .close-nav-left {
   display: flex;
+  cursor: pointer;
   align-items: center;
   justify-content: center;
   position: relative;

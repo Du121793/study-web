@@ -1,8 +1,7 @@
 const router = require("express").Router();
 const VideoAccess = require("../../models").courseVideoAccess;
 const VideoInfo = require("../../models").courseVideoInfo;
-const User = require("../../models").User;
-// CourseMethod/videoAccess
+const User = require("../../models").user;
 
 /**
  * 目標：VideoAccess 資料結構
@@ -42,7 +41,9 @@ router.get("/", async (req, res) => {
           select: "_id userinfo",
         });
       if (!record) {
-        return res.status(404).json({ success: false, msg: "找不到對應的存取紀錄" });
+        return res
+          .status(404)
+          .json({ success: false, msg: "找不到對應的存取紀錄" });
       }
       return res.json({ success: true, data: record });
     } else {
@@ -64,7 +65,9 @@ router.get("/", async (req, res) => {
     }
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ success: false, msg: "取得 video access 紀錄失敗" });
+    return res
+      .status(500)
+      .json({ success: false, msg: "取得 video access 紀錄失敗" });
   }
 });
 
@@ -74,29 +77,30 @@ router.get("/", async (req, res) => {
 // Body 參數: { accessName, videoIDs, studentIDs, accessDate, unlimited }
 // - 所有課程都強制指定為 req.course._id
 // - 若 unlimited = true，accessDate = null
-// - studentIDs 必須都在 req.course.members 中
 // - videoIDs 必須查詢確認都屬於該 course
 // ------------------------------
 router.post("/postNewAccess", async (req, res) => {
   try {
     let { accessName, videoIDs, studentIDs, accessDate, unlimited } = req.body;
 
-    // 1) 若 unlimited 為 true，設為 null
+    // 1) 若 unlimited 為 true，則將 accessDate 設為 null
     if (unlimited) {
       accessDate = null;
     }
 
-    // 2) 確認 studentIDs 皆在 req.course.members 中
+    // 2) 確認 studentIDs 都屬於該課程
     if (studentIDs && Array.isArray(studentIDs)) {
-      const notMember = studentIDs.find(
-        (sid) => !req.course.members.includes(sid)
-      );
-      if (notMember) {
-        return res.status(400).json({
-          success: false,
-          msg: "有指定的 studentIDs 不在本課程成員列表中",
+      // 從 User 模型中查詢，必須同時符合 _id 在 studentIDs 且 courses 陣列包含 req.course._id
+        const validCount = await User.countDocuments({
+          _id: { $in: studentIDs },
+          courses: req.course._id,
         });
-      }
+        if (validCount !== studentIDs.length) {
+          return res.status(400).json({
+            success: false,
+            msg: "有指定的 studentIDs 不屬於本課程成員",
+          });
+        }
     }
 
     // 3) 確認 videoIDs 皆屬於該課程
@@ -105,15 +109,16 @@ router.post("/postNewAccess", async (req, res) => {
         _id: { $in: videoIDs },
         courseID: req.course._id,
       }).select("_id");
-      // 若查到的數量 < 傳入的數量，代表有不屬於本課程的影片
+      // 若查到的數量小於傳入的數量，表示有不屬於本課程的影片
       if (foundVideos.length < videoIDs.length) {
-        return res
-          .status(400)
-          .json({ success: false, msg: "有指定的 videoIDs 不屬於本課程" });
+        return res.status(400).json({
+          success: false,
+          msg: "有指定的 videoIDs 不屬於本課程",
+        });
       }
     }
 
-    // 4) 建立新紀錄
+    // 4) 建立新的 VideoAccess 紀錄，所有課程強制指定為 req.course._id
     const newAccess = new VideoAccess({
       courseID: req.course._id,
       videoIDs,
@@ -147,11 +152,12 @@ router.patch("/patchAccess/:id", async (req, res) => {
     const recordId = req.params.id;
     let { accessName, videoIDs, studentIDs, accessDate, unlimited } = req.body;
 
+    // 若 unlimited 為 true，將 accessDate 設為 null
     if (unlimited) {
       accessDate = null;
     }
 
-    // 構建更新物件
+    // 建立更新物件
     const updateObj = {
       creater: req.user._id,
       date: Date.now(),
@@ -161,20 +167,22 @@ router.patch("/patchAccess/:id", async (req, res) => {
     if (studentIDs !== undefined) updateObj.studentIDs = studentIDs;
     if (accessDate !== undefined) updateObj.accessDate = accessDate;
 
-    // 若 body 有 studentIDs，檢查是否都在本課程
+    // 1) 檢查 studentIDs 是否皆屬於該課程
+    // 從 User 模型中查詢，必須同時符合 _id 在 studentIDs 且 courses 陣列包含 req.course._id
     if (studentIDs && Array.isArray(studentIDs)) {
-      const notMember = studentIDs.find(
-        (sid) => !req.course.members.includes(sid)
-      );
-      if (notMember) {
+      const validCount = await User.countDocuments({
+        _id: { $in: studentIDs },
+        courses: req.course._id,
+      });
+      if (validCount !== studentIDs.length) {
         return res.status(400).json({
           success: false,
-          msg: "有指定的 studentIDs 不在本課程成員列表中",
+          msg: "有指定的 studentIDs 不屬於本課程成員",
         });
       }
     }
 
-    // 若 body 有 videoIDs，檢查是否都屬於本課程
+    // 2) 檢查 videoIDs 是否皆屬於該課程
     if (videoIDs && Array.isArray(videoIDs) && videoIDs.length > 0) {
       const foundVideos = await VideoInfo.find({
         _id: { $in: videoIDs },
@@ -187,7 +195,7 @@ router.patch("/patchAccess/:id", async (req, res) => {
       }
     }
 
-    // 建立查詢條件 (Admin 可改所有, 非 Admin 只能改本課程)
+    // 3) 建立查詢條件 (Admin 可修改所有紀錄，非 Admin 只可修改該課程的紀錄)
     const queryCondition = { _id: recordId };
     if (req.user.role !== "admin") {
       queryCondition.courseID = req.course._id;

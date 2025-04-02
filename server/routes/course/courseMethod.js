@@ -9,6 +9,7 @@ const videoAccessRoute = require("./videoAccess");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const mongoose = require("mongoose");
 
 router.use("/videoAccess", accessChecker.teacher, videoAccessRoute);
 
@@ -49,64 +50,41 @@ router.get("/members", async (req, res) => {
     const page = parseInt(req.query.page, 10) || 1;
     const pageSize = parseInt(req.query.pageSize, 10) || 10;
     const sortBy = req.query.sortBy; // 可選 "grade" 或 "date"
-    const sortOrder = req.query.sortOrder === "desc" ? "desc" : "asc";
+    const sortOrder = req.query.sortOrder === "desc" ? -1 : 1;
 
-    // 取得課程成員，假設 req.course.members 為已填充的成員陣列
-    let members = req.course.members || [];
-
-    // 過濾：若指定角色，則僅回傳該角色成員
+    // 篩選出修習此課程的成員
+    // 假設 req.course 已包含課程資料且有 _id
+    const filter = { courses: req.course._id };
     if (role) {
-      members = members.filter((member) => member.role === role);
+      filter.role = role;
     }
 
-    // 排序：依據 sortBy 參數排序
+    // 排序條件
+    let sortCriteria = {};
     if (sortBy === "grade") {
-      members.sort((a, b) => {
-        // 取得年級，若不存在則視為 null
-        const gradeA = a.userinfo && a.userinfo.grade ? a.userinfo.grade : null;
-        const gradeB = b.userinfo && b.userinfo.grade ? b.userinfo.grade : null;
-        // 假設 grade 為數值型態或數值字串，若非數值可用字串比較
-        const numA = gradeA !== null ? parseInt(gradeA, 10) : null;
-        const numB = gradeB !== null ? parseInt(gradeB, 10) : null;
-
-        // 排序規則：
-        // - 若兩者皆有年級，則依據數值大小比較
-        // - 若一方沒有年級，則該成員排在後面
-        if (numA === null && numB === null) {
-          // 都沒有年級，則以 date 排序
-          const dateA = new Date(a.date).getTime();
-          const dateB = new Date(b.date).getTime();
-          return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
-        } else if (numA === null) {
-          return 1;
-        } else if (numB === null) {
-          return -1;
-        } else if (numA !== numB) {
-          return sortOrder === "asc" ? numA - numB : numB - numA;
-        } else {
-          // 若年級相同，則以 date 排序
-          const dateA = new Date(a.date).getTime();
-          const dateB = new Date(b.date).getTime();
-          return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
-        }
-      });
+      // 以 userinfo.grade 排序（注意：若 grade 缺失時，排序邏輯與原本的自訂排序可能會有差異）
+      sortCriteria = { "userinfo.grade": sortOrder, date: sortOrder };
     } else if (sortBy === "date") {
-      members.sort((a, b) => {
-        const dateA = new Date(a.date).getTime();
-        const dateB = new Date(b.date).getTime();
-        return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
-      });
+      sortCriteria = { date: sortOrder };
     }
-    // 若未指定 sortBy，則保留原有順序
 
-    // 分頁：依據 page 與 pageSize 計算起始與結束索引
-    const total = members.length;
-    const startIndex = (page - 1) * pageSize;
-    const paginatedMembers = members.slice(startIndex, startIndex + pageSize);
+    const skip = (page - 1) * pageSize;
+
+    // 從 User 中查詢符合條件的成員，只選取 _id 欄位
+    const members = await User.find(filter, { _id: 1 })
+      .sort(sortCriteria)
+      .skip(skip)
+      .limit(pageSize);
+
+    // 取得符合條件的成員總數（分頁用）
+    const total = await User.countDocuments(filter);
+
+    // 提取 _id 並包成陣列回傳
+    const memberIds = members.map((member) => member._id);
 
     return res.json({
       success: true,
-      data: paginatedMembers,
+      data: memberIds,
       page,
       pageSize,
       total,
@@ -266,7 +244,7 @@ router.post(
   "/uploadVideo",
   [accessChecker.teacher, upload.single("thumbnail")],
   // 使用 upload.single('thumbnail') 代表只處理單一檔案，且該欄位名稱為 thumbnail
-  
+
   async (req, res) => {
     try {
       // 由 formData 取得文字欄位
@@ -280,8 +258,8 @@ router.post(
         isPrivate,
       } = req.body;
 
-      console.log(req.body)
-      
+      console.log(req.body);
+
       // 檢查必要欄位
       if (!title || !fileSize)
         return res.status(400).json({ success: false, msg: "上傳資料缺少" });
@@ -432,7 +410,7 @@ router.patch(
   upload.single("thumbnail"), // 處理 thumbnail 的檔案更新
   async (req, res) => {
     try {
-      console.log(req.body)
+      console.log(req.body);
       const { videoID } = req.body;
       if (!videoID)
         return res.status(400).json({ success: false, msg: "缺少 videoID" });
@@ -529,30 +507,25 @@ router.patch(
 router.delete("/deleteVideo", accessChecker.teacher, async (req, res) => {
   try {
     const { videoId } = req.body;
-    console.log("video", videoId);
 
-    // 取得影片資料
-    let foundVideoInfo = await VideoInfo.findOne({ _id: videoId });
-    if (!foundVideoInfo)
-      return res.status(400).json({ success: false, msg: "找不到影片資料" });
-
-    // 若影片已有 thumbnail，且檔案存在，則刪除該圖片檔案
-    if (foundVideoInfo.thumbnail && fs.existsSync(foundVideoInfo.thumbnail)) {
-      fs.unlinkSync(foundVideoInfo.thumbnail);
+    if (!videoId) {
+      return res.status(400).json({ success: false, msg: "缺少 videoId" });
+    }
+    if (!mongoose.Types.ObjectId.isValid(videoId)) {
+      return res.status(400).json({ success: false, msg: "無效的 videoId" });
     }
 
-    const newSchedule = new vimeoSchedule({
-      method: "delete",
-      videoIndex: { videoId: videoId },
-    });
-    await newSchedule.save();
+    // 只做基本檢查 & 刪除，不用再手動刪縮圖或排程
+    const foundVideoInfo = await VideoInfo.findOneAndDelete({ _id: videoId });
+    if (!foundVideoInfo) {
+      return res.status(404).json({ success: false, msg: "找不到影片資料" });
+    }
 
-    await VideoInfo.findOneAndDelete({ _id: videoId });
-
-    return res.json({ success: true, msg: "已更新資料庫" });
+    return res.json({ success: true, msg: "已刪除影片並更新資料庫" });
   } catch (e) {
     console.error(e);
     return res.status(500).json({ success: false, msg: "伺服器處理失敗" });
   }
 });
+
 module.exports = router;

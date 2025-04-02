@@ -7,21 +7,21 @@ import Link from 'next/link'
 // method
 import { useUserToken } from '../../method/useUserToken'
 import userService from '../../method/userService'
+import adminService from '../../method/adminService'
 
 // public
 import downArrow from '../../public/course/downArrow.png'
 import client from 'react-dom/client'
 
 // 子組件
-import ShowMoreQA from './ShowMoreQA'
-import ShowPublicQA from './ShowPublicQA'
-import adminService from '../../method/adminService'
-import ImageZoom from './ImageZoom'
+import ShowMoreQA from './component/ShowMoreQA'
+import ShowPublicQA from './component/ShowPublicQA'
+import ImageZoom from './component/ImageZoom'
 
 // env
 const client_URL = process.env.NEXT_PUBLIC_CLIENT_IP
 
-export default function QaNav({ course_id, courseName }) {
+export default function QaNav({ user_role, course_id, courseName }) {
   const token = useUserToken()
   const [courseQas, setCourseQas] = useState([])
   const [userToken, setUserToken] = useState('')
@@ -49,9 +49,6 @@ export default function QaNav({ course_id, courseName }) {
   // 請求參數的狀態
   const [sortBy, setSortBy] = useState('resourceCategories')
   const [timeSort, setTimeSort] = useState('desc')
-
-  // 用戶資料
-  const [userInfo, setUserInfo] = useState({})
 
   // 公開QA資料
   const [publicQAInfo, setPublicQAInfo] = useState({})
@@ -149,11 +146,6 @@ export default function QaNav({ course_id, courseName }) {
         })
         .catch((err) => console.error('Error:', err.message))
     }
-    if (token) {
-      userService.getUserInfo(token).then((res) => {
-        setUserInfo(res.data)
-      })
-    }
   }, [token, course_id, sortBy, timeSort])
 
   return (
@@ -214,16 +206,16 @@ export default function QaNav({ course_id, courseName }) {
             </select>
           </div>
 
-          {userInfo.role === 'teacher' ||
-            ('admin' && (
+          {(user_role && user_role === 'teacher') ||
+            (user_role && user_role === 'admin' && (
               <div
                 className="show-public-QA"
                 onClick={showPublicQAClick}>
                 顯示公開QA
               </div>
             ))}
-          {userInfo.role === 'teacher' ||
-            ('admin' && (
+          {(user_role && user_role === 'teacher') ||
+            (user_role && user_role === 'admin' && (
               <div
                 className="show-delete-btn"
                 onClick={() => {
@@ -361,6 +353,7 @@ export default function QaNav({ course_id, courseName }) {
                           src={`${qaInfo.image[0]}?token=${userToken}`}
                           width={200}
                           height={0}
+                          loading='lazy'
                           style={{ height: 'auto' }}
                           alt="qa-image"
                           onClick={() => {

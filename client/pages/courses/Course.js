@@ -6,6 +6,7 @@ import Link from 'next/link'
 
 // global組件
 import Header from '../../components/global/Header'
+import Footer from '../../components/global/Footer'
 
 // method
 import { useUserToken } from '../../method/useUserToken'
@@ -28,7 +29,7 @@ export default function Course() {
   const token = useUserToken()
   const router = useRouter()
   const { courseName, courseId } = router.query
-  const course_id = useRef(null);
+  const course_id = useRef(null)
 
   // 請求參數
   const baseUrl = `${clientIp}/`
@@ -37,10 +38,22 @@ export default function Course() {
   const [userInfo, setUserInfo] = useState(null)
   const [isShowVideoUpload, setIsShowVideoUpload] = useState(false)
 
-  const test = () => {
-    console.log(course_id)
-    console.log(courseName)
-  }
+  const [userRole, setUserRole] = useState(null)
+
+  useEffect(() => {
+    if (!sessionStorage.getItem('user_role') || !sessionStorage.getItem('user_id')) {
+      userService.getUserInfo(token).then((res) => {
+        sessionStorage.setItem('user_lineID', res.data.lineID)
+        sessionStorage.setItem('user_id', res.data._id)
+        sessionStorage.setItem('user_line_shot', res.data.userinfo.pictureUrl)
+        sessionStorage.setItem('user_role', res.data.role)
+      })
+    }
+    const role = sessionStorage.getItem('user_role')
+    if (role) {
+      setUserRole(role)
+    }
+  }, [])
 
   // 請求使用者資料
   useEffect(() => {
@@ -58,9 +71,9 @@ export default function Course() {
   // 透過query拿到的courseName來更改course_id的狀態
   useEffect(() => {
     if (courseName) {
-      course_id.current = courseId;
+      course_id.current = courseId
     }
-  }, [courseName, courseId]);
+  }, [courseName, courseId])
 
   return (
     <div className="course-main">
@@ -82,22 +95,28 @@ export default function Course() {
         </div>
 
         {/* 影片組件 */}
-        {courseId !== null && (
+        {courseId !== null && userRole && (
           <VideoNav
+            user_role={userRole}
             course_id={courseId}
             courseName={courseName}></VideoNav>
         )}
         {/* Q&A 組件 */}
-        {courseId !== null && (
+        {courseId !== null && userRole && (
           <QaNav
+            user_role={userRole}
             course_id={courseId}
             courseName={courseName}></QaNav>
         )}
         {/* Ask 組件 */}
-        <AskNav
-          course_id={courseId}
-          courseName={courseName}></AskNav>
+        {userRole && (
+          <AskNav
+            user_role={userRole}
+            course_id={courseId}
+            courseName={courseName}></AskNav>
+        )}
       </div>
+      <Footer></Footer>
     </div>
   )
 }

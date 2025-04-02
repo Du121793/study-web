@@ -297,10 +297,10 @@ router.patch(
         description,
         resourceCategories,
         hints,
-        rmIMG,  // array(index)
+        rmIMG, // array(index)
         replied,
       } = req.body;
-      console.log(req.body)
+      console.log(req.body);
 
       // 必須提供有效的 question_id
       if (!mongoose.Types.ObjectId.isValid(question_id)) {
@@ -354,19 +354,19 @@ router.patch(
       if (course_ids !== undefined) {
         oldQA.courses = course_ids;
       }
-      if (isPublic!== undefined) {
+      if (isPublic !== undefined) {
         oldQA.isPublic = isPublic;
       }
-      if (description!== undefined) {
+      if (description !== undefined) {
         oldQA.description = description;
       }
-      if (resourceCategories!== undefined) {
+      if (resourceCategories !== undefined) {
         oldQA.resourceCategories = resourceCategories;
       }
-      if (hints!== undefined) {
+      if (hints !== undefined) {
         oldQA.hints = hints;
       }
-      if (replied!== undefined) {
+      if (replied !== undefined) {
         oldQA.replied = replied;
       }
 
@@ -385,11 +385,6 @@ router.patch(
   }
 );
 
-/* -------------------------------
-   DELETE: 刪除問題
-   - 刪除資料庫中的 QA 文件
-   - 刪除對應的圖片資料夾（包含所有子檔案與子資料夾）
----------------------------------*/
 router.delete(
   "/deleteQuestion",
   accessChecker.updateAndDeleteQuestion,
@@ -400,32 +395,17 @@ router.delete(
         return res.status(400).json({ success: false, msg: "無效的問題ID" });
       }
 
-      // 刪除對應的圖片資料夾（包含所有子檔案與子資料夾）
-      const questionFolder = getQuestionFolder(question_id);
-      if (fs.existsSync(questionFolder)) {
-        fs.rmSync(questionFolder, { recursive: true, force: true });
-      }
+      // 由於問題圖片資料夾的刪除已放在 QA 模型的 pre hook 中，
+      // 因此這裡不再需要手動刪除資料夾
 
       // 找出所有關聯此問題的留言（pointTo 為該問題ID）
       const comments = await QAmessage.find({ pointTo: question_id });
       for (const comment of comments) {
-        // 若留言中有影片（videoURL 陣列不為空），則加入 Vimeo 刪除排程
-        if (
-          comment.videoURL &&
-          Array.isArray(comment.videoURL) &&
-          comment.videoURL.length > 0
-        ) {
-          const newSchedule = new vimeoSchedule({
-            method: "delete",
-            videoIndex: { commentID: comment._id },
-          });
-          await newSchedule.save();
-        }
-        // 刪除留言，留言內的圖片不需額外刪除（因為父資料夾已被移除）
+        // 呼叫 findByIdAndDelete 刪除留言，留言內的圖片與影片排程會由 QAmessage 的 hook 自動處理
         await QAmessage.findByIdAndDelete(comment._id);
       }
 
-      // 刪除問題資料
+      // 刪除問題資料（刪除前會先觸發 QA 模型的 pre hook 刪除圖片資料夾）
       await QA.findByIdAndDelete(question_id);
 
       return res.json({ success: true, msg: "問題刪除成功" });

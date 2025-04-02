@@ -47,12 +47,14 @@
         border: 1px solid rgb(179, 179, 179);
         padding: 12px;
         gap: 8px;
+        max-width: 500px;
         .qa-link {
           width: 100%;
           height: 100%;
           position: absolute;
         }
         .tag-area {
+          flex-wrap: wrap;
           display: flex;
           gap: 8px;
           .big-tag-area {
@@ -82,6 +84,7 @@
         }
         .image-area {
           display: flex;
+          flex-wrap: wrap;
           .image {
             border: 1px solid rgba(0, 0, 0, 0.2);
             border-radius: 8px;
@@ -91,10 +94,13 @@
           display: flex;
           flex-direction: column;
           gap: 8px;
+          width: 100%;
           .description {
+            width: 90%;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            text-overflow: ellipsis;
           }
           .time {
             display: flex;

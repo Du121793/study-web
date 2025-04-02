@@ -11,6 +11,24 @@ const QAMETHOD_URL = `${serverIp}/course/question/QAMethod`
 const INDEX_URL = `${serverIp}/course/question`
 const USER_URL = `${serverIp}/user`
 
+// 登出函式
+const signOut = () => {
+  if (sessionStorage.getItem('user_lineID')) {
+    sessionStorage.removeItem('user_lineID')
+  }
+  if (sessionStorage.getItem('user_role')) {
+    sessionStorage.removeItem('user_role')
+  }
+  if (sessionStorage.getItem('user_id')) {
+    sessionStorage.removeItem('user_id')
+  }
+  if (sessionStorage.getItem('user_role')) {
+    sessionStorage.removeItem('user_role')
+  }
+  localStorage.removeItem('token')
+  window.location.replace('/')
+}
+
 const adminService = {
   // 創建新課程
   async createANewCourse(token, courseInfo) {
@@ -19,6 +37,10 @@ const adminService = {
       const response = await axios.post(COURSE_URL + '/createNewCourse', courseInfo, {
         headers: authHeader,
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (e) {
       return e.response
@@ -35,6 +57,10 @@ const adminService = {
       const response = await axios.post(COURSE_URL + '/register', data, {
         headers: authHeader,
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (e) {
       return e.response.data
@@ -43,12 +69,17 @@ const adminService = {
 
   // 取消註冊該課程的成員
   async unRegisterMember(token, unRegisterInfo) {
+    console.log(unRegisterInfo)
     // unRegisterInfo 內存放 學生id陣列與課程id { user_ids, course_id }
     const authHeader = token ? { Authorization: token } : {}
     try {
       const response = await axios.post(COURSE_URL + '/unRegister', unRegisterInfo, {
         headers: authHeader,
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (e) {
       return e
@@ -62,6 +93,10 @@ const adminService = {
       headers: authHeader,
       params: grade,
     })
+    if (response.status === 401) {
+      signOut()
+      return
+    }
     return response.data
   },
 
@@ -81,8 +116,56 @@ const adminService = {
       headers: authHeader,
       params: data,
     })
+    if (response.status === 401) {
+      signOut()
+      return
+    }
     return response.data
   },
+
+  /* const data = {
+        realname: nameInput,
+        phoneNumber: phoneInput,
+        gradeInput: gradeInput,
+        role: roleInput,
+        courses: selectCourse,
+        page: page,
+        pageSize: pageSize,
+    }*/
+  async exportMembers(token, data) {
+    const authHeader = token ? { Authorization: token } : {}
+    const response = await axios
+      .get(USER_URL + '/exportMembers', {
+        headers: authHeader,
+        params: data,
+        responseType: 'blob',
+      })
+      .then((response) => {
+        const now = new Date()
+        const year = now.getFullYear()
+        const month = String(now.getMonth() + 1).padStart(2, '0') // 月份從 0 開始所以要 +1
+        const day = String(now.getDate()).padStart(2, '0')
+        const hour = String(now.getHours()).padStart(2, '0')
+        const minute = String(now.getMinutes()).padStart(2, '0')
+        const formattedTime = `${year}/${month}/${day}_${hour}-${minute}`
+
+        const url = window.URL.createObjectURL(new Blob([response.data]))
+        const link = document.createElement('a')
+        link.href = url
+        // 設定下載檔名
+        link.setAttribute('download', `${formattedTime}_members.csv`)
+        // Date+time_members.csv
+        document.body.appendChild(link)
+        link.click()
+        // 釋放記憶體
+        window.URL.revokeObjectURL(url)
+        return
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+  },
+
   /*
   const data = {
     courseName: courseNameInput,
@@ -103,6 +186,10 @@ const adminService = {
       headers: authHeader,
       params: data,
     })
+    if (response.status === 401) {
+      signOut()
+      return
+    }
     return response.data
   },
 
@@ -113,16 +200,25 @@ const adminService = {
       headers: authHeader,
       params: filter,
     })
+    if (response.status === 401) {
+      signOut()
+      return
+    }
     return response.data
   },
 
   // 刪除課程
   async deleteCourse(token, courseId) {
+    console.log(courseId)
     const authHeader = token ? { Authorization: token } : {}
     const response = await axios.delete(COURSE_URL + '/deleteCourse', {
       headers: authHeader,
       data: { course_id: courseId },
     })
+    if (response.status === 401) {
+      signOut()
+      return
+    }
     return response.data
   },
 
@@ -135,6 +231,10 @@ const adminService = {
       const response = await axios.post(USER_URL + '/preRegisterUser', users, {
         headers: authHeader,
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       console.log(response)
       return response.data
     } catch (e) {
@@ -153,7 +253,10 @@ const adminService = {
         headers: authHeader,
         data: userIds,
       })
-
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (error) {
       console.error(error)
@@ -171,6 +274,10 @@ const adminService = {
         headers: authHeader,
         data: { videoId },
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (error) {
       console.error(error)
@@ -186,6 +293,10 @@ const adminService = {
       const response = await axios.patch(QA_URL + `/patchQuestion`, payload, {
         headers: authHeader,
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (err) {
       console.error(err.response.data)
@@ -202,6 +313,10 @@ const adminService = {
         headers: authHeader,
         params: payload,
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (err) {
       console.log(err.response)
@@ -218,6 +333,10 @@ const adminService = {
         headers: authHeader,
         params: payload,
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (err) {
       console.error(err.response.data)
@@ -234,6 +353,10 @@ const adminService = {
       const response = await axios.patch(COURSE_URL + `/patchCourse`, data, {
         headers: authHeader,
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (err) {
       console.error(err.response.data)
@@ -249,6 +372,10 @@ const adminService = {
       const response = await axios.post(BASE_COURSE_URL + `/${course_id}/videoAccess/postNewAccess`, data, {
         headers: authHeader,
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (err) {
       console.error(err.response.data)
@@ -266,6 +393,10 @@ const adminService = {
         headers: authHeader,
         params: data,
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (err) {
       console.error(err.response.data)
@@ -281,6 +412,10 @@ const adminService = {
       const response = await axios.patch(BASE_COURSE_URL + `/${course_id}/videoAccess/patchAccess/${choseAccessId}`, data, {
         headers: authHeader,
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (err) {
       console.error(err.response.data)
@@ -294,6 +429,10 @@ const adminService = {
       const response = await axios.delete(BASE_COURSE_URL + `/${course_id}/videoAccess/deleteAccess/${choseAccessId}`, {
         headers: authHeader,
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (err) {
       console.error(err)
@@ -317,6 +456,10 @@ const adminService = {
       const response = await axios.patch(BASE_COURSE_URL + `/${courseID}/patchVideo`, data, {
         headers: authHeader,
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (error) {
       console.error(error)
@@ -343,9 +486,46 @@ const adminService = {
       const response = await axios.patch(QA_URL + `/patchQuestion`, data, {
         headers: authHeader,
       })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
       return response.data
     } catch (error) {
       console.error(error)
+    }
+  },
+  //  {title, content}
+  async postCarousels(token, data) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.post(API_URL + `/modifyResource/postNewCarousel`, data, {
+        headers: authHeader,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (e) {
+      return e.response.data
+    }
+  },
+  // { numbers: [1, 3, 5] }
+  async deleteCarousels(token, data) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.delete(API_URL + `/modifyResource/deleteCarousel`, {
+        headers: authHeader,
+        params: data,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (e) {
+      return e.response.data
     }
   },
 }

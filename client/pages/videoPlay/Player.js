@@ -1,11 +1,10 @@
 // 組件庫
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 import Link from 'next/link'
 // public
 import arrow from '../../public/videoPlay/arrow.png'
-import downArrow from '../../public/videoPlay/downArrow.png'
 import logo from '../../public/videoPlay/logo2.png'
 // method
 import { useUserToken } from '../../method/useUserToken'
@@ -31,12 +30,10 @@ export default function Player() {
   const [videoUrl, setVideoUrl] = useState()
   // 影片清單
   const [VideosList, setVideosList] = useState([])
-  // 用戶資料
-  const [userInfo, setUserInfo] = useState([])
-  const [userToken, setUserToeken] = useState('')
   // 根據是否打開清單決定影片資訊部分是否為置中
   const [isAlignCenter, setIsAlignCenter] = useState('flex-start')
-
+  // 使用者line縮圖
+  const [userShot, setUserShot] = useState(null)
   //   開關右邊列表
   const listSwitch = (e) => {
     if (e === 'close-button') {
@@ -85,18 +82,16 @@ export default function Player() {
           setVideosList(res.data)
         })
     }
-    if (token) {
-      userService.getUserInfo(token).then((res) => {
-        setUserInfo(res.data)
-      })
-    }
-    if (typeof window !== 'undefined') {
-      setUserToeken(window.localStorage.getItem('token').split(' ')[1])
-    }
   }, [token, course_id, video_id])
 
+  useEffect(() => {
+    const shot = localStorage.getItem('user_line_shot')
+    if (shot) {
+      setUserShot(shot)
+    }
+  }, [])
+
   const test = () => {
-    
     console.log(VideosList)
   }
 
@@ -117,13 +112,15 @@ export default function Player() {
           className="logos"
           width={100}
           height={100}></Image>
-        <Image
-          className="user-shot"
-          src={userInfo.userinfo && userInfo.userinfo.pictureUrl}
-          alt="user's shot"
-          width={100}
-          height={100}
-        />
+        {userShot && (
+          <Image
+            className="user-shot"
+            src={userShot}
+            alt="user's shot"
+            width={100}
+            height={100}
+          />
+        )}
       </div>
       <div className="player-area">
         {/* 左側影片播放器 */}

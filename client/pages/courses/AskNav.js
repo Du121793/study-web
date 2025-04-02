@@ -22,7 +22,7 @@ import QaNav from './QaNav'
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
-export default function AskNav({ course_id, courseName }) {
+export default function AskNav({ course_id, courseName, user_role }) {
   // count用於控制nav收合
   const [count, setCount] = useState(0)
   // 獲取資料
@@ -31,10 +31,6 @@ export default function AskNav({ course_id, courseName }) {
   const [rerander, setRerander] = useState(false)
   // ref
   const fileInputRef = useRef(null)
-  // 常用參數
-  const baseUrl = `${clientIp}/`
-  const [isLogined, setLogined] = useState(false)
-  const [userInfo, setUserInfo] = useState(null)
 
   // ask 區塊 - 同樣使用 ref 與 state 控制展開/收合
   const [qaAsk, setQaAsk] = useState(false)
@@ -48,8 +44,6 @@ export default function AskNav({ course_id, courseName }) {
   // ask 請求參數
   // 描述
   const [description, setDescription] = useState('')
-  // 課程ID 陣列
-  const [course_ids, setCourse_ids] = useState([])
   // 是否公開，只有教師可以設定
   const [isPublic, setIsPublic] = useState(false)
   // 圖片
@@ -217,30 +211,13 @@ export default function AskNav({ course_id, courseName }) {
     }
   }
 
-  // 初始化askNav高度
-  const initToggle = () => {}
-
   const handleButtonClick = () => {
     fileInputRef.current.click()
   }
 
   const test = () => {
-    console.log(hints)
-    console.log(theme)
+    console.log(askContentRef.current.scrollHeight)
   }
-
-  // 請求使用者資料
-  useEffect(() => {
-    if (token) {
-      userService
-        .getUserInfo(token)
-        .then((res) => {
-          setUserInfo(res.data)
-          setLogined(true)
-        })
-        .catch((err) => console.error('Error:', err.message))
-    }
-  }, [token])
 
   // nav更新高度，count用來防止第一次渲染造成預設計算高度後直接開啟nav
   useEffect(() => {
@@ -301,33 +278,39 @@ export default function AskNav({ course_id, courseName }) {
                 if (!file) return
                 console.log(e.target.value)
                 e.target.value = ''
+                let tempHeight = askContentRef.current.scrollHeight
+                if (askContentHeight === tempHeight) {
+                  setAskContentHeight(askContentRef.current.scrollHeight)
+                }
               }}
               style={{ display: 'none' }}
               accept="image/jpeg, image/png"
               type="file"
             />
-            <div className="preview-img">
-              {previewUrl.map((item, index) => (
-                <div
-                  key={index}
-                  className="preview-images-container">
-                  {/* 刪除圖片 */}
+            {previewUrl.length > 0 && (
+              <div className="preview-img">
+                {previewUrl.map((item, index) => (
                   <div
-                    className="remove-image-btn"
-                    onClick={() => {
-                      removeChoseImage(index)
-                    }}>
-                    刪除
+                    key={index}
+                    className="preview-images-container">
+                    {/* 刪除圖片 */}
+                    <div
+                      className="remove-image-btn"
+                      onClick={() => {
+                        removeChoseImage(index)
+                      }}>
+                      刪除
+                    </div>
+                    <Image
+                      className="preview-images"
+                      src={item}
+                      alt="user chose image"
+                      width={400}
+                      height={400}></Image>
                   </div>
-                  <Image
-                    className="preview-images"
-                    src={item}
-                    alt="user chose image"
-                    width={400}
-                    height={400}></Image>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
           <div className="qa-info-area">
             {/* 主題 */}
@@ -339,7 +322,9 @@ export default function AskNav({ course_id, courseName }) {
                 }}
                 type="text"
               />
-              <button onClick={addNewTheme}>新增</button>
+              <button onClick={addNewTheme}>
+                <div className="content">新增</div>
+              </button>
             </div>
             <div className="themes-area">
               {theme.map((item, index) => (
@@ -367,7 +352,9 @@ export default function AskNav({ course_id, courseName }) {
                 className="hint-input"
                 type="text"
               />
-              <button onClick={addNewHint}>新增</button>
+              <button onClick={addNewHint}>
+                <div className="content">新增</div>
+              </button>
             </div>
             {/* 顯示標籤 */}
             <div className="hints-area">
@@ -397,7 +384,7 @@ export default function AskNav({ course_id, courseName }) {
                 className="ask-text-area"></textarea>
             </div>
             <div className="submit-area">
-              {userInfo && userInfo.role === 'teacher' && (
+              {user_role && user_role === 'teacher' && (
                 <div className="public-area">
                   是否要公開此提問
                   <input

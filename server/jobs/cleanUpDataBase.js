@@ -175,7 +175,10 @@ async function processDeleteSchedule() {
     const videoIndexObj = Object.fromEntries(plainSchedule.videoIndex);
     const deleteResp = await VimeoMethods.delete(videoIndexObj);
     // 若 DELETE API 回傳 success 為 false
-    if (deleteResp.data && deleteResp.data.success === false) {
+    if (
+      (deleteResp.data && deleteResp.success === false) ||
+      deleteResp.total == 0
+    ) {
       console.log(
         `DELETE 排程失敗：method: ${
           schedule.method
@@ -195,7 +198,7 @@ async function processDeleteSchedule() {
       }
       return { success: false, processed: 0, APILimit: deleteResp.APILimit };
     }
-    if (deleteResp.data && deleteResp.data.success) {
+    if (deleteResp.data && deleteResp.success === true) {
       await vimeoSchedule.findByIdAndDelete(schedule._id);
       console.log(`DELETE 排程：成功處理並刪除 _id: ${schedule._id}`);
     }
@@ -214,7 +217,7 @@ async function processDeleteSchedule() {
 
 // 過期影片清理排程：每天 16:06 執行
 cron.schedule(
-  "06 16 * * *",
+  "26 14 * * *",
   async () => {
     console.log("開始執行過期影片清理排程...");
     try {

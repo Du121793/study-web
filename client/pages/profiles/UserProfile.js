@@ -1,3 +1,8 @@
+import LoadingAnime from '../../components/global/LoadingAnime'
 export default function UserProfile() {
-  return <div></div>
+  return (
+    <div>
+      <LoadingAnime></LoadingAnime>
+    </div>
+  )
 }

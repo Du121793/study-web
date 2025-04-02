@@ -5,9 +5,12 @@ import PreRegister from '../../pages/profiles/PreRegister'
 import RemoveUsers from '../../pages/profiles/RemoveUsers'
 import EditCourse from '../../pages/profiles/EditCourse'
 import EditMembers from '../../pages/profiles/EditMembers.js'
+import UploadAnnouncement from '../../pages/profiles/UploadAnnouncement.js'
+import UploadCarousel from '../../pages/profiles/UploadCarousel.js'
+
 // 引用組件庫
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 // 引用public
 import menuIcon from '../../public/imgs/menu.png'
 import closeBtn from '../../public/profile/close.png'
@@ -20,7 +23,7 @@ import { useUserToken } from '../../method/useUserToken'
 import userService from '../../method/userService'
 import Link from 'next/link'
 
-export default function AdminLayout() {
+export default function AdminLayout({ user_role }) {
   // env
   const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
   // nav的route
@@ -38,63 +41,67 @@ export default function AdminLayout() {
   // 選單transition參數
   // 選單的leftMargin
   const [listLeftMargin, setListLeftMargin] = useState('0')
+  const [listHeight, setListHeight] = useState('0')
+  const rightItemtRef = useRef(null)
   // 選單按鈕的transition參數
   const [listSwitchBtnWidth, setListSwitchBtnWidth] = useState('0')
   const [listSwitchBtnBorder, setListSwitchBtnBorder] = useState('none')
+
+  // 給子組件刷新其他子組件用
+  const [refresh, setRefresh] = useState(0)
+  const onRefresh = () => {
+    setRefresh((prev) => prev + 1)
+  }
 
   // 用於切換組件
   let routes = {
     MyCourse: {
       index: {
-        component: <MyCourse />,
+        component: (
+          <MyCourse
+            refresh={refresh}
+            user_role={user_role}
+          />
+        ),
         className: 'right-item',
       },
       className: '',
     },
     TeacherFunction: {
       EditCourse: {
-        component: <EditCourse />,
+        component: (
+          <EditCourse
+            onRefresh={onRefresh}
+            user_role={user_role}
+          />
+        ),
         className: 'right-item',
       },
       EditMembers: {
-        component: <EditMembers />,
+        component: <EditMembers user_role={user_role} />,
         className: 'right-item',
       },
       className: '',
     },
     AdminFunction: {
       PreRegister: {
-        component: <PreRegister />,
+        component: <PreRegister user_role={user_role} />,
         className: 'right-item',
       },
       RemoveUsers: {
-        component: <RemoveUsers />,
+        component: <RemoveUsers user_role={user_role} />,
         className: 'right-item',
       },
       className: '',
     },
     UserProfile: {
       index: {
-        component: <UserProfile />,
+        component: <UserProfile user_role={user_role} />,
         className: 'right-item',
       },
       className: '',
     },
   }
-
-  // 獲得使用者已註冊的課程
-  useEffect(() => {
-    if (token) {
-      ;(async function () {
-        const res = await userService.getUserRegistedCourses(token)
-        setGetCourses(
-          res.data.map((item) => {
-            return { name: item.courseName, _id: item._id }
-          })
-        )
-      })()
-    }
-  }, [token])
 
   // 開啟左邊選單
   const showLeftNav = () => {
@@ -173,94 +180,182 @@ export default function AdminLayout() {
     }
   }
 
+  // 獲得使用者已註冊的課程
+  useEffect(() => {
+    if (token) {
+      ;(async function () {
+        const res = await userService.getUserRegistedCourses(token)
+        setGetCourses(
+          res.data.map((item) => {
+            return { name: item.courseName, _id: item._id }
+          })
+        )
+      })()
+    }
+  }, [token, refresh])
+
   const { component, className } = routes[navSelecter[0]][navSelecter[1]]
+
+  useEffect(() => {
+    setTimeout(() => {
+      setListHeight(rightItemtRef.current.scrollHeight)
+    }, 100)
+  }, [component, className])
+
   return (
     <div className="Layout-main">
       <div className="Layout-container">
         {/* left nav area */}
         <nav
           className="Layout-left-nav"
-          style={{ marginLeft: listLeftMargin }}>
+          style={{ marginLeft: listLeftMargin, height: listHeight }}>
           <ul className="options">
-            {/* 關閉選單按鈕 */}
-            <button
-              className="close-nav-left"
-              onClick={hideLeftNav}>
-              <Image
-                className="close-nav-btn"
-                src={closeBtn}
-                alt="close nav s button image"></Image>
-            </button>
-            {/* 我的課程*/}
-            <li className="nav">
-              <div className="nav-container">
-                <div
-                  className="nav-option-header active"
-                  onClick={(e) => {
-                    switchNavActive(e.target)
-                    setNavSelecter(['MyCourse', 'index'])
-                  }}>
-                  {/* 標題左邊的icon */}
+            <div className="innerElement">
+              {/* 關閉選單按鈕 */}
+              <button
+                className="close-nav-left"
+                onClick={hideLeftNav}>
+                <Image
+                  className="close-nav-btn"
+                  src={closeBtn}
+                  alt="close nav s button image"></Image>
+              </button>
+              {/* 我的課程*/}
+              <li className="nav">
+                <div className="nav-container">
                   <div
-                    className="title-icon"
-                    style={{ pointerEvents: 'none' }}>
-                    <Image
-                      alt="nav,s myCourse Icon"
-                      src={myCourseIcon}
-                      width={24}
-                      height={24}></Image>
+                    className="nav-option-header active"
+                    onClick={(e) => {
+                      switchNavActive(e.target)
+                      setNavSelecter(['MyCourse', 'index'])
+                    }}>
+                    {/* 標題左邊的icon */}
+                    <div
+                      className="title-icon"
+                      style={{ pointerEvents: 'none' }}>
+                      <Image
+                        alt="nav,s myCourse Icon"
+                        src={myCourseIcon}
+                        width={24}
+                        height={24}></Image>
+                    </div>
+                    {/* 標題文字 */}
+                    <span
+                      className="title"
+                      style={{ pointerEvents: 'none' }}>
+                      我的課程
+                    </span>
                   </div>
-                  {/* 標題文字 */}
-                  <span
-                    className="title"
-                    style={{ pointerEvents: 'none' }}>
-                    我的課程
-                  </span>
+
+                  {/* 開關list的按鈕 */}
+                  <Image
+                    className="list-switch-btn"
+                    id="my-course-list-btn"
+                    style={{ transform: 'rotate(90deg)' }}
+                    onClick={(e) => {
+                      switchNavList(e.target)
+                    }}
+                    src={rightArrow}
+                    width={24}
+                    height={24}
+                    alt="open my courses button icon"></Image>
                 </div>
 
-                {/* 開關list的按鈕 */}
-                <Image
-                  className="list-switch-btn"
-                  id="my-course-list-btn"
-                  style={{ transform: 'rotate(90deg)' }}
-                  onClick={(e) => {
-                    switchNavList(e.target)
-                  }}
-                  src={rightArrow}
-                  width={24}
-                  height={24}
-                  alt="open my courses button icon"></Image>
-              </div>
+                {/* list */}
+                <div
+                  style={{ height: myCourseNavListSwitcher }}
+                  className="nav-options">
+                  {getCourses.map((course) => {
+                    return (
+                      <li
+                        key={course.id}
+                        className="option">
+                        <Image
+                          className="turn-right-icon"
+                          src={dotIcon}
+                          alt="nav option icon"></Image>
+                        <Link
+                          className="link"
+                          href={curserBaseUrl + `?courseName=${course.name}&courseId=${course._id}`}>
+                          {course.name}
+                        </Link>
+                      </li>
+                    )
+                  })}
+                </div>
+              </li>
 
-              {/* list */}
-              <div
-                style={{ height: myCourseNavListSwitcher }}
-                className="nav-options">
-                {getCourses.map((course) => {
-                  return (
-                    <li
-                      key={course.id}
-                      className="option">
+              {/* 教師功能 標題*/}
+              <li className="nav">
+                <div className="nav-container">
+                  {/* 標題行 */}
+                  <div className="nav-option-header">
+                    <div className="title-icon">
                       <Image
-                        className="turn-right-icon"
-                        src={dotIcon}
-                        alt="nav option icon"></Image>
-                      <Link
-                        className="link"
-                        href={curserBaseUrl + `?courseName=${course.name}&courseId=${course._id}`}>
-                        {course.name}
-                      </Link>
-                    </li>
-                  )
-                })}
-              </div>
-            </li>
+                        alt="nav,s myCourse Icon"
+                        src={myCourseIcon}
+                        width={24}
+                        height={24}></Image>
+                    </div>
+                    {/* 標題文字 */}
+                    <span
+                      className="title"
+                      onClick={(e) => {
+                        document.getElementById('teacher-function-list-btn').click()
+                      }}>
+                      教師功能
+                    </span>
+                  </div>
 
-            {/* 教師功能 標題*/}
-            <li className="nav">
-              <div className="nav-container">
-                {/* 標題行 */}
-                <div className="nav-option-header">
+                  {/* 開關list的按鈕 */}
+                  <Image
+                    style={{ transform: 'rotate(90deg)' }}
+                    className="list-switch-btn"
+                    id="teacher-function-list-btn"
+                    onClick={(e) => {
+                      switchNavList(e.target)
+                    }}
+                    src={rightArrow}
+                    width={24}
+                    height={24}
+                    alt="open my courses button icon"></Image>
+                </div>
+
+                <div
+                  style={{ height: teacherFuntionNavListSwitcher }}
+                  className="nav-options">
+                  {/* 編輯課程 */}
+                  <div
+                    className="option"
+                    onClick={(e) => {
+                      setNavSelecter(['TeacherFunction', 'EditCourse'])
+                      switchNavActive(e.target)
+                    }}>
+                    <Image
+                      className="turn-right-icon"
+                      src={dotIcon}
+                      alt="nav option icon"></Image>
+                    編輯課程
+                  </div>
+                  {/* 成員編輯 */}
+                  <div
+                    className="option"
+                    onClick={(e) => {
+                      setNavSelecter(['TeacherFunction', 'EditMembers'])
+                      switchNavActive(e.target)
+                    }}>
+                    <Image
+                      className="turn-right-icon"
+                      src={dotIcon}
+                      alt="nav option icon"></Image>
+                    成員編輯
+                  </div>
+                </div>
+              </li>
+
+              {/* 管理員功能 標題*/}
+              <li className="nav">
+                <div className="nav-container">
                   <div className="title-icon">
                     <Image
                       alt="nav,s myCourse Icon"
@@ -271,138 +366,73 @@ export default function AdminLayout() {
                   {/* 標題文字 */}
                   <span
                     className="title"
-                    onClick={(e) => {
-                      document.getElementById('teacher-function-list-btn').click()
+                    onClick={() => {
+                      document.getElementById('admin-function-list-btn').click()
                     }}>
-                    教師功能
+                    管理員功能
+                  </span>
+                  {/* 標題右邊小箭頭圖片 */}
+                  <Image
+                    id="admin-function-list-btn"
+                    className="list-switch-btn"
+                    style={{ transform: 'rotate(90deg)' }}
+                    onClick={(e) => {
+                      switchNavList(e.target)
+                    }}
+                    src={rightArrow}
+                    width={24}
+                    height={24}
+                    alt="open my courses button icon"></Image>
+                </div>
+                <div
+                  style={{ height: adminFuntionNavListSwitcher }}
+                  className="nav-options">
+                  {/* 功能區 */}
+                  <div
+                    className="option"
+                    onClick={(e) => {
+                      setNavSelecter(['AdminFunction', 'PreRegister'])
+                      switchNavActive(e.target)
+                    }}>
+                    <Image
+                      className="turn-right-icon"
+                      src={dotIcon}
+                      alt="nav option icon"></Image>
+                    預註冊使用者
+                  </div>
+                  <div
+                    className="option"
+                    onClick={(e) => {
+                      setNavSelecter(['AdminFunction', 'RemoveUsers'])
+                      switchNavActive(e.target)
+                    }}>
+                    <Image
+                      className="turn-right-icon"
+                      src={dotIcon}
+                      alt="nav option icon"></Image>
+                    移除成員
+                  </div>
+                </div>
+              </li>
+
+              {/* 個人資訊 標題*/}
+              <li className="nav">
+                <div className="nav-container">
+                  <div className="icon">
+                    <Image
+                      alt="nav,s profile Icon"
+                      src={profileIcon}
+                      width={24}
+                      height={24}></Image>
+                  </div>
+                  <span
+                    onClick={() => setNavSelecter(['UserProfile', 'index'])}
+                    className="title">
+                    個人資訊
                   </span>
                 </div>
-
-                {/* 開關list的按鈕 */}
-                <Image
-                  style={{ transform: 'rotate(90deg)' }}
-                  className="list-switch-btn"
-                  id="teacher-function-list-btn"
-                  onClick={(e) => {
-                    switchNavList(e.target)
-                  }}
-                  src={rightArrow}
-                  width={24}
-                  height={24}
-                  alt="open my courses button icon"></Image>
-              </div>
-
-              <div
-                style={{ height: teacherFuntionNavListSwitcher }}
-                className="nav-options">
-                {/* 編輯課程 */}
-                <div
-                  className="option"
-                  onClick={(e) => {
-                    setNavSelecter(['TeacherFunction', 'EditCourse'])
-                    switchNavActive(e.target)
-                  }}>
-                  <Image
-                    className="turn-right-icon"
-                    src={dotIcon}
-                    alt="nav option icon"></Image>
-                  編輯課程
-                </div>
-                {/* 成員編輯 */}
-                <div
-                  className="option"
-                  onClick={(e) => {
-                    setNavSelecter(['TeacherFunction', 'EditMembers'])
-                    switchNavActive(e.target)
-                  }}>
-                  <Image
-                    className="turn-right-icon"
-                    src={dotIcon}
-                    alt="nav option icon"></Image>
-                  成員編輯
-                </div>
-              </div>
-            </li>
-
-            {/* 管理員功能 標題*/}
-            <li className="nav">
-              <div className="nav-container">
-                <div className="title-icon">
-                  <Image
-                    alt="nav,s myCourse Icon"
-                    src={myCourseIcon}
-                    width={24}
-                    height={24}></Image>
-                </div>
-                {/* 標題文字 */}
-                <span
-                  className="title"
-                  onClick={() => {
-                    document.getElementById('admin-function-list-btn').click()
-                  }}>
-                  管理員功能
-                </span>
-                {/* 標題右邊小箭頭圖片 */}
-                <Image
-                  id="admin-function-list-btn"
-                  className="list-switch-btn"
-                  style={{ transform: 'rotate(90deg)' }}
-                  onClick={(e) => {
-                    switchNavList(e.target)
-                  }}
-                  src={rightArrow}
-                  width={24}
-                  height={24}
-                  alt="open my courses button icon"></Image>
-              </div>
-              <div
-                style={{ height: adminFuntionNavListSwitcher }}
-                className="nav-options">
-                {/* 功能區 */}
-                <div
-                  className="option"
-                  onClick={(e) => {
-                    setNavSelecter(['AdminFunction', 'PreRegister'])
-                    switchNavActive(e.target)
-                  }}>
-                  <Image
-                    className="turn-right-icon"
-                    src={dotIcon}
-                    alt="nav option icon"></Image>
-                  預註冊使用者
-                </div>
-                <div
-                  className="option"
-                  onClick={(e) => {
-                    setNavSelecter(['AdminFunction', 'RemoveUsers'])
-                    switchNavActive(e.target)
-                  }}>
-                  <Image
-                    className="turn-right-icon"
-                    src={dotIcon}
-                    alt="nav option icon"></Image>
-                  移除成員
-                </div>
-              </div>
-            </li>
-
-            {/* 個人資訊 標題*/}
-            <li className="nav">
-              <div className="nav-container">
-                <div className="icon">
-                  <Image
-                    alt="nav,s profile Icon"
-                    src={profileIcon}
-                    width={24}
-                    height={24}></Image>
-                </div>
-                <span
-                  onClick={() => setNavSelecter(['UserProfile', 'index'])}
-                  className="title">
-                  個人資訊
-                </span>
-              </div>
-            </li>
+              </li>
+            </div>
           </ul>
           {/* 開啟選單的按鈕 */}
           <button
@@ -416,7 +446,11 @@ export default function AdminLayout() {
           </button>
         </nav>
         {/* middle cursor info area */}
-        <div className={className}>{component}</div>
+        <div
+          ref={rightItemtRef}
+          className={className}>
+          {component}
+        </div>
       </div>
     </div>
   )

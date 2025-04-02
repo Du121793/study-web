@@ -7,7 +7,6 @@ import Link from 'next/link'
 
 // public
 import downArrow from '../../public/course/downArrow.png'
-import leftArrow from '../../public/course/leftArrow.png'
 
 // method
 import { useUserToken } from '../../method/useUserToken'
@@ -16,16 +15,13 @@ import userService from '../../method/userService'
 // 子組件
 import VideoUploadComponent from './UploadVideo'
 import adminService from '../../method/adminService'
-import EditVideoInfo from './EditVideoInfo'
+import EditVideoInfo from './component/EditVideoInfo'
 
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
-export default function VideoNav({ course_id, courseName }) {
+export default function VideoNav({ course_id, courseName, user_role }) {
   const token = useUserToken()
-  // 使用者資料狀態
-  const [userInfo, setUserInfo] = useState(null)
-  const [isLogined, setLogined] = useState(false)
   // 影片
   const [videos, setVideos] = useState([])
   // 影片專區 - 使用 ref 與 state 控制展開/收合
@@ -213,6 +209,7 @@ export default function VideoNav({ course_id, courseName }) {
   }
 
   // 若是任何一個有改變，重新發一次影片請求
+  // 問題:會跑兩次
   useEffect(() => {
     if (token && course_id) {
       userService
@@ -235,19 +232,6 @@ export default function VideoNav({ course_id, courseName }) {
       setVideoContentHeight(videoContentRef.current.scrollHeight)
     }
   }, [videos, videoNavOpen])
-
-  // 請求使用者資料
-  useEffect(() => {
-    if (token) {
-      userService
-        .getUserInfo(token)
-        .then((res) => {
-          setUserInfo(res.data)
-          setLogined(true)
-        })
-        .catch((err) => console.error('Error:', err.message))
-    }
-  }, [token])
 
   return (
     <div
@@ -304,14 +288,14 @@ export default function VideoNav({ course_id, courseName }) {
         }}>
         <div className="update-video-area">
           {/* 上傳影片 */}
-          {userInfo && userInfo.role === 'teacher' && (
+          {user_role && user_role === 'teacher' && (
             <div
               className="button"
               onClick={showVideoUploadComponent}>
               上傳影片
             </div>
           )}
-          {userInfo && userInfo.role === 'admin' && (
+          {user_role && user_role === 'admin' && (
             <div
               className="button"
               onClick={showVideoUploadComponent}>
@@ -319,14 +303,14 @@ export default function VideoNav({ course_id, courseName }) {
             </div>
           )}
           {/* 移除影片 */}
-          {userInfo && userInfo.role === 'teacher' && (
+          {user_role && user_role === 'teacher' && (
             <div
               className="button"
               onClick={showDeleteBtn}>
               移除影片
             </div>
           )}
-          {userInfo && userInfo.role === 'admin' && (
+          {user_role && user_role === 'admin' && (
             <div
               className="button"
               onClick={showDeleteBtn}>
@@ -347,14 +331,14 @@ export default function VideoNav({ course_id, courseName }) {
               <option value="asc">正序</option>
             </select>
           </div>
-          {userInfo && userInfo.role === 'teacher' && (
+          {user_role && user_role === 'teacher' && (
             <Link
               href={{ pathname: `${clientIp}/courses/AccessSetting`, query: { course_name: courseName, course_id: course_id } }}
               className="button">
               編輯權限
             </Link>
           )}
-          {userInfo && userInfo.role === 'admin' && (
+          {user_role && user_role === 'admin' && (
             <Link
               href={{ pathname: `${clientIp}/courses/AccessSetting`, query: { course_name: courseName, course_id: course_id } }}
               className="button">
@@ -366,7 +350,7 @@ export default function VideoNav({ course_id, courseName }) {
           <div className="video-area">
             {videos &&
               videos.map((item) => {
-                if (userInfo && userInfo.role === 'sutdent' && item.access.isAccess === true) {
+                if (user_role && user_role === 'sutdent' && item.access.isAccess === true) {
                   return (
                     <Link
                       key={item._id}
@@ -393,6 +377,7 @@ export default function VideoNav({ course_id, courseName }) {
                       <Image
                         src={item.thumbnail}
                         className="videos-shot"
+                        loading="lazy"
                         alt={item.title}
                         width={142}
                         height={142}
@@ -425,7 +410,7 @@ export default function VideoNav({ course_id, courseName }) {
                       </div>
                     </Link>
                   )
-                } else if ((userInfo && userInfo.role === 'teacher') || (userInfo && userInfo.role === 'admin')) {
+                } else if ((user_role && user_role === 'teacher') || (user_role && user_role === 'admin')) {
                   return (
                     <Link
                       key={item._id}
@@ -481,8 +466,8 @@ export default function VideoNav({ course_id, courseName }) {
                               <div className="content private">公開影片</div>
                             </div>
                           )}
-                          {userInfo.role === 'teacher' ||
-                            (userInfo.role === 'admin' && (
+                          {(user_role && user_role === 'teacher') ||
+                            (user_role && user_role === 'admin' && (
                               <div
                                 className="edit-btn"
                                 onClick={(e) => {

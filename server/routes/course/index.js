@@ -22,7 +22,6 @@ router.get("/getCourses", checkTeacherAccess, async (req, res) => {
       subject, // 科目
       grade, // 年級
       courseClass, // 班級
-      members, // 成員
       _id, // 課程 ID，若傳入則搜尋特定課程
       page, // 分頁頁數
       pageSize, // 每頁筆數
@@ -50,9 +49,6 @@ router.get("/getCourses", checkTeacherAccess, async (req, res) => {
     }
     if (courseClass) {
       filter.courseClass = courseClass;
-    }
-    if (members) {
-      filter.members = members;
     }
 
     // 當使用者的 role 不是 admin 時，僅限搜尋使用者已註冊的課程

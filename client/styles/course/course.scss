@@ -1,5 +1,6 @@
 .course-main {
   min-width: 1250px;
+  min-height: 100vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -16,6 +17,7 @@
     transition: 0.3s;
   }
   .container {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -66,7 +68,7 @@
         padding-left: 24px;
         user-select: none;
         border-radius: 8px;
-        background-color: rgba(0, 0, 0, 0.6);
+        background-color: var(--main-color);
         display: flex;
         cursor: pointer;
         align-items: center;
@@ -86,14 +88,14 @@
       .update-video-area {
         display: flex;
         align-items: center;
-        justify-content: start;
+        justify-content: flex-start;
         gap: 24px;
         padding-top: 24px;
         width: 100%;
         margin-left: 24px;
         background-color: #fff;
         .button {
-          color: black;
+          color: rgb(0, 0, 0);
           width: 120px;
           display: flex;
           justify-content: center;
@@ -104,13 +106,13 @@
           padding: 8px 10px;
           border: 1px solid rgba(0, 0, 0, 0.2);
           border-radius: 4px;
-          background-color: #f7f7f7;
+          background-color: var(--button-white);
           transition: border-color 0.2s;
           box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
           transition: 0.2s;
         }
         .button:hover {
-          background-color: #ededed;
+          background-color: var(--botton-white-hover);
         }
       }
 
@@ -123,7 +125,7 @@
       }
       .show-more-video-btn {
         margin-bottom: 12px;
-        background-color: #fff;
+        background-color: var(--button-white);
         cursor: pointer;
         padding: 12px;
         border: 1px solid rgba(0, 0, 0, 0.2);
@@ -132,7 +134,7 @@
         transition: 0.2s;
       }
       .show-more-video-btn:hover {
-        background-color: #f6f6f6;
+        background-color: var(--botton-white-hover);
       }
       .video-area-container {
         width: 100%;
@@ -227,7 +229,7 @@
               }
               .isPublic {
                 display: flex;
-                justify-content: start;
+                justify-content: flex-start;
                 .content {
                   padding: 4px 6px;
                   border-radius: 4px;
@@ -285,7 +287,6 @@
 
           .show-public-QA {
             cursor: pointer;
-            font-weight: bold;
             padding: 4px 6px;
             border: 1px solid rgba(0, 0, 0, 0.2);
             border-radius: 2px;
@@ -298,7 +299,6 @@
           }
           .show-delete-btn {
             cursor: pointer;
-            font-weight: bold;
             padding: 4px 6px;
             border: 1px solid rgba(0, 0, 0, 0.2);
             border-radius: 2px;
@@ -361,11 +361,11 @@
                     border: 1px solid rgba(0, 0, 0, 0.2);
                     display: flex;
                     justify-content: center;
-                    background-color: #ffffff;
+                    background-color: var(--button-white);
                     transition: 0.2s;
                   }
                   .into-qa-btn:hover {
-                    background-color: #e1e1e1;
+                    background-color: var(--botton-white-hover);
                   }
                   .remove-btn {
                     color: black;
@@ -459,6 +459,7 @@
 
           /* 圖片區域 */
           .upload-img-area {
+            flex: 0.3;
             margin-top: 24px;
             display: flex;
             flex-direction: column;
@@ -538,14 +539,17 @@
               button {
                 padding: 0.3rem 0.6rem;
                 border: none;
-                background-color: #0070f3;
-                color: #fff;
+                background-color: #eeeeee;
                 border-radius: 4px;
+                border: 1px solid rgba(0, 0, 0, 0.2);
                 cursor: pointer;
                 transition: background-color 0.3s ease;
                 color: black;
+                .content {
+                  color: black;
+                }
                 &:hover {
-                  background-color: #005bb5;
+                  background-color: rgb(224, 224, 224);
                 }
               }
             }
@@ -612,15 +616,18 @@
               button {
                 padding: 0.3rem 0.6rem;
                 border: none;
-                background-color: #0070f3;
-                color: #fff;
+                background-color: #eeeeee;
                 border-radius: 4px;
+                border: 1px solid rgba(0, 0, 0, 0.2);
                 cursor: pointer;
                 transition: background-color 0.3s ease;
                 color: black;
 
+                .content {
+                  color: black;
+                }
                 &:hover {
-                  background-color: #005bb5;
+                  background-color: rgb(224, 224, 224);
                 }
               }
             }

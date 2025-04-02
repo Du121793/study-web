@@ -23,11 +23,17 @@ const upload = multer({ storage: multer.memoryStorage() });
  * @param {number} startingIndex - 檔案命名起始編號，預設為 1
  * @returns {Promise<Array>} - 回傳圖片相對路徑陣列，例如：["resource/questionIMG/comment/xxx/image_1.jpg"]
  */
-async function saveUploadedCommentImages(files, commentId, startingIndex = 1) {
+async function saveUploadedCommentImages(
+  files,
+  questionId,
+  commentId,
+  startingIndex = 1
+) {
   // 定義目標資料夾路徑（不包含 SERVER_IP）
   const folderPath = path.join(
     "resource",
     "questionIMG",
+    String(questionId),
     "comment",
     String(commentId)
   );
@@ -51,6 +57,7 @@ async function saveUploadedCommentImages(files, commentId, startingIndex = 1) {
       return path.join(
         "resource",
         "questionIMG",
+        String(questionId),
         "comment",
         String(commentId),
         fileName
@@ -134,14 +141,13 @@ router.post("/postNewComment", upload.array("image"), async (req, res) => {
     const { content, fileSize, isPrivate = false, isBest = false } = req.body;
     // 上傳的圖片會存放在 req.files 陣列中
     const uploadedFiles = req.files || [];
-
     // 檢查必要欄位，至少需提供文字內容、圖片或檔案大小
     if (!content && uploadedFiles.length === 0 && !fileSize) {
       return res.status(400).json({ success: false, msg: "資料提供不完整" });
     }
 
     // 權限檢查：若 isBest 為 true，且使用者角色為 student 則拒絕
-    if (isBest && req.user.role === "student") {
+    if (isBest === true && req.user.role === "student") {
       return res.status(400).json({ success: false, msg: "資料提供不完整" });
     }
 
@@ -164,6 +170,7 @@ router.post("/postNewComment", upload.array("image"), async (req, res) => {
     if (uploadedFiles.length > 0) {
       const savedImagePaths = await saveUploadedCommentImages(
         uploadedFiles,
+        req.question._id,
         newComment._id,
         1
       );
@@ -267,6 +274,7 @@ router.patch("/uploadVideoStatus", async (req, res) => {
 
 router.delete("/deleteComment", async (req, res) => {
   try {
+    console.log("this");
     const { commentID } = req.query;
     if (!commentID) {
       return res.status(400).json({ success: false, msg: "缺少 commentID" });
@@ -285,7 +293,7 @@ router.delete("/deleteComment", async (req, res) => {
     ) {
       return res.status(401).json({
         success: false,
-        msg: `你不屬於本課程`,
+        msg: "你不屬於本課程",
       });
     }
     // 若為 student，僅能刪除自己的留言
@@ -295,30 +303,12 @@ router.delete("/deleteComment", async (req, res) => {
     ) {
       return res.status(401).json({
         success: false,
-        msg: `你沒有刪除此留言的權限`,
+        msg: "你沒有刪除此留言的權限",
       });
     }
 
-    // 刪除留言中的圖片
-    if (foundComment.image && Array.isArray(foundComment.image)) {
-      foundComment.image.forEach((imgPath) => {
-        if (fs.existsSync(imgPath)) {
-          fs.unlinkSync(imgPath);
-        }
-      });
-    }
-
-    // 如果 videoURL 存在，建立 Vimeo 刪除排程
-    if (foundComment.videoURL) {
-      const newSchedule = new vimeoSchedule({
-        method: "delete",
-        videoIndex: { commentID: foundComment._id },
-      });
-      await newSchedule.save();
-    }
-
-    // 刪除留言資料
-    await QAmessage.findByIdAndDelete(foundComment);
+    // 呼叫 findByIdAndDelete，刪除前會先執行 pre hook 的資源清理邏輯
+    await QAmessage.findByIdAndDelete(commentID);
 
     return res.json({
       success: true,

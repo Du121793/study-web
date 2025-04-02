@@ -9,7 +9,7 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
 
   // 請求參數
   const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(9999)
+  const [pageSize, setPageSize] = useState(10)
   const [nameInput, setNameInput] = useState(null)
   const [phoneInput, setPhoneInput] = useState(null)
   const [gradeInput, setGradeInput] = useState(null)
@@ -79,7 +79,6 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
           temp.push(i)
         }
         setTotalArray(temp)
-        console.log(res)
       })
     } catch (e) {
       console.error(e)
@@ -100,6 +99,11 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
     if (e.firstChild) {
       e.firstChild.click()
     }
+  }
+
+  // 初始化已選擇的學生
+  const initSelectedId = () => {
+    setSelectedStudentId([])
   }
 
   // 獲得成員清單
@@ -126,15 +130,12 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
   }, [token, page, pageSize])
 
   const test = () => {
-    console.log(totalArray)
+    console.log(selectedStudentId)
   }
+
   return (
     <div className="member-select-area">
-      <div
-        className="member-select-header"
-        onClick={test}>
-        成員搜尋功能
-      </div>
+      <div className="member-select-header">成員搜尋功能</div>
       <div className="classification">
         <div className="search-inputs">
           {/* 姓名 */}
@@ -204,7 +205,10 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
           <button
             className="search-option-btn"
             style={{ cursor: 'pointer' }}
-            onClick={searchStudentButton}>
+            onClick={() => {
+              searchStudentButton()
+              initSelectedId()
+            }}>
             搜尋
           </button>
         </div>
@@ -220,6 +224,13 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
         {members &&
           members.map((item, index) => (
             <li
+              style={{
+                border: selectedStudentId.find((id) => {
+                  return id === item._id
+                })
+                  ? '2px solid rgb(124, 225, 180)'
+                  : '2px solid rgb(0, 0, 0,0.2)',
+              }}
               key={index}
               onClick={(e) => {
                 memberAreaClickEvent(e.target)
@@ -228,6 +239,12 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
               <input
                 className="student-checkbox"
                 type="checkbox"
+                checked={selectedStudentId.find((id) => {
+                  return id === item._id
+                })}
+                onLoad={() => {
+                  initSelectedId()
+                }}
                 onChange={(e) => {
                   checkboxClickEvent(e.target)
                   setSelectedStudentId((prev) => {
@@ -249,46 +266,59 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
             </li>
           ))}
       </ul>
+
       <div className="page-switch">
-        <div
-          className="page-switcher"
-          onClick={() => {
-            if (page === 1) {
-              clearSearch()
-              return
-            } else {
-              setPage(page - 1)
-              clearSearch()
-            }
-          }}>
-          上一頁
-        </div>
-        <div className="total-page">
-          {totalArray.length < 6 &&
-            totalArray.map((item, index) => (
-              <div
-                key={index}
-                className={`page ${index + 1 === page && 'active'}`}
-                onClick={() => {
-                  setPage(index + 1)
-                }}>
-                {item}
-              </div>
-            ))}
-        </div>
-        <div
-          className="page-switcher"
-          onClick={() => {
-            if (page === totalPage) {
-              clearSearch()
-              return
-            } else {
-              clearSearch()
-              setPage(page + 1)
-            }
-          }}>
-          下一頁
-        </div>
+        {page === 1 ? (
+          <div className="content">已經在第一頁了</div>
+        ) : (
+          <div
+            className="pointer content"
+            onClick={() => {
+              setPage(1)
+            }}>
+            第一頁
+          </div>
+        )}
+        {page === 1 ? null : (
+          <div
+            className="page-switcher"
+            onClick={() => {
+              if (page === 1) {
+                return
+              } else {
+                setPage((prop) => prop - 1)
+              }
+            }}>
+            上一頁
+          </div>
+        )}
+
+        <div className="now-page">{page}</div>
+        {page === totalPage ? null : (
+          <div
+            className="page-switcher"
+            onClick={() => {
+              console.log(totalPage)
+              if (page === totalPage) {
+                return
+              } else {
+                setPage((prop) => prop + 1)
+              }
+            }}>
+            下一頁
+          </div>
+        )}
+        {page === totalPage ? (
+          <div className="content">已經是最後一頁了</div>
+        ) : (
+          <div
+            className="pointer content"
+            onClick={() => {
+              setPage(totalPage)
+            }}>
+            最後一頁
+          </div>
+        )}
       </div>
     </div>
   )

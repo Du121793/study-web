@@ -38,13 +38,9 @@ export default function MyCourse() {
     randomNumber = randomNumber * 10
     return shots[parseInt(randomNumber)]
   }
-  const test = () => {
-    console.log(getCourses)
-  }
 
   return (
     <div className="myCourse-main">
-      {/* <button onClick={test}>測試按鈕</button> */}
       <div className="courses-container">
         <div className="course-page-header">我的課程</div>
         <ul className="courses">
@@ -66,7 +62,7 @@ export default function MyCourse() {
                       height={100}></Image>
                   </div>
                   <div className="course-name">{item.courseName}</div>
-                  <div className="class-number">成員人數:{item.members.length}</div>
+                  <div className="class-number">成員人數:{item.members}</div>
                 </div>
               </Link>
 

@@ -9,6 +9,7 @@
 .edit-course-main {
   position: relative;
   display: flex;
+  justify-content: center;
   background-color: #fefefe;
   width: 100%;
   padding: 24px 0;
@@ -18,7 +19,6 @@
   font-weight: bold;
 }
 .edit-course-main .edit-course-function-area {
-  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -97,6 +97,7 @@
 }
 .edit-course-main .edit-course-function-area .input-area {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   width: 100%;
@@ -141,7 +142,6 @@
   flex-direction: column;
   align-items: center;
   width: 80%;
-  min-width: 870px;
   padding: 24px 0;
   border: 1px solid rgba(0, 0, 0, 0.2);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
@@ -194,22 +194,21 @@
   padding-left: 4px;
 }
 .edit-course-main .edit-course-function-area .courses-info-list .courses-info-area .course-name-input {
-  margin-left: 38px;
-  width: 186px;
+  width: 32%;
   border-left: 1px solid rgba(0, 0, 0, 0.2);
 }
 .edit-course-main .edit-course-function-area .courses-info-list .courses-info-area .course-grade-input {
-  width: 118px;
+  width: 15%;
   border-left: 1px solid rgba(0, 0, 0, 0.2);
   margin-left: 4px;
 }
 .edit-course-main .edit-course-function-area .courses-info-list .courses-info-area .course-subject-input {
-  width: 118px;
+  width: 15%;
   border-left: 1px solid rgba(0, 0, 0, 0.2);
   margin-left: 4px;
 }
 .edit-course-main .edit-course-function-area .courses-info-list .courses-info-area .course-class-input {
-  width: 118px;
+  width: 15%;
   border-left: 1px solid rgba(0, 0, 0, 0.2);
   margin-left: 4px;
 }

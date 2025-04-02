@@ -4,6 +4,7 @@
   display: flex;
 }
 .Layout-main .Layout-container .myCourse-main {
+  flex: 1;
   z-index: 999;
   gap: 12px;
   z-index: 99;

@@ -27,7 +27,8 @@ const userSchema = new Schema({
     },
   },
   courses: {
-    type: [String],
+    type: [Schema.Types.ObjectId],
+    ref: "Course",
   },
   role: {
     type: String,
