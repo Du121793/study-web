@@ -2,10 +2,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  position: absolute;
-  top: 0;
+  position: relative;
   width: 100%;
-  height: 100vh;
+  height: 100%;
 }
 .loading-main .loader {
   z-index: 10000;

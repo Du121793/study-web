@@ -1,0 +1,8 @@
+.index-main {
+  position: relative;
+}
+.index-main .footer-area {
+  position: absolute;
+  bottom: -104px;
+  width: 100%;
+}/*# sourceMappingURL=index.css.map */

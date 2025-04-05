@@ -55,15 +55,15 @@ const videoInfoSchema = new Schema({
 videoInfoSchema.index({ isUploadSuccess: 1, date: 1 });
 
 /**
- * 共用的清理函數：
- *  - 刪除縮圖檔案 (thumbnail)
- *  - 建立 Vimeo 刪除排程 (若有 videoURL)
- *  - 從 VideoAccess 中移除該影片 _id；若 videoIDs 空了，就刪除那筆 VideoAccess
+ * 清理影片相關資源
+ * @description 當影片被刪除時，清理所有相關資源
+ * @param {Object} doc - 要刪除的影片文件
+ * @returns {Promise<void>}
  */
 async function cleanupVideo(doc) {
   if (!doc) return;
 
-  // 1) 刪除縮圖檔案
+  // 步驟 1: 刪除縮圖檔案
   if (doc.thumbnail && fs.existsSync(doc.thumbnail)) {
     try {
       fs.unlinkSync(doc.thumbnail);
@@ -72,12 +72,12 @@ async function cleanupVideo(doc) {
     }
   }
 
-  // 2) 若有 videoURL，建立 Vimeo 刪除排程
+  // 步驟 2: 建立 Vimeo 刪除排程
   if (doc.videoURL) {
     try {
       const newSchedule = new vimeoSchedule({
         method: "delete",
-        videoIndex: { videoId: doc._id },
+        videoIndex: { videoId: doc._id, courseID: doc.courseID },
       });
       await newSchedule.save();
     } catch (err) {
@@ -85,12 +85,10 @@ async function cleanupVideo(doc) {
     }
   }
 
-  // 3) 從所有 VideoAccess 的 videoIDs 移除該影片 _id
+  // 步驟 3: 更新 VideoAccess 記錄
   try {
-    // 找出所有包含此影片的 VideoAccess
     const videoAccessList = await VideoAccess.find({ videoIDs: doc._id });
     for (const accessDoc of videoAccessList) {
-      // 移除該影片 _id
       accessDoc.videoIDs = accessDoc.videoIDs.filter(
         (vid) => String(vid) !== String(doc._id)
       );
@@ -101,45 +99,47 @@ async function cleanupVideo(doc) {
   }
 }
 
-/* 
-   ================================
-   Post Hooks for "single-document" deletes
-   ================================
-   由於需要「非多筆刪除」時進行這些清理流程，
-   我們針對以下幾種“單筆刪除”操作設置 post hook：
-   1. findOneAndDelete (例如 findByIdAndDelete)
-   2. remove (直接對文件實例呼叫 .remove())
-   3. deleteOne (以 document 方式：{ document:true, query:false })
-
-   若是 deleteMany，則代表可能一次刪除多筆，在這裡就跳過或自行另行處理。
-*/
-
-/** 1) findOneAndDelete */
+/**
+ * 影片刪除後的處理鉤子
+ * @description 在影片被刪除後執行資源清理
+ * @param {Object} doc - 被刪除的影片文件
+ */
 videoInfoSchema.post("findOneAndDelete", async function (doc) {
-  // doc 即是已被刪除的那筆文件
-  // 若為多筆情況 (findManyAndDelete) 不會觸發這個 hook
   if (doc) {
     await cleanupVideo(doc);
   }
 });
 
-/** 2) remove (document.remove()) */
+/**
+ * 影片移除後的處理鉤子
+ * @description 在影片被移除後執行資源清理
+ * @param {Object} doc - 被移除的影片文件
+ */
 videoInfoSchema.post("remove", async function (doc) {
   if (doc) {
     await cleanupVideo(doc);
   }
 });
 
-/** 3) deleteOne with document:true, query:false (文件層級) */
+/**
+ * 影片單筆刪除後的處理鉤子
+ * @description 在影片被單筆刪除後執行資源清理
+ * @param {Object} doc - 被刪除的影片文件
+ */
 videoInfoSchema.post("deleteOne", async function (doc) {
   if (doc) {
     await cleanupVideo(doc);
   }
 });
 
+/**
+ * 影片批次刪除後的處理鉤子
+ * @description 在影片被批次刪除後執行資源清理
+ * @param {Object} result - 刪除操作結果
+ * @param {Function} next - 下一個中間件函數
+ */
 videoInfoSchema.post("deleteMany", async function (result, next) {
   try {
-    // 取得符合查詢條件的所有文件
     const docs = await this.model.find(this.getQuery());
     for (const doc of docs) {
       await cleanupVideo(doc);
@@ -149,13 +149,5 @@ videoInfoSchema.post("deleteMany", async function (result, next) {
     next(error);
   }
 });
-
-/**
- * 如果想確保 deleteMany 不執行這些清理，可以不寫 hook 或在 pre hook 裏顯式攔截
- * videoInfoSchema.pre("deleteMany", function(next){
- *   // 這裡可以選擇要不要處理，或直接 next();
- *   next();
- * });
- */
 
 module.exports = mongoose.model("VideoInfo", videoInfoSchema);

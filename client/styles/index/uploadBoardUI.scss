@@ -1,0 +1,60 @@
+.upload-board-main {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.15);
+  z-index: 2;
+  .upload-board-ui {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    overflow: hidden;
+    transition: 0.2s;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 24px;
+    .input-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 100%;
+      input {
+        width: 100%;
+      }
+    }
+    .title {
+      font-size: 30px;
+      font-weight: bold;
+    }
+    .textarea-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      .quill {
+        height: 480px;
+        margin-bottom: 32px;
+      }
+      .content {
+        font-size: 18px;
+        font-weight: bold;
+      }
+      textarea {
+        width: 320px;
+        height: 240px;
+        resize: none;
+      }
+    }
+    .g-btn-area {
+      .submit {
+        position: absolute;
+        bottom: 15px;
+      }
+    }
+  }
+}

@@ -1,0 +1,58 @@
+.upload-board-main {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.15);
+  z-index: 2;
+}
+.upload-board-main .upload-board-ui {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+  transition: 0.2s;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 24px;
+}
+.upload-board-main .upload-board-ui .input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
+.upload-board-main .upload-board-ui .input-container input {
+  width: 100%;
+}
+.upload-board-main .upload-board-ui .title {
+  font-size: 30px;
+  font-weight: bold;
+}
+.upload-board-main .upload-board-ui .textarea-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.upload-board-main .upload-board-ui .textarea-container .quill {
+  height: 480px;
+  margin-bottom: 32px;
+}
+.upload-board-main .upload-board-ui .textarea-container .content {
+  font-size: 18px;
+  font-weight: bold;
+}
+.upload-board-main .upload-board-ui .textarea-container textarea {
+  width: 320px;
+  height: 240px;
+  resize: none;
+}
+.upload-board-main .upload-board-ui .g-btn-area .submit {
+  position: absolute;
+  bottom: 15px;
+}/*# sourceMappingURL=uploadBoardUI.css.map */

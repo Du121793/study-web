@@ -1,3 +1,10 @@
+/**
+ * @file modifyQA.js
+ * @description 問答修改相關路由處理，包含問題的增刪改查和圖片處理
+ * @author StudyWeb Team
+ * @date 2024-03-30
+ */
+
 const express = require("express");
 const router = express.Router();
 const path = require("path");
@@ -16,17 +23,27 @@ const upload = multer().fields([{ name: "image", maxCount: 10 }]);
 /* -------------------------------
    共用工具函數
 ---------------------------------*/
-// 取得圖片儲存的基底路徑
+/**
+ * 取得圖片儲存的基底路徑
+ * @returns {string} 圖片儲存的基底路徑
+ */
 function getBaseImagePath() {
   return path.join(__dirname, "../../../resource/questionIMG");
 }
 
-// 取得指定 question 對應的資料夾路徑
+/**
+ * 取得指定問題對應的資料夾路徑
+ * @param {string|ObjectId} questionId - 問題ID
+ * @returns {string} 問題對應的資料夾路徑
+ */
 function getQuestionFolder(questionId) {
   return path.join(getBaseImagePath(), questionId.toString());
 }
 
-// 確保指定資料夾存在，不存在則建立
+/**
+ * 確保指定資料夾存在，不存在則建立
+ * @param {string} folderPath - 資料夾路徑
+ */
 function ensureFolderExists(folderPath) {
   if (!fs.existsSync(folderPath)) {
     fs.mkdirSync(folderPath, { recursive: true });
@@ -36,6 +53,10 @@ function ensureFolderExists(folderPath) {
 /**
  * 根據傳入的 rmIMG 陣列，刪除 oldImages 中對應的圖片檔案，
  * 並回傳更新後的圖片相對路徑陣列
+ * @param {Array} oldImages - 舊圖片相對路徑陣列
+ * @param {Array} rmIMG - 要刪除的圖片索引陣列
+ * @param {string} baseImagePath - 圖片儲存的基底路徑
+ * @returns {Array} 更新後的圖片相對路徑陣列
  */
 function removeOldImages(oldImages, rmIMG, baseImagePath) {
   if (!Array.isArray(oldImages)) return [];
@@ -80,61 +101,65 @@ async function saveUploadedImages(
   return savedPaths;
 }
 
-/* -------------------------------
-   GET: 取得問題資訊 (並修正圖片 URL)
-   將 DB 中存的相對路徑改成完整 URL，
-   例如：process.env.SERVER_IP/resource/questionIMG/【相對路徑】
----------------------------------*/
+/**
+ * 獲取問題列表
+ * @route GET /getQuestion
+ * @param {number} [page=1] - 頁碼
+ * @param {number} [pageSize=10] - 每頁筆數
+ * @param {string} [sortBy="lastUpdate"] - 排序欄位，"createDate"或"lastUpdate"
+ * @param {string} [sortOrder="asc"] - 排序方向，"asc"為升序，"desc"為降序
+ * @param {string} [sortType="resourceCategories"] - 分群依據，"resourceCategories"或"hints"
+ * @returns {Object} 按標籤分組的問題列表及分頁資訊
+ */
 router.get("/getQuestion", async (req, res) => {
   try {
-    // 取得分頁與排序參數
+    // 解析查詢參數，設置默認值
     const page = parseInt(req.query.page, 10) || 1;
     const pageSize = parseInt(req.query.pageSize, 10) || 10;
-    const sortByParam = req.query.sortBy || "lastUpdate"; // 若為 "createDate"，以 date 排序
+    const sortByParam = req.query.sortBy || "lastUpdate";
     const sortOrder = req.query.sortOrder || "asc";
-    // 可選 "resourceCategories" 或 "hints"
     const sortType = req.query.sortType || "resourceCategories";
 
-    // 決定排序欄位與排序方向
+    // 設置排序欄位和方向
     const sortField = sortByParam === "createDate" ? "date" : "lastUpdate";
     const sortDirection = sortOrder === "asc" ? 1 : -1;
 
-    // 建立 aggregation pipeline
+    // 構建聚合管道
     const pipeline = [
+      // 添加排序欄位
       {
-        // 新增一個欄位 sortField，依據所選欄位
         $addFields: {
           sortField: `$${sortField}`,
         },
       },
+      // 展開標籤陣列
       {
-        // 針對 sortType 欄位 (陣列) 做展開，產生單筆文件，每筆文件會包含一個 tag 值
         $unwind: `$${sortType}`,
       },
+      // 按排序欄位排序
       {
-        // 依據 sortField 排序
         $sort: { sortField: sortDirection },
       },
+      // 按標籤分組
       {
-        // 依照展開後的 tag 分組，每組收集符合條件的 QA 文件
         $group: {
-          _id: `$${sortType}`, // 分組依據的標籤
+          _id: `$${sortType}`,
           docs: { $push: "$$ROOT" },
-          representative: { $first: "$sortField" }, // 以第一筆作為代表排序值
+          representative: { $first: "$sortField" },
         },
       },
+      // 限制每組文檔數量
       {
-        // 每組僅取最多 3 筆 QA 文件
         $addFields: {
           docs: { $slice: ["$docs", 3] },
         },
       },
+      // 按代表值排序
       {
-        // 依據代表排序值，再次排序各組
         $sort: { representative: sortDirection },
       },
+      // 分頁處理
       {
-        // 分頁處理：跳過前面 (page - 1)*pageSize 筆組，再取 pageSize 筆
         $skip: (page - 1) * pageSize,
       },
       {
@@ -145,7 +170,7 @@ router.get("/getQuestion", async (req, res) => {
     // 執行聚合查詢
     const groups = await QA.aggregate(pipeline);
 
-    // 處理每個 QA 文件的 image 欄位，補上 SERVER_IP 前綴
+    // 處理圖片URL
     const transformedGroups = groups.map((group) => {
       const tag = group._id;
       const docs = group.docs.map((doc) => {
@@ -162,8 +187,8 @@ router.get("/getQuestion", async (req, res) => {
     return res.json({
       success: true,
       data: transformedGroups,
-      page, // 回傳目前頁碼
-      pageSize, // 回傳每頁分組數量
+      page,
+      pageSize,
       sortBy: sortByParam,
       sortOrder,
       sortType,
@@ -174,11 +199,20 @@ router.get("/getQuestion", async (req, res) => {
   }
 });
 
-/* -------------------------------
-   POST: 建立新問題
----------------------------------*/
+/**
+ * 創建新問題
+ * @route POST /postQuestion
+ * @param {string[]} course_ids - 課程ID陣列
+ * @param {boolean} [isPublic=false] - 是否公開
+ * @param {string} description - 問題描述
+ * @param {string[]} [resourceCategories=["無特定主題"]] - 資源類別標籤
+ * @param {string[]} [hints=["無特定知識點"]] - 提示標籤
+ * @param {Object[]} [image] - 上傳的圖片檔案
+ * @returns {Object} 新創建的問題
+ */
 router.post("/postQuestion", upload, async (req, res) => {
   try {
+    // 解析請求參數
     let {
       course_ids,
       isPublic = false,
@@ -199,15 +233,14 @@ router.post("/postQuestion", upload, async (req, res) => {
         .status(400)
         .json({ success: false, msg: "請提供有效的課程ID陣列" });
     }
-
-    // 僅要求必須提供敘述
     if (!description) {
       return res.status(400).json({ success: false, msg: "必須提供敘述" });
     }
 
+    // 驗證權限
     if (isPublic === true && req.user.role === "student") {
       return res
-        .status(401)
+        .status(403)
         .json({ success: false, msg: "你沒有將此問題公開的權利" });
     }
     if (req.user.role !== "admin") {
@@ -216,7 +249,7 @@ router.post("/postQuestion", upload, async (req, res) => {
       );
       if (!allCoursesIncluded) {
         return res
-          .status(401)
+          .status(403)
           .json({ success: false, msg: "你不是此課程的成員" });
       }
     }
@@ -226,13 +259,12 @@ router.post("/postQuestion", upload, async (req, res) => {
         .json({ success: false, msg: "必須提供上傳課程ID" });
     }
 
-    // 產生新的 QA 文件 ID，並以此作為圖片儲存的資料夾名稱
+    // 處理圖片上傳
     const qaId = new mongoose.Types.ObjectId();
     const baseImagePath = getBaseImagePath();
     const questionFolder = getQuestionFolder(qaId);
     ensureFolderExists(questionFolder);
 
-    // 如果上傳了圖片，則處理圖片上傳；若無則 imagesRelativePaths 為空陣列
     let imagesRelativePaths = [];
     if (req.files && req.files.image && Array.isArray(req.files.image)) {
       imagesRelativePaths = await saveUploadedImages(
@@ -243,47 +275,40 @@ router.post("/postQuestion", upload, async (req, res) => {
       );
     }
 
+    // 創建並保存新問題
     const newQA = new QA({
       _id: qaId,
       image: imagesRelativePaths,
       description,
       resourceCategories,
       hints,
-      isPublic,
       courses: course_ids,
+      isPublic,
       poster: req.user._id,
     });
 
     const savedQA = await newQA.save();
-    return res.json({
-      success: true,
-      msg: "新問題創建成功",
-      data: { QA_id: savedQA._id },
-    });
+    return res.status(201).json({ success: true, data: savedQA });
   } catch (error) {
     console.error(error);
-    return res
-      .status(500)
-      .json({ success: false, msg: "發生了不可預期的錯誤" });
+    return res.status(500).json({ success: false, msg: "建立問題時發生錯誤" });
   }
 });
 
-/* -------------------------------
-   PATCH: 修改問題
-   - 處理舊圖片刪除 (根據 rmIMG)
-   - 處理新圖片上傳，並確保命名不重複
----------------------------------*/
-/*
-前端說明:
-若要更新欄位，請在請求中包含該欄位的鍵值。若想要將欄位內容更新為空值，請傳入 null，
-例如:
-{
-  "description": "新的描述",
-  "hints": null // 表示將 hints 更新為空值
-}
-若某個欄位不傳，則保留原有資料不變。
-*/
-
+/**
+ * 修改問題
+ * @route PATCH /patchQuestion
+ * @param {string} question_id - 問題ID
+ * @param {string[]} [course_ids] - 課程ID陣列，不傳則保留原有資料
+ * @param {boolean} [isPublic] - 是否公開，不傳則保留原有資料
+ * @param {string} [description] - 問題描述，不傳則保留原有資料
+ * @param {string[]} [resourceCategories] - 資源類別標籤，不傳則保留原有資料
+ * @param {string[]} [hints] - 提示標籤，不傳則保留原有資料
+ * @param {number[]} [rmIMG] - 要刪除的圖片索引陣列
+ * @param {boolean} [replied] - 是否已回覆，不傳則保留原有資料
+ * @param {Object[]} [image] - 上傳的新圖片檔案
+ * @returns {Object} 更新後的問題ID
+ */
 router.patch(
   "/patchQuestion",
   upload,
@@ -297,17 +322,16 @@ router.patch(
         description,
         resourceCategories,
         hints,
-        rmIMG, // array(index)
+        rmIMG,
         replied,
       } = req.body;
-      console.log(req.body);
 
-      // 必須提供有效的 question_id
+      // 驗證問題ID
       if (!mongoose.Types.ObjectId.isValid(question_id)) {
         return res.status(400).json({ success: false, msg: "無效的問題ID" });
       }
 
-      // 若前端有傳入 course_ids 且非 null，則需為非空陣列
+      // 驗證課程ID陣列
       if (course_ids !== null) {
         if (!Array.isArray(course_ids) || course_ids.length === 0) {
           return res
@@ -316,6 +340,7 @@ router.patch(
         }
       }
 
+      // 查找並驗證問題存在
       const oldQA = await QA.findById(question_id);
       if (!oldQA) {
         return res
@@ -323,19 +348,23 @@ router.patch(
           .json({ success: false, msg: "找不到對應的問題" });
       }
 
+      // 處理圖片
       const baseImagePath = getBaseImagePath();
       const questionFolder = getQuestionFolder(question_id);
       ensureFolderExists(questionFolder);
 
+      // 刪除舊圖片
       if (Array.isArray(rmIMG)) {
         oldQA.image = removeOldImages(oldQA.image, rmIMG, baseImagePath);
       }
 
+      // 計算新圖片索引
       const nextIndex =
         (oldQA.image || [])
           .map((relPath) => Number(path.basename(relPath).split(/[_\.]/)[1]))
           .reduce((max, cur) => (cur > max ? cur : max), -1) + 1;
 
+      // 處理新圖片上傳
       if (
         req.files &&
         Array.isArray(req.files.image) &&
@@ -350,26 +379,16 @@ router.patch(
         oldQA.image = (oldQA.image || []).concat(newPaths);
       }
 
-      // 僅更新前端有傳入的欄位（即使值為 null）
-      if (course_ids !== undefined) {
-        oldQA.courses = course_ids;
-      }
-      if (isPublic !== undefined) {
-        oldQA.isPublic = isPublic;
-      }
-      if (description !== undefined) {
-        oldQA.description = description;
-      }
-      if (resourceCategories !== undefined) {
+      // 更新問題資料
+      if (course_ids !== undefined) oldQA.courses = course_ids;
+      if (isPublic !== undefined) oldQA.isPublic = isPublic;
+      if (description !== undefined) oldQA.description = description;
+      if (resourceCategories !== undefined)
         oldQA.resourceCategories = resourceCategories;
-      }
-      if (hints !== undefined) {
-        oldQA.hints = hints;
-      }
-      if (replied !== undefined) {
-        oldQA.replied = replied;
-      }
+      if (hints !== undefined) oldQA.hints = hints;
+      if (replied !== undefined) oldQA.replied = replied;
 
+      // 保存更新
       const savedQA = await oldQA.save();
       return res.json({
         success: true,
@@ -385,27 +404,30 @@ router.patch(
   }
 );
 
+/**
+ * 刪除問題
+ * @route DELETE /deleteQuestion
+ * @param {string} question_id - 要刪除的問題ID
+ * @returns {Object} 刪除結果
+ */
 router.delete(
   "/deleteQuestion",
   accessChecker.updateAndDeleteQuestion,
   async (req, res) => {
     try {
+      // 驗證問題ID
       const { question_id } = req.query;
       if (!mongoose.Types.ObjectId.isValid(question_id)) {
         return res.status(400).json({ success: false, msg: "無效的問題ID" });
       }
 
-      // 由於問題圖片資料夾的刪除已放在 QA 模型的 pre hook 中，
-      // 因此這裡不再需要手動刪除資料夾
-
-      // 找出所有關聯此問題的留言（pointTo 為該問題ID）
+      // 刪除相關留言
       const comments = await QAmessage.find({ pointTo: question_id });
       for (const comment of comments) {
-        // 呼叫 findByIdAndDelete 刪除留言，留言內的圖片與影片排程會由 QAmessage 的 hook 自動處理
         await QAmessage.findByIdAndDelete(comment._id);
       }
 
-      // 刪除問題資料（刪除前會先觸發 QA 模型的 pre hook 刪除圖片資料夾）
+      // 刪除問題（圖片資料夾會由 hook 自動處理）
       await QA.findByIdAndDelete(question_id);
 
       return res.json({ success: true, msg: "問題刪除成功" });

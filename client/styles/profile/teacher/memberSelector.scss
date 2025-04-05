@@ -1,16 +1,15 @@
 .member-select-area {
   margin-top: 24px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
   padding-top: 64px;
   padding: 24px 24px 24px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  // width: 90%;
   background-color: #fff; // 讓清單區域白底
+  width: 75%;
 
   .member-select-header {
     font-size: 24px;
@@ -161,31 +160,6 @@
         #grade {
           width: 80px;
         }
-      }
-    }
-  }
-  .page-switch {
-    display: flex;
-    gap: 12px;
-    .page-switcher {
-      cursor: pointer;
-      color: #525252;
-    }
-    .content{
-      font-weight: bold;
-      color: #525252;
-    }
-    .pointer{
-      cursor: pointer;
-    }
-    .now-page {
-      display: flex;
-      color: #9a9a9a;
-      gap: 4px;
-      font-weight: bold;
-      color: rgb(0, 0, 0);
-      .page {
-        cursor: pointer;
       }
     }
   }

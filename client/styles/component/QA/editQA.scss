@@ -10,7 +10,7 @@
   background-color: rgba(0, 0, 0, 0.4);
   z-index: 9;
   .form-area {
-    max-width: 80%;
+    width: 70%;
     max-height: 90%;
     overflow-y: scroll;
     padding: 24px 64px;
@@ -56,7 +56,9 @@
         user-select: none;
         padding: 4px 6px;
         border-radius: 4px;
-        border: 1px solid rgba(0, 0, 0, 0.4);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        background-color: #4f4f4f;
+        color: white;
       }
     }
     .hints-area {
@@ -77,7 +79,9 @@
         user-select: none;
         padding: 4px 6px;
         border-radius: 4px;
-        border: 1px solid rgba(0, 0, 0, 0.4);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        background-color: #cacaca;
+        color: rgb(0, 0, 0);
       }
     }
     .image-area {
@@ -132,8 +136,13 @@
       align-items: center;
       width: 100%;
       gap: 4px;
+      .textarea {
+        resize: none;
+        width: 80%;
+        height: 240px;
+      }
       .content {
-        width: 102%;
+        width: 80%;;
       }
       .description-input {
         outline: none;

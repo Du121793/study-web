@@ -1,3 +1,10 @@
+/**
+ * @file index.js
+ * @description 資源路由配置，處理靜態資源的存取和權限控制
+ * @author StudyWeb Team
+ * @date 2024-03-30
+ */
+
 const router = require("express").Router();
 const publicRoute = require("./public");
 const express = require("express");
@@ -8,6 +15,13 @@ require("../config/passport")(passport);
 const accessChecker = require("./resourceMiddleware/accessChecker");
 require("dotenv");
 
+/**
+ * 從 URL query 參數中驗證 JWT token
+ * @description 使用 passport-jwt-query 策略驗證 token
+ * @param {Object} req - Express 請求物件
+ * @param {Object} res - Express 回應物件
+ * @param {Function} next - Express 下一個中間件函數
+ */
 const tokenCheckFromQuery = (req, res, next) => {
   passport.authenticate("jwt-query", { session: false }, (err, user, info) => {
     if (err) return next(err);
@@ -19,33 +33,47 @@ const tokenCheckFromQuery = (req, res, next) => {
   })(req, res, next);
 };
 
-// 而是動態地為每一個 questionId 回傳對應的靜態資料夾。
+/**
+ * 問題圖片存取路由
+ * @description 處理問題相關圖片的存取
+ * - 需要通過 token 驗證和問題存取權限檢查
+ * - 動態映射到對應的問題圖片資料夾
+ */
 router.use(
   "/questionIMG/:questionId",
   [tokenCheckFromQuery, accessChecker.question], // 先做權限檢查
   (req, res, next) => {
-    // 計算出對應的 question 資料夾位置
+    // 計算目標資料夾路徑
     const folderPath = path.join(
       __dirname,
       "questionIMG",
       req.params.questionId
     );
-    // 此時 req.url 內含例如 "/comment/comment_id" 的子路徑，
-    // express.static 會依照此相對路徑去尋找檔案，
-    // 因此即使有 comment 資料夾，也能正常讀取。
+    // 使用 express.static 處理靜態檔案請求
     express.static(folderPath)(req, res, next);
   }
 );
 
+/**
+ * 影片圖片存取路由
+ * @description 處理課程相關影片圖片的存取
+ * - 動態映射到對應的課程影片圖片資料夾
+ */
 router.use(
   "/videoIMG/:courseId",
   // [tokenCheckFromQuery,accessChecker.course],
   (req, res, next) => {
+    // 計算目標資料夾路徑
     const folderPath = path.join(__dirname, "videoIMG", req.params.courseId);
+    // 使用 express.static 處理靜態檔案請求
     express.static(folderPath)(req, res, next);
   }
 );
 
+/**
+ * 問題圖片根目錄存取限制
+ * @description 禁止直接存取 questionIMG 根目錄
+ */
 router.use("/questionIMG", (req, res) => {
   return res.status(403).json({
     success: false,
@@ -53,6 +81,10 @@ router.use("/questionIMG", (req, res) => {
   });
 });
 
+/**
+ * 影片圖片根目錄存取限制
+ * @description 禁止直接存取 videoIMG 根目錄
+ */
 router.use("/videoIMG", (req, res) => {
   return res.status(403).json({
     success: false,
@@ -60,6 +92,7 @@ router.use("/videoIMG", (req, res) => {
   });
 });
 
+// 掛載公開資源路由
 router.use("/public", publicRoute);
 
 module.exports = router;

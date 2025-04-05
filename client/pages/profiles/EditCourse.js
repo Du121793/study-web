@@ -4,7 +4,11 @@ import Image from 'next/image'
 // methods
 import userService from '../../method/userService'
 import adminService from '../../method/adminService'
-// public
+//public
+import dbArrowLeft from '../../public/profile/doubleArrowLeft.png'
+import dbArrowRight from '../../public/profile/doubleArrowRight.png'
+import ArrowLeft from '../../public/profile/leftArrow.png'
+import ArrowRight from '../../public/profile/rightArrow.png'
 import searchIcon from '../../public/global/search.png'
 import addIcon from '../../public/global/add.png'
 import editIcon from '../../public/global/edit.png'
@@ -12,8 +16,13 @@ import deleteIcon from '../../public/global/delete.png'
 import complateIcon from '../../public/global/complate.png'
 // 子組件
 import MemberSelector from './MemberSelector'
+// global
+import LoadingAnime from '../../components/global/LoadingAnime'
+// env
+const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
 export default function EditCourse({ onRefresh }) {
+  const [courseLoading, setCourseLoading] = useState(false)
   const token = useUserToken()
   const [editStatusIndex, setEditStatusIndex] = useState(null)
   const [doubleCheck, setDoubleCheck] = useState(false)
@@ -27,7 +36,8 @@ export default function EditCourse({ onRefresh }) {
   const [classInput, setClassInput] = useState('')
   const [courseNameInput, setCourseNameInput] = useState('')
   const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(9999)
+  const [pageSize, setPageSize] = useState(1)
+  const [totalPage, setTotalPage] = useState(1)
   // 更新課程參數
   const [editCourseName, setEditCourseName] = useState(null)
   const [editGrade, setEditGrade] = useState(null)
@@ -42,7 +52,7 @@ export default function EditCourse({ onRefresh }) {
   const [courses, setCourses] = useState([])
   // 是否要在新增課程時也將選擇的成員加入課程
   const [addThenRegister, setAddThenRegister] = useState(false)
-  // 控制訊息
+
   // 控制訊息
   const [message, setMessage] = useState('無訊息')
   const [messageStatus, setMessageStatus] = useState(false)
@@ -72,6 +82,41 @@ export default function EditCourse({ onRefresh }) {
         setMessageColor('')
       }, 200)
     }, 2000)
+  }
+
+  // 參數:總頁數，中間頁數，從中間往左右總共要幾頁
+  function getPage(total, thisPage, pageSize = 5) {
+    if (total <= 0 || thisPage <= 0 || thisPage > total) {
+      return []
+    }
+
+    let page = []
+    if (total <= pageSize) {
+      for (let i = 0; i < total; i++) {
+        page.push(i + 1)
+      }
+      return page
+    }
+
+    const leftSize = Math.floor((pageSize - 1) / 2)
+    const rightSize = pageSize - 1 - leftSize
+
+    let start = Math.max(1, thisPage - leftSize)
+    let end = Math.min(total, thisPage + rightSize)
+
+    if (start === 1) {
+      end = Math.min(total, pageSize)
+      start = 1
+    } else if (end === total) {
+      start = Math.max(1, total - pageSize + 1)
+      end = total
+    }
+
+    for (let i = start; i <= end; i++) {
+      page.push(i)
+    }
+
+    return page
   }
 
   // 搜尋課程功能
@@ -192,18 +237,28 @@ export default function EditCourse({ onRefresh }) {
     console.log([...courses])
   }
 
-  // 獲取課程資料，page:1, pageSize:10
+  // 獲取課程資料
   useEffect(() => {
     if (token) {
+      setCourseLoading(true)
       let data = {
         page: page,
         pageSize: pageSize,
       }
       adminService.getCourses(token, data).then((res) => {
-        setCoursesInfo(res.data)
+        if (res.success) {
+          setTotalPage(res.data.total)
+          setCoursesInfo(res.data)
+          setCourseLoading(false)
+        } else {
+          messageControl('發生錯誤，即將跳轉回首頁', false)
+          setTimeout(() => {
+            window.location(clientIp)
+          }, 3000)
+        }
       })
     }
-  }, [token])
+  }, [token, page])
 
   // 當年級、科目、班級更改時也會更改課名
   useEffect(() => {
@@ -346,6 +401,11 @@ export default function EditCourse({ onRefresh }) {
             </div>
           </div>
           {/* list info */}
+          {courseLoading && (
+            <div className="courses-info-area">
+              <LoadingAnime />
+            </div>
+          )}
           {coursesInfo &&
             coursesInfo.courses.map((item, index) => (
               <div
@@ -407,15 +467,16 @@ export default function EditCourse({ onRefresh }) {
                       />
                       <input
                         type="checkbox"
-                        onChange={(e) => {
-                          if (e.target.checked === true) {
-                            setCourses([...courses, item._id])
-                          } else {
+                        checked={courses.find((value) => value === item._id)}
+                        onChange={() => {
+                          if (courses.find((value) => value === item._id)) {
                             setCourses(
                               courses.filter((value) => {
                                 return value === item._id
                               })
                             )
+                          } else {
+                            setCourses([...courses, item._id])
                           }
                         }}
                       />
@@ -454,15 +515,16 @@ export default function EditCourse({ onRefresh }) {
 
                       <input
                         type="checkbox"
-                        onChange={(e) => {
-                          if (e.target.checked === true) {
-                            setCourses([...courses, item._id])
-                          } else {
+                        checked={courses.find((value) => value === item._id)}
+                        onChange={() => {
+                          if (courses.find((value) => value === item._id)) {
                             setCourses(
                               courses.filter((value) => {
-                                return value === item._id
+                                return value !== item._id
                               })
                             )
+                          } else {
+                            setCourses([...courses, item._id])
                           }
                         }}
                       />
@@ -471,6 +533,73 @@ export default function EditCourse({ onRefresh }) {
                 )}
               </div>
             ))}
+          <div className="page-switch">
+            <Image
+              alt="switch back to first page icon"
+              src={dbArrowLeft}
+              className="page-switcher"
+              width={24}
+              height={24}
+              onClick={() => {
+                setPage(1)
+              }}></Image>
+            <Image
+              alt="switch back one page icon"
+              src={ArrowLeft}
+              className="page-switcher"
+              width={24}
+              height={24}
+              onClick={() => {
+                if (page === 1) {
+                  return
+                } else {
+                  setPage((prop) => prop - 1)
+                }
+              }}></Image>
+            {getPage(totalPage, page).map((item, index) => {
+              if (page === item) {
+                return (
+                  <div
+                    key={index}
+                    className="now-page active">
+                    {item}
+                  </div>
+                )
+              }
+              return (
+                <div
+                  onClick={() => {
+                    setPage(item)
+                  }}
+                  key={index}
+                  className="now-page">
+                  {item}
+                </div>
+              )
+            })}
+            <Image
+              alt="switch next to left page icon"
+              src={ArrowRight}
+              className="page-switcher"
+              width={24}
+              height={24}
+              onClick={() => {
+                if (page === totalPage) {
+                  return
+                } else {
+                  setPage((prop) => prop + 1)
+                }
+              }}></Image>
+            <Image
+              alt="switch next one page icon"
+              src={dbArrowRight}
+              className="page-switcher"
+              width={24}
+              height={24}
+              onClick={() => {
+                setPage(totalPage)
+              }}></Image>
+          </div>
         </div>
         <MemberSelector
           selectedStudentId={selectedStudentId}

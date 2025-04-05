@@ -1,3 +1,10 @@
+/**
+ * @file user.js
+ * @description 用戶相關路由處理，包含用戶資訊查詢、課程註冊和成員管理功能
+ * @author StudyWeb Team
+ * @date 2024-03-30
+ */
+
 const router = require("express").Router();
 const mongoose = require("mongoose");
 const Course = require("../models").course;
@@ -9,6 +16,15 @@ const accessChecker = require("./routesMiddleware/accessChecker");
 const checkTeacherAccess = accessChecker.teacher;
 const checkAdminAccess = accessChecker.admin;
 
+// =====================
+// 基本用戶資訊路由
+// =====================
+
+/**
+ * 獲取當前用戶資訊
+ * @route GET /
+ * @returns {Object} 當前用戶的完整資訊
+ */
 router.get("/", (req, res) => {
   try {
     return res.json({ success: true, data: req.user });
@@ -17,14 +33,25 @@ router.get("/", (req, res) => {
   }
 });
 
+// =====================
+// 課程註冊相關路由
+// =====================
+
+/**
+ * 獲取用戶已註冊的課程
+ * @route GET /registedCourse
+ * @param {string} course_id - 可選，指定課程ID
+ * @param {string|Object} filter - 可選，過濾條件（JSON格式）
+ * @returns {Object} 課程資訊列表或單一課程詳情
+ */
 router.get("/registedCourse", async (req, res) => {
   try {
-    // 從 query 參數中取得 course_id 與 filter (filter 為 JSON 格式字串或物件)
+    // 解析查詢參數
     const { course_id, filter } = req.query;
     let projection = {};
-    let page, pageSize; // 從 filter 中抽取出來的分頁參數
+    let page, pageSize;
 
-    // 定義允許過濾的欄位（對應 schema）
+    // 定義可過濾的欄位
     const allowedFields = [
       "courseName",
       "subject",
@@ -33,6 +60,7 @@ router.get("/registedCourse", async (req, res) => {
       "date",
     ];
 
+    // 處理過濾條件
     if (filter) {
       let parsedFilter = {};
       try {
@@ -43,7 +71,8 @@ router.get("/registedCourse", async (req, res) => {
           msg: "filter 格式錯誤，請傳入合法的 JSON 字串",
         });
       }
-      // 從 filter 中抽取分頁參數（若存在則取出，page 預設為 1）
+
+      // 處理分頁參數
       if (parsedFilter.hasOwnProperty("page")) {
         page = parseInt(parsedFilter.page) || 1;
         delete parsedFilter.page;
@@ -52,7 +81,8 @@ router.get("/registedCourse", async (req, res) => {
         pageSize = parseInt(parsedFilter.pageSize);
         delete parsedFilter.pageSize;
       }
-      // 根據剩下的 parsedFilter 中的屬性建立投影物件，只允許 schema 定義的欄位
+
+      // 建立投影物件
       allowedFields.forEach((field) => {
         if (parsedFilter.hasOwnProperty(field)) {
           projection[field] = 1;
@@ -60,9 +90,9 @@ router.get("/registedCourse", async (req, res) => {
       });
     }
 
-    // 若有指定 course_id，則只查詢該筆資料
+    // 處理單一課程查詢
     if (course_id) {
-      // 非 teacher 身份需檢查該課程是否在使用者的已註冊清單中
+      // 權限檢查
       if (
         !req.user.courses.includes(course_id) &&
         req.user.role !== "teacher"
@@ -71,41 +101,50 @@ router.get("/registedCourse", async (req, res) => {
           .status(404)
           .json({ success: false, msg: "您尚未註冊此課程" });
       }
+
+      // 查詢課程資訊
       const foundCourse =
         Object.keys(projection).length > 0
           ? await Course.findOne({ _id: course_id }, projection)
           : await Course.findOne({ _id: course_id });
+
       if (!foundCourse) {
         return res.status(404).json({ success: false, msg: "找不到該課程" });
       }
-      // 取得該課程的成員數，透過查詢 User 模型中 courses 陣列包含此課程的使用者數量
+
+      // 計算成員數量
       const memberCount = await User.countDocuments({ courses: course_id });
-      // 若 foundCourse 為 mongoose 文件，轉成純物件以便加入新欄位
+
+      // 轉換為純物件並添加成員數
       const courseData =
         typeof foundCourse.toObject === "function"
           ? foundCourse.toObject()
           : foundCourse;
       courseData.members = memberCount;
+
       return res.json({ success: true, data: courseData });
-    } else {
-      // 未指定 course_id，回傳使用者所有已註冊課程的資料
+    }
+
+    // 處理課程列表查詢
+    else {
       let courseIds = req.user.courses;
       const totalCourses = courseIds.length;
 
-      // 若有設定 pageSize 則執行分頁（若未提供則全部回傳）
+      // 處理分頁
       if (pageSize) {
         const currentPage = page || 1;
         const start = (currentPage - 1) * pageSize;
         courseIds = courseIds.slice(start, start + pageSize);
       }
 
-      // 取得每筆課程資料並附加成員數
+      // 獲取課程詳細資訊
       const coursesInfo = await Promise.all(
         courseIds.map(async (courseID) => {
           const courseInfo =
             Object.keys(projection).length > 0
               ? await Course.findOne({ _id: courseID }, projection)
               : await Course.findOne({ _id: courseID });
+
           if (courseInfo) {
             const memberCount = await User.countDocuments({
               courses: courseID,
@@ -116,16 +155,17 @@ router.get("/registedCourse", async (req, res) => {
                 : courseInfo;
             courseData.members = memberCount;
             return courseData;
-          } else {
-            return null;
           }
+          return null;
         })
       );
-      // 移除可能查不到的課程資料（null）
+
+      // 過濾無效課程
       const filteredCoursesInfo = coursesInfo.filter(
         (course) => course !== null
       );
 
+      // 返回結果
       if (pageSize) {
         return res.json({
           success: true,
@@ -136,9 +176,8 @@ router.get("/registedCourse", async (req, res) => {
             pageSize: pageSize,
           },
         });
-      } else {
-        return res.json({ success: true, data: filteredCoursesInfo });
       }
+      return res.json({ success: true, data: filteredCoursesInfo });
     }
   } catch (error) {
     console.error(error);
@@ -148,43 +187,37 @@ router.get("/registedCourse", async (req, res) => {
   }
 });
 
-/**
- * GET /getMembers
- *
- * 取得會員資料（僅限教師及管理者存取），並支援過濾、排序與分頁。
- *
- * 查詢參數說明：
- * - username: 模糊比對用戶名稱 (userinfo.username)。
- * - realname: 模糊比對真實姓名 (userinfo.realname)。
- * - phoneNumber: 模糊比對手機號碼 (userinfo.phoneNumber)。
- * - _id: 精準比對用戶 ID。
- * - role: 指定用戶角色（"student"、"teacher"、"admin"），預設回傳全部用戶。
- * - courses: 依據課程 ID 過濾用戶。
- *
- * 分頁與排序參數：
- * - page (預設: 1): 當前頁碼。
- * - pageSize (預設: 10): 每頁回傳的筆數。
- * - sortBy (預設: 不做額外排序，即使用 MongoDB 的預設輸出順序)：
- *      可指定 "grade" 或 "date" 進行排序。
- *      - "grade": 依據用戶的年級 (userinfo.grade) 排序。由於教師通常沒有年級，
- *                 因此會將沒有年級的用戶排在最後；同時以創建時間 (date) 作為次排序。
- *      - "date": 依據用戶的創建時間 (date) 排序。
- * - sortOrder (預設: "asc"): 排序方向，"asc" 為升冪、"desc" 為降冪。
- *
- * 範例：
- * GET /getMembers?username=john&page=2&pageSize=5&sortBy=grade&sortOrder=desc&role=student
- */
+// =====================
+// 成員管理路由
+// =====================
 
+/**
+ * 獲取會員列表
+ * @route GET /getMembers
+ * @param {string} username - 用戶名稱過濾
+ * @param {string} realname - 真實姓名過濾
+ * @param {string} phoneNumber - 電話號碼過濾
+ * @param {string} _id - 用戶ID過濾
+ * @param {string} role - 角色過濾
+ * @param {string} courses - 課程過濾
+ * @param {string} grade - 年級過濾
+ * @param {number} page - 頁碼
+ * @param {number} pageSize - 每頁筆數
+ * @param {string} sortBy - 排序欄位
+ * @param {string} sortOrder - 排序方向
+ * @returns {Object} 會員列表及分頁資訊
+ */
 router.get("/getMembers", checkTeacherAccess, async (req, res) => {
   try {
+    // 解析查詢參數
     const { username, realname, phoneNumber, _id, role, courses, grade } =
       req.query;
     const { page = 1, pageSize = 10, sortBy, sortOrder = "asc" } = req.query;
     const parsedPage = parseInt(page);
     const parsedPageSize = parseInt(pageSize);
 
+    // 建立過濾條件
     const filter = {};
-
     if (username) {
       filter["userinfo.username"] = new RegExp(username, "i");
     }
@@ -207,6 +240,7 @@ router.get("/getMembers", checkTeacherAccess, async (req, res) => {
       filter["userinfo.grade"] = new RegExp(grade, "i");
     }
 
+    // 設定排序條件
     let sortQuery = {};
     if (sortBy === "grade") {
       if (sortOrder === "asc") {
@@ -218,12 +252,11 @@ router.get("/getMembers", checkTeacherAccess, async (req, res) => {
       sortQuery = { date: sortOrder === "asc" ? 1 : -1 };
     }
 
-    // 先取得符合條件的總筆數
+    // 計算總筆數和總頁數
     const totalCount = await User.countDocuments(filter);
     const totalPage = Math.ceil(totalCount / parsedPageSize);
 
-    // 查詢符合條件的用戶，並在投影 (projection) 中排除 lineID
-    // - "lineID" 代表排除該欄位
+    // 查詢用戶資料
     const users = await User.find(filter, { lineID: 0 })
       .sort(sortQuery)
       .skip((parsedPage - 1) * parsedPageSize)
@@ -244,26 +277,39 @@ router.get("/getMembers", checkTeacherAccess, async (req, res) => {
   }
 });
 
+/**
+ * 導出會員資料為 CSV 格式
+ * @route GET /exportMembers
+ * @param {string} selected_members - 可選，指定要導出的會員ID陣列
+ * @param {string} username - 可選，用戶名稱過濾
+ * @param {string} realname - 可選，真實姓名過濾
+ * @param {string} phoneNumber - 可選，電話號碼過濾
+ * @param {string} _id - 可選，用戶ID過濾
+ * @param {string} role - 可選，角色過濾
+ * @param {string} courses - 可選，課程過濾
+ * @param {string} grade - 可選，年級過濾
+ * @returns {Object} CSV 格式的會員資料
+ */
 router.get("/exportMembers", checkTeacherAccess, async (req, res) => {
   try {
     let filter = {};
 
-    // 如果前端有提供 selected_members 的陣列，就以此為主要篩選條件
+    // 處理選擇的會員過濾
     if (req.query.selected_members) {
       let selected = req.query.selected_members;
-      // 如果 selected_members 為字串，嘗試解析成陣列
+      // 解析選擇的會員ID
       if (typeof selected === "string") {
         try {
           selected = JSON.parse(selected);
         } catch (e) {
-          // 若解析失敗，假設是以逗號分隔的字串
           selected = selected.split(",").map((s) => s.trim());
         }
       }
       filter = { _id: { $in: selected } };
     } else {
-      // 否則根據其他查詢參數建立過濾條件（不使用分頁）
-      const { username, realname, phoneNumber, _id, role, courses, grade } = req.query;
+      // 處理其他過濾條件
+      const { username, realname, phoneNumber, _id, role, courses, grade } =
+        req.query;
       if (username) {
         filter["userinfo.username"] = new RegExp(username, "i");
       }
@@ -287,53 +333,70 @@ router.get("/exportMembers", checkTeacherAccess, async (req, res) => {
       }
     }
 
-    // 取得所有符合條件的使用者（不進行分頁）
+    // 查詢用戶資料
     const users = await User.find(filter)
       .populate("courses", "courseName")
-      .sort({ date: 1 }) // 可自行調整預設排序
+      .sort({ date: 1 })
       .lean();
 
-    // 整理成 CSV 所需的結構，每列依序為：
-    // lineID, 用戶名稱, 真實姓名, 電話號碼, 年級, 已註冊的課程, 身份, 創建日期
-    const dataForCSV = users.map(user => {
+    // 轉換為 CSV 格式
+    const dataForCSV = users.map((user) => {
       const courseNames = Array.isArray(user.courses)
-        ? user.courses.map(c => c.courseName).join(",")
+        ? user.courses.map((c) => c.courseName).join(",")
         : "";
-      // 將電話號碼包裝成 ="xxxx" 格式，讓 Excel 當作文字顯示保留前導零
-      const phone = user.userinfo && user.userinfo.phoneNumber 
-        ? `="${user.userinfo.phoneNumber}"`
-        : "";
+      const phone =
+        user.userinfo && user.userinfo.phoneNumber
+          ? `="${user.userinfo.phoneNumber}"`
+          : "";
       return {
         lineID: user.lineID || "",
-        "用戶名稱": user.userinfo?.username || "",
-        "真實姓名": user.userinfo?.realname || "",
-        "電話號碼": phone,
-        "年級": user.userinfo?.grade || "",
-        "已註冊課程": courseNames,
-        "身分": user.role || "",
-        "創建日期": user.date ? user.date.toISOString().slice(0, 10) : ""
+        用戶名稱: user.userinfo?.username || "",
+        真實姓名: user.userinfo?.realname || "",
+        電話號碼: phone,
+        年級: user.userinfo?.grade || "",
+        已註冊課程: courseNames,
+        身分: user.role || "",
+        創建日期: user.date ? user.date.toISOString().slice(0, 10) : "",
       };
     });
 
-    const fields = ["lineID", "用戶名稱", "真實姓名", "電話號碼", "年級", "已註冊課程", "身分", "創建日期"];
+    // 設定 CSV 欄位
+    const fields = [
+      "lineID",
+      "用戶名稱",
+      "真實姓名",
+      "電話號碼",
+      "年級",
+      "已註冊課程",
+      "身分",
+      "創建日期",
+    ];
     const json2csvParser = new Parser({ fields });
     const csvData = json2csvParser.parse(dataForCSV);
-    const csvDataWithBOM = "\ufeff" + csvData; // 加入 BOM 以確保 Excel 正確辨識 UTF-8
+    const csvDataWithBOM = "\ufeff" + csvData;
 
-    // 設定 header 以附件形式下載 CSV
-    res.status(200)
+    // 設定回應標頭並發送 CSV
+    res
+      .status(200)
       .set("Content-Type", "text/csv; charset=utf-8")
       .set("Content-Disposition", 'attachment; filename="members.csv"')
       .send(Buffer.from(csvDataWithBOM, "utf8"));
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ success: false, msg: "發生了不可預期的錯誤" });
+    return res
+      .status(500)
+      .json({ success: false, msg: "發生了不可預期的錯誤" });
   }
 });
 
+/**
+ * 預註冊用戶
+ * @route POST /preRegisterUser
+ * @param {Array} body - 用戶資料陣列，每個元素包含 userinfo 和 role
+ * @returns {Object} 註冊結果統計
+ */
 router.post("/preRegisterUser", checkAdminAccess, async (req, res) => {
   try {
-    // 直接將 req.body 當作陣列來處理，每個元素應為 { userinfo, role }
     const users = req.body;
     if (!Array.isArray(users) || users.length === 0) {
       return res
@@ -341,23 +404,24 @@ router.post("/preRegisterUser", checkAdminAccess, async (req, res) => {
         .json({ success: false, msg: "請提供正確的註冊陣列" });
     }
 
+    // 初始化結果追蹤
     let successCount = 0;
     let successStudentId = [];
     let alreadyRegisteredUsers = [];
     let invalidUsers = [];
     let serverSavedErrorUsers = [];
 
-    // 處理每筆預註冊的資料
+    // 處理每個用戶註冊
     for (const user of users) {
       const { userinfo, role } = user;
 
-      // 驗證 userinfo 是否存在並具備必要欄位
+      // 驗證必要欄位
       if (!userinfo || !userinfo.realname || !userinfo.phoneNumber || !role) {
         invalidUsers.push(userinfo ? userinfo.realname : "未知使用者");
         continue;
       }
 
-      // 檢查是否已有相同 realname 與 phoneNumber 的使用者
+      // 檢查重複註冊
       try {
         let foundUser = await User.findOne({
           "userinfo.realname": userinfo.realname,
@@ -372,7 +436,7 @@ router.post("/preRegisterUser", checkAdminAccess, async (req, res) => {
         continue;
       }
 
-      // 建立新使用者，若未提供 role 則預設為 "student"
+      // 創建新用戶
       try {
         let newUser = new User({
           userinfo,
@@ -390,15 +454,12 @@ router.post("/preRegisterUser", checkAdminAccess, async (req, res) => {
       }
     }
 
-    // 組合全域訊息：若所有使用者皆成功則顯示「全部」，否則顯示成功筆數
-    let globalMsg = "";
-    if (successCount === users.length) {
-      globalMsg = "成功預註冊全部使用者";
-    } else {
-      globalMsg = `成功預註冊 ${successCount} 位使用者`;
-    }
+    // 組合回應訊息
+    let globalMsg =
+      successCount === users.length
+        ? "成功預註冊全部使用者"
+        : `成功預註冊 ${successCount} 位使用者`;
 
-    // 組成詳細訊息物件
     const detailedMsg = {
       preRegisterSuccess: globalMsg,
       alreadyRegistered:
@@ -415,7 +476,7 @@ router.post("/preRegisterUser", checkAdminAccess, async (req, res) => {
               ", "
             )}。`
           : "",
-      successStudentId, // 將成功預註冊的使用者 id 一併回傳
+      successStudentId,
     };
 
     return res.status(200).json({

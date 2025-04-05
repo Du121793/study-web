@@ -143,6 +143,15 @@
       .submit-btn:hover {
         background-color: #e1b08a;
       }
+      .is-private {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        .hint {
+          font-size: 14px;
+          color: red;
+        }
+      }
     }
     .access-info {
       background: linear-gradient(60deg, #a7c4ec, #c1f8f6);
@@ -207,7 +216,7 @@
         display: flex;
         align-items: center;
         gap: 4px;
-        .complate-btn{
+        .complate-btn {
           cursor: pointer;
           padding: 4px 6px;
           border-radius: 4px;
@@ -215,7 +224,7 @@
           background-color: #c2f8b1;
           transition: 0.2s;
         }
-        .complate-btn:hover{
+        .complate-btn:hover {
           background-color: #aedf9f;
         }
         .image {
@@ -234,6 +243,7 @@
           gap: 4px;
           transition: 0.2s;
           .content {
+            user-select: none;
             font-weight: bold;
             padding: 4px 6px;
             border-radius: 4px;
@@ -241,6 +251,7 @@
             background-color: #fff;
           }
           .confirm-btn {
+            user-select: none;
             cursor: pointer;
             font-weight: bold;
             padding: 4px 6px;
@@ -253,6 +264,7 @@
             background-color: #b3e6a4;
           }
           .cancel-btn {
+            user-select: none;
             cursor: pointer;
             font-weight: bold;
             padding: 4px 6px;
@@ -265,6 +277,11 @@
             background-color: #e49393;
           }
         }
+      }
+      .edit-area{
+        display: flex;
+        align-items: center;
+        gap: 4px;
       }
     }
   }

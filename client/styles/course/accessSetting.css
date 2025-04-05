@@ -145,6 +145,15 @@
 .access-setting-main .main-container .add-area .submit-btn:hover {
   background-color: #e1b08a;
 }
+.access-setting-main .main-container .add-area .is-private {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.access-setting-main .main-container .add-area .is-private .hint {
+  font-size: 14px;
+  color: red;
+}
 .access-setting-main .main-container .access-info {
   background: linear-gradient(60deg, #a7c4ec, #c1f8f6);
   display: flex;
@@ -238,6 +247,9 @@
   transition: 0.2s;
 }
 .access-setting-main .main-container .access-info .image-area .double-check-area .content {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
   font-weight: bold;
   padding: 4px 6px;
   border-radius: 4px;
@@ -245,6 +257,9 @@
   background-color: #fff;
 }
 .access-setting-main .main-container .access-info .image-area .double-check-area .confirm-btn {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
   cursor: pointer;
   font-weight: bold;
   padding: 4px 6px;
@@ -257,6 +272,9 @@
   background-color: #b3e6a4;
 }
 .access-setting-main .main-container .access-info .image-area .double-check-area .cancel-btn {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
   cursor: pointer;
   font-weight: bold;
   padding: 4px 6px;
@@ -267,4 +285,9 @@
 }
 .access-setting-main .main-container .access-info .image-area .double-check-area .cancel-btn:hover {
   background-color: #e49393;
+}
+.access-setting-main .main-container .access-info .edit-area {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }/*# sourceMappingURL=accessSetting.css.map */

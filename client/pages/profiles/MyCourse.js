@@ -9,25 +9,31 @@ import Link from 'next/link'
 // 導入methmod
 import userService from '../../method/userService'
 import { useUserToken } from '../../method/useUserToken'
+// global
+import LoadingAnime from '../../components/global/LoadingAnime'
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
 export default function MyCourse() {
   const [getCourses, setGetCourses] = useState([])
+  const [courseLoading, setCourseLoading] = useState()
   // 使用method獲取token
   const token = useUserToken()
   // 請求課程網址
   const curserBaseUrl = `${clientIp}/courses/Course`
   // 假圖片，用於課程左邊頭像
   const shots = [shotA, shotB, shotC, shotA, shotB, shotC, shotA, shotB, shotC, shotA]
-
-  // 渲染執行請求用戶資料，存到getCourse
+  // 請求所有用戶已註冊課程資訊，若為admin則為全部
   useEffect(() => {
     if (token) {
+      setCourseLoading(true)
       userService
         .getUserRegistedCourses(token)
         .then((res) => {
-          setGetCourses(res.data)
+          if (res.success) {
+            setCourseLoading(false)
+            setGetCourses(res.data)
+          }
         })
         .catch((err) => console.error('Error:', err))
     }
@@ -44,6 +50,7 @@ export default function MyCourse() {
       <div className="courses-container">
         <div className="course-page-header">我的課程</div>
         <ul className="courses">
+          {courseLoading && <LoadingAnime />}
           {getCourses.map((item, index) => (
             <li
               className="course"

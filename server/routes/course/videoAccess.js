@@ -1,25 +1,33 @@
+/**
+ * @file videoAccess.js
+ * @description 視頻權限權限管理路由，處理視頻權限記錄的增刪改查
+ * @author StudyWeb Team
+ * @date 2024-03-30
+ */
+
 const router = require("express").Router();
 const VideoAccess = require("../../models").courseVideoAccess;
 const VideoInfo = require("../../models").courseVideoInfo;
 const User = require("../../models").user;
 
 /**
- * 目標：VideoAccess 資料結構
- * {
- *   _id: ...,
- *   courseID: ...,
- *   videoIDs: [...],
- *   studentIDs: [...],
- *   accessDate: Date 或 null (無限期)
- * }
+ * VideoAccess 資料結構
+ * @typedef {Object} VideoAccess
+ * @property {string} _id - 記錄ID
+ * @property {string} courseID - 課程ID
+ * @property {string[]} videoIDs - 視頻ID列表
+ * @property {string[]} studentIDs - 學生ID列表
+ * @property {Date|null} accessDate - 權限截止日期，null表示無限期
+ * @property {string} accessName - 權限記錄名稱
+ * @property {string} creater - 創建者ID
  */
 
-// ------------------------------
-// GET /videoAccess
-// - Admin：回傳所有 VideoAccess 記錄（不限定課程）
-// - 非 Admin：僅回傳當前課程 (req.course._id) 的 VideoAccess
-// - 同時將 studentIDs / videoIDs 轉成指定格式
-// ------------------------------
+/**
+ * 獲取視頻權限記錄
+ * @route GET /
+ * @param {string} [access_id] - 可選的權限記錄ID，如果提供則只返回該記錄
+ * @returns {Object} 視頻權限記錄列表或單條記錄
+ */
 router.get("/", async (req, res) => {
   try {
     let queryCondition = { courseID: req.course._id };
@@ -71,17 +79,27 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ------------------------------
-// POST /videoAccess/postNewAccess
-// 建立新的 VideoAccess 紀錄
-// Body 參數: { accessName, videoIDs, studentIDs, accessDate, unlimited }
-// - 所有課程都強制指定為 req.course._id
-// - 若 unlimited = true，accessDate = null
-// - videoIDs 必須查詢確認都屬於該 course
-// ------------------------------
+/**
+ * 創建新的視頻權限記錄
+ * @route POST /postNewAccess
+ * @param {string} accessName - 權限記錄名稱
+ * @param {string[]} videoIDs - 視頻ID列表
+ * @param {string[]} studentIDs - 學生ID列表
+ * @param {Date} [accessDate] - 權限截止日期
+ * @param {boolean} [unlimited] - 是否無限期權限，true則忽略accessDate
+ * @param {boolean} [setPrivate] - 是否將所有影片設為私密，true則設置
+ * @returns {Object} 新創建的權限記錄
+ */
 router.post("/postNewAccess", async (req, res) => {
   try {
-    let { accessName, videoIDs, studentIDs, accessDate, unlimited } = req.body;
+    let {
+      accessName,
+      videoIDs,
+      studentIDs,
+      accessDate,
+      unlimited,
+      setPrivate = true,
+    } = req.body;
 
     // 1) 若 unlimited 為 true，則將 accessDate 設為 null
     if (unlimited) {
@@ -91,16 +109,16 @@ router.post("/postNewAccess", async (req, res) => {
     // 2) 確認 studentIDs 都屬於該課程
     if (studentIDs && Array.isArray(studentIDs)) {
       // 從 User 模型中查詢，必須同時符合 _id 在 studentIDs 且 courses 陣列包含 req.course._id
-        const validCount = await User.countDocuments({
-          _id: { $in: studentIDs },
-          courses: req.course._id,
+      const validCount = await User.countDocuments({
+        _id: { $in: studentIDs },
+        courses: req.course._id,
+      });
+      if (validCount !== studentIDs.length) {
+        return res.status(400).json({
+          success: false,
+          msg: "有指定的 studentIDs 不屬於本課程成員",
         });
-        if (validCount !== studentIDs.length) {
-          return res.status(400).json({
-            success: false,
-            msg: "有指定的 studentIDs 不屬於本課程成員",
-          });
-        }
+      }
     }
 
     // 3) 確認 videoIDs 皆屬於該課程
@@ -116,9 +134,17 @@ router.post("/postNewAccess", async (req, res) => {
           msg: "有指定的 videoIDs 不屬於本課程",
         });
       }
+
+      // 4) 如果 setPrivate 為 true，將所有影片設為私密
+      if (setPrivate) {
+        await VideoInfo.updateMany(
+          { _id: { $in: videoIDs } },
+          { $set: { isPrivate: true } }
+        );
+      }
     }
 
-    // 4) 建立新的 VideoAccess 紀錄，所有課程強制指定為 req.course._id
+    // 5) 建立新的 VideoAccess 紀錄，所有課程強制指定為 req.course._id
     const newAccess = new VideoAccess({
       courseID: req.course._id,
       videoIDs,
@@ -138,19 +164,29 @@ router.post("/postNewAccess", async (req, res) => {
   }
 });
 
-// ------------------------------
-// PATCH /videoAccess/patchAccess/:id
-// 更新指定的 VideoAccess 紀錄
-// Body 參數:{ accessName, videoIDs, studentIDs, accessDate, unlimited }
-// - studentIDs 需在 req.course.members
-// - videoIDs 需屬於該課程
-// - 若 unlimited = true，accessDate = null
-// Admin 可修改所有紀錄，否則只改自己課程的紀錄 (courseID = req.course._id)
-// ------------------------------
+/**
+ * 更新視頻權限記錄
+ * @route PATCH /patchAccess/:id
+ * @param {string} id - 權限記錄ID
+ * @param {string} [accessName] - 權限記錄名稱
+ * @param {string[]} [videoIDs] - 視頻ID列表
+ * @param {string[]} [studentIDs] - 學生ID列表
+ * @param {Date} [accessDate] - 權限截止日期
+ * @param {boolean} [unlimited] - 是否無限期權限，true則忽略accessDate
+ * @param {boolean} [setPrivate] - 是否將所有影片設為私密，true則設置
+ * @returns {Object} 更新後的權限記錄
+ */
 router.patch("/patchAccess/:id", async (req, res) => {
   try {
     const recordId = req.params.id;
-    let { accessName, videoIDs, studentIDs, accessDate, unlimited } = req.body;
+    let {
+      accessName,
+      videoIDs,
+      studentIDs,
+      accessDate,
+      unlimited,
+      setPrivate = true,
+    } = req.body;
 
     // 若 unlimited 為 true，將 accessDate 設為 null
     if (unlimited) {
@@ -193,9 +229,17 @@ router.patch("/patchAccess/:id", async (req, res) => {
           .status(400)
           .json({ success: false, msg: "有指定的 videoIDs 不屬於本課程" });
       }
+
+      // 3) 如果提供了新的 videoIDs 且 setPrivate 為 true，將這些影片設為私密
+      if (setPrivate) {
+        await VideoInfo.updateMany(
+          { _id: { $in: videoIDs } },
+          { $set: { isPrivate: true } }
+        );
+      }
     }
 
-    // 3) 建立查詢條件 (Admin 可修改所有紀錄，非 Admin 只可修改該課程的紀錄)
+    // 4) 建立查詢條件 (Admin 可修改所有紀錄，非 Admin 只可修改該課程的紀錄)
     const queryCondition = { _id: recordId };
     if (req.user.role !== "admin") {
       queryCondition.courseID = req.course._id;
@@ -221,11 +265,12 @@ router.patch("/patchAccess/:id", async (req, res) => {
   }
 });
 
-// ------------------------------
-// DELETE /videoAccess/deleteAccess/:id
-// 刪除指定的 VideoAccess 紀錄
-// Admin 可刪除所有紀錄，非 Admin 只能刪除 courseID = req.course._id
-// ------------------------------
+/**
+ * 刪除視頻權限記錄
+ * @route DELETE /deleteAccess/:id
+ * @param {string} id - 權限記錄ID
+ * @returns {Object} 刪除結果
+ */
 router.delete("/deleteAccess/:id", async (req, res) => {
   try {
     const recordId = req.params.id;

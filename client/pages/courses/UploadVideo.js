@@ -215,10 +215,12 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
 
       // 上傳失敗
       onError: async (error) => {
+        localStorage.removeItem('uploadProgress');
         messageControl(`上傳失敗:${error}`, false)
         setUploads((prev) => prev.map((u) => (u.id === uploadId ? { ...u, message: '上傳失敗', progress: 0 } : u)))
         if (vidId && course_id) {
           try {
+            // 回傳上傳狀態給後端
             await videoUploader.returnUploadStatus(token, course_id, vidId, false)
           } catch (err) {
             console.error('通知後端失敗: ', err)
@@ -234,6 +236,8 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
 
       // 上傳完成
       onSuccess: () => {
+        localStorage.removeItem('uploadProgress');
+        // 回傳上傳狀態給後端
         videoUploader.returnUploadStatus(token, course_id, vidId, true).then((res) => {
           getCourseVideos(false)
           messageControl('上傳完成', true)

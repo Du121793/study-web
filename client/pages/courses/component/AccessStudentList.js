@@ -41,7 +41,7 @@ export default function AccessStudentList({ messageControl, editStatus, setEditS
       accessDate: choseAccessInfo.accessDate,
       unlimited: choseAccessInfo.accessDate === null ? true : false,
     }
-    
+
     adminService.editAccessInfo(token, course_id, choseAccessId, data).then((res) => {
       if (res.success === true) {
         setEditStatus(!editStatus)
@@ -52,8 +52,9 @@ export default function AccessStudentList({ messageControl, editStatus, setEditS
 
   useEffect(() => {
     if (token && course_id) {
+      console.log(course_id)
       let data = {
-        course_ids: course_id,
+        courses: course_id,
       }
       adminService.getMembers(token, data).then((res) => {
         setMembers(res.data)

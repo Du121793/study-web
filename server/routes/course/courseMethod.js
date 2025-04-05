@@ -1,3 +1,10 @@
+/**
+ * @file courseMethod.js
+ * @description 課程方法相關路由處理，包含視頻上傳、管理、訪問權限等功能
+ * @author StudyWeb Team
+ * @date 2024-03-30
+ */
+
 const router = require("express").Router();
 const VideoInfo = require("../../models").courseVideoInfo;
 const VideoAccess = require("../../models").courseVideoAccess;
@@ -6,31 +13,30 @@ const vimeoSchedule = require("../../models").vimeoSchedule;
 const imageCompresser = require("../../methods/imageCompresser");
 const accessChecker = require("../routesMiddleware/accessChecker");
 const videoAccessRoute = require("./videoAccess");
+const vimeoMigrateRoute = require("./vimeoMigrate");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const mongoose = require("mongoose");
 
 router.use("/videoAccess", accessChecker.teacher, videoAccessRoute);
+router.use("/vimeoMigrate", accessChecker.teacher, vimeoMigrateRoute);
 
 // 改用 memoryStorage，接收到的檔案將保留在 req.file.buffer 中
 const upload = multer({ storage: multer.memoryStorage() });
 
 /**
- * 處理上傳的 thumbnail 圖片，直接使用 fs 寫入檔案
- * 檔案最終存放在 resource/videoIMG/ 目錄下，檔名為 videoId + 原始副檔名
+ * 處理上傳的縮略圖圖片
  * @param {Object} file - 透過 multer 處理後的單一檔案
  * @param {string|ObjectId} videoId - 影片的 _id
- * @returns {Promise<string>} - 回傳寫入檔案的路徑
+ * @returns {Promise<string>} 寫入檔案的路徑
  */
 async function processThumbnailImage(file, videoId) {
   return new Promise((resolve, reject) => {
     const fileExt = path.extname(file.originalname);
     const newFilename = videoId + fileExt;
-    // 最終檔案存放在 resource/videoIMG/ 下（與文件1原本的存放規則相同）
+    // 最終檔案存放在 resource/videoIMG/ 下
     const newPath = path.join("resource/videoIMG/", newFilename);
-
-    // 若有需要可在此加入圖片壓縮的邏輯，類似文件2 的 compressImageBuffer
 
     // 直接寫入 buffer 到指定路徑
     fs.writeFile(newPath, file.buffer, (err) => {
@@ -43,26 +49,34 @@ async function processThumbnailImage(file, videoId) {
   });
 }
 
+/**
+ * 獲取課程成員列表
+ * @route GET /members
+ * @param {string} [role] - 成員角色過濾
+ * @param {number} [page=1] - 頁碼
+ * @param {number} [pageSize=10] - 每頁筆數
+ * @param {string} [sortBy] - 排序欄位（"grade" 或 "date"）
+ * @param {string} [sortOrder="asc"] - 排序方向（"asc" 或 "desc"）
+ * @returns {Object} 成員ID列表及分頁資訊
+ */
 router.get("/members", async (req, res) => {
   try {
-    // 取得查詢參數
+    // 解析查詢參數
     const { role } = req.query;
     const page = parseInt(req.query.page, 10) || 1;
     const pageSize = parseInt(req.query.pageSize, 10) || 10;
     const sortBy = req.query.sortBy; // 可選 "grade" 或 "date"
     const sortOrder = req.query.sortOrder === "desc" ? -1 : 1;
 
-    // 篩選出修習此課程的成員
-    // 假設 req.course 已包含課程資料且有 _id
+    // 建立過濾條件
     const filter = { courses: req.course._id };
     if (role) {
       filter.role = role;
     }
 
-    // 排序條件
+    // 設定排序條件
     let sortCriteria = {};
     if (sortBy === "grade") {
-      // 以 userinfo.grade 排序（注意：若 grade 缺失時，排序邏輯與原本的自訂排序可能會有差異）
       sortCriteria = { "userinfo.grade": sortOrder, date: sortOrder };
     } else if (sortBy === "date") {
       sortCriteria = { date: sortOrder };
@@ -70,16 +84,16 @@ router.get("/members", async (req, res) => {
 
     const skip = (page - 1) * pageSize;
 
-    // 從 User 中查詢符合條件的成員，只選取 _id 欄位
+    // 查詢成員
     const members = await User.find(filter, { _id: 1 })
       .sort(sortCriteria)
       .skip(skip)
       .limit(pageSize);
 
-    // 取得符合條件的成員總數（分頁用）
+    // 獲取總數
     const total = await User.countDocuments(filter);
 
-    // 提取 _id 並包成陣列回傳
+    // 提取成員ID
     const memberIds = members.map((member) => member._id);
 
     return res.json({
@@ -98,42 +112,51 @@ router.get("/members", async (req, res) => {
   }
 });
 
+/**
+ * 獲取課程視頻信息
+ * @route GET /videoInfo
+ * @param {string} type - 視頻類型（必填）
+ * @param {number} [page=1] - 頁碼
+ * @param {string} [sortBy] - 排序欄位
+ * @param {string} [sortOrder] - 排序方向
+ * @param {boolean} [noImg] - 是否不返回縮略圖
+ * @returns {Object} 視頻信息列表
+ */
 router.get("/videoInfo", async (req, res) => {
   try {
-    // 從 query 中解析參數，注意 pageSize 不再給預設值
+    // 解析查詢參數
     let { type, page = 1, sortBy, sortOrder, noImg } = req.query;
     let pageSize = req.query.pageSize;
 
-    // type 為必填
+    // 驗證必要參數
     if (!type) {
       return res.status(400).json({ success: false, msg: "type is required" });
     }
 
-    // 建立查詢條件 (必須同時符合 courseID 和 type)
+    // 建立過濾條件
     const filter = {
       courseID: req.course._id,
       type: type,
       isUploadSuccess: true,
     };
 
-    // 設定可排序的欄位: 新增 date
+    // 設定排序
     const allowedSortFields = ["length", "recordDate", "date"];
     const sortField = allowedSortFields.includes(sortBy) ? sortBy : "date";
-
-    // 排序方向：預設 asc，若傳 'desc' 則 -1
     const sortDirection = sortOrder === "desc" ? -1 : 1;
     const sortOptions = { [sortField]: sortDirection };
 
-    // 預設只回傳這些欄位 (mongoose 會預設包含 _id)
+    // 設定返回欄位
     let fields = "title description thumbnail length recordDate date isPrivate";
     // 若傳入 noImg，則不回傳 thumbnail
     if (noImg == true) {
       fields = "title description length recordDate date isPrivate";
     }
 
-    // 建立查詢，並依據條件、選取欄位與排序
+    // 建立查詢
     let query = VideoInfo.find(filter).select(fields).sort(sortOptions);
-    // 若有傳入 pageSize，則進行分頁，否則回傳所有符合條件的資料
+
+    // 處理分頁
     if (typeof pageSize !== "undefined") {
       const pageSizeNum = parseInt(pageSize);
       const pageNum = parseInt(page);
@@ -141,13 +164,15 @@ router.get("/videoInfo", async (req, res) => {
       query = query.skip(skip).limit(pageSizeNum);
     }
 
+    // 執行查詢並處理結果
     let foundVideoInfo = await query;
     foundVideoInfo = await Promise.all(
       foundVideoInfo.map(async (item) => {
-        // 將 Mongoose document 轉成純物件
         let plainItem = item.toObject();
         let hasAccess = true;
         let accessRecord = null;
+
+        // 處理私有視頻的訪問權限
         if (plainItem.isPrivate) {
           const records = await VideoAccess.aggregate([
             {
@@ -158,7 +183,6 @@ router.get("/videoInfo", async (req, res) => {
               },
             },
             {
-              // 若 accessDate 為 null 或不存在，則用一個極大的日期（表示「無限期」）代替
               $addFields: {
                 effectiveAccessDate: {
                   $ifNull: ["$accessDate", new Date(8640000000000000)],
@@ -174,22 +198,25 @@ router.get("/videoInfo", async (req, res) => {
           ]);
 
           accessRecord = records[0] || null;
-
           hasAccess = !!accessRecord;
         }
-        plainItem.access = {};
-        plainItem.access.isAccess = hasAccess;
-        plainItem.access.accessDate = accessRecord
-          ? accessRecord.accessDate
-          : null;
 
+        // 添加訪問權限信息
+        plainItem.access = {
+          isAccess: hasAccess,
+          accessDate: accessRecord ? accessRecord.accessDate : null,
+        };
+
+        // 處理縮略圖URL
         if (plainItem.thumbnail) {
           plainItem.thumbnail =
             `${process.env.SERVER_IP}/` + plainItem.thumbnail;
         }
+
         return plainItem;
       })
     );
+
     return res.json({ success: true, data: foundVideoInfo });
   } catch (e) {
     console.log(e);
@@ -197,26 +224,34 @@ router.get("/videoInfo", async (req, res) => {
   }
 });
 
+/**
+ * 獲取視頻URI
+ * @route GET /videoUri
+ * @param {string} videoId - 視頻ID
+ * @returns {Object} 視頻嵌入鏈接
+ */
 router.get("/videoUri", async (req, res) => {
   try {
-    // 1. 從 query 取得 videoId（對應到資料庫中的 _id）
+    // 獲取視頻ID
     const { videoId } = req.query;
     if (!videoId) {
       return res.status(400).json({ success: false, msg: "videoId 必須提供" });
     }
 
-    // 2. 先從資料庫中確認是否存在該筆 VideoInfo 與是否擁有觀看權限
+    // 查找視頻信息
     const foundVideo = await VideoInfo.findOne({ _id: videoId });
     if (!foundVideo) {
       return res.status(404).json({ success: false, msg: "找不到該影片資料" });
     }
 
-    if (foundVideo.isPrivate) {
+    // 檢查訪問權限
+    if (foundVideo.isPrivate && req.user.role === "student") {
       const access = !!(await VideoAccess.findOne({
         courseID: req.course._id,
-        videoIDs, // 依需求這邊也可以改成其他查詢條件
+        videoIDs: { $in: [videoId] },
         studentIDs: { $in: [req.user._id] },
       }));
+
       if (!access) {
         return res
           .status(401)
@@ -224,12 +259,13 @@ router.get("/videoUri", async (req, res) => {
       }
     }
 
-    const result = {
+    // 返回視頻信息
+    return res.json({
       success: true,
-      embedLink: foundVideo.videoURL, // 若需要前端用 iframe embed
-    };
-
-    return res.json({ success: true, data: result });
+      data: {
+        embedLink: foundVideo.videoURL,
+      },
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({
@@ -240,11 +276,19 @@ router.get("/videoUri", async (req, res) => {
   }
 });
 
+/**
+ * 上傳視頻
+ * @route POST /uploadVideo
+ * @param {Object} thumbnail - 視頻縮略圖文件
+ * @param {string} title - 視頻標題
+ * @param {string} description - 視頻描述
+ * @param {string} type - 視頻類型
+ * @param {boolean} isPrivate - 是否為私有視頻
+ * @returns {Object} 上傳結果
+ */
 router.post(
   "/uploadVideo",
   [accessChecker.teacher, upload.single("thumbnail")],
-  // 使用 upload.single('thumbnail') 代表只處理單一檔案，且該欄位名稱為 thumbnail
-
   async (req, res) => {
     try {
       // 由 formData 取得文字欄位
@@ -257,8 +301,6 @@ router.post(
         recordDate,
         isPrivate,
       } = req.body;
-
-      console.log(req.body);
 
       // 檢查必要欄位
       if (!title || !fileSize)
@@ -324,6 +366,7 @@ router.post(
 
       // 呼叫 VimeoMethods.upload 進行影片上傳
       const uploadUri = await VimeoMethods.upload(req.body, videoIndex);
+      console.log(uploadUri);
       if (!uploadUri.success)
         return res.status(500).json({
           success: false,
@@ -333,13 +376,18 @@ router.post(
       return res.json({ success: true, data: uploadUri });
     } catch (e) {
       console.error(e);
-      return res
-        .status(500)
-        .json({ success: false, msg: "很抱歉，伺服器無法處理上傳" });
+      return res.status(500).json({ success: false, msg: "視頻上傳失敗" });
     }
   }
 );
 
+/**
+ * 更新視頻上傳狀態
+ * @route PATCH /uploadVideoStatus
+ * @param {boolean} isUploadSuccess - 上傳是否成功
+ * @param {string} videoId - 視頻ID
+ * @returns {Object} 更新結果
+ */
 router.patch("/uploadVideoStatus", accessChecker.teacher, async (req, res) => {
   try {
     const { isUploadSuccess, videoId } = req.body;
@@ -356,7 +404,10 @@ router.patch("/uploadVideoStatus", accessChecker.teacher, async (req, res) => {
     if (!isUploadSuccess) {
       const newSchedule = new vimeoSchedule({
         method: "delete",
-        videoIndex: { videoId: videoId },
+        videoIndex: {
+          courseID: foundItem.courseID.toString(),
+          videoId: videoId.toString(),
+        },
       });
       newSchedule.save();
       await VideoInfo.findByIdAndDelete(videoId);
@@ -365,14 +416,22 @@ router.patch("/uploadVideoStatus", accessChecker.teacher, async (req, res) => {
 
     foundItem.isUploadSuccess = true;
 
-    let foundVideo = await VimeoMethods.find({ videoId });
+    let foundVideo = await VimeoMethods.find({
+      courseID: foundItem.courseID.toString(),
+      videoId: videoId.toString(),
+    });
+
+    console.log(foundVideo);
 
     if (foundVideo.success && foundVideo.total !== 0) {
       foundItem.videoURL = foundVideo.data[0].player_embed_url;
     } else {
       const newSchedule = new vimeoSchedule({
         method: "get",
-        videoIndex: { videoId: videoId },
+        videoIndex: {
+          courseID: foundItem.courseID.toString(),
+          videoId: videoId.toString(),
+        },
         takeTo: {
           schema: "VideoInfo",
           id: foundItem._id,
@@ -395,19 +454,20 @@ router.patch("/uploadVideoStatus", accessChecker.teacher, async (req, res) => {
   }
 });
 
-/* 
-payload={
-  videoID = videoID
-  thumbnail = null
-  title = ''
-  description = null
-  isPrivate = true || false
-}
+/**
+ * 更新視頻信息
+ * @route PATCH /patchVideo
+ * @param {string} videoID - 視頻ID
+ * @param {Object} [thumbnail] - 新的視頻縮略圖文件
+ * @param {string} [title] - 新的視頻標題
+ * @param {string} [description] - 新的視頻描述
+ * @param {boolean} [isPrivate] - 是否為私有視頻
+ * @returns {Object} 更新後的視頻信息
  */
 router.patch(
   "/patchVideo",
   accessChecker.teacher,
-  upload.single("thumbnail"), // 處理 thumbnail 的檔案更新
+  upload.single("thumbnail"),
   async (req, res) => {
     try {
       console.log(req.body);
@@ -504,6 +564,12 @@ router.patch(
   }
 );
 
+/**
+ * 刪除視頻
+ * @route DELETE /deleteVideo
+ * @param {string} videoId - 要刪除的視頻ID
+ * @returns {Object} 刪除結果
+ */
 router.delete("/deleteVideo", accessChecker.teacher, async (req, res) => {
   try {
     const { videoId } = req.body;

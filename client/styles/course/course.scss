@@ -96,14 +96,13 @@
         background-color: #fff;
         .button {
           color: rgb(0, 0, 0);
-          width: 120px;
           display: flex;
           justify-content: center;
           position: relative;
           cursor: pointer;
           outline: none;
           margin-left: 24px;
-          padding: 8px 10px;
+          padding: 6px 10px;
           border: 1px solid rgba(0, 0, 0, 0.2);
           border-radius: 4px;
           background-color: var(--button-white);
@@ -263,192 +262,200 @@
         }
       }
       .QA-area {
-        display: flex;
-        flex-direction: column;
-        gap: 24px; /* 區塊間距 */
         background-color: #f5f5f5;
-        .QA-header {
-          padding-top: 16px;
+        .container {
+          width: 100%;
           display: flex;
-          gap: 24px;
-          .sort-by-area {
-            align-items: center;
+          flex-direction: column;
+          gap: 24px; /* 區塊間距 */
+          .QA-header {
+            width: 100%;
+            padding-top: 16px;
             display: flex;
-            gap: 8px;
-          }
-          .time-sort-area {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-          }
-          .select {
-            height: 32px;
-          }
-
-          .show-public-QA {
-            cursor: pointer;
-            padding: 4px 6px;
-            border: 1px solid rgba(0, 0, 0, 0.2);
-            border-radius: 2px;
-            background-color: #cbf6ff;
-            box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
-            transition: 0.2s;
-          }
-          .show-public-QA:hover {
-            background-color: #bae1e9;
-          }
-          .show-delete-btn {
-            cursor: pointer;
-            padding: 4px 6px;
-            border: 1px solid rgba(0, 0, 0, 0.2);
-            border-radius: 2px;
-            background-color: #ffb7b7;
-            box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
-            transition: 0.2s;
-          }
-          .show-delete-btn:hover {
-            background-color: #e7a5a5;
-          }
-        }
-        .sort-title {
-          margin-left: 24px;
-        }
-        .QA-grid {
-          .QA-container {
-            display: flex;
-            justify-content: flex-start;
-            padding: 0 32px 24px 32px;
-            gap: 12px;
-            margin-right: 24px;
-            .QA-list {
-              margin-bottom: 32px;
-              padding: 16px;
-              display: flex;
-              flex-direction: column;
+            gap: 24px;
+            .sort-by-area {
               align-items: center;
-              border: 1px solid #bebebe;
+              display: flex;
+              gap: 8px;
+            }
+            .time-sort-area {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            }
+            .select {
+              height: 32px;
+            }
+
+            .show-public-QA {
+              cursor: pointer;
+              padding: 4px 6px;
+              border: 1px solid rgba(0, 0, 0, 0.2);
               border-radius: 2px;
-              gap: 18px;
-              background-color: rgb(235, 235, 235);
-              .QA-tag {
-                display: flex;
-                .content {
-                  font-weight: bold;
-                  font-size: 22px;
-                  padding: 4px;
-                  background-color: #f6b594;
-                  border-radius: 4px;
-                  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
-                }
-              }
-              .qa-info {
+              background-color: #cbf6ff;
+              box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
+              transition: 0.2s;
+            }
+            .show-public-QA:hover {
+              background-color: #bae1e9;
+            }
+            .show-delete-btn {
+              cursor: pointer;
+              padding: 4px 6px;
+              border: 1px solid rgba(0, 0, 0, 0.2);
+              border-radius: 2px;
+              background-color: #ffb7b7;
+              box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
+              transition: 0.2s;
+            }
+            .show-delete-btn:hover {
+              background-color: #e7a5a5;
+            }
+          }
+          .sort-title {
+            margin-left: 24px;
+          }
+          .QA-grid {
+            width: 100%;
+            .QA-container {
+              width: 100%;
+              display: flex;
+              justify-content: flex-start;
+              padding: 0 32px 24px 32px;
+              gap: 12px;
+              margin-right: 24px;
+              .QA-list {
+                margin-bottom: 32px;
+                padding: 16px;
                 display: flex;
                 flex-direction: column;
-                position: relative;
-                width: 90%;
-                border: 1px solid #ababab;
-                padding: 12px;
-                border-radius: 4px;
-                gap: 12px;
-                background-color: #ffffff;
-                .btn-area {
+                align-items: center;
+                border: 1px solid #bebebe;
+                border-radius: 2px;
+                gap: 18px;
+                background-color: rgb(235, 235, 235);
+                .QA-tag {
                   display: flex;
-                  gap: 12px;
-                  .into-qa-btn {
-                    color: black;
-                    flex: 1;
-                    padding: 4px 6px;
-                    border: 1px solid rgba(0, 0, 0, 0.2);
-                    display: flex;
-                    justify-content: center;
-                    background-color: var(--button-white);
-                    transition: 0.2s;
-                  }
-                  .into-qa-btn:hover {
-                    background-color: var(--botton-white-hover);
-                  }
-                  .remove-btn {
-                    color: black;
-                    padding: 4px 6px;
-                    border: 1px solid rgba(0, 0, 0, 0.2);
-                    display: flex;
-                    justify-content: center;
-                    background-color: #ffdada;
-                    transition: 0.2s;
-                    cursor: pointer;
-                  }
-                  .remove-btn:hover {
-                    background-color: #ebc1c1;
-                  }
-                }
-                .qa-info-title {
-                  display: flex;
-                  flex-wrap: wrap;
-                  gap: 4px;
                   .content {
                     font-weight: bold;
-                    font-size: 18px;
+                    font-size: 22px;
                     padding: 4px;
-                    background-color: #b9cdf9;
+                    background-color: #f6b594;
                     border-radius: 4px;
                     box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
-                    color: black;
                   }
                 }
-                .qa-image-area {
+                .qa-info {
                   display: flex;
-                  flex-wrap: wrap;
-                  .qa-image {
-                    width: 100%;
-                    border-radius: 4px;
-                    border: 1px solid rgba(0, 0, 0, 0.2);
-                  }
-                  .qa-images {
-                    width: 33%;
-                  }
-                }
-                .time-replied-area {
-                  display: flex;
-                  flex-wrap: wrap;
-                  align-items: center;
-                  justify-content: space-between;
-                  font-size: 15px;
-                  .time {
-                    color: rgba(0, 0, 0, 0.5);
-                  }
-                  .not-replied {
-                    color: blue;
-                  }
-                  .is-replied {
-                    color: rgb(114, 37, 255);
-                  }
-                }
-                .qa-description {
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                  white-space: nowrap;
-                  color: black;
+                  flex-direction: column;
+                  position: relative;
                   width: 90%;
-                  border: 1px solid rgba(0, 0, 0, 0.4);
+                  border: 1px solid #ababab;
+                  padding: 12px;
                   border-radius: 4px;
-                  background-color: #f1f1f1;
-                  box-shadow: inset 1px 1px 4px rgba(0, 0, 0, 0.15);
-                  padding: 0 4px;
-                  margin-top: -6px;
+                  gap: 12px;
+                  background-color: #ffffff;
+                  .btn-area {
+                    display: flex;
+                    gap: 12px;
+                    .into-qa-btn {
+                      color: black;
+                      flex: 1;
+                      padding: 4px 6px;
+                      border: 1px solid rgba(0, 0, 0, 0.2);
+                      display: flex;
+                      justify-content: center;
+                      background-color: var(--button-white);
+                      transition: 0.2s;
+                    }
+                    .into-qa-btn:hover {
+                      background-color: var(--botton-white-hover);
+                    }
+                    .remove-btn {
+                      color: black;
+                      padding: 4px 6px;
+                      border: 1px solid rgba(0, 0, 0, 0.2);
+                      display: flex;
+                      justify-content: center;
+                      background-color: #ffdada;
+                      transition: 0.2s;
+                      cursor: pointer;
+                    }
+                    .remove-btn:hover {
+                      background-color: #ebc1c1;
+                    }
+                  }
+                  .qa-info-title {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 4px;
+                    .content {
+                      font-weight: bold;
+                      font-size: 18px;
+                      padding: 4px;
+                      background-color: #b9cdf9;
+                      border-radius: 4px;
+                      box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
+                      color: black;
+                    }
+                  }
+                  .qa-image-area {
+                    display: flex;
+                    flex-wrap: wrap;
+                    .qa-image {
+                      width: 100%;
+                      border-radius: 4px;
+                      border: 1px solid rgba(0, 0, 0, 0.2);
+                    }
+                    .qa-images {
+                      width: 33%;
+                    }
+                  }
+                  .time-replied-area {
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: center;
+                    justify-content: space-between;
+                    font-size: 15px;
+                    .time {
+                      color: rgba(0, 0, 0, 0.5);
+                    }
+                    .not-replied {
+                      color: blue;
+                    }
+                    .is-replied {
+                      color: rgb(114, 37, 255);
+                    }
+                  }
+                  .qa-description {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    color: black;
+                    width: 90%;
+                    border: 1px solid rgba(0, 0, 0, 0.4);
+                    border-radius: 4px;
+                    background-color: #f1f1f1;
+                    box-shadow: inset 1px 1px 4px rgba(0, 0, 0, 0.15);
+                    padding: 0 4px;
+                    margin-top: -6px;
+                  }
                 }
               }
-            }
-            .load-more-btn {
-              cursor: pointer;
-              padding: 12px;
-              border: 1px solid rgba(0, 0, 0, 0.2);
-              border-radius: 4px;
-              background-color: white;
+              .load-more-btn {
+                cursor: pointer;
+                padding: 12px;
+                border: 1px solid rgba(0, 0, 0, 0.2);
+                border-radius: 4px;
+                background-color: white;
+              }
             }
           }
         }
       }
       .ask-area {
+        overflow: scroll;
+        position: relative;
         background-color: #f5f5f5;
         padding-left: 12px;
         padding-right: 80px;

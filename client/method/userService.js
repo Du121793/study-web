@@ -152,9 +152,6 @@ const userService = {
 
   // 新增新的QA給指定課程
   async createNewQuestion(token, formData) {
-    formData.forEach((value, key) => {
-      console.log(key, value)
-    })
     // isPublic, course_ids, description, image, resourceCategories, hints
     try {
       const authHeader = token ? { Authorization: token } : {}
@@ -262,9 +259,6 @@ const userService = {
       }
       return response.data
     } catch (e) {
-      if (!e.response) {
-        return { success: false, msg: '前端沒有接收到訊息' }
-      }
       return e.response.data
     }
   },
@@ -319,11 +313,43 @@ const userService = {
       }
       return response.data
     } catch (e) {
-      return e.response.data
+      return e
     }
   },
 
-  
+  async getBoards(token, data = null) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.get(API_URL + `/publicResource/board`, {
+        headers: authHeader,
+        params: data,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (e) {
+      return e
+    }
+  },
+
+  // /board/:board_id
+  async getBoardsById(token, id) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.get(API_URL + `/publicResource/board/${id}`, {
+        headers: authHeader,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (e) {
+      return e
+    }
+  },
 }
 
 export default userService

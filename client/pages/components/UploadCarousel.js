@@ -1,12 +1,15 @@
 // 組件庫
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
+// method
 import { useUserToken } from '../../method/useUserToken'
 import userService from '../../method/userService'
 import adminService from '../../method/adminService'
+
+// public
 import trashCanIcon from '../../public/index/banner/trashCanIcon.png'
 
-export default function UploadCarousel({ showCarouselEdit, setShowCarouselEdit }) {
+export default function UploadCarousel({ showCarouselEdit, setShowCarouselEdit, bannerHasChange, setBannerHasChange }) {
   // 控制body滑動條
   const [page_body, setPage_body] = useState([])
   // 二次確認刪除用
@@ -60,6 +63,7 @@ export default function UploadCarousel({ showCarouselEdit, setShowCarouselEdit }
       formData.append('image', files)
       adminService.postCarousels(token, formData).then((res) => {
         if (res.success) {
+          setBannerHasChange(!bannerHasChange)
           init()
           messageControl('上傳成功', true)
         } else {
@@ -78,6 +82,7 @@ export default function UploadCarousel({ showCarouselEdit, setShowCarouselEdit }
     }
     adminService.deleteCarousels(token, data).then((res) => {
       if (res.success) {
+        setBannerHasChange(!bannerHasChange)
         init()
         messageControl('刪除成功', true)
       } else {
@@ -109,7 +114,6 @@ export default function UploadCarousel({ showCarouselEdit, setShowCarouselEdit }
   }, [token])
 
   const test = () => {
-    console.log(carousel[0].split('/').pop().split('-')[1].split('.')[0])
   }
 
   // 控制頁面scroll狀態

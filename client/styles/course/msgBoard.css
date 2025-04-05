@@ -1,12 +1,13 @@
 .msg-board {
   display: flex;
-  padding: 12px;
-  width: 60%;
+  padding: 24px;
+  width: 80%;
   background-color: #fff;
-  border: 1px solid #ccc;
+  border-radius: 12px;
   gap: 12px;
   margin-bottom: 24px;
   transition: 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 @media screen and (max-width: 1000px) {
   .msg-board {
@@ -18,11 +19,41 @@
     flex-direction: column;
   }
 }
+.msg-board .image-name-area {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+.msg-board .image-name-area .image-name {
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  height: 29px;
+  background-color: #f3f3f3;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+.msg-board .image-name-area .image-name .remove-image-btn {
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.2s;
+}
+.msg-board .image-name-area .image-name .remove-image-btn:hover {
+  font-size: 22px;
+}
 .msg-board .text-area {
   resize: none;
   outline: none;
   width: 90%;
   border: 1px solid #ccc;
+  background-color: #eeeeee;
   padding: 8px;
   transition: 0.2s;
 }
@@ -42,11 +73,16 @@
   width: 200px;
 }
 .msg-board .is-private-checkbox-area {
-  margin-bottom: 128px;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 12px;
+}
+.msg-board .is-private-checkbox-area .input-area {
+  display: flex;
+  gap: 4px;
+  align-items: center;
 }
 .msg-board .submit-btn-area {
   width: 100%;

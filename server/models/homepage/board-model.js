@@ -6,12 +6,11 @@ const boardSchema = new Schema({
     type: String,
     required: true,
   },
-  content: {
+  subTitle: {
     type: String,
   },
-  image: {
-    type: [String],
-    default: [],
+  content: {
+    type: String,
   },
   poster: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   date: {

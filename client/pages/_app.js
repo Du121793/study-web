@@ -7,8 +7,11 @@ import '../styles/global/unlogined.css'
 import '../styles/global/footer.css'
 import '../styles/global/loading.css'
 // index
+import '../styles/index/index.css'
 import '../styles/index/banner.css'
 import '../styles/index/board.css'
+import '../styles/index/boardPage.css'
+import '../styles/index/uploadBoardUI.css'
 // profile
 import '../styles/profile/teacher/memberSelector.css'
 import '../styles/profile/teacher/teacherLayout.css'

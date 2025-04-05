@@ -35,20 +35,29 @@ const QAmessageSchema = new Schema({
   },
 });
 
+/**
+ * 取得圖片儲存的基底路徑
+ * @returns {string} 圖片儲存的基底路徑
+ */
 function getBaseImagePath() {
   return path.join(__dirname, "../../resource/questionIMG");
 }
 
-// 取得對應的資料夾路徑
+/**
+ * 取得指定問題對應的資料夾路徑
+ * @param {string} questionId - 問題ID
+ * @returns {string} 問題圖片資料夾的完整路徑
+ */
 function getFolder(questionId) {
   return path.join(getBaseImagePath(), questionId.toString());
 }
 
 /**
- * 清理函數：
- * - 刪除留言中的所有圖片檔案
- * - 如果留言中包含影片連結，則建立 Vimeo 刪除排程
- * 若其中任何一步失敗，則丟出錯誤，從而中斷後續的刪除動作。
+ * 清理留言相關資源
+ * @description 刪除留言相關的圖片資料夾和影片
+ * @param {Object} doc - 要刪除的留言文件
+ * @returns {Promise<void>}
+ * @throws {Error} 當建立 Vimeo 刪除排程失敗時拋出錯誤
  */
 async function cleanupDocument(doc) {
   const commentFolder = getFolder(doc.pointTo + "/comment" + `/${doc._id}`);
@@ -61,7 +70,7 @@ async function cleanupDocument(doc) {
     try {
       const newSchedule = new vimeoSchedule({
         method: "delete",
-        videoIndex: { commentID: doc._id },
+        videoIndex: { commentID: doc._id, questionId: doc.pointTo },
       });
       await newSchedule.save();
     } catch (err) {
@@ -70,9 +79,11 @@ async function cleanupDocument(doc) {
   }
 }
 
-// 使用 pre hook，確保在刪除資料前先完成資源清理
-
-// 針對 findOneAndDelete（例如 findByIdAndDelete）
+/**
+ * 留言刪除前的處理鉤子
+ * @description 在留言被刪除前執行資源清理
+ * @param {Function} next - 下一個中間件函數
+ */
 QAmessageSchema.pre("findOneAndDelete", async function (next) {
   try {
     const docToDelete = await this.model.findOne(this.getQuery());
@@ -85,7 +96,11 @@ QAmessageSchema.pre("findOneAndDelete", async function (next) {
   }
 });
 
-// 針對文件的 remove() 操作
+/**
+ * 留言移除前的處理鉤子
+ * @description 在留言被移除前執行資源清理
+ * @param {Function} next - 下一個中間件函數
+ */
 QAmessageSchema.pre("remove", async function (next) {
   try {
     await cleanupDocument(this);
@@ -95,7 +110,11 @@ QAmessageSchema.pre("remove", async function (next) {
   }
 });
 
-// 如果使用 deleteOne 作為文件方法（document middleware）
+/**
+ * 留言單筆刪除前的處理鉤子
+ * @description 在留言被單筆刪除前執行資源清理
+ * @param {Function} next - 下一個中間件函數
+ */
 QAmessageSchema.pre("deleteOne", async function (next) {
   try {
     await cleanupDocument(this);
@@ -105,6 +124,11 @@ QAmessageSchema.pre("deleteOne", async function (next) {
   }
 });
 
+/**
+ * 留言批次刪除前的處理鉤子
+ * @description 在留言被批次刪除前執行資源清理
+ * @param {Function} next - 下一個中間件函數
+ */
 QAmessageSchema.pre("deleteMany", async function (next) {
   try {
     const docs = await this.model.find(this.getQuery());

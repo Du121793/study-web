@@ -1,7 +1,5 @@
 .board-main {
   width: 100%;
-  margin-top: 48px;
-  height: 1000px;
   display: flex;
   justify-content: center;
   background-color: #fff;
@@ -12,6 +10,7 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
+  padding: 32px;
 }
 .board-main .board-contianer .title {
   height: 100px;
@@ -75,9 +74,10 @@
   margin-top: 60px;
   display: flex;
   flex-direction: column;
-  gap: 45px;
+  gap: 24px;
 }
 .board-main .board-contianer .news-link-area .news-container {
+  color: black;
   cursor: pointer;
   background-color: #cfe5ef;
   position: relative;
@@ -110,7 +110,7 @@
   position: relative;
   left: 12px;
   top: -12px;
-  z-index: 99;
+  z-index: 1;
 }
 .board-main .board-contianer .news-link-area .news-container .info {
   position: relative;
@@ -122,12 +122,10 @@
   font-size: 20px;
 }
 .board-main .board-contianer .news-link-area .news-container:hover {
-  width: 905px;
-  height: 125px;
   box-shadow: 0px 0px 0px 5px rgba(0, 0, 0, 0.443);
 }
 .board-main .board-contianer .more-news-link {
-  margin-top: 120px;
+  margin-top: 24px;
   width: 240px;
   height: 70px;
   display: flex;
@@ -144,7 +142,7 @@
   right: 12px;
 }
 .board-main .board-contianer .more-news-link::after {
-  z-index: -1;
+  z-index: 1;
   transition: 0.2s;
   border-radius: 8px;
   content: "";
@@ -153,7 +151,7 @@
   top: 0;
   width: 0;
   height: 100%;
-  background-color: #CFE5EF;
+  background-color: rgba(0, 0, 0, 0.0784313725);
 }
 .board-main .board-contianer .more-news-link:hover::after {
   width: 100%;

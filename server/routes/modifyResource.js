@@ -1,3 +1,10 @@
+/**
+ * @file modifyResource.js
+ * @description 資源修改相關路由處理，包含輪轉圖和公告的增刪改查
+ * @author StudyWeb Team
+ * @date 2024-03-30
+ */
+
 const express = require("express");
 const router = require("express").Router();
 const Board = require("../models").board;
@@ -53,13 +60,23 @@ async function processCarouselImage(file) {
   });
 }
 
-// POST /postNewCarousel：上傳並新增輪轉圖
+/**
+ * POST /postNewCarousel
+ * 上傳並新增輪轉圖
+ * @route POST /postNewCarousel
+ * @param {Object} req.file - 上傳的圖片檔案
+ * @returns {Object} 包含成功狀態、訊息和存檔路徑的 JSON 響應
+ */
 router.post("/postNewCarousel", upload.single("image"), async (req, res) => {
   try {
+    // 檢查是否有上傳檔案
     if (!req.file) {
       return res.status(400).json({ success: false, msg: "請上傳一張圖片" });
     }
+
+    // 處理並儲存輪轉圖
     const savedPath = await processCarouselImage(req.file);
+
     // 回傳存檔路徑，可依實際需求轉成 URL 回傳前端
     return res.json({
       success: true,
@@ -76,11 +93,14 @@ router.post("/postNewCarousel", upload.single("image"), async (req, res) => {
 
 /**
  * DELETE /deleteCarousel
- * 用戶透過 request body 傳入數字陣列，例如 { numbers: [1, 3, 5] }
- * 刪除所有檔名符合 "carousel-{數字}{副檔名}" 的檔案，數字為陣列內的數字
+ * 刪除指定的輪轉圖
+ * @route DELETE /deleteCarousel
+ * @param {Array} req.query.numbers - 要刪除的輪轉圖編號陣列
+ * @returns {Object} 包含成功狀態、訊息和已刪除檔案列表的 JSON 響應
  */
 router.delete("/deleteCarousel", async (req, res) => {
   try {
+    // 從查詢參數中獲取要刪除的輪轉圖編號陣列
     const { numbers } = req.query;
     if (!Array.isArray(numbers)) {
       return res.status(400).json({ success: false, msg: "請傳入數字陣列" });
@@ -91,10 +111,12 @@ router.delete("/deleteCarousel", async (req, res) => {
 
     // 讀取 carousel 目錄中的所有檔案
     const files = await fs.promises.readdir(carouselPath);
+
     // 檔案格式為：carousel-{數字}.{副檔名}
     const regex = /^carousel-(\d+)\.[^\.]+$/;
     const deletedFiles = [];
 
+    // 遍歷所有檔案，找出符合條件的檔案並刪除
     for (const file of files) {
       const match = file.match(regex);
       if (match) {
@@ -107,6 +129,7 @@ router.delete("/deleteCarousel", async (req, res) => {
       }
     }
 
+    // 回傳刪除結果
     return res.json({
       success: true,
       msg: "輪轉圖刪除完成",
@@ -123,19 +146,24 @@ router.delete("/deleteCarousel", async (req, res) => {
 /**
  * POST /postNewBoard
  * 上傳公告，並將上傳的圖片存入 {boardPath}/{newBoard._id}/ 下，命名格式為 image-{數字}{副檔名}
- * poster 自動填入 req.user._id
+ * @route POST /postNewBoard
+ * @param {string} req.body.title - 公告標題
+ * @param {string} req.body.subTitle - 公告副標題
+ * @param {string} req.body.content - 公告內容，可包含 base64 格式的圖片
+ * @returns {Object} 包含成功狀態、訊息和新增的公告資料的 JSON 響應
  */
-router.post("/postNewBoard", upload.array("image"), async (req, res) => {
+router.post("/postNewBoard", async (req, res) => {
   try {
-    // 從 req.body 取得標題、內容等欄位
-    const { title, content } = req.body;
+    // 從 req.body 取得標題、副標題、內容等欄位
+    const { title, subTitle, content } = req.body;
+    console.log(subTitle)
+
     // 建立新 Board，poster 從 req.user 取得
     const newBoard = new Board({
       title,
+      subTitle,
       content,
       poster: req.user._id,
-      // image 初始值為空陣列
-      image: [],
     });
     await newBoard.save();
 
@@ -145,38 +173,41 @@ router.post("/postNewBoard", upload.array("image"), async (req, res) => {
       fs.mkdirSync(boardFolder, { recursive: true });
     }
 
-    // 若有上傳圖片，存檔並記錄檔名
-    if (req.files && req.files.length > 0) {
-      let imageFiles = [];
-      // 取得目前資料夾內已有多少張圖片（假設命名格式為 image-{數字})
-      const existingFiles = fs.existsSync(boardFolder)
-        ? fs.readdirSync(boardFolder)
-        : [];
-      let maxNumber = 0;
-      existingFiles.forEach((fname) => {
-        const match = fname.match(/^image-(\d+)\.[^\.]+$/);
-        if (match) {
-          const num = parseInt(match[1], 10);
-          if (num > maxNumber) {
-            maxNumber = num;
-          }
-        }
-      });
+    // 尋找內容中的 base64 圖片
+    const imageRegex = /<img[^>]+src="data:image\/([^;]+);base64,([^"]+)"/g;
+    let match;
+    let newContent = content;
+    let imageCount = 0;
 
-      for (let i = 0; i < req.files.length; i++) {
-        const file = req.files[i];
-        const fileExt = path.extname(file.originalname);
-        const newNumber = maxNumber + i + 1; // 從現有最大數字+1開始
-        const newFilename = `image-${newNumber}${fileExt}`;
-        const newFilePath = path.join(boardFolder, newFilename);
-        fs.writeFileSync(newFilePath, file.buffer);
-        // 這裡存入 Board.image 陣列的可以是相對路徑或 URL，依需求調整
-        imageFiles.push(newFilename);
-      }
-      // 更新 Board 文件的 image 欄位
-      newBoard.image = imageFiles;
+    // 處理內容中的每張 base64 圖片
+    while ((match = imageRegex.exec(content)) !== null) {
+      const [fullMatch, imageType, base64Data] = match;
+
+      // 將 base64 轉換為 buffer
+      const imageBuffer = Buffer.from(base64Data, "base64");
+
+      // 建立新的檔名
+      const newNumber = imageCount + 1;
+      const newFilename = `image-${newNumber}.${imageType}`;
+      const newFilePath = path.join(boardFolder, newFilename);
+
+      // 寫入檔案
+      fs.writeFileSync(newFilePath, imageBuffer);
+
+      // 更新 content 中的圖片路徑
+      const relativePath = `/resource/public/board/${newBoard._id}/${newFilename}`;
+      newContent = newContent.replace(fullMatch, `<img src="${relativePath}"`);
+
+      imageCount++;
+    }
+
+    // 更新 Board 文件的 content
+    if (imageCount > 0) {
+      newBoard.content = newContent;
       await newBoard.save();
     }
+
+    // 回傳新增結果
     return res.json({
       success: true,
       msg: "公告新增成功",
@@ -191,101 +222,77 @@ router.post("/postNewBoard", upload.array("image"), async (req, res) => {
 });
 
 /**
- * PATCH /patchBoard
- * 更新公告：
- *  - 可更新 title 與 content
- *  - 用戶可透過 req.body.deleteImages 傳入數字陣列（或 JSON 字串），表示要刪除哪些圖片（依檔名中的數字判斷）
- *  - 同時可上傳新圖片，上傳的新圖片檔名由資料夾內現有圖片的最大數字+1 命名，格式為 image-{數字}{副檔名}
- *  - 若更新後公告圖片為空，則刪除該公告對應的資料夾
- *  - poster 自動填入 req.user._id（通常在新增時已處理，此處僅更新其他欄位）
+ * PUT /putBoard
+ * 更新公告內容，包括標題、副標題和內容
+ * @route PUT /putBoard
+ * @param {string} req.body.board_id - 要更新的公告 ID
+ * @param {string} [req.body.title] - 新的公告標題
+ * @param {string} [req.body.subTitle] - 新的公告副標題
+ * @param {string} [req.body.content] - 新的公告內容，可包含 base64 格式的圖片
+ * @returns {Object} 包含成功狀態、訊息和更新後的公告資料的 JSON 響應
  */
-router.patch("/patchBoard", upload.array("image"), async (req, res) => {
+router.put("/putBoard", async (req, res) => {
   try {
-    const { board_id, title, content, deleteImages } = req.body;
+    // 從請求體中獲取公告ID和更新內容
+    const { board_id, title, subTitle, content } = req.body;
+
+    // 查找要更新的公告
     let board = await Board.findById(board_id);
     if (!board) {
       return res.status(404).json({ success: false, msg: "找不到該公告" });
     }
-    // 更新標題與內容
+
+    // 更新基本資料
     if (title !== undefined) board.title = title;
+    if (subTitle !== undefined) board.subTitle = subTitle;
     if (content !== undefined) board.content = content;
 
     // 計算該公告的圖片資料夾路徑
     const boardFolder = path.join(boardPath, board._id.toString());
 
-    // -------------------------------
-    // Step 1: 處理刪除圖片
-    // -------------------------------
-    let imagesToDelete = [];
-    if (deleteImages) {
-      // 若傳入 deleteImages 為字串，嘗試解析為 JSON 陣列，或以逗號分隔
-      if (typeof deleteImages === "string") {
-        try {
-          imagesToDelete = JSON.parse(deleteImages);
-        } catch (err) {
-          imagesToDelete = deleteImages.split(",").map(Number);
-        }
-      } else if (Array.isArray(deleteImages)) {
-        imagesToDelete = deleteImages.map(Number);
-      }
-    }
-    if (fs.existsSync(boardFolder) && imagesToDelete.length > 0) {
-      // 讀取資料夾內所有檔案
-      const files = fs.readdirSync(boardFolder);
-      // 檔名格式： image-{數字}.{副檔名}
-      const regex = /^image-(\d+)\.[^\.]+$/;
-      for (const file of files) {
-        const match = file.match(regex);
-        if (match) {
-          const fileNum = Number(match[1]);
-          if (imagesToDelete.includes(fileNum)) {
-            const filePath = path.join(boardFolder, file);
-            fs.unlinkSync(filePath);
-            // 從 board.image 陣列中移除該檔名
-            board.image = board.image.filter((f) => f !== file);
-          }
-        }
-      }
-    }
-
-    // -------------------------------
-    // Step 2: 處理上傳新圖片
-    // -------------------------------
-    if (req.files && req.files.length > 0) {
-      // 若資料夾不存在則建立
-      if (!fs.existsSync(boardFolder)) {
-        fs.mkdirSync(boardFolder, { recursive: true });
-      }
-      // 讀取目前資料夾內檔案，找出最大數字
-      const currentFiles = fs.readdirSync(boardFolder);
-      let maxNumber = 0;
-      currentFiles.forEach((fname) => {
-        const match = fname.match(/^image-(\d+)\.[^\.]+$/);
-        if (match) {
-          const num = parseInt(match[1], 10);
-          if (num > maxNumber) maxNumber = num;
-        }
-      });
-      // 上傳的新圖片依序編號
-      for (let i = 0; i < req.files.length; i++) {
-        const file = req.files[i];
-        const fileExt = path.extname(file.originalname);
-        const newNumber = maxNumber + i + 1;
-        const newFilename = `image-${newNumber}${fileExt}`;
-        const newFilePath = path.join(boardFolder, newFilename);
-        fs.writeFileSync(newFilePath, file.buffer);
-        board.image.push(newFilename);
-      }
-    }
-
-    // -------------------------------
-    // Step 3: 若更新後 Board.image 為空，則刪除整個資料夾
-    // -------------------------------
-    if (board.image.length === 0 && fs.existsSync(boardFolder)) {
+    // 清空原有圖片資料夾
+    if (fs.existsSync(boardFolder)) {
       fs.rmSync(boardFolder, { recursive: true, force: true });
     }
+    fs.mkdirSync(boardFolder, { recursive: true });
 
+    // 處理新的 base64 圖片
+    const imageRegex = /<img[^>]+src="data:image\/([^;]+);base64,([^"]+)"/g;
+    let match;
+    let newContent = content;
+    let imageCount = 0;
+
+    // 處理內容中的每張 base64 圖片
+    while ((match = imageRegex.exec(content)) !== null) {
+      const [fullMatch, imageType, base64Data] = match;
+
+      // 將 base64 轉換為 buffer
+      const imageBuffer = Buffer.from(base64Data, "base64");
+
+      // 建立新的檔名
+      const newNumber = imageCount + 1;
+      const newFilename = `image-${newNumber}.${imageType}`;
+      const newFilePath = path.join(boardFolder, newFilename);
+
+      // 寫入檔案
+      fs.writeFileSync(newFilePath, imageBuffer);
+
+      // 更新 content 中的圖片路徑
+      const relativePath = `/resource/public/board/${board._id}/${newFilename}`;
+      newContent = newContent.replace(fullMatch, `<img src="${relativePath}"`);
+
+      imageCount++;
+    }
+
+    // 更新 Board 文件的 content
+    if (imageCount > 0) {
+      board.content = newContent;
+    }
+
+    // 儲存更新後的公告
     await board.save();
+
+    // 回傳更新結果
     return res.json({ success: true, msg: "公告更新成功", data: board });
   } catch (e) {
     console.error(e);
@@ -296,21 +303,30 @@ router.patch("/patchBoard", upload.array("image"), async (req, res) => {
 });
 
 /**
- * DELETE /deleteBoard
- * 刪除公告：刪除 Board 文件並刪除對應的圖片資料夾
+ * DELETE /deleteBoard/:board_id
+ * 刪除指定的公告及其相關圖片
+ * @route DELETE /deleteBoard/:board_id
+ * @param {string} req.params.board_id - 要刪除的公告 ID
+ * @returns {Object} 包含成功狀態和訊息的 JSON 響應
  */
-router.delete("/deleteBoard", async (req, res) => {
+router.delete("/deleteBoard/:board_id", async (req, res) => {
   try {
-    const { board_id } = req.body;
+    // 從路徑參數中獲取公告ID
+    const { board_id } = req.params;
+
+    // 查找並刪除公告
     const board = await Board.findByIdAndDelete(board_id);
     if (!board) {
       return res.status(404).json({ success: false, msg: "找不到該公告" });
     }
+
     // 刪除對應的圖片資料夾
     const boardFolder = path.join(boardPath, board._id.toString());
     if (fs.existsSync(boardFolder)) {
       fs.rmSync(boardFolder, { recursive: true, force: true });
     }
+
+    // 回傳刪除結果
     return res.json({ success: true, msg: "公告已成功刪除" });
   } catch (e) {
     console.error(e);

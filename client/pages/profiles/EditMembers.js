@@ -10,9 +10,15 @@ import dbArrowLeft from '../../public/profile/doubleArrowLeft.png'
 import dbArrowRight from '../../public/profile/doubleArrowRight.png'
 import ArrowLeft from '../../public/profile/leftArrow.png'
 import ArrowRight from '../../public/profile/rightArrow.png'
+
 // global component
 import LoadingAnime from '../../components/global/LoadingAnime'
+
 export default function EditMembers() {
+  // env
+  // const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
+
+  // const [memberloading, setMemberloading] = useState()
   const [loading, setLoading] = useState(false)
   const token = useUserToken()
   const [selectedStudentId, setSelectedStudentId] = useState([])
@@ -212,8 +218,8 @@ export default function EditMembers() {
 
   // 顯示課程成員
   const showCourseMembers = () => {
-    setLoading(true)
     if (courseId !== '') {
+      setLoading(true)
       let data = {
         page: page,
         pageSize: pageSize,
@@ -291,6 +297,7 @@ export default function EditMembers() {
     setSelectedStudentId([])
   }
 
+  // 導出成csv
   const exportCSV = (by) => {
     if (by === 'search') {
       setExportRequested(true)

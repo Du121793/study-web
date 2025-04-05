@@ -22,7 +22,7 @@ import QaNav from './QaNav'
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
-export default function AskNav({ course_id, courseName, user_role }) {
+export default function AskNav({ qaHasUpload, setQaHasUpload, course_id, courseName, user_role }) {
   // count用於控制nav收合
   const [count, setCount] = useState(0)
   // 獲取資料
@@ -31,6 +31,7 @@ export default function AskNav({ course_id, courseName, user_role }) {
   const [rerander, setRerander] = useState(false)
   // ref
   const fileInputRef = useRef(null)
+  const innerEleHeight = useRef(null)
 
   // ask 區塊 - 同樣使用 ref 與 state 控制展開/收合
   const [qaAsk, setQaAsk] = useState(false)
@@ -59,7 +60,7 @@ export default function AskNav({ course_id, courseName, user_role }) {
   const [messageColor, setMessageColor] = useState('')
 
   // 用於預覽圖片
-  const [previewUrl, setPreviewUrl] = useState([])
+  const [previewUrl,  setPreviewUrl] = useState([])
 
   // 控制訊息
   const messageControl = (info, isSuccess) => {
@@ -166,8 +167,9 @@ export default function AskNav({ course_id, courseName, user_role }) {
   const initInput = () => {
     setDescription('')
     setImages([])
-    setTheme(['主題'])
+    setTheme(['主題']) 
     setHints(['標籤'])
+    setPreviewUrl([])
   }
 
   // ask，新增提問給該課程
@@ -191,9 +193,10 @@ export default function AskNav({ course_id, courseName, user_role }) {
     })
     initInput()
     userService.createNewQuestion(token, formData).then((res) => {
-      console.log(res)
       if (res.success) {
         messageControl('新增成功', true)
+        setQaHasUpload(!qaHasUpload)
+        initInput()
       }
     })
   }
@@ -211,24 +214,18 @@ export default function AskNav({ course_id, courseName, user_role }) {
     }
   }
 
+  // 替換input按鈕
   const handleButtonClick = () => {
     fileInputRef.current.click()
   }
 
-  const test = () => {
-    console.log(askContentRef.current.scrollHeight)
-  }
+  const test = () => {}
 
-  // nav更新高度，count用來防止第一次渲染造成預設計算高度後直接開啟nav
+  // 刪除圖片後，nav更新高度
   useEffect(() => {
-    if (askContentRef.current && count > 0) {
-      askContentRef.current.style.height = 'auto'
-      // 延遲量測新高度（可使用 requestAnimationFrame 或 setTimeout）
-      setTimeout(() => {
-        const newHeight = askContentRef.current.scrollHeight
-        setAskContentHeight(newHeight)
-      }, 100)
-    }
+    setTimeout(() => {
+      setAskContentHeight(innerEleHeight.current.scrollHeight)
+    }, 10)
   }, [images, count])
 
   return (
@@ -260,7 +257,9 @@ export default function AskNav({ course_id, courseName, user_role }) {
           overflow: 'hidden',
           transition: 'height 0.3s ease',
         }}>
-        <div className="ask-form">
+        <div
+          className="ask-form"
+          ref={innerEleHeight}>
           <div className="upload-img-area">
             <span onClick={test}>可上傳多張圖片</span>
             <button
@@ -276,7 +275,6 @@ export default function AskNav({ course_id, courseName, user_role }) {
                 const file = e.target.files?.[0]
                 setPreviewUrl([...previewUrl, URL.createObjectURL(file)])
                 if (!file) return
-                console.log(e.target.value)
                 e.target.value = ''
                 let tempHeight = askContentRef.current.scrollHeight
                 if (askContentHeight === tempHeight) {
@@ -378,10 +376,11 @@ export default function AskNav({ course_id, courseName, user_role }) {
             <div className="description-input-area">
               <span>問題描述</span>
               <textarea
+                value={description}
+                className="ask-text-area"
                 onChange={(e) => {
                   setDescription(e.target.value)
-                }}
-                className="ask-text-area"></textarea>
+                }}></textarea>
             </div>
             <div className="submit-area">
               {user_role && user_role === 'teacher' && (

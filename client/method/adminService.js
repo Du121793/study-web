@@ -289,7 +289,6 @@ const adminService = {
     try {
       const authHeader = token ? { Authorization: token } : {}
       const payload = { course_ids, question_id, isPublic, replied }
-      console.log(QA_URL + `/patchQuestion`)
       const response = await axios.patch(QA_URL + `/patchQuestion`, payload, {
         headers: authHeader,
       })
@@ -308,7 +307,6 @@ const adminService = {
     try {
       const authHeader = token ? { Authorization: token } : {}
       const payload = { question_id }
-      console.log(QA_URL + `/deleteQuestion`)
       const response = await axios.delete(QA_URL + `/deleteQuestion`, {
         headers: authHeader,
         params: payload,
@@ -407,7 +405,6 @@ const adminService = {
   // Body 參數: { accessName, videoIDs, studentIDs, accessDate, unlimited }
   async editAccessInfo(token, course_id, choseAccessId, data) {
     try {
-      console.log(data)
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.patch(BASE_COURSE_URL + `/${course_id}/videoAccess/patchAccess/${choseAccessId}`, data, {
         headers: authHeader,
@@ -518,6 +515,46 @@ const adminService = {
       const response = await axios.delete(API_URL + `/modifyResource/deleteCarousel`, {
         headers: authHeader,
         params: data,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (e) {
+      return e.response.data
+    }
+  },
+
+  /* 
+  {
+    title,
+    content,
+    poster: req.user._id,
+    image: [],
+  }
+  */
+  async postBoard(token, data) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.post(API_URL + `/modifyResource/postNewBoard`, data, {
+        headers: authHeader,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (e) {
+      return e.response.data
+    }
+  },
+  // const { board_id, title, subTitle, content } = req.body;
+  async putBoard(token, data) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.put(API_URL + `/modifyResource/putBoard`, data, {
+        headers: authHeader,
       })
       if (response.status === 401) {
         signOut()

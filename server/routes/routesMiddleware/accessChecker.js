@@ -1,24 +1,49 @@
+/**
+ * @file accessChecker.js
+ * @description 訪問權限檢查中間件，用於驗證用戶對不同資源的訪問權限
+ * @author StudyWeb Team
+ * @date 2024-03-30
+ */
+
 const Course = require("../../models").course;
 const QA = require("../../models").QA;
 const mongoose = require("mongoose");
 
+/**
+ * 檢查用戶是否有權限訪問指定課程
+ * @param {Object} req - Express 請求對象
+ * @param {Object} res - Express 響應對象
+ * @param {Function} next - Express 下一個中間件函數
+ * @returns {void|Object} 如果權限檢查通過，調用 next()；否則返回錯誤響應
+ */
 const course = async (req, res, next) => {
   try {
+    // 從請求參數中獲取課程ID
     let { course_id } = req.params;
 
+    // 檢查課程ID是否存在且格式有效
     if (!course_id || !mongoose.Types.ObjectId.isValid(course_id)) {
       return res.status(400).json({ success: false, msg: "無效的路由" });
     }
+
+    // 查詢課程是否存在
     let foundCourse = await Course.findOne({ _id: course_id }).exec();
     if (!foundCourse)
       return res.status(400).json({ success: false, msg: "無法找到課程" });
 
+    // 權限檢查：非管理員用戶必須是該課程的學生或教師
     if (req.user.role !== "admin") {
-      if (!req.user.courses.find((n) => n.toString() == foundCourse._id.toString()))
+      if (
+        !req.user.courses.find(
+          (n) => n.toString() == foundCourse._id.toString()
+        )
+      )
         return res
-          .status(401)
+          .status(403)
           .json({ success: false, msg: "你沒有訪問此課程的權限" });
     }
+
+    // 將找到的課程添加到請求對象中，供後續中間件使用
     req.course = foundCourse;
     next();
   } catch (e) {
@@ -29,74 +54,103 @@ const course = async (req, res, next) => {
   }
 };
 
+/**
+ * 檢查用戶是否有權限訪問指定問題
+ * @param {Object} req - Express 請求對象
+ * @param {Object} res - Express 響應對象
+ * @param {Function} next - Express 下一個中間件函數
+ * @returns {void|Object} 如果權限檢查通過，調用 next()；否則返回錯誤響應
+ */
 const question = async (req, res, next) => {
   try {
+    // 從請求參數中獲取問題ID
     let { question_id } = req.params;
 
+    // 檢查問題ID是否存在且格式有效
     if (!question_id || !mongoose.Types.ObjectId.isValid(question_id)) {
       return res.status(400).json({ success: false, msg: "無效的路由" });
     }
 
+    // 查詢問題是否存在
     let foundQuestion = await QA.findOne({ _id: question_id }).exec();
     if (!foundQuestion)
-      return res.status(400).json({ success: false, msg: "無法找到課程" });
+      return res.status(400).json({ success: false, msg: "無法找到問題" });
 
+    // 權限檢查：非管理員用戶的訪問權限檢查
     if (req.user.role !== "admin") {
+      // 檢查用戶是否有權限訪問該問題（用戶的課程與問題的課程有交集）
       const commonElements = foundQuestion.courses.filter((item) =>
         req.user.courses.includes(item)
       );
 
+      // 如果用戶沒有相關課程權限且問題不是公開的，則拒絕訪問
       if (commonElements.length === 0 && !foundQuestion.isPublic) {
         return res
-          .status(401)
+          .status(403)
           .json({ success: false, msg: "你沒有訪問此問題的權限" });
       }
 
+      // 如果是公開問題，學生無法訪問（僅教師可以訪問）
       if (foundQuestion.isPublic && req.user.role === "student") {
         return res
-          .status(401)
+          .status(403)
           .json({ success: false, msg: "你沒有訪問此問題的權限" });
       }
     }
+
+    // 將找到的問題添加到請求對象中，供後續中間件使用
     req.question = foundQuestion;
     next();
   } catch (e) {
     console.error(e);
     return res
       .status(500)
-      .json({ success: false, msg: "很抱歉，伺服器無法訪問此課程" });
+      .json({ success: false, msg: "很抱歉，伺服器無法訪問此問題" });
   }
 };
 
+/**
+ * 檢查用戶是否有權限更新或刪除指定問題
+ * 根據用戶角色（admin、teacher、student）進行不同的權限檢查
+ * @param {Object} req - Express 請求對象
+ * @param {Object} res - Express 響應對象
+ * @param {Function} next - Express 下一個中間件函數
+ * @returns {void|Object} 如果權限檢查通過，調用 next()；否則返回錯誤響應
+ */
 const updateAndDeleteQuestion = async (req, res, next) => {
   try {
+    // 獲取用戶角色和請求中的更新字段
     const role = req.user.role;
     const updateFields = Object.keys(req.body);
+
+    // 從請求體或查詢參數中獲取問題ID
     const qaId = req.body.question_id
       ? req.body.question_id
-      : req.query.question_id; // 資源 ID 從路由參數取得
+      : req.query.question_id;
 
-    // 取得資源，若不存在則回傳 404
+    // 查詢問題是否存在
     const resource = await QA.findById(qaId);
     req.question = resource;
     if (!resource) {
       return res.status(404).json({ success: false, msg: "資源不存在" });
     }
 
-    // ───────────── admin ─────────────
+    // ───────────── admin 權限檢查 ─────────────
     if (role === "admin") {
-      return next(); // admin 不做任何限制
+      return next(); // 管理員擁有所有權限，不做任何限制
     }
 
-    // ───────────── student ─────────────
+    // ───────────── student 權限檢查 ─────────────
     if (role === "student") {
+      // 檢查學生是否為問題的發布者
       if (resource.poster != req.user._id) {
-        return res.status(401).json({
+        return res.status(403).json({
           success: false,
           msg: `你沒有變更此問題的權限`,
         });
       }
-      // 不允許修改的欄位
+
+      // 檢查學生是否嘗試修改不允許的欄位
       const forbiddenKeys = ["isPublic", "replied", "courses", "poster"];
       const invalidKeys = updateFields.filter((key) =>
         forbiddenKeys.includes(key)
@@ -107,14 +161,16 @@ const updateAndDeleteQuestion = async (req, res, next) => {
           msg: `學生不能修改這些欄位: ${invalidKeys.join(", ")}`,
         });
       }
-      // 若資源已被回覆，則學生無法修改或刪除
+
+      // 檢查問題是否已被回覆，已回覆的問題學生無法修改或刪除
       if (resource.replied === true) {
         return res.status(403).json({
           success: false,
           msg: "資源已被回覆，無法修改或刪除",
         });
       }
-      // 學生僅允許修改的欄位
+
+      // 檢查學生是否只修改允許的欄位
       const allowedKeys = [
         "image",
         "description",
@@ -135,20 +191,21 @@ const updateAndDeleteQuestion = async (req, res, next) => {
       return next();
     }
 
-    // ───────────── teacher ─────────────
+    // ───────────── teacher 權限檢查 ─────────────
     if (role === "teacher") {
+      // 檢查教師是否屬於問題相關的課程
       if (
         !req.question.courses.some((item) => req.user.courses.includes(item))
       ) {
-        return res.status(401).json({
+        return res.status(403).json({
           success: false,
           msg: `你不屬於本課程`,
         });
       }
 
+      // 處理刪除請求
       if (req.method === "DELETE") {
-        // 刪除動作 (DELETE)
-        // 若資源是公開的，檢查 resource.courses 是否都屬於此老師
+        // 如果是公開問題，檢查所有相關課程是否都屬於此教師
         if (resource.isPublic) {
           const allCoursesIncluded = resource.courses.every((courseId) =>
             req.user.courses.includes(courseId)
@@ -163,9 +220,9 @@ const updateAndDeleteQuestion = async (req, res, next) => {
         return next();
       }
 
-      // 更新動作 (PUT)
+      // 處理更新請求（PUT 或 PATCH）
       if (req.method === "PUT" || req.method === "PATCH") {
-        // 教師允許修改的欄位
+        // 檢查教師是否只修改允許的欄位
         const allowedKeys = [
           "isPublic",
           "replied",
@@ -183,8 +240,9 @@ const updateAndDeleteQuestion = async (req, res, next) => {
           });
         }
 
-        // 若更新中包含 courses 欄位，需做進階檢查
+        // 如果更新包含 courses 欄位，進行額外檢查
         if (updateFields.includes("courses")) {
+          // 確保 courses 是陣列
           if (!Array.isArray(req.body.courses)) {
             return res.status(400).json({
               success: false,
@@ -192,10 +250,11 @@ const updateAndDeleteQuestion = async (req, res, next) => {
             });
           }
 
-          const oldCourses = resource.courses; // 更新前的課程列表
-          const newCourses = req.body.courses; // 更新後的課程列表
+          // 獲取更新前後的課程列表
+          const oldCourses = resource.courses;
+          const newCourses = req.body.courses;
 
-          // 計算「被移除」與「被新增」的課程
+          // 計算被移除和新增的課程
           const removedCourses = oldCourses.filter(
             (c) => !newCourses.includes(c)
           );
@@ -203,9 +262,9 @@ const updateAndDeleteQuestion = async (req, res, next) => {
             (c) => !oldCourses.includes(c)
           );
 
-          // ───── 被移除的課程 ─────
+          // 檢查被移除的課程
           if (removedCourses.length > 0 && resource.isPublic) {
-            // 資源是公開時，檢查被移除的課程是否都屬於此教師
+            // 如果是公開問題，檢查被移除的課程是否都屬於此教師
             const canRemoveAll = removedCourses.every((courseId) =>
               req.user.courses.includes(courseId)
             );
@@ -217,8 +276,9 @@ const updateAndDeleteQuestion = async (req, res, next) => {
             }
           }
 
-          // ───── 被新增的課程 ─────
+          // 檢查新增的課程
           if (addedCourses.length > 0) {
+            // 檢查新增的課程是否都屬於此教師
             const canAddAll = addedCourses.every((courseId) =>
               req.user.courses.includes(courseId)
             );
@@ -233,11 +293,11 @@ const updateAndDeleteQuestion = async (req, res, next) => {
         return next();
       }
 
-      // 其餘方法 (PATCH, POST, etc.) 不支援
+      // 其他請求方法不支援
       return res.status(403).json({ success: false, msg: "教師不支援此操作" });
     }
 
-    // 若角色非 admin/student/teacher，回傳錯誤
+    // 如果用戶角色不是 admin、student 或 teacher，返回錯誤
     return res.status(403).json({ success: false, msg: "無法辨識的權限" });
   } catch (error) {
     console.error(error);
@@ -247,18 +307,34 @@ const updateAndDeleteQuestion = async (req, res, next) => {
   }
 };
 
+/**
+ * 檢查用戶是否為教師
+ * @param {Object} req - Express 請求對象
+ * @param {Object} res - Express 響應對象
+ * @param {Function} next - Express 下一個中間件函數
+ * @returns {void|Object} 如果用戶是教師，調用 next()；否則返回錯誤響應
+ */
 const teacher = (req, res, next) => {
+  // 檢查用戶是否為學生，如果是則拒絕訪問
   if (req.user.role == "student")
     return res
-      .status(401)
+      .status(403)
       .json({ success: false, msg: "只有老師可以使用此資源" });
   next();
 };
 
+/**
+ * 檢查用戶是否為管理員
+ * @param {Object} req - Express 請求對象
+ * @param {Object} res - Express 響應對象
+ * @param {Function} next - Express 下一個中間件函數
+ * @returns {void|Object} 如果用戶是管理員，調用 next()；否則返回錯誤響應
+ */
 const admin = (req, res, next) => {
+  // 檢查用戶是否為管理員，如果不是則拒絕訪問
   if (req.user.role != "admin")
     return res
-      .status(401)
+      .status(403)
       .json({ success: false, msg: "只有管理員可以使用此資源" });
   next();
 };

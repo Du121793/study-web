@@ -1,0 +1,8 @@
+{
+  "ignore": [
+    "methods/vimeoPathCache.json",
+    "*.test.js",
+    "node_modules/**/node_modules"
+  ],
+  "ext": "js,json,env"
+}

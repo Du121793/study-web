@@ -3,20 +3,82 @@
   .banner-btn-area {
     display: flex;
     justify-content: center;
-    padding: 12px 0 0 0;
+    padding: 12px 0;
+    background-color: #fff;
+    .btn {
+      padding: 8px 16px;
+      background-color: #007bff;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+    }
   }
   .banner-main {
     width: 100%;
     position: relative;
     .banner {
-      display: flex;
-      justify-content: center;
+      position: relative;
       overflow: hidden;
-      .img {
-        width: 120vh;
-        height: 60vh;
-        border-radius: 12px;
-        margin-top: 24px;
+      width: 100%;
+      height: 60vh;
+      .carousel-container {
+        display: flex;
+        height: 100%;
+      }
+      .carousel-item {
+        position: relative;
+        min-width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.2);
+      }
+      .arrow {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        top: 50%;
+        height: 100%;
+        transform: translateY(-50%);
+        font-size: 2rem;
+        color: #fff;
+        cursor: pointer;
+        user-select: none;
+        z-index: 2;
+        padding: 0 24px;
+        transition: 0.2s;
+      }
+      .arrow:hover {
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+      .left-arrow {
+        left: 0px;
+      }
+      .right-arrow {
+        right: 0px;
+      }
+      /* 底部指示器容器 */
+      .indicator-bar {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+      }
+      /* 指示器內容 */
+      .indicator {
+        display: flex;
+        gap: 16px;
+        width: 100%;
+      }
+      .indicator-dot {
+        width: 40px;
+        height: 6px;
+        background-color: rgba(255, 255, 255, 0.4);
+        border-radius: 2px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      .indicator-dot.active {
+        background-color: rgba(255, 255, 255, 1);
       }
     }
   }

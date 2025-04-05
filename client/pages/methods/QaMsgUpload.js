@@ -1,9 +1,12 @@
-import React, { use, useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { Upload } from 'tus-js-client'
 import videoUploader from '../../method/videoUploader'
 import userService from '../../method/userService'
+// 假設有對應的 scss 檔案，如下方範例 (QAMsgUpload.module.scss)
+import styles from '../../styles/course/methods/qaMsgUpload.module.css'
 
 export default function QAMsgUpload({
+  messageControl,
   token,
   question_id,
   file, // 影片檔案 (File)
@@ -15,13 +18,12 @@ export default function QAMsgUpload({
   submitSuccess,
   setSubmitSuccess,
 }) {
-  // 組成 FormData
+  const [uploadLock, setUploadLock] = useState(false)
   const formData = new FormData()
   formData.append('content', content)
   if (fileSize) formData.append('fileSize', fileSize)
   formData.append('isPrivate', isPrivate)
   formData.append('isBest', isBest)
-  // ★ 將多張圖片依序 append，key 皆為 "image" ★
   if (images && images.length > 0) {
     images.forEach((imgFile) => {
       formData.append('image', imgFile)
@@ -40,7 +42,7 @@ export default function QAMsgUpload({
   // 新增一個狀態來存儲待上傳的文件
   const [pendingFile, setPendingFile] = useState(null)
 
-  // 監聽 uploadLink 的變化
+  // 一旦拿到 uploadLink，就開始上傳
   useEffect(() => {
     if (uploadLink && pendingFile) {
       startTusUpload(pendingFile)
@@ -48,7 +50,7 @@ export default function QAMsgUpload({
     }
   }, [uploadLink])
 
-  // 將 TUS 上傳邏輯抽離成單獨的函數
+  // TUS 上傳邏輯
   const startTusUpload = (file) => {
     const uploadId = Date.now() + '-' + file.name
     const tusUpload = new Upload(file, {
@@ -58,6 +60,7 @@ export default function QAMsgUpload({
       uploadLength: file.size,
 
       onError: async (error) => {
+        messageControl('上傳失敗', false)
         console.error('TUS 上傳失敗:', error)
         setUploads((prev) => prev.map((u) => (u.id === uploadId ? { ...u, message: '上傳失敗', progress: 0 } : u)))
         try {
@@ -73,13 +76,13 @@ export default function QAMsgUpload({
       },
 
       onSuccess: async () => {
+        messageControl('上傳成功', true)
         setSubmitSuccess(!submitSuccess)
         try {
-          const response = await videoUploader.returnQuestionUploadStatus(token, question_id, commentID, true)
+          await videoUploader.returnQuestionUploadStatus(token, question_id, commentID, true)
         } catch (err) {
           console.error('通知後端失敗: ', err)
         }
-
         setUploads((prev) => prev.filter((u) => u.id !== uploadId))
         setUploadSuccess(true)
       },
@@ -91,56 +94,83 @@ export default function QAMsgUpload({
 
   // 「開始上傳」按鈕事件
   const handleTusUpload = async () => {
-    if (uploading) return
+    if (uploading || uploadLock) return
+    setUploadLock(true)
     setUploading(true)
 
     try {
-      // (1) 送出留言並取得 uploadLink、commentID
+      // 送出留言並取得 uploadLink、commentID
       const res = await userService.submitQaMessage(token, question_id, formData)
 
-      if (res.success === true && Object.keys(res.data.uploadLink).length === 0) {
+      // 若回應成功但沒有 uploadLink，代表沒有影片要上傳
+      if (res.success === true && !res.data.uploadLink) {
         setSubmitSuccess(!submitSuccess)
+        setUploadLock(false)
       }
-      if (res) {
-        const { uploadLink, commentID } = res.data
-        setUploadLink(uploadLink)
-        setCommentID(commentID)
 
-        if (!uploadLink) {
-          console.error('後端沒有回傳 uploadLink, 上傳影片失敗')
+      if (res.success) {
+        if (res.data.uploadLink) {
+          const { uploadLink } = res.data
+          setUploadLink(uploadLink)
+        }
+        if (res.data.commentID) {
+          const { commentID } = res.data
+          setCommentID(commentID)
+        }
+
+        // 若後端沒有回傳 uploadLink，但回傳了 commentID
+        if (!uploadLink && commentID) {
           await videoUploader.returnQuestionUploadStatus(token, question_id, commentID, false)
+          setUploadLock(false)
           return
         }
+      } else {
+        console.error('上傳失敗', res)
       }
 
-      // (2) 若沒有要上傳影片，就結束
+      // 沒有影片檔案就直接完成
       if (!file) {
-        console.log('沒有影片需要上傳，流程結束')
         setUploadSuccess(true)
+        setUploadLock(false)
         return
       }
 
-      // 設置待上傳的文件，等待 uploadLink 更新後再上傳
+      // 有影片檔案要上傳
       setPendingFile(file)
     } catch (err) {
       console.error('handleTusUpload流程失敗:', err)
     } finally {
+      setUploadLock(false)
       setUploading(false)
     }
   }
 
   return (
     <div>
-      <div>
-        {uploads.map((upload) => (
-          <div
-            key={upload.id}
-            style={{ marginBottom: '8px' }}>
-            <p>進度: {upload.progress}%</p>
+      {/* 當上傳列表為空時才顯示按鈕（也就是還沒開始上傳） */}
+      {uploads.length === 0 && (
+        <button
+          style={{ cursor: 'pointer' }}
+          onClick={handleTusUpload}>
+          {uploading ? '上傳中...' : '開始上傳'}
+        </button>
+      )}
+
+      {/* 進度條區塊：只要有檔案在上傳，就顯示這個區域 */}
+      {uploads.map((upload) => (
+        <div
+          key={upload.id}
+          className={styles.progressContainer} // <== 這裡要改用 {styles.xxx}
+        >
+          <div className={styles.progressBar}>
+            <div
+              className={styles.progressFill}
+              style={{ width: `${upload.progress}%` }}
+            />
+            填充文字填充文字
           </div>
-        ))}
-      </div>
-      <button onClick={handleTusUpload}>{uploading ? '上傳中...' : '開始上傳'}</button>
+        </div>
+      ))}
     </div>
   )
 }

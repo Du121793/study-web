@@ -1,3 +1,10 @@
+/**
+ * @file index.js
+ * @description 課程相關路由處理，包含課程查詢、修改和問答功能
+ * @author StudyWeb Team
+ * @date 2024-03-30
+ */
+
 const router = require("express").Router();
 const Course = require("../../models").course;
 const QA = require("../../models").QA;
@@ -10,65 +17,72 @@ const accessChecker = require("../routesMiddleware/accessChecker");
 const checkTeacherAccess = accessChecker.teacher;
 const checkCourseAccess = accessChecker.course;
 
+// =====================
+// 路由配置
+// =====================
+
+// 問答相關路由
 router.use("/question", QARouter);
 
+// 課程修改相關路由（需要教師權限）
 router.use("/modifyCourse", checkTeacherAccess, modifyCourseRouter);
 
+/**
+ * 獲取課程列表
+ * @route GET /getCourses
+ * @param {string} courseName - 課程名稱過濾
+ * @param {string} subject - 科目過濾
+ * @param {string} grade - 年級過濾
+ * @param {string} courseClass - 班級過濾
+ * @param {string} _id - 課程ID過濾
+ * @param {number} page - 頁碼
+ * @param {number} pageSize - 每頁筆數
+ * @returns {Object} 課程列表及分頁資訊
+ */
 router.get("/getCourses", checkTeacherAccess, async (req, res) => {
   try {
-    // 從 query 參數中取得各個搜尋條件與分頁資訊
+    // 解析查詢參數
     const {
       courseName, // 課程名稱
       subject, // 科目
       grade, // 年級
       courseClass, // 班級
-      _id, // 課程 ID，若傳入則搜尋特定課程
+      _id, // 課程 ID
       page, // 分頁頁數
       pageSize, // 每頁筆數
     } = req.query;
 
-    // 設定分頁預設值：page 預設為 1，pageSize 預設為 10
+    // 設定分頁參數
     const currentPage = parseInt(page, 10) || 1;
     const limit = parseInt(pageSize, 10) || 10;
 
-    // 建立搜尋條件的物件
+    // 建立過濾條件
     const filter = {};
 
-    // 若有傳入 _id 或其他搜尋條件，則加入至 filter 中
-    if (_id) {
-      filter._id = _id;
-    }
-    if (courseName) {
-      filter.courseName = courseName;
-    }
-    if (subject) {
-      filter.subject = subject;
-    }
-    if (grade) {
-      filter.grade = grade;
-    }
-    if (courseClass) {
-      filter.courseClass = courseClass;
-    }
+    // 處理過濾條件
+    if (_id) filter._id = _id;
+    if (courseName) filter.courseName = courseName;
+    if (subject) filter.subject = subject;
+    if (grade) filter.grade = grade;
+    if (courseClass) filter.courseClass = courseClass;
 
-    // 當使用者的 role 不是 admin 時，僅限搜尋使用者已註冊的課程
+    // 處理非管理員的課程訪問限制
     if (req.user.role !== "admin") {
       if (filter._id) {
-        // 如果使用者指定了 _id，確認該 _id 是否屬於使用者已註冊的課程
+        // 檢查指定課程是否在用戶已註冊課程中
         if (!req.user.courses.includes(filter._id)) {
-          // 如果不在，則設置條件使查詢結果為空
-          filter._id = { $in: [] };
+          filter._id = { $in: [] }; // 設置空結果
         }
       } else {
-        // 若未指定 _id，則僅搜尋使用者已註冊的課程
+        // 限制只能查看已註冊的課程
         filter._id = { $in: req.user.courses };
       }
     }
 
-    // 取得符合條件的總筆數
+    // 獲取總筆數
     const total = await Course.countDocuments(filter);
 
-    // 若未提供 page 與 pageSize，則回傳所有資料，不做分頁
+    // 處理不分頁的情況
     if (!(page && pageSize)) {
       const courses = await Course.find(filter);
       return res.json({
@@ -77,7 +91,7 @@ router.get("/getCourses", checkTeacherAccess, async (req, res) => {
       });
     }
 
-    // 計算跳過的筆數，並取得分頁後的資料
+    // 執行分頁查詢
     const skip = (currentPage - 1) * limit;
     const courses = await Course.find(filter).skip(skip).limit(limit);
 
@@ -93,6 +107,7 @@ router.get("/getCourses", checkTeacherAccess, async (req, res) => {
   }
 });
 
+// 課程方法相關路由（需要課程訪問權限）
 router.use("/:course_id", checkCourseAccess, courseMethodRouter);
 
 module.exports = router;

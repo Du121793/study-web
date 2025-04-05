@@ -89,6 +89,7 @@
 .preRegister-main .form .form-line .copy-area div {
   gap: 12px;
   display: flex;
+  justify-content: center;
 }
 .preRegister-main .form .form-line .copy-area div .input {
   width: 200px;

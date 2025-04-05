@@ -37,9 +37,11 @@ export default function Course() {
   const [isLogined, setLogined] = useState(false)
   const [userInfo, setUserInfo] = useState(null)
   const [isShowVideoUpload, setIsShowVideoUpload] = useState(false)
-
+  // 檢查是否有新增qa，用於更新子組件的qa
+  const [qaHasUpload, setQaHasUpload] = useState(true)
   const [userRole, setUserRole] = useState(null)
 
+  // 設定sessionStorage
   useEffect(() => {
     if (!sessionStorage.getItem('user_role') || !sessionStorage.getItem('user_id')) {
       userService.getUserInfo(token).then((res) => {
@@ -104,6 +106,8 @@ export default function Course() {
         {/* Q&A 組件 */}
         {courseId !== null && userRole && (
           <QaNav
+            qaHasUpload={qaHasUpload}
+            setQaHasUpload={setQaHasUpload}
             user_role={userRole}
             course_id={courseId}
             courseName={courseName}></QaNav>
@@ -111,6 +115,8 @@ export default function Course() {
         {/* Ask 組件 */}
         {userRole && (
           <AskNav
+            qaHasUpload={qaHasUpload}
+            setQaHasUpload={setQaHasUpload}
             user_role={userRole}
             course_id={courseId}
             courseName={courseName}></AskNav>

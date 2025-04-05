@@ -169,7 +169,6 @@ export default function VimeoUploadPage() {
       chunkSize: 5 * 1024 * 1024,
       uploadLength: videoFile.size,
       onError: async (error) => {
-        console.error('TUS 上傳失敗:', error)
         setMessage('TUS 上傳失敗: ' + error.toString())
 
         if (vidId) {
@@ -194,7 +193,6 @@ export default function VimeoUploadPage() {
       },
       onSuccess: () => {
         setMessage('影片上傳完成!')
-        console.log('影片上傳完成')
       },
     })
 

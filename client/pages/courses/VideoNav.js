@@ -317,6 +317,15 @@ export default function VideoNav({ course_id, courseName, user_role }) {
               移除影片
             </div>
           )}
+          {user_role && user_role === 'admin' && (
+            <div
+              className="button"
+              onClick={() => {
+                showUpdateVimeoVideoUI(true)
+              }}>
+              搬遷舊有Vimeo影片
+            </div>
+          )}
           <span onClick={test}>排序根據</span>
           <div className="select">
             <select onChange={(e) => switchSortBy(e.target.value)}>
@@ -466,18 +475,17 @@ export default function VideoNav({ course_id, courseName, user_role }) {
                               <div className="content private">公開影片</div>
                             </div>
                           )}
-                          {(user_role && user_role === 'teacher') ||
-                            (user_role && user_role === 'admin' && (
-                              <div
-                                className="edit-btn"
-                                onClick={(e) => {
-                                  e.preventDefault()
-                                  setShowEditVideoInfo(true)
-                                  setVideo_id(item._id)
-                                }}>
-                                編輯
-                              </div>
-                            ))}
+                          {((user_role && user_role === 'teacher') || user_role === 'admin') && (
+                            <div
+                              className="edit-btn"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                setShowEditVideoInfo(true)
+                                setVideo_id(item._id)
+                              }}>
+                              編輯
+                            </div>
+                          )}
                         </div>
                       </div>
                     </Link>

@@ -1,8 +1,7 @@
 .member-select-area {
   margin-top: 24px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
   padding-top: 64px;
   padding: 24px 24px 24px 24px;
   display: flex;
@@ -10,6 +9,7 @@
   align-items: center;
   gap: 16px;
   background-color: #fff;
+  width: 75%;
 }
 .member-select-area .member-select-header {
   font-size: 24px;
@@ -161,29 +161,4 @@
 }
 .member-select-area .member-area li .searched-info #grade {
   width: 80px;
-}
-.member-select-area .page-switch {
-  display: flex;
-  gap: 12px;
-}
-.member-select-area .page-switch .page-switcher {
-  cursor: pointer;
-  color: #525252;
-}
-.member-select-area .page-switch .content {
-  font-weight: bold;
-  color: #525252;
-}
-.member-select-area .page-switch .pointer {
-  cursor: pointer;
-}
-.member-select-area .page-switch .now-page {
-  display: flex;
-  color: #9a9a9a;
-  gap: 4px;
-  font-weight: bold;
-  color: rgb(0, 0, 0);
-}
-.member-select-area .page-switch .now-page .page {
-  cursor: pointer;
 }/*# sourceMappingURL=memberSelector.css.map */

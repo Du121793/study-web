@@ -5,8 +5,6 @@ import PreRegister from '../../pages/profiles/PreRegister'
 import RemoveUsers from '../../pages/profiles/RemoveUsers'
 import EditCourse from '../../pages/profiles/EditCourse'
 import EditMembers from '../../pages/profiles/EditMembers.js'
-import UploadAnnouncement from '../../pages/profiles/UploadAnnouncement.js'
-import UploadCarousel from '../../pages/profiles/UploadCarousel.js'
 
 // 引用組件庫
 import Image from 'next/image'

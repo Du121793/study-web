@@ -1,3 +1,10 @@
+/**
+ * @file auth.js
+ * @description 認證相關路由處理，包含 LINE OAuth 登入、用戶註冊和預註冊功能
+ * @author StudyWeb Team
+ * @date 2024-03-30
+ */
+
 const router = require("express").Router();
 // const registerValidation = require("../validation").registerValidation;
 // const loginValidation = require("../validation").loginValidation;
@@ -15,6 +22,14 @@ const accessChecker = require("./routesMiddleware/accessChecker");
 
 const checkTeacherAccess = accessChecker.teacher;
 
+// =====================
+// LINE OAuth 路由
+// =====================
+
+/**
+ * LINE 登入路由
+ * 使用 LINE OAuth 進行身份驗證
+ */
 router.get(
   "/line",
   passport.authenticate("line", {
@@ -23,6 +38,10 @@ router.get(
   })
 );
 
+/**
+ * LINE 登入成功回調路由
+ * 處理 LINE OAuth 登入成功後的回調
+ */
 router.get(
   "/successful",
   passport.authenticate("line", { failureRedirect: "/" }),
@@ -33,7 +52,9 @@ router.get(
       const tokenObject = {
         userID: req.user._id,
       };
-      const token = jwt.sign(tokenObject, process.env.PASSPORT_SECRET);
+      const token = jwt.sign(tokenObject, process.env.PASSPORT_SECRET, {
+        expiresIn: "3d",
+      });
 
       // 導回前端的某個頁面，帶上正式 JWT
       return res.redirect(
@@ -66,6 +87,14 @@ router.get(
   }
 );
 
+// =====================
+// 用戶註冊路由
+// =====================
+
+/**
+ * 完成用戶註冊
+ * 處理新用戶完成 LINE 綁定後的註冊流程
+ */
 router.post("/completeRegistration", async (req, res) => {
   try {
     const { tempToken, realname, phoneNumber } = req.body;
@@ -120,7 +149,9 @@ router.post("/completeRegistration", async (req, res) => {
 
       // 產生最終 JWT
       const tokenObject = { userID: existingUser._id };
-      const finalToken = jwt.sign(tokenObject, process.env.PASSPORT_SECRET);
+      const finalToken = jwt.sign(tokenObject, process.env.PASSPORT_SECRET, {
+        expiresIn: "3d",
+      });
 
       return res.status(200).json({
         success: true,
@@ -157,6 +188,14 @@ router.post("/completeRegistration", async (req, res) => {
   }
 });
 
+// =====================
+// 預註冊路由
+// =====================
+
+/**
+ * 教師預註冊用戶
+ * 允許教師批量預註冊學生帳號
+ */
 router.post("/preRegisterUser", checkTeacherAccess, async (req, res) => {
   try {
     // userinfo 必須包含 { realname, phoneNumber, grade }

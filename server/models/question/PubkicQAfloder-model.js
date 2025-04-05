@@ -48,21 +48,28 @@ const QASchema = new Schema({
   },
 });
 
-/* -------------------------------
-   共用工具函數
----------------------------------*/
-// 取得圖片儲存的基底路徑
+/**
+ * 取得圖片儲存的基底路徑
+ * @returns {string} 圖片儲存的基底路徑
+ */
 function getBaseImagePath() {
   return path.join(__dirname, "../../resource/questionIMG");
 }
 
-// 取得指定 question 對應的資料夾路徑
+/**
+ * 取得指定問題對應的資料夾路徑
+ * @param {string} questionId - 問題ID
+ * @returns {string} 問題圖片資料夾的完整路徑
+ */
 function getQuestionFolder(questionId) {
   return path.join(getBaseImagePath(), questionId.toString());
 }
 
 /**
- * 共用函數：根據問題 _id 取得對應的圖片資料夾並刪除之（包含所有子檔案與子資料夾）
+ * 清理問題相關資源
+ * @description 刪除問題相關的圖片資料夾和訊息
+ * @param {Object} doc - 要刪除的問題文件
+ * @returns {Promise<void>}
  */
 async function removeQuestionFolder(doc) {
   if (doc) {
@@ -74,9 +81,11 @@ async function removeQuestionFolder(doc) {
   }
 }
 
-// 透過 pre hook 確保任何 delete 動作前先移除問題圖片資料夾
-
-// 1. query middleware：適用於 findOneAndDelete (例如 findByIdAndDelete)
+/**
+ * 問題刪除前的處理鉤子
+ * @description 在問題被刪除前執行資源清理
+ * @param {Function} next - 下一個中間件函數
+ */
 QASchema.pre("findOneAndDelete", async function (next) {
   try {
     const docToDelete = await this.model.findOne(this.getQuery());
@@ -89,7 +98,11 @@ QASchema.pre("findOneAndDelete", async function (next) {
   }
 });
 
-// 2. document middleware：適用於直接對文件執行 remove()
+/**
+ * 問題移除前的處理鉤子
+ * @description 在問題被移除前執行資源清理
+ * @param {Function} next - 下一個中間件函數
+ */
 QASchema.pre("remove", async function (next) {
   try {
     await removeQuestionFolder(this);
@@ -99,7 +112,11 @@ QASchema.pre("remove", async function (next) {
   }
 });
 
-// 3. document middleware：適用於直接調用 deleteOne()（文件模式）
+/**
+ * 問題單筆刪除前的處理鉤子
+ * @description 在問題被單筆刪除前執行資源清理
+ * @param {Function} next - 下一個中間件函數
+ */
 QASchema.pre("deleteOne", async function (next) {
   try {
     await removeQuestionFolder(this);
@@ -109,12 +126,16 @@ QASchema.pre("deleteOne", async function (next) {
   }
 });
 
+/**
+ * 問題批次刪除前的處理鉤子
+ * @description 在問題被批次刪除前執行資源清理
+ * @param {Function} next - 下一個中間件函數
+ */
 QASchema.pre("deleteMany", async function (next) {
   try {
     const docs = await this.model.find(this.getQuery());
     for (const doc of docs) {
       await removeQuestionFolder(doc);
-      // 刪除所有與此 QA 相關的 QAmessage（假設 QAmessage 的 pointTo 為該 QA 的 _id）
       await QAmessage.deleteMany({ pointTo: doc._id });
     }
     next();

@@ -101,14 +101,13 @@
 }
 .course-main .container .nav .update-video-area .button {
   color: rgb(0, 0, 0);
-  width: 120px;
   display: flex;
   justify-content: center;
   position: relative;
   cursor: pointer;
   outline: none;
   margin-left: 24px;
-  padding: 8px 10px;
+  padding: 6px 10px;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   background-color: var(--button-white);
@@ -268,30 +267,34 @@
   display: flex;
 }
 .course-main .container .nav .QA-area {
+  background-color: #f5f5f5;
+}
+.course-main .container .nav .QA-area .container {
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 24px; /* 區塊間距 */
-  background-color: #f5f5f5;
 }
-.course-main .container .nav .QA-area .QA-header {
+.course-main .container .nav .QA-area .container .QA-header {
+  width: 100%;
   padding-top: 16px;
   display: flex;
   gap: 24px;
 }
-.course-main .container .nav .QA-area .QA-header .sort-by-area {
+.course-main .container .nav .QA-area .container .QA-header .sort-by-area {
   align-items: center;
   display: flex;
   gap: 8px;
 }
-.course-main .container .nav .QA-area .QA-header .time-sort-area {
+.course-main .container .nav .QA-area .container .QA-header .time-sort-area {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.course-main .container .nav .QA-area .QA-header .select {
+.course-main .container .nav .QA-area .container .QA-header .select {
   height: 32px;
 }
-.course-main .container .nav .QA-area .QA-header .show-public-QA {
+.course-main .container .nav .QA-area .container .QA-header .show-public-QA {
   cursor: pointer;
   padding: 4px 6px;
   border: 1px solid rgba(0, 0, 0, 0.2);
@@ -300,10 +303,10 @@
   box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
   transition: 0.2s;
 }
-.course-main .container .nav .QA-area .QA-header .show-public-QA:hover {
+.course-main .container .nav .QA-area .container .QA-header .show-public-QA:hover {
   background-color: #bae1e9;
 }
-.course-main .container .nav .QA-area .QA-header .show-delete-btn {
+.course-main .container .nav .QA-area .container .QA-header .show-delete-btn {
   cursor: pointer;
   padding: 4px 6px;
   border: 1px solid rgba(0, 0, 0, 0.2);
@@ -312,20 +315,24 @@
   box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
   transition: 0.2s;
 }
-.course-main .container .nav .QA-area .QA-header .show-delete-btn:hover {
+.course-main .container .nav .QA-area .container .QA-header .show-delete-btn:hover {
   background-color: #e7a5a5;
 }
-.course-main .container .nav .QA-area .sort-title {
+.course-main .container .nav .QA-area .container .sort-title {
   margin-left: 24px;
 }
-.course-main .container .nav .QA-area .QA-grid .QA-container {
+.course-main .container .nav .QA-area .container .QA-grid {
+  width: 100%;
+}
+.course-main .container .nav .QA-area .container .QA-grid .QA-container {
+  width: 100%;
   display: flex;
   justify-content: flex-start;
   padding: 0 32px 24px 32px;
   gap: 12px;
   margin-right: 24px;
 }
-.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list {
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .QA-list {
   margin-bottom: 32px;
   padding: 16px;
   display: flex;
@@ -336,10 +343,10 @@
   gap: 18px;
   background-color: rgb(235, 235, 235);
 }
-.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .QA-tag {
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .QA-list .QA-tag {
   display: flex;
 }
-.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .QA-tag .content {
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .QA-list .QA-tag .content {
   font-weight: bold;
   font-size: 22px;
   padding: 4px;
@@ -347,7 +354,7 @@
   border-radius: 4px;
   box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
 }
-.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info {
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info {
   display: flex;
   flex-direction: column;
   position: relative;
@@ -358,11 +365,11 @@
   gap: 12px;
   background-color: #ffffff;
 }
-.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .btn-area {
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .btn-area {
   display: flex;
   gap: 12px;
 }
-.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .btn-area .into-qa-btn {
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .btn-area .into-qa-btn {
   color: black;
   flex: 1;
   padding: 4px 6px;
@@ -372,10 +379,10 @@
   background-color: var(--button-white);
   transition: 0.2s;
 }
-.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .btn-area .into-qa-btn:hover {
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .btn-area .into-qa-btn:hover {
   background-color: var(--botton-white-hover);
 }
-.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .btn-area .remove-btn {
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .btn-area .remove-btn {
   color: black;
   padding: 4px 6px;
   border: 1px solid rgba(0, 0, 0, 0.2);
@@ -385,15 +392,15 @@
   transition: 0.2s;
   cursor: pointer;
 }
-.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .btn-area .remove-btn:hover {
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .btn-area .remove-btn:hover {
   background-color: #ebc1c1;
 }
-.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .qa-info-title {
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .qa-info-title {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
 }
-.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .qa-info-title .content {
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .qa-info-title .content {
   font-weight: bold;
   font-size: 18px;
   padding: 4px;
@@ -402,35 +409,35 @@
   box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
   color: black;
 }
-.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .qa-image-area {
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .qa-image-area {
   display: flex;
   flex-wrap: wrap;
 }
-.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .qa-image-area .qa-image {
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .qa-image-area .qa-image {
   width: 100%;
   border-radius: 4px;
   border: 1px solid rgba(0, 0, 0, 0.2);
 }
-.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .qa-image-area .qa-images {
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .qa-image-area .qa-images {
   width: 33%;
 }
-.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .time-replied-area {
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .time-replied-area {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   font-size: 15px;
 }
-.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .time-replied-area .time {
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .time-replied-area .time {
   color: rgba(0, 0, 0, 0.5);
 }
-.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .time-replied-area .not-replied {
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .time-replied-area .not-replied {
   color: blue;
 }
-.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .time-replied-area .is-replied {
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .time-replied-area .is-replied {
   color: rgb(114, 37, 255);
 }
-.course-main .container .nav .QA-area .QA-grid .QA-container .QA-list .qa-info .qa-description {
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .qa-description {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -443,7 +450,7 @@
   padding: 0 4px;
   margin-top: -6px;
 }
-.course-main .container .nav .QA-area .QA-grid .QA-container .load-more-btn {
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .load-more-btn {
   cursor: pointer;
   padding: 12px;
   border: 1px solid rgba(0, 0, 0, 0.2);
@@ -451,6 +458,8 @@
   background-color: white;
 }
 .course-main .container .nav .ask-area {
+  overflow: scroll;
+  position: relative;
   background-color: #f5f5f5;
   padding-left: 12px;
   padding-right: 80px;

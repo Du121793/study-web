@@ -15,10 +15,11 @@ import { useEffect, useState } from 'react'
 export default function Profile() {
   const [role, setRole] = useState('')
   const token = useUserToken()
-  const [userInfo, setUserInfo] = useState(null)
   const [isLogined, setLogined] = useState(false)
 
   const [userRole, setUserRole] = useState(null)
+  // 傳給header用於渲染
+  const [userShot, setUserShot] = useState(null)
 
   useEffect(() => {
     if (!sessionStorage.getItem('user_role') || !sessionStorage.getItem('user_id')) {
@@ -29,28 +30,23 @@ export default function Profile() {
         sessionStorage.setItem('user_role', res.data.role)
       })
     }
-    const role = sessionStorage.getItem('user_role')
-    if (role) {
-      setUserRole(role)
+    if (sessionStorage.getItem('user_id')) {
+      setLogined(true)
+    }
+    if (sessionStorage.getItem('user_role')) {
+      setUserRole(sessionStorage.getItem('user_role'))
+    }
+    if (sessionStorage.getItem('user_shot')) {
+      setUserShot(sessionStorage.getItem('user_shot'))
     }
   }, [])
-
-  useEffect(() => {
-    if (token) {
-      userService
-        .getUserInfo(token)
-        .then((res) => {
-          setUserInfo(res.data)
-          setLogined(true)
-        })
-        .catch((err) => console.error('Error:', err))
-    }
-  }, [token])
 
   return (
     <div className="profile-main">
       <Head></Head>
-      <Header loginState={isLogined}></Header>
+      <Header
+        user_line_shot={userShot}
+        loginState={isLogined}></Header>
       {userRole && userRole === 'student' && <StudentLayout user_role={userRole}></StudentLayout>}
       {userRole && userRole === 'teacher' && <TeacherLayout user_role={userRole}></TeacherLayout>}
       {userRole && userRole === 'admin' && <AdminLayout user_role={userRole}></AdminLayout>}

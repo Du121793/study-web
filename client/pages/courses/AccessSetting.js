@@ -24,6 +24,8 @@ export default function AccessSetting() {
   const token = useUserToken()
   const router = useRouter()
   const { course_name, course_id } = router.query
+  // 請求參數
+  const [isPrivate, setIsPrivate] = useState(true)
   // 獲得所有權杖狀態
   const [accessInfo, setAccessInfo] = useState(null)
   // 控制新增權杖狀態
@@ -59,6 +61,7 @@ export default function AccessSetting() {
   const [editAccessName, setEditAccessName] = useState('')
   const [editAccessDate, setEditAccessDate] = useState('')
   const [editisInfiniite, setEditIsInfiniite] = useState(false)
+  const [editIsPrivate, setEditIsPrivate] = useState(true)
 
   // 獲得該課程的成員資料
   useEffect(() => {
@@ -85,6 +88,7 @@ export default function AccessSetting() {
           studentIDs: selectedStudent,
           accessDate: overDate ? overDate : null,
           unlimited: isInfiniite ? isInfiniite : null,
+          setPrivate: isPrivate,
         }
         adminService.addNewVideoAccess(token, course_id, data).then((res) => {
           if (res && res.success) {
@@ -135,6 +139,7 @@ export default function AccessSetting() {
       accessName: editAccessName,
       accessDate: editAccessDate,
       unlimited: editAccessDate === null ? true : false,
+      setPrivate: editIsPrivate,
     }
     try {
       adminService.editAccessInfo(token, course_id, editAccessId, data).then((res) => {
@@ -284,6 +289,17 @@ export default function AccessSetting() {
                 />
               )}
             </div>
+            <div className="is-private">
+              <div className="content">將影片設為私人</div>
+              <input
+                type="checkbox"
+                checked={isPrivate}
+                onChange={(e) => {
+                  setIsPrivate(e.target.checked)
+                }}
+              />
+              {!isPrivate && <div className="hint">若關閉此設定，設定公開的影片會維持公開，但他將不會套用此權杖</div>}
+            </div>
             <div
               className="submit-btn"
               onClick={submitNewAccess}>
@@ -291,7 +307,142 @@ export default function AccessSetting() {
             </div>
           </div>
         )}
-        {/* 顯示權杖UI */}
+
+        {accessInfo &&
+          accessInfo.map((item, index) => (
+            <div
+              className="access-info"
+              key={index}>
+              <div className="name-area">
+                權杖名稱 :
+                {editAccessId === item._id ? (
+                  <input
+                    className="input-area"
+                    placeholder={item.accessName}
+                    onChange={(e) => {
+                      setEditAccessName(e.target.value)
+                    }}></input>
+                ) : (
+                  <div className="name">{item.accessName}</div>
+                )}
+              </div>
+
+              <div className="date-area">
+                期限 :
+                {editAccessId === item._id ? (
+                  <div>
+                    {!editisInfiniite && (
+                      <input
+                        className="input-area"
+                        type="datetime-local"
+                        placeholder="輸入時間"
+                        onChange={(e) => {
+                          setEditAccessDate(e.target.value)
+                        }}></input>
+                    )}
+                    無期限
+                    <input
+                      type="checkbox"
+                      onClick={(e) => {
+                        setEditIsInfiniite(e.target.checked)
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="time">{item.accessDate === null ? '永久' : new Date(item.accessDate).toLocaleString()}</div>
+                )}
+              </div>
+              <div className="student">
+                <div className="content">學生人數 : {item.studentIDs.length}</div>
+              </div>
+              <div className="video">
+                <div className="content">影片數量 : {item.videoIDs.length}</div>
+              </div>
+              <div
+                className="list-btn"
+                onClick={() => {
+                  setShowAccessStudentList(true)
+                  setChoseAccessId(item._id)
+                }}>
+                授權學生清單
+              </div>
+              <div
+                className="list-btn"
+                onClick={() => {
+                  setShowAccessVideoList(true)
+                  setChoseAccessId(item._id)
+                }}>
+                授權影片清單
+              </div>
+              {editAccessId === item._id && (
+                <div className="edit-area">
+                  <div className="content">將影片設為私人</div>
+                  <input
+                    type="checkbox"
+                    checked={editIsPrivate}
+                    onChange={(e) => {
+                      setEditIsPrivate(e.target.checked)
+                    }}></input>
+                </div>
+              )}
+              <div className="image-area">
+                {editAccessId === item._id && (
+                  <div
+                    className="complate-btn"
+                    onClick={() => {
+                      setEditAccessId('')
+                      submitEditAccess()
+                    }}>
+                    完成
+                  </div>
+                )}
+                {editAccessId !== item._id && (
+                  <Image
+                    src={editIcon}
+                    className="image"
+                    alt="edit icon"
+                    width={20}
+                    height={20}
+                    onClick={() => {
+                      setEditAccessId(item._id)
+                    }}></Image>
+                )}
+                {deleteDoubleCheck !== item._id && (
+                  <Image
+                    src={removeIcon}
+                    className="image"
+                    alt="delete icon"
+                    width={20}
+                    height={20}
+                    onClick={() => {
+                      setDeleteDoubleCheck(item._id)
+                    }}></Image>
+                )}
+                {deleteDoubleCheck === item._id && (
+                  <div className="double-check-area">
+                    <div
+                      className="confirm-btn"
+                      onClick={() => {
+                        setDeleteDoubleCheck(null)
+                        setChoseAccessId(item._id)
+                        deleteAccess(item._id)
+                      }}>
+                      確定
+                    </div>
+
+                    <div className="content">確定刪除嗎?</div>
+                    <div
+                      className="cancel-btn"
+                      onClick={() => {
+                        setDeleteDoubleCheck(null)
+                      }}>
+                      取消
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
       </div>
     </div>
   )

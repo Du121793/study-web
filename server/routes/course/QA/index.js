@@ -1,3 +1,10 @@
+/**
+ * @file index.js
+ * @description 課程問答相關路由處理，包含問答查詢、修改和管理功能
+ * @author StudyWeb Team
+ * @date 2024-03-30
+ */
+
 const router = require("express").Router();
 const Course = require("../../../models").course;
 const QA = require("../../../models").QA;
@@ -11,7 +18,15 @@ const checkQuestionAccess =
 router.use("/modifyQA", modifyQARoute);
 router.use("/QAMethod/:question_id", checkQuestionAccess, QAMethodRoute);
 
-// 取得公開問題，並修正 image URL
+/**
+ * 獲取公開問題列表
+ * @route GET /getPublicQAs
+ * @param {number} [page=1] - 頁碼
+ * @param {number} [pageSize=10] - 每頁筆數
+ * @param {string} [sortBy="lastUpdate"] - 排序欄位
+ * @param {string} [sortOrder="desc"] - 排序方向，"asc"為升序，"desc"為降序
+ * @returns {Object} 公開問題列表及分頁資訊
+ */
 router.get("/getPublicQAs", checkTeacherAccess, async (req, res) => {
   try {
     // 取得分頁與排序參數，預設值如下：
@@ -63,30 +78,17 @@ router.get("/getPublicQAs", checkTeacherAccess, async (req, res) => {
   }
 });
 
-// 取得某課程問題，並修正 image URL
 /**
- * GET /getCourseQAs/:course_id
- *
- * 查詢指定課程的 QA 資料，支援分群、分頁與排序。
- *
- * 查詢參數：
- * - page (預設: 1)：目前要顯示的分群頁碼。
- * - pageSize (預設: 10)：每頁回傳的「不同」標籤數量。
- * - sortBy (預設: "lastUpdate")：排序依據。
- *      若傳入 "createDate"，則根據 QA 文件內的 date 欄位排序；
- *      其他則預設依據 lastUpdate 欄位排序。
- * - sortOrder (預設: "asc")：排序方向，"asc" 為升冪，"desc" 為降冪。
- * - sortType (預設: "resourceCategories")：分群依據，可選 "resourceCategories" 或 "hints"。
- *
- * 回傳資料：
- * 回傳一個陣列，每個元素代表一個不同的 sortType 標籤，結構如下：
- * {
- *    tag: <標籤內容>,
- *    qas: [ ... ] // 該標籤下最多三筆 QA 資料，依 sortBy 與 sortOrder 排序
- * }
- * 並同時回傳目前的 page、pageSize、sortBy、sortOrder 與 sortType 等參數資訊。
+ * 獲取課程問題列表
+ * @route GET /getCourseQAs/:course_id
+ * @param {string} course_id - 課程ID
+ * @param {number} [page=1] - 頁碼
+ * @param {number} [pageSize=10] - 每頁筆數
+ * @param {string} [sortBy="lastUpdate"] - 排序欄位，"createDate"或"lastUpdate"
+ * @param {string} [sortOrder="asc"] - 排序方向，"asc"為升序，"desc"為降序
+ * @param {string} [sortType="resourceCategories"] - 分群依據，"resourceCategories"或"hints"
+ * @returns {Object} 按標籤分組的課程問題列表及分頁資訊
  */
-
 router.get("/getCourseQAs/:course_id", async (req, res) => {
   try {
     // 取得查詢參數，並設定預設值
@@ -95,7 +97,6 @@ router.get("/getCourseQAs/:course_id", async (req, res) => {
     const sortBy = req.query.sortBy || "lastUpdate"; // 若為 "createDate"，則依據 date 欄位排序
     const sortOrder = req.query.sortOrder || "asc"; // "asc" 或 "desc"
     const sortType = req.query.sortType || "resourceCategories"; // 可選 "resourceCategories" 或 "hints"
-    console.log(sortType)
     // 決定排序欄位與方向
     const sortField = sortBy === "createDate" ? "date" : "lastUpdate";
     const sortDirection = sortOrder === "asc" ? 1 : -1;
@@ -181,30 +182,14 @@ router.get("/getCourseQAs/:course_id", async (req, res) => {
 });
 
 /**
- * GET /getCourseQAsByTag/:course_id
- *
- * 前端使用說明：
- * --------------------------------------------
- * 此接口根據指定課程 (course_id) 回傳符合特定標籤的 QA 資料，
- * 請求中必須提供單一的標籤過濾參數（僅接受一個），
- * 可選擇以下其中之一：
- * - resourceCategory：回傳所有 QA 資料中，resourceCategories 欄位包含指定標籤的資料。
- * - hint：回傳所有 QA 資料中，hints 欄位包含指定標籤的資料。
- *
- * 注意事項：
- * - 請勿同時提供 resourceCategory 與 hint 參數，也不可提供多個標籤值，
- *   否則接口將回傳 400 錯誤訊息。
- * - 分頁參數：
- *   • page（預設：1）：當前頁碼。
- *   • pageSize（預設：15）：每頁回傳 QA 筆數。
- *
- * 範例：
- * 1. GET /getCourseQAsByTag/course123?resourceCategory=A&page=1&pageSize=15
- *    → 回傳所有 resourceCategories 包含 "A" 的 QA 資料（依 lastUpdate 降冪排序）。
- *
- * 2. GET /getCourseQAsByTag/course123?hint=甲&page=1&pageSize=15
- *    → 回傳所有 hints 包含 "甲" 的 QA 資料（依 lastUpdate 降冪排序）。
- * --------------------------------------------
+ * 根據標籤獲取課程問題
+ * @route GET /getCourseQAsByTag/:course_id
+ * @param {string} course_id - 課程ID
+ * @param {string} [resourceCategory] - 資源類別標籤
+ * @param {string} [hint] - 提示標籤
+ * @param {number} [page=1] - 頁碼
+ * @param {number} [pageSize=15] - 每頁筆數
+ * @returns {Object} 符合標籤的課程問題列表及分頁資訊
  */
 router.get("/getCourseQAsByTag/:course_id", async (req, res) => {
   try {

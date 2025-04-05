@@ -1,6 +1,11 @@
 // 組件庫
 import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
+//public
+import dbArrowLeft from '../../public/profile/doubleArrowLeft.png'
+import dbArrowRight from '../../public/profile/doubleArrowRight.png'
+import ArrowLeft from '../../public/profile/leftArrow.png'
+import ArrowRight from '../../public/profile/rightArrow.png'
 // 導入method
 import { useUserToken } from '../../method/useUserToken'
 import adminService from '../../method/adminService'
@@ -10,7 +15,8 @@ export default function RemoveUsers() {
   // 請求用餐數
   const [selectedUserId, setSelectedUserId] = useState([])
   const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(9999)
+  const [pageSize, setPageSize] = useState(10)
+  const [totalPage, setTotalPage] = useState(1)
   const [realNameValue, setRealNameValue] = useState(null)
   const [phoneValue, setPhoneValue] = useState(null)
   const [choseRole, setChoseRole] = useState(null)
@@ -22,6 +28,41 @@ export default function RemoveUsers() {
   const [message, setMessage] = useState('無訊息')
   const [messageStatus, setMessageStatus] = useState(false)
   const [messageColor, setMessageColor] = useState('')
+
+  // 參數:總頁數，中間頁數，從中間往左右總共要幾頁
+  function getPage(total, thisPage, pageSize = 5) {
+    if (total <= 0 || thisPage <= 0 || thisPage > total) {
+      return []
+    }
+
+    let page = []
+    if (total <= pageSize) {
+      for (let i = 0; i < total; i++) {
+        page.push(i + 1)
+      }
+      return page
+    }
+
+    const leftSize = Math.floor((pageSize - 1) / 2)
+    const rightSize = pageSize - 1 - leftSize
+
+    let start = Math.max(1, thisPage - leftSize)
+    let end = Math.min(total, thisPage + rightSize)
+
+    if (start === 1) {
+      end = Math.min(total, pageSize)
+      start = 1
+    } else if (end === total) {
+      start = Math.max(1, total - pageSize + 1)
+      end = total
+    }
+
+    for (let i = start; i <= end; i++) {
+      page.push(i)
+    }
+
+    return page
+  }
 
   // 控制訊息
   const messageControl = (info, isSuccess) => {
@@ -45,9 +86,9 @@ export default function RemoveUsers() {
   const getUsersFunction = () => {
     adminService.getMembers(token).then((res) => {
       setGetUsers(res.data)
-      console.log(res)
     })
   }
+
   // 點擊選擇單個用戶
   const selectedUser = (e, _id) => {
     if (
@@ -70,6 +111,7 @@ export default function RemoveUsers() {
       e.target.style.border = '1px solid rgba(0, 0, 0, 0.2)'
     }
   }
+
   // 點擊刪除發送請求
   const deleteSelectedUsers = () => {
     if (selectedUserId.length) {
@@ -87,6 +129,7 @@ export default function RemoveUsers() {
       })
     }
   }
+
   // 取消選取所有已選取的成員
   const clearSelectedMemebers = () => {
     setSelectedUserId([])
@@ -95,6 +138,7 @@ export default function RemoveUsers() {
       item.style.border = '1px solid rgba(0, 0, 0, 0.2)'
     })
   }
+
   // 搜尋使用者資料
   const searchMemebers = () => {
     let data = {
@@ -114,11 +158,18 @@ export default function RemoveUsers() {
   // 刷新渲染使用者資料
   useEffect(() => {
     if (token) {
-      adminService.getMembers(token).then((res) => {
-        setGetUsers(res.data)
+      let data = {
+        page: page,
+        pageSize: pageSize,
+      }
+      adminService.getMembers(token, data).then((res) => {
+        if (res.success) {
+          setTotalPage(res.totalPage)
+          setGetUsers(res.data)
+        }
       })
     }
-  }, [token])
+  }, [token, page])
 
   return (
     <div className="remove-users-page">
@@ -242,6 +293,74 @@ export default function RemoveUsers() {
               </div>
             )
         )}
+      </div>
+      <div className="page-switch">
+        <Image
+          alt="switch back to first page icon"
+          src={dbArrowLeft}
+          className="page-switcher"
+          width={24}
+          height={24}
+          onClick={() => {
+            setPage(1)
+          }}></Image>
+        <Image
+          alt="switch back one page icon"
+          src={ArrowLeft}
+          className="page-switcher"
+          width={24}
+          height={24}
+          onClick={() => {
+            if (page === 1) {
+              return
+            } else {
+              setPage((prop) => prop - 1)
+            }
+          }}></Image>
+        {getPage(totalPage, page).map((item, index) => {
+          if (page === item) {
+            return (
+              <div
+                key={index}
+                className="now-page active">
+                {item}
+              </div>
+            )
+          }
+          return (
+            <div
+              onClick={() => {
+                setPage(item)
+              }}
+              key={index}
+              className="now-page">
+              {item}
+            </div>
+          )
+        })}
+        <Image
+          alt="switch next to left page icon"
+          src={ArrowRight}
+          className="page-switcher"
+          width={24}
+          height={24}
+          onClick={() => {
+            console.log(totalPage)
+            if (page === totalPage) {
+              return
+            } else {
+              setPage((prop) => prop + 1)
+            }
+          }}></Image>
+        <Image
+          alt="switch next one page icon"
+          src={dbArrowRight}
+          className="page-switcher"
+          width={24}
+          height={24}
+          onClick={() => {
+            setPage(totalPage)
+          }}></Image>
       </div>
     </div>
   )

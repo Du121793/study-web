@@ -17,16 +17,26 @@ import userService from '../../method/userService'
 import QaMessageBoard from './component/MessageBoard'
 import ImageZoom from './component/ImageZoom'
 import adminService from '../../method/adminService'
-import EditQA from './QA/EditQA'
+import EditQA from './component/EditQA'
+
+// public
+import anonymous from '../../public/course/anonymous.png'
+import star from '../../public/course/star.png'
 
 // 用於請求後端圖片的路由
 const getImageUrl = 'http://localhost:8080/resource/questionIMG'
+
+// env
+const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 // --------------------------------------------------------------------------
 export default function QaPage() {
   // 控制訊息
   const [message, setMessage] = useState('無訊息')
   const [messageStatus, setMessageStatus] = useState(false)
   const [messageColor, setMessageColor] = useState('')
+  // 綁定timeout，用於重計
+  const messageTimer = useRef(null)
+  const resetTimer = useRef(null)
 
   // 30分鐘，用於判斷該qa是否超過30分鐘
   const thirtyMinutes = 30 * 60 * 1000
@@ -85,13 +95,17 @@ export default function QaPage() {
         sessionStorage.setItem('user_role', res.data.role)
       })
     }
-    const role = localStorage.getItem('user_role')
-    const user_id = localStorage.getItem('user_role')
-    if (role) {
-      setUserRole(role)
+    if (sessionStorage.getItem('user_role')) {
+      const user_role = sessionStorage.getItem('user_role')
+      if (user_role) {
+        setUserRole(user_role)
+      }
     }
-    if (user_id) {
-      setUserId(user_id)
+    if (sessionStorage.getItem('user_id')) {
+      const user_id = sessionStorage.getItem('user_role')
+      if (user_id) {
+        setUserId(user_id)
+      }
     }
   }, [])
 
@@ -104,9 +118,14 @@ export default function QaPage() {
     } else {
       setMessageColor('rgba(240, 178, 178, 0.8)')
     }
-    setTimeout(() => {
+
+    // 清除之前的 timer
+    if (messageTimer.current) clearTimeout(messageTimer.current)
+    if (resetTimer.current) clearTimeout(resetTimer.current)
+
+    messageTimer.current = setTimeout(() => {
       setMessageStatus(false)
-      setTimeout(() => {
+      resetTimer.current = setTimeout(() => {
         setMessage('無訊息')
         setMessageColor('')
       }, 200)
@@ -132,18 +151,35 @@ export default function QaPage() {
     })
   }
 
-  const test = () => {}
+  const initQaInfo = () => {
+    userService.getQaInfo(token, qa_id).then((res) => {
+      if (res.success) {
+        setQaInfo(res.data)
+      } else {
+        messageControl('發生錯誤，即將跳轉回首頁', false)
+        setTimeout(() => {
+          window.location(clientIp)
+        }, 3000)
+      }
+    })
+  }
+
+  const test = () => {
+    console.log(qaInfo)
+  }
 
   // 請求修改問題設定
-  const submitTeacherSetting = () => {
+  const submitTeacherSetting = (pulic, isReplied) => {
     if (qaInfo) {
       adminService
-        .commentPublicSetting(token, qaInfo.courses, qaInfo._id, publicComment, isReplied)
+        .commentPublicSetting(token, qaInfo.courses, qaInfo._id, pulic, isReplied)
         .then((res) => {
-          console.log(res)
-        })
-        .catch((err) => {
-          console.log(err)
+          if (res.success) {
+            initQaInfo()
+            messageControl('修改成功', true)
+          } else {
+            messageControl('發生錯誤，修改失敗', false)
+          }
         })
     }
   }
@@ -166,7 +202,6 @@ export default function QaPage() {
   // 3. QA的留言區
   useEffect(() => {
     if (token && qa_id) {
-      console.log('跑一次')
       userService
         .getUserInfo(token)
         .then((res) => {
@@ -283,71 +318,38 @@ export default function QaPage() {
         </div>
       )}
 
-      <div className="btn-area">
-        {/* 教師功能 */}
-        <div
-          className="control-teacher-function"
-          style={{ width: teacherFunction ? '40%' : '134px' }}>
-          <div className="btn-area">
-            <button
-              className="control-teacher-function-btn"
-              style={{ backgroundColor: teacherFunction ? '#f2bebe' : '#b5f3ad' }}
-              onClick={() => {
-                setTeacherFunction(!teacherFunction)
-              }}>
-              {teacherFunction && '關閉教師功能'}
-              {!teacherFunction && '開啟教師功能'}
-            </button>
-          </div>
-
-          {teacherFunction && (
-            <div className="teacher-function">
-              <div className="public-setting">
-                <div>此問題設為公開</div>
-                <input
-                  className="checkbox"
-                  type="checkbox"
-                  onChange={(e) => {
-                    setPublicComment(e.target.checked)
-                  }}
-                />
-              </div>
-              <div className="replied-setting">
-                <div>此問題是否已回覆</div>
-                <input
-                  className="checkbox"
-                  type="checkbox"
-                  onChange={(e) => {
-                    setIsReplied(e.target.checked)
-                  }}
-                />
-              </div>
-              <div className="submit-btn">
-                <button onClick={submitTeacherSetting}>送出並儲存</button>
-              </div>
-            </div>
-          )}
-        </div>
+      {/* 問題詳細 */}
+      <div className="qa-info-area">
         {/* 編輯qa功能 */}
         {/* 老師可以在任何時間修改QA */}
         {/* 若是學生只有在30分鐘內可以編輯QA */}
-        {userRole && (userRole === 'teacher' || userRole === 'admin' || (userRole === 'student' && new Date(qaInfo.date).getTime() >= thirtyMinutes)) && (
+        {qaInfo && userRole && (userRole === 'teacher' || userRole === 'admin' || (userRole === 'student' && new Date(qaInfo.date).getTime() >= thirtyMinutes)) && (
           <div className="edit-qa-function-area">
-            <div className="form-area">
-              <div
-                className="title"
-                onClick={() => {
-                  setShowEditQAUI(true)
-                }}>
-                編輯提問
-              </div>
+            <div
+              onClick={() => {
+                setShowEditQAUI(true)
+              }}
+              className="content edit-btn">
+              編輯提問
             </div>
+            <div className="content submit">公開提問</div>
+            <input
+              type="checkbox"
+              checked={qaInfo.isPublic}
+              onChange={() => {
+                submitTeacherSetting(!qaInfo.isPublic, qaInfo.replied)
+              }}
+            />
+            <div className="content submit">，已回覆</div>
+            <input
+              type="checkbox"
+              checked={qaInfo.replied}
+              onChange={() => {
+                submitTeacherSetting(qaInfo.isPublic, !qaInfo.replied)
+              }}
+            />
           </div>
         )}
-      </div>
-
-      {/* 問題詳細 */}
-      <div className="qa-info-area">
         <div className="time">{qaInfo && new Date(qaInfo.date).toLocaleString()}</div>
         <HtmlRenderer htmlString={qaInfo && qaInfo.description}></HtmlRenderer>
       </div>
@@ -372,16 +374,27 @@ export default function QaPage() {
                 <Image
                   loading="lazy"
                   className="user-shot"
-                  src={item.poster.pictureUrl}
-                  width={50}
-                  height={50}
+                  src={item.poster.pictureUrl || anonymous}
+                  width={40}
+                  height={40}
                   alt="user shot"></Image>
               </div>
               <div className="message-info">
                 <div className="message-top">
                   <div className="name">{item.poster.username}</div>
                   <div className="time">{new Date(item.date).toLocaleString()}</div>
-                  <div className="isBest">{item.isBest === true && '最佳留言'}</div>
+                  {item.isBest && (
+                    <div className="isBest">
+                      <Image
+                        loading="lazy"
+                        className="best-comment"
+                        src={star}
+                        width={12}
+                        height={12}
+                        alt="user shot"></Image>
+                      <div className="content">置頂</div>
+                    </div>
+                  )}
                   {(item.poster._id === userId || userRole === 'teacher' || userRole === 'admin') && (
                     <div
                       onClick={() => {
@@ -403,11 +416,11 @@ export default function QaPage() {
                       title="Video Player"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
-                      width={'240px'}
-                      height={'160px'}
+                      width={'600px'}
+                      height={'240px'}
                     />
                   ))}
-                  {/* 後端路徑正確不用用getImageUrl調整 */}
+                  {/* 後端回傳圖片路徑正確不使用getImageUrl調整 */}
                   {item.image.map((item, index) => (
                     <Image
                       key={index}
@@ -419,7 +432,8 @@ export default function QaPage() {
                       src={`${item}?token=${token.split(' ')[1]}`}
                       alt="Attached image of the commenter"
                       width={400}
-                      height={400}></Image>
+                      height={0}
+                      style={{ height: 'auto' }}></Image>
                   ))}
                 </div>
               </div>
