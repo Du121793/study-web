@@ -17,12 +17,6 @@ export default function Banner({ bannerHasChange }) {
   // 節流鎖
   const lockRef = useRef(false)
 
-  // 取得 user_role
-  useEffect(() => {
-    const userRole = sessionStorage.getItem('user_role')
-    if (userRole) setRole(userRole)
-  }, [])
-
   // 利用克隆方法：當原始陣列不為空時，在前面加上最後一張，在後面加上第一張
   const getSlides = () => {
     if (carousel.length === 0) return []
@@ -84,16 +78,20 @@ export default function Banner({ bannerHasChange }) {
     setCurrentIndex(index + 1)
     setTransitionEnabled(true)
   }
+
+  // 取得 user_role
+  useEffect(() => {
+    const userRole = sessionStorage.getItem('user_role')
+    if (userRole) setRole(userRole)
+  }, [])
+
   // 取得輪播圖圖片（這裡假設回傳的資料為圖片 URL 陣列）
   useEffect(() => {
-    if (token) {
-      userService.getCarousels(token).then((res) => {
-        console.log(res)
-        setCarousel(res.data)
-        setCurrentIndex(1) // 重新設定起始位置
-      })
-    }
-  }, [token, bannerHasChange])
+    userService.getCarousels().then((res) => {
+      setCarousel(res.data)
+      setCurrentIndex(1) // 重新設定起始位置
+    })
+  }, [bannerHasChange])
 
   // 自動切換，每 5 秒移動下一張
   useEffect(() => {

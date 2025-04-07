@@ -1,5 +1,5 @@
 // 組件庫
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 // TSU
 import { Upload } from 'tus-js-client'
 // method
@@ -12,30 +12,57 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
   const [videoFiles, setVideoFiles] = useState([])
   const [isPublic, setIsPublic] = useState(false)
   const [uploads, setUploads] = useState([])
-
-  // ★ 第一次載入：從 localStorage 讀取先前的上傳狀態
-  useEffect(() => {
-    const storedUploads = JSON.parse(localStorage.getItem('uploadProgress')) || []
-    setUploads(storedUploads)
-  }, [])
-
-  // ★ 每當 uploads 改變，就存回 localStorage
-  useEffect(() => {
-    localStorage.setItem('uploadProgress', JSON.stringify(uploads))
-  }, [uploads])
-
+  const fileInput = useRef(null)
+  const fileAvatarInput = useRef(null)
   // 單檔顯示用
   const [videoFile, setVideoFile] = useState(null)
   const [thumbFile, setThumbFile] = useState(null)
-  // 不再使用 base64，故移除 thumbnailBase64
-  // const [thumbnailBase64, setThumbnailBase64] = useState('')
   const [recordDate, setRecordDate] = useState(null)
 
-  const [title, setTitle] = useState('此處輸入影片標題')
-  const [description, setDescription] = useState('測試描述')
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
   const [type, setType] = useState('MainClass')
   const [duration, setDuration] = useState(0)
   const [fileSize, setFileSize] = useState(0)
+
+  useEffect(() => {
+    setVideoFiles([])
+    setVideoFile(null)
+    setThumbFile(null)
+    setRecordDate(null)
+    setTitle('')
+    setDescription('')
+    setType('MainClass')
+    setDuration(0)
+    setFileSize(0)
+    setIsPublic(false)
+    fileInput.current.value = ''
+    fileAvatarInput.current.value = ''
+  }, [isShowVideoUpload])
+
+  // ★ 第一次載入：從 sessionStorage 讀取先前的上傳狀態
+  useEffect(() => {
+    const storedUploads = JSON.parse(sessionStorage.getItem('uploadProgress')) || []
+    setUploads(storedUploads)
+  }, [])
+
+  // ★ 每當 uploads 改變，就存回 sessionStorage
+  useEffect(() => {
+    sessionStorage.setItem('uploadProgress', JSON.stringify(uploads))
+  }, [uploads])
+
+  const initValues = () => {
+    setVideoFiles([])
+    setVideoFile(null)
+    setThumbFile(null)
+    setRecordDate(null)
+    setTitle('')
+    setDescription('')
+    setType('MainClass')
+    setDuration(0)
+    setFileSize(0)
+    setIsPublic(false)
+  }
 
   // STEP 1: 選擇影片 (可支援多檔)
   const handleVideoSelect = (e) => {
@@ -58,15 +85,14 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
     videoEl.src = fileURL
   }
 
-  // STEP 2: 若用戶有選擇自訂縮圖（改為直接存檔案或 Blob）
+  // STEP 2: 若用戶有選擇自訂縮圖
   const handleThumbSelect = (e) => {
     const file = e.target.files?.[0]
     if (!file) return
     setThumbFile(file)
-    // 不再用 base64 讀檔
   }
 
-  // (可選) 從影片自動擷取指定時間的畫面 (預設第1秒) → 回傳 Blob
+  // (可選) 從影片自動擷取第1秒當縮圖
   const autoExtractFrame = (file, captureTimeSec = 1) => {
     return new Promise((resolve) => {
       const fileURL = URL.createObjectURL(file)
@@ -75,7 +101,6 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
       video.src = fileURL
 
       video.addEventListener('loadedmetadata', () => {
-        // 確保擷取時間不要超過影片長度
         video.currentTime = Math.min(video.duration, captureTimeSec)
       })
 
@@ -87,10 +112,9 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
           const ctx = canvas.getContext('2d')
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
 
-          // 不再用 toDataURL，而是用 toBlob 取得 Blob
           canvas.toBlob((blob) => {
             URL.revokeObjectURL(fileURL)
-            resolve(blob) // 回傳 Blob
+            resolve(blob)
           }, 'image/png')
         } catch (err) {
           console.error(err)
@@ -107,7 +131,6 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
     })
   }
 
-  // 用來判斷使用者是否有輸入標題
   const isUserHasInputVideoTitle = () => {
     const titleInput = document.querySelector('#video-title')
     if (titleInput && titleInput.value.length) {
@@ -139,7 +162,7 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
     // ★ 若沒有手動選縮圖，就自動擷取影片第一秒
     let finalThumbnailBlob = thumbFile
     if (!finalThumbnailBlob && videoFiles.length > 0) {
-      finalThumbnailBlob = await autoExtractFrame(videoFiles[0]) // 回傳 Blob
+      finalThumbnailBlob = await autoExtractFrame(videoFiles[0])
     }
 
     // 逐一為每部影片建立上傳任務
@@ -160,7 +183,6 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
       ])
 
       try {
-        // 若後端支援 multipart/form-data，這裡直接做一個 FormData 帶參數和封面檔案。
         const formData = new FormData()
         formData.append('title', title)
         formData.append('description', description)
@@ -170,12 +192,27 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
         formData.append('type', type)
         formData.append('isPrivate', isPublic ? 'true' : 'false')
 
-        // 如果有縮圖，就帶上去。finalThumbnailBlob 可能是 Blob 或 File
         if (finalThumbnailBlob) {
           formData.append('thumbnail', finalThumbnailBlob)
         }
-        // 送到後端，讓後端建立 TUS 上傳連結（假設後端可以處理 FormData）
-        const data = await videoUploader.requestUploadLink(token, course_id, formData)
+
+        try {
+          // 建立上傳連結流程…
+          const data = await videoUploader.requestUploadLink(token, course_id, formData)
+          if (!data.success) {
+            throw new Error(data.message || '後端建立上傳連結失敗')
+          }
+          const { uploadLink, videoId } = data
+          startTusUpload(uploadLink, videoId, file, uploadId)
+        } catch (err) {
+          console.error(err)
+          // 更新對應項目為「建立連結失敗」
+          setUploads((prev) => prev.map((u) => (u.id === uploadId ? { ...u, message: '建立連結失敗', progress: 0 } : u)))
+          // 3秒後自動從列表移除該項目
+          setTimeout(() => {
+            handleRemoveUploadItem(uploadId)
+          }, 3000)
+        }
 
         if (!data.success) {
           throw new Error(data.message || '後端建立上傳連結失敗')
@@ -185,7 +222,6 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
         startTusUpload(uploadLink, videoId, file, uploadId)
       } catch (err) {
         console.error(err)
-        // 只更新該檔案為「建立連結失敗」
         setUploads((prev) => prev.map((u) => (u.id === uploadId ? { ...u, message: '建立連結失敗', progress: 0 } : u)))
       }
     })
@@ -197,7 +233,6 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
   // STEP 4: 開始 TUS 上傳
   const startTusUpload = (upUrl, vidId, file, uploadId) => {
     if (!file || !upUrl) {
-      // 如果連結或檔案不存在 → 自動標記失敗 / 通知後端
       ;(async () => {
         try {
           await videoUploader.returnUploadStatus(token, course_id, vidId, false)
@@ -212,15 +247,25 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
       uploadUrl: upUrl,
       chunkSize: 5 * 1024 * 1024,
       uploadLength: file.size,
-
       // 上傳失敗
       onError: async (error) => {
-        localStorage.removeItem('uploadProgress');
+        // 1) 移除 localStorage 的紀錄
+        localStorage.removeItem('uploadProgress')
+
+        // 2) 顯示訊息
         messageControl(`上傳失敗:${error}`, false)
+
+        // 3) 把對應檔案標記為「上傳失敗」
         setUploads((prev) => prev.map((u) => (u.id === uploadId ? { ...u, message: '上傳失敗', progress: 0 } : u)))
+
+        // 4) 倒數3秒後，幫使用者自動移除
+        setTimeout(() => {
+          handleRemoveUploadItem(uploadId)
+        }, 3000)
+
+        // 5) 通知後端上傳失敗
         if (vidId && course_id) {
           try {
-            // 回傳上傳狀態給後端
             await videoUploader.returnUploadStatus(token, course_id, vidId, false)
           } catch (err) {
             console.error('通知後端失敗: ', err)
@@ -228,49 +273,48 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
         }
       },
 
-      // 上傳中
       onProgress: (bytesUploaded, bytesTotal) => {
         const pct = ((bytesUploaded / bytesTotal) * 100).toFixed(2)
         setUploads((prev) => prev.map((u) => (u.id === uploadId ? { ...u, progress: pct, message: '上傳中' } : u)))
       },
 
-      // 上傳完成
       onSuccess: () => {
-        localStorage.removeItem('uploadProgress');
+        // 當上傳成功，移除tus斷點保護生成的localStorage
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i)
+          if (key === tusUpload._urlStorageKey) {
+            localStorage.removeItem(tusUpload._urlStorageKey)
+          }
+        }
+        localStorage.removeItem('uploadProgress')
         // 回傳上傳狀態給後端
         videoUploader.returnUploadStatus(token, course_id, vidId, true).then((res) => {
           getCourseVideos(false)
           messageControl('上傳完成', true)
-          // 上傳完就從進度列表中移除
           setUploads((prev) => prev.filter((u) => u.id !== uploadId))
           setUploadSuccess(!uploadSuccess)
         })
       },
     })
-
     // 更新 tusInstance, videoId
     setUploads((prev) => prev.map((u) => (u.id === uploadId ? { ...u, tusInstance: tusUpload, videoId: vidId } : u)))
 
     tusUpload.start()
   }
 
-  /** 按鈕：移除進度列 (適用「上傳失敗」或「建立連結失敗」等) **/
+  // 移除進度列
   const handleRemoveUploadItem = (uploadId) => {
-    // 從 state 移除即可，自動觸發同步更新到 localStorage
     setUploads((prev) => prev.filter((u) => u.id !== uploadId))
   }
 
-  // 可選：暫停上傳
+  // 暫停上傳
   const handlePauseUpload = (uploadId) => {
     setUploads((prev) =>
       prev.map((u) => {
         if (u.id === uploadId) {
-          // 確認 tusInstance 仍存在且具備 abort 方法
           if (u.tusInstance && typeof u.tusInstance.abort === 'function' && u.message === '上傳中') {
             u.tusInstance.abort()
             return { ...u, message: '已暫停' }
-          } else {
-            console.log('無有效的 tusInstance，無法暫停。')
           }
         }
         return u
@@ -278,17 +322,14 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
     )
   }
 
-  // 可選：繼續上傳
+  // 繼續上傳
   const handleResumeUpload = (uploadId) => {
     setUploads((prev) =>
       prev.map((u) => {
         if (u.id === uploadId) {
-          // 確認 tusInstance 仍存在且具備 start 方法
           if (u.tusInstance && typeof u.tusInstance.start === 'function' && u.message === '已暫停') {
             u.tusInstance.start()
             return { ...u, message: '上傳中' }
-          } else {
-            console.log('無有效的 tusInstance，無法繼續上傳。')
           }
         }
         return u
@@ -296,7 +337,7 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
     )
   }
 
-  // 可選：終止上傳 (中斷後直接從列表移除)
+  // 終止上傳
   const handleCancelUpload = async (uploadId) => {
     let found = null
     setUploads((prev) => {
@@ -305,14 +346,12 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
     })
     if (!found) return
 
-    // 如果 tusInstance 存在且在「上傳中/已暫停」，先嘗試 abort
     if (found.tusInstance && (found.message === '上傳中' || found.message === '已暫停') && typeof found.tusInstance.abort === 'function') {
       found.tusInstance.abort()
     } else {
       console.log('無有效的 tusInstance，無法真正終止上傳。')
     }
 
-    // 通知後端刪除（非必要，依你的後端需求）
     if (found.videoId) {
       try {
         await videoUploader.returnUploadStatus(token, course_id, found.videoId, false)
@@ -321,11 +360,9 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
       }
     }
 
-    // 從 state 移除
     setUploads((prev) => prev.filter((u) => u.id !== uploadId))
   }
 
-  // 右下角進度顯示
   function UploadProgressDisplay({ uploads }) {
     return (
       <div className="upload-progress-container">
@@ -336,15 +373,10 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
             <div
               key={id}
               className="upload-progress-item">
-              {/* 第一行：顯示狀態圖示 + 檔案資訊 + 操作按鈕 */}
               <div className="header-row">
-                {/* 若正在上傳或等待中 → 顯示 spinner */}
                 {(message === '上傳中' || message === '等待上傳') && <div className="spinner" />}
-
-                {/* 若上傳或連結建立失敗 → 顯示失敗圖示 (可用 icon 或文字) */}
                 {(message === '上傳失敗' || message === '建立連結失敗') && <span className="fail-icon">X</span>}
 
-                {/* 檔案名稱 + 狀態訊息 */}
                 <div className="file-info">
                   <div
                     className="file-name"
@@ -354,20 +386,14 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
                   <div className="status-message">{message === '上傳中' ? `${progress}%` : message === '等待上傳' ? '等待上傳…' : message}</div>
                 </div>
 
-                {/* 右側操作按鈕 (根據各種狀態顯示不同按鈕) */}
                 <div className="actions">
-                  {/* 上傳失敗或建立連結失敗 → 移除 */}
                   {(message === '上傳失敗' || message === '建立連結失敗') && <button onClick={() => handleRemoveUploadItem(id)}>移除</button>}
-
-                  {/* 上傳中 → 暫停、終止 */}
                   {message === '上傳中' && (
                     <>
                       <button onClick={() => handlePauseUpload(id)}>暫停</button>
                       <button onClick={() => handleCancelUpload(id)}>終止</button>
                     </>
                   )}
-
-                  {/* 已暫停 → 繼續、終止 */}
                   {message === '已暫停' && (
                     <>
                       <button onClick={() => handleResumeUpload(id)}>繼續</button>
@@ -376,13 +402,12 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
                   )}
                 </div>
               </div>
-
-              {/* 第二行：若正在上傳 (message === '上傳中')，顯示進度條 */}
               {message === '上傳中' && (
                 <div className="progress-bar-container">
                   <div
                     className="progress-bar"
-                    style={{ width: `${progress}%` }}></div>
+                    style={{ width: `${progress}%` }}
+                  />
                 </div>
               )}
             </div>
@@ -397,9 +422,19 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
       {/* 上傳視窗 */}
       <div className="upload-vidoe-main">
         <h1 className="title">影片上傳</h1>
-        <div className="section">
-          <label className="label">上傳影片檔案(可多選):</label>
+        <div className="section title-section">
+          <label className="label">影片檔案上傳</label>
+          <button
+            className="g-blue-btn"
+            onClick={() => {
+              fileInput.current.click()
+            }}>
+            選擇檔案
+          </button>
+          {fileInput.current?.value.length > 0 && <div className="content">{fileInput.current.value}</div>}
           <input
+            style={{ display: 'none' }}
+            ref={fileInput}
             type="file"
             accept="video/*"
             multiple
@@ -408,9 +443,19 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
           />
         </div>
 
-        <div className="section">
-          <label className="label">上傳影片縮圖(可選):</label>
+        <div className="section title-section">
+          <label className="label">影片縮圖上傳 (可選)</label>
+          <button
+            className="g-blue-btn"
+            onClick={() => {
+              fileAvatarInput.current.click()
+            }}>
+            選擇檔案
+          </button>
+          {fileAvatarInput.current?.value.length > 0 && <div className="content">{fileAvatarInput.current.value}</div>}
           <input
+            style={{ display: 'none' }}
+            ref={fileAvatarInput}
             type="file"
             accept="image/*"
             onChange={handleThumbSelect}
@@ -419,30 +464,33 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
         </div>
 
         <div className="section">
-          <label className="label">輸入錄影日期(可選):</label>
+          <label className="label">錄影日期 (可選)</label>
           <input
             id="video-record-date"
             type="datetime-local"
+            value={recordDate}
             onChange={(e) => setRecordDate(e.target.value)}
             className="input"
           />
         </div>
 
         <div className="section">
-          <label className="label">標題:</label>
+          <label className="label">影片標題</label>
           <input
             id="video-title"
             placeholder="此處輸入標題"
+            value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="input"
           />
         </div>
 
         <div className="section">
-          <label className="label">描述:</label>
+          <label className="label">影片描述</label>
           <textarea
             rows={3}
             placeholder="此處輸入影片描述"
+            value={description}
             onChange={(e) => setDescription(e.target.value)}
             className="textarea"></textarea>
         </div>
@@ -455,6 +503,7 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
               type="radio"
               name="contact"
               value="confirm"
+              checked={!isPublic}
               onClick={() => {
                 setIsPublic(false)
               }}
@@ -466,12 +515,14 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
               type="radio"
               name="contact"
               value="reject"
+              checked={isPublic}
               onClick={() => {
                 setIsPublic(true)
               }}
             />
           </div>
         </div>
+
         <div className="section">
           <p>
             <strong>影片時長:</strong> {duration.toFixed(2)} 秒

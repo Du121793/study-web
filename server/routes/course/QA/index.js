@@ -251,4 +251,50 @@ router.get("/getCourseQAsByTag/:course_id", async (req, res) => {
   }
 });
 
+/**
+ 
+獲取課程的所有標籤和主題
+@route GET /getCourseTags/:course_id
+@param {string} course_id - 課程ID
+@returns {Object} 包含課程所有標籤和主題的物件*/
+router.get("/getCourseTags/:course_id", async (req, res) => {
+  try {
+    const courseId = req.params.course_id;
+
+    // 使用聚合管道獲取所有不重複的標籤和主題
+    const result = await QA.aggregate([
+      // 只選擇屬於指定課程的問題
+      { $match: { courses: courseId } },
+      // 展開 resourceCategories 和 hints 陣列
+      { $unwind: "$resourceCategories" },
+      { $unwind: "$hints" },
+      // 分組並收集不重複的標籤和主題
+      {
+        $group: {
+          _id: null,
+          resourceCategories: { $addToSet: "$resourceCategories" },
+          hints: { $addToSet: "$hints" },
+        },
+      },
+      // 移除 _id 欄位
+      { $project: { _id: 0 } },
+    ]);
+
+    // 如果沒有找到任何標籤或主題，返回空陣列
+    const tags =
+      result.length > 0 ? result[0] : { resourceCategories: [], hints: [] };
+
+    return res.json({
+      success: true,
+      msg: "",
+      data: tags,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      msg: "發生了不可預期的錯誤",
+    });
+  }
+});
 module.exports = router;

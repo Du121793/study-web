@@ -36,7 +36,7 @@ export default function EditCourse({ onRefresh }) {
   const [classInput, setClassInput] = useState('')
   const [courseNameInput, setCourseNameInput] = useState('')
   const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const [totalPage, setTotalPage] = useState(1)
   // 更新課程參數
   const [editCourseName, setEditCourseName] = useState(null)
@@ -233,9 +233,7 @@ export default function EditCourse({ onRefresh }) {
     })
   }
 
-  const test = () => {
-    console.log([...courses])
-  }
+  const test = () => {}
 
   // 獲取課程資料
   useEffect(() => {
@@ -340,11 +338,12 @@ export default function EditCourse({ onRefresh }) {
           />
           <div className="course-name-title">課名:</div>
           <input
-            style={{ pointerEvents: 'none' }}
             type="text"
             className="course-name-input"
-            readOnly
             value={courseNameInput}
+            onChange={(e) => {
+              setCourseNameInput(e.target.value)
+            }}
           />
           <Image
             onClick={searchCourse}
@@ -601,9 +600,11 @@ export default function EditCourse({ onRefresh }) {
               }}></Image>
           </div>
         </div>
-        <MemberSelector
-          selectedStudentId={selectedStudentId}
-          setSelectedStudentId={setSelectedStudentId}></MemberSelector>
+        {addThenRegister && (
+          <MemberSelector
+            selectedStudentId={selectedStudentId}
+            setSelectedStudentId={setSelectedStudentId}></MemberSelector>
+        )}
       </div>
     </div>
   )

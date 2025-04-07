@@ -7,7 +7,6 @@ const API_URL = serverIp
 const BASE_COURSE_URL = `${serverIp}/course`
 const COURSE_URL = `${serverIp}/course/modifyCourse`
 const QA_URL = `${serverIp}/course/question/modifyQA`
-const QAMETHOD_URL = `${serverIp}/course/question/QAMethod`
 const INDEX_URL = `${serverIp}/course/question`
 const USER_URL = `${serverIp}/user`
 
@@ -302,6 +301,23 @@ const adminService = {
     }
   },
 
+  // commentId
+  async setCommentBest(token, data, qa_id) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.patch(serverIp + `/course/question/QAMethod/${qa_id}/patchComment`, data, {
+        headers: authHeader,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (err) {
+      console.error(err?.response?.data)
+    }
+  },
+
   // 刪除問題
   async removeQuestion(token, question_id) {
     try {
@@ -549,11 +565,13 @@ const adminService = {
       return e.response.data
     }
   },
-  // const { board_id, title, subTitle, content } = req.body;
-  async putBoard(token, data) {
+
+  // data = {videos : [{title,description,length(可選),recordDate(可選),isPrivate}]}
+  async batchCreate(token, data, course_id) {
+    console.log(data)
     try {
       const authHeader = token ? { Authorization: token } : {}
-      const response = await axios.put(API_URL + `/modifyResource/putBoard`, data, {
+      const response = await axios.post(API_URL + `/course/${course_id}/vimeoMigrate/batchCreate`, data, {
         headers: authHeader,
       })
       if (response.status === 401) {
@@ -563,6 +581,44 @@ const adminService = {
       return response.data
     } catch (e) {
       return e.response.data
+    }
+  },
+
+  // {videoIds}
+  // [VIDEOID]=67f2b3609fc0c947afc46291
+  async updateUrls(token, data) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.patch(API_URL + `/courseMethod/vimeoMigrate/updateUrls`, data, {
+        headers: authHeader,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (e) {
+      return e.response.data
+    }
+  },
+
+  async getCourseQAsByTag(token, course_id) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.get(serverIp + `/course/question/getCourseTags/${course_id}`, {
+        headers: authHeader,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (e) {
+      if (e?.response?.data) {
+        return e?.response?.data
+      } else {
+        return e
+      }
     }
   },
 }

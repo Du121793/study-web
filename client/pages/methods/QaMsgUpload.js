@@ -104,6 +104,7 @@ export default function QAMsgUpload({
 
       // 若回應成功但沒有 uploadLink，代表沒有影片要上傳
       if (res.success === true && !res.data.uploadLink) {
+        // setSubmitSuccess取返來更新父組件的留言區狀態
         setSubmitSuccess(!submitSuccess)
         setUploadLock(false)
       }
@@ -122,6 +123,7 @@ export default function QAMsgUpload({
         if (!uploadLink && commentID) {
           await videoUploader.returnQuestionUploadStatus(token, question_id, commentID, false)
           setUploadLock(false)
+          setSubmitSuccess(!submitSuccess)
           return
         }
       } else {
@@ -132,6 +134,7 @@ export default function QAMsgUpload({
       if (!file) {
         setUploadSuccess(true)
         setUploadLock(false)
+        setSubmitSuccess(!submitSuccess)
         return
       }
 

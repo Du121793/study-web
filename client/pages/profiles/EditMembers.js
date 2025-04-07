@@ -18,8 +18,7 @@ export default function EditMembers() {
   // env
   // const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
-  // const [memberloading, setMemberloading] = useState()
-  const [loading, setLoading] = useState(false)
+  const [memberloading, setMemberloading] = useState()
   const token = useUserToken()
   const [selectedStudentId, setSelectedStudentId] = useState([])
   // 控制訊息
@@ -97,7 +96,7 @@ export default function EditMembers() {
   // 按下"加入到課程"的函式，將選擇的人加入到指定課程
   const registerMemberToCourse = async () => {
     if (courseId !== '') {
-      setLoading(true)
+      setMemberloading(true)
       adminService
         .registerMember(token, {
           user_ids: selectedStudentId, // 可以是陣列
@@ -105,24 +104,24 @@ export default function EditMembers() {
         })
         .then((res) => {
           if (res.success) {
-            setLoading(false)
+            setMemberloading(false)
             showAllCourseMemebers(false)
             initSelector()
             messageControl('加入到課程', true)
           } else {
-            setLoading(false)
+            setMemberloading(false)
             messageControl('發生錯誤', false)
           }
         })
     } else {
-      setLoading(false)
+      setMemberloading(false)
       messageControl('請先選擇課程', false)
     }
   }
 
   //  按下"移除出課程"的函式，將選擇的人加入到指定課程
   const removeRegisterCourse = () => {
-    setLoading(true)
+    setMemberloading(true)
     adminService
       .unRegisterMember(token, {
         user_ids: selectedStudentId, // 可以是陣列
@@ -130,12 +129,12 @@ export default function EditMembers() {
       })
       .then((res) => {
         if (res.success) {
-          setLoading(false)
+          setMemberloading(false)
           messageControl('移除成功', true)
           showAllCourseMemebers(false)
           initSelector()
         } else {
-          setLoading(false)
+          setMemberloading(false)
           messageControl('移除失敗', false)
         }
       })
@@ -194,14 +193,14 @@ export default function EditMembers() {
 
   // 顯示所有成員
   const showAllCourseMemebers = (needMessage) => {
-    setLoading(true)
+    setMemberloading(true)
     let data = {
       page: page,
       pageSize: pageSize,
     }
     adminService.getMembers(token, data).then((res) => {
       if (res.success) {
-        setLoading(false)
+        setMemberloading(false)
         if (needMessage) {
           messageControl('顯示所有成員', true)
         }
@@ -209,7 +208,7 @@ export default function EditMembers() {
         setMembers(res.data)
         initSelector()
       } else {
-        setLoading(false)
+        setMemberloading(false)
         initSelector()
         messageControl('發生錯誤', false)
       }
@@ -219,7 +218,7 @@ export default function EditMembers() {
   // 顯示課程成員
   const showCourseMembers = () => {
     if (courseId !== '') {
-      setLoading(true)
+      setMemberloading(true)
       let data = {
         page: page,
         pageSize: pageSize,
@@ -227,13 +226,13 @@ export default function EditMembers() {
       }
       adminService.getMembers(token, data).then((res) => {
         if (res.success) {
-          setLoading(false)
+          setMemberloading(false)
           setShowMembersState('course members')
           setMembers(res.data)
           initSelector()
           messageControl('顯示課程成員', true)
         } else {
-          setLoading(false)
+          setMemberloading(false)
           initSelector()
           messageControl('發生錯誤', false)
         }
@@ -247,7 +246,7 @@ export default function EditMembers() {
   const showElseCourseMemebers = () => {
     // 檢查是否有選擇課程
     if (courseId !== '') {
-      setLoading(true)
+      setMemberloading(true)
       let allMembers = ''
       let courseMembers = ''
       let getAllMemberData = {
@@ -255,8 +254,11 @@ export default function EditMembers() {
         pageSize: pageSize,
       }
       adminService.getMembers(token, getAllMemberData).then((res) => {
-        initSelector()
-        allMembers = res.data
+        if (res.success) {
+          setMemberloading(true)
+          initSelector()
+          allMembers = res.data
+        }
       })
 
       let getCourseMemberData = {
@@ -268,7 +270,7 @@ export default function EditMembers() {
         .getMembers(token, getCourseMemberData)
         .then((res) => {
           if (res.success) {
-            setLoading(false)
+            setMemberloading(false)
             courseMembers = res.data
           }
         })
@@ -288,7 +290,7 @@ export default function EditMembers() {
         })
     } else {
       messageControl('請先選擇課程', false)
-      setLoading(false)
+      setMemberloading(false)
     }
   }
 
@@ -365,6 +367,7 @@ export default function EditMembers() {
     }
     // 顯示該課程成員
     if (token && courseId) {
+      setMemberloading(true)
       let data = {
         page: page,
         pageSize: pageSize,
@@ -372,6 +375,7 @@ export default function EditMembers() {
       }
       adminService.getMembers(token, data).then((res) => {
         if (res.success) {
+          setMemberloading(false)
           setMembers(res.data)
           setTotalPage(res.totalPage)
           messageControl('顯示該課程成員', true)
@@ -386,7 +390,7 @@ export default function EditMembers() {
 
   return (
     <div className="edit-members-main">
-      {loading && <LoadingAnime />}
+      {memberloading && <LoadingAnime />}
       <div
         style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
         className="message">
@@ -465,7 +469,7 @@ export default function EditMembers() {
             className="button unselect-all-btn"
             onClick={initSelector}>
             反選
-          </div> 
+          </div>
         </div>
         {userRole && userRole === 'admin' && (
           <div className="option-area">

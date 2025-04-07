@@ -23,12 +23,15 @@
   margin-bottom: 30px;
 }
 .upload-vidoe-main .section {
+  width: 426px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
   margin-bottom: 20px;
 }
 .upload-vidoe-main .section .label {
-  width: 300px;
-  display: block;
-  margin-bottom: 6px;
+  width: 426px;
   font-weight: bold;
   color: #333;
 }
@@ -41,6 +44,14 @@
 }
 .upload-vidoe-main .section .textarea {
   resize: none;
+}
+.upload-vidoe-main .title-section {
+  flex-direction: column;
+  align-items: center;
+}
+.upload-vidoe-main .title-section .label {
+  display: flex;
+  justify-content: center;
 }
 .upload-vidoe-main .public-setting {
   width: 426px;

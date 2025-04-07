@@ -13,4 +13,5 @@ module.exports = {
   QAmessage: require("./question/QAmessage-model"),
   vimeoSchedule: require("./gc/vimeoSchedule-model"),
   board: require("./homepage/board-model"),
+  folder: require("./folder/folder-model"),
 };

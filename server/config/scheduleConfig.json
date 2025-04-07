@@ -9,7 +9,7 @@
     "apiLimitThreshold": 0.66
   },
   "deleteSchedule": {
-    "cronTime": "*/3 * * * *",
+    "cronTime": "*/1 * * * *",
     "maxFailCount": 5,
     "apiLimitThreshold": 0.5,
     "timeRange": {

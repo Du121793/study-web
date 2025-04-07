@@ -1,0 +1,9 @@
+{
+  "token": {
+    "expiration": {
+      "accessToken": "3d",
+      "tempToken": "30m"
+    },
+    "bindIP": true
+  }
+}

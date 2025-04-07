@@ -1,6 +1,5 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 // 組件庫
-import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -16,12 +15,17 @@ import userService from '../../method/userService'
 import VideoUploadComponent from './UploadVideo'
 import adminService from '../../method/adminService'
 import EditVideoInfo from './component/EditVideoInfo'
-
+import UploadOldVimeoVDO from '../components/UploadOldVimeoVDO'
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
 export default function VideoNav({ course_id, courseName, user_role }) {
   const token = useUserToken()
+  // 控制上傳舊vimeoUI
+  const [UploadOldVimeoVDOHeight, setUploadOldVimeoVDOHeight] = useState(0)
+  const [showUploadOldVimeoVDOUI, setShowUploadOldVimeoVDOUI] = useState(false)
+  const [uploadOldVimeoVDOWidht, setUploadOldVimeoVDOWidht] = useState(0)
+  const [uploadOldVimeoVDOInnerEleOpacity, setUploadOldVimeoVDOInnerEleOpacity] = useState(0)
   // 影片
   const [videos, setVideos] = useState([])
   // 影片專區 - 使用 ref 與 state 控制展開/收合
@@ -249,6 +253,7 @@ export default function VideoNav({ course_id, courseName, user_role }) {
         uploadError={uploadError}
         setUploadError={setUploadError}
       />
+      {/* 編輯影片的子組件 */}
       {editShowVideoInfo && (
         <EditVideoInfo
           getCourseVideos={getCourseVideos}
@@ -257,6 +262,19 @@ export default function VideoNav({ course_id, courseName, user_role }) {
           course_id={course_id}
           token={token}
           video_id={video_id}></EditVideoInfo>
+      )}
+      {/* 上傳舊vimeoVDO的組件 */}
+      {showUploadOldVimeoVDOUI && (
+        <UploadOldVimeoVDO
+          course_id={course_id}
+          UploadOldVimeoVDOHeight={UploadOldVimeoVDOHeight}
+          setUploadOldVimeoVDOHeight={setUploadOldVimeoVDOHeight}
+          showUploadOldVimeoVDOUI={showUploadOldVimeoVDOUI}
+          setShowUploadOldVimeoVDOUI={setShowUploadOldVimeoVDOUI}
+          uploadOldVimeoVDOWidht={uploadOldVimeoVDOWidht}
+          setUploadOldVimeoVDOWidht={setUploadOldVimeoVDOWidht}
+          uploadOldVimeoVDOInnerEleOpacity={uploadOldVimeoVDOInnerEleOpacity}
+          setUploadOldVimeoVDOInnerEleOpacity={setUploadOldVimeoVDOInnerEleOpacity}></UploadOldVimeoVDO>
       )}
       <div
         style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
@@ -321,7 +339,12 @@ export default function VideoNav({ course_id, courseName, user_role }) {
             <div
               className="button"
               onClick={() => {
-                showUpdateVimeoVideoUI(true)
+                setShowUploadOldVimeoVDOUI(true)
+                setTimeout(() => {
+                  setUploadOldVimeoVDOHeight(800)
+                  setUploadOldVimeoVDOWidht(1200)
+                  setUploadOldVimeoVDOInnerEleOpacity(1)
+                }, 10)
               }}>
               搬遷舊有Vimeo影片
             </div>
@@ -393,7 +416,6 @@ export default function VideoNav({ course_id, courseName, user_role }) {
                       />
                       <div className="video-length">{formatSecondsToHMS(item.length)}</div>
                       <div className="info">
-                        <div className="title">{item.title}</div>
                         <div className="time">
                           <div className="day">
                             <div>{item.date.split(/[-T:.]/)[0]}/</div>
@@ -404,18 +426,19 @@ export default function VideoNav({ course_id, courseName, user_role }) {
                             {item.date.split(/[-T:.]/)[3] >= 0 && item.date.split(/[-T:.]/)[3] && <div>{Number(item.date.split(/[-T:.]/)[3]) + 8}點</div>}
                             <div>{item.date.split(/[-T:.]/)[4]}分</div>
                           </div>
+                          {item.isPrivate === true && (
+                            <div className="isPublic">
+                              <div className="content unprivate">未公開影片</div>
+                            </div>
+                          )}
+                          {item.isPrivate === false && (
+                            <div className="isPublic">
+                              <div className="content private">公開影片</div>
+                            </div>
+                          )}
                         </div>
-
-                        {item.isPrivate === true && (
-                          <div className="isPublic">
-                            <div className="content unprivate">未公開影片</div>
-                          </div>
-                        )}
-                        {item.isPrivate === false && (
-                          <div className="isPublic">
-                            <div className="content private">公開影片</div>
-                          </div>
-                        )}
+                        <div className="title">{item.title}</div>
+                        <div className="bottom-area">{item.access.accessDate === null ? <div className="access-time">無期限</div> : <div className="access-time">影片授權時間至{item.access.accessDate}</div>}</div>
                       </div>
                     </Link>
                   )
@@ -452,7 +475,6 @@ export default function VideoNav({ course_id, courseName, user_role }) {
                       />
                       <div className="video-length">{formatSecondsToHMS(item.length)}</div>
                       <div className="info">
-                        <div className="title">{item.title}</div>
                         <div className="time">
                           <div className="day">
                             <div>{item.date.split(/[-T:.]/)[0]}/</div>
@@ -463,8 +485,6 @@ export default function VideoNav({ course_id, courseName, user_role }) {
                             {item.date.split(/[-T:.]/)[3] >= 0 && item.date.split(/[-T:.]/)[3] && <div>{Number(item.date.split(/[-T:.]/)[3]) + 8}點</div>}
                             <div>{item.date.split(/[-T:.]/)[4]}分</div>
                           </div>
-                        </div>
-                        <div className="public-and-edit-btn">
                           {item.isPrivate === true && (
                             <div className="isPublic">
                               <div className="content unprivate">未公開影片</div>
@@ -475,15 +495,22 @@ export default function VideoNav({ course_id, courseName, user_role }) {
                               <div className="content private">公開影片</div>
                             </div>
                           )}
+                        </div>
+
+                        <div className="title">{item.title}</div>
+                        <div className="bottom-area">
                           {((user_role && user_role === 'teacher') || user_role === 'admin') && (
-                            <div
-                              className="edit-btn"
-                              onClick={(e) => {
-                                e.preventDefault()
-                                setShowEditVideoInfo(true)
-                                setVideo_id(item._id)
-                              }}>
-                              編輯
+                            <div className="container">
+                              <div
+                                className="edit-btn"
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  setShowEditVideoInfo(true)
+                                  setVideo_id(item._id)
+                                }}>
+                                編輯
+                              </div>
+                              {item.access.accessDate === null ? <div className="access-time">無期限</div> : <div className="access-time">影片授權時間至{item.access.accessDate}</div>}
                             </div>
                           )}
                         </div>

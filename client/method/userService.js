@@ -185,16 +185,12 @@ const userService = {
   },
 
   // 獲得課程的所有QA
-  async getCourseQAs(token, course_id, sortBy, sortOrder, pageSize) {
+  async getCourseQAs(token, course_id, data) {
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.get(QA_URL + `/getCourseQAs/${course_id}`, {
         headers: authHeader,
-        params: {
-          sortType: sortBy,
-          pageSize: pageSize || null,
-          sortOrder,
-        },
+        params: data,
       })
       if (response.status === 401) {
         signOut()
@@ -202,7 +198,11 @@ const userService = {
       }
       return response.data
     } catch (e) {
-      console.log(e)
+      if (e?.response?.data) {
+        console.log(e.response.data)
+      } else {
+        console.log(e)
+      }
       return e
     }
   },
@@ -232,11 +232,13 @@ const userService = {
   },
 
   // 獲得QA問題的留言區
-  async getQaComment(token, question_id) {
+  async getQaComment(token, qa_id, data) {
+    console.log(data)
     try {
       const authHeader = token ? { Authorization: token } : {}
-      const response = await axios.get(QA_URL + `/QAMethod/${question_id}/getComment`, {
+      const response = await axios.get(QA_URL + `/QAMethod/${qa_id}/getComment`, {
         headers: authHeader,
+        params: data,
       })
       if (response.status === 401) {
         signOut()
@@ -335,12 +337,9 @@ const userService = {
   },
 
   // /board/:board_id
-  async getBoardsById(token, id) {
+  async getBoardsById(id) {
     try {
-      const authHeader = token ? { Authorization: token } : {}
-      const response = await axios.get(API_URL + `/publicResource/board/${id}`, {
-        headers: authHeader,
-      })
+      const response = await axios.get(API_URL + `/publicResource/board/${id}`)
       if (response.status === 401) {
         signOut()
         return
@@ -350,6 +349,23 @@ const userService = {
       return e
     }
   },
+
+  // 編輯使用者資料
+  // async patchUserInfo(token, id) {
+  //   try {
+  //     const authHeader = token ? { Authorization: token } : {}
+  //     const response = await axios.get(API_URL + `/publicResource/board/${id}`, {
+  //       headers: authHeader,
+  //     })
+  //     if (response.status === 401) {
+  //       signOut()
+  //       return
+  //     }
+  //     return response.data
+  //   } catch (e) {
+  //     return e
+  //   }
+  // },
 }
 
 export default userService

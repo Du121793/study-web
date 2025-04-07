@@ -20,6 +20,7 @@
     flex-direction: column;
     align-items: center;
     gap: 12px;
+    transition: .2s;
     .add-icon {
       cursor: pointer;
       padding: 4px;
@@ -44,6 +45,13 @@
       flex-wrap: wrap;
     }
 
+    .title-content{
+      user-select: none;
+      margin-bottom: -4px;
+      width: 80%;
+      color: rgba(0, 0, 0, 0.8);
+    }
+
     .themes {
       display: flex;
       gap: 8px;
@@ -52,6 +60,11 @@
       border-radius: 4px;
       padding: 8px;
       min-width: 80%;
+      .content {
+        display: flex;
+        align-items: center;
+        color: rgba(0, 0, 0, 0.6);
+      }
       .theme {
         user-select: none;
         padding: 4px 6px;
@@ -75,6 +88,12 @@
       gap: 8px;
       min-width: 80%;
       flex-wrap: wrap;
+      .content {
+        display: flex;
+        align-items: center;
+        user-select: none;
+        color: rgba(0, 0, 0, 0.6);
+      }
       .hint {
         user-select: none;
         padding: 4px 6px;
@@ -142,7 +161,7 @@
         height: 240px;
       }
       .content {
-        width: 80%;;
+        width: 80%;
       }
       .description-input {
         outline: none;

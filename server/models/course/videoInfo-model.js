@@ -77,7 +77,10 @@ async function cleanupVideo(doc) {
     try {
       const newSchedule = new vimeoSchedule({
         method: "delete",
-        videoIndex: { videoId: doc._id, courseID: doc.courseID },
+        videoIndex: {
+          videoId: doc._id.toString(),
+          courseID: doc.courseID.toString(),
+        },
       });
       await newSchedule.save();
     } catch (err) {

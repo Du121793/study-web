@@ -23,8 +23,8 @@ export default function AdminLayout({ user_role }) {
   const curserBaseUrl = `${clientIp}/courses/Course`
   // token
   const token = useUserToken()
-  // 右方組件
-  const [navSelecter, setNavSelecter] = useState(['MyCourse', 'index'])
+  // 右方組件：修改預設值為 ['publicFunction', 'MyCourse']
+  const [navSelecter, setNavSelecter] = useState(['publicFunction', 'MyCourse'])
   // 存取獲得到的使用者以註冊課程
   const [getCourses, setGetCourses] = useState([])
   // 用於切換nav list的下拉顯示
@@ -42,11 +42,10 @@ export default function AdminLayout({ user_role }) {
   const [hasUpdate, setHasUpdate] = useState(false)
   const [refresh, setRefresh] = useState(0)
 
-  // 用於切換組件
+  // 用於切換組件，routes內容不變
   let routes = {
-    // 我的課程
-    MyCourse: {
-      index: {
+    publicFunction: {
+      MyCourse: {
         component: (
           <MyCourse
             refresh={refresh}
@@ -55,15 +54,10 @@ export default function AdminLayout({ user_role }) {
         ),
         className: 'right-item',
       },
-      className: '',
-    },
-    // 個人資料
-    UserProfile: {
-      index: {
-        component: <UserProfile user_role={user_role} />,
+      UserProfile: {
+        component: <UserProfile />,
         className: 'right-item',
       },
-      className: '',
     },
   }
 
@@ -132,6 +126,7 @@ export default function AdminLayout({ user_role }) {
     }
   }, [token])
 
+  // 取得目前要渲染的 component 和 className
   const { component, className } = routes[navSelecter[0]][navSelecter[1]]
 
   useEffect(() => {
@@ -159,14 +154,15 @@ export default function AdminLayout({ user_role }) {
                   src={closeBtn}
                   alt="close nav s button image"></Image>
               </button>
-              {/* 我的課程*/}
+              {/* 我的課程 */}
               <li className="nav">
                 <div className="nav-container">
                   <div
                     className="nav-option-header active"
                     onClick={(e) => {
                       switchNavActive(e.target)
-                      setNavSelecter(['MyCourse', 'index'])
+                      // 修改切換至 我的課程，設定為 ['publicFunction', 'MyCourse']
+                      setNavSelecter(['publicFunction', 'MyCourse'])
                     }}>
                     {/* 標題左邊的icon */}
                     <div
@@ -206,7 +202,7 @@ export default function AdminLayout({ user_role }) {
                   {getCourses.map((course) => {
                     return (
                       <li
-                        key={course.id}
+                        key={course._id}
                         className="option">
                         <Image
                           className="turn-right-icon"
@@ -223,7 +219,7 @@ export default function AdminLayout({ user_role }) {
                 </div>
               </li>
 
-              {/* 個人資訊 標題*/}
+              {/* 個人資訊 標題 */}
               <li className="nav">
                 <div className="nav-container">
                   <div className="icon">
@@ -233,8 +229,12 @@ export default function AdminLayout({ user_role }) {
                       width={24}
                       height={24}></Image>
                   </div>
+                  {/* 修改個人資訊切換，設定為 ['publicFunction', 'UserProfile'] */}
                   <span
-                    onClick={() => setNavSelecter(['UserProfile', 'index'])}
+                    onClick={(e) => {
+                      switchNavActive(e.target)
+                      setNavSelecter(['publicFunction', 'UserProfile'])
+                    }}
                     className="title">
                     個人資訊
                   </span>

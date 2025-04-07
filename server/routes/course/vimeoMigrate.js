@@ -13,6 +13,9 @@ const VimeoMethods = require("../../methods").vimeoMethods;
 const accessChecker = require("../routesMiddleware/accessChecker");
 const fs = require("fs");
 const path = require("path");
+const vimeoConfig = require("../../config/vimeoConfig.json");
+
+router.use(accessChecker.admin);
 
 /**
  * 批量創建影片資訊
@@ -21,16 +24,16 @@ const path = require("path");
  * @returns {Object} 創建結果
  */
 // 從使用者輸入獲得，res會回傳物件
-// video :[{title、description、length(可選)、recordDate(可選)、isPrivate}]
+// videos :{[{title、description、length(可選)、recordDate(可選)、isPrivate}]}
 router.post("/batchCreate", accessChecker.teacher, async (req, res) => {
   try {
     const { videos } = req.body;
 
     // 驗證必要參數
-    if (!Array.isArray(videos) || !vimeoPath) {
+    if (!Array.isArray(videos)) {
       return res.status(400).json({
         success: false,
-        msg: "請提供正確的影片資訊陣列和 Vimeo 路徑",
+        msg: "請提供正確的影片資訊陣列",
       });
     }
 
@@ -44,6 +47,7 @@ router.post("/batchCreate", accessChecker.teacher, async (req, res) => {
           length,
           recordDate,
           isPrivate,
+          uid,
         } = video;
 
         // 建立新的影片資訊
@@ -57,23 +61,37 @@ router.post("/batchCreate", accessChecker.teacher, async (req, res) => {
           ...(recordDate && { recordDate }),
         });
 
-        return await videoInfo.save();
+        await videoInfo.save();
+        let newObj = videoInfo
+        newObj.uid = uid
+        return newObj
       })
     );
 
     const returnInfo = [];
+    const videoIds = [];
     createdVideos.forEach((video) => {
       let videoObj = {};
       videoObj.title = video.title;
       videoObj.description =
         video.description +
-        `[VIDEOID]=${video._id};[COURSEID]=${video.courseID};[SUBJECT]=${video.subject};[GRADE]=${video.grade};[COURSECLASS]=${video.courseClass};`;
-      videoObj.movePath = `WebVideos/Course/${video._id}`;
+        `;[VIDEOID]=${video._id};[COURSEID]=${video.courseID};[SUBJECT]=${req.course.subject};[GRADE]=${req.course.grade};[COURSECLASS]=${req.course.courseClass};`;
+      if (vimeoConfig.version === "VimeoMethodsForFree") {
+        videoObj.movePath = "Course";
+      } else if (vimeoConfig.version === "VimeoMethodsForFreeV2") {
+        videoObj.movePath = `COURSE:${video._id}`;
+      } else if (vimeoConfig.version === "VimeoMethodsForFolders") {
+        videoObj.movePath = `WebVideos/Course/COURSE:${video._id}`;
+      }
+      videoObj.uid = video.uid;
+      
+      returnInfo.push(videoObj)
+      videoIds.push(video._id)
     });
 
     return res.json({
       success: true,
-      data: returnInfo,
+      data: {returnInfo, videoIds},
       msg: "已成功創建影片資訊",
     });
   } catch (e) {

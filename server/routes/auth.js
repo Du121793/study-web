@@ -14,6 +14,7 @@ require("../config/passport");
 const User = require("../models").user;
 const jwt = require("jsonwebtoken");
 const { user } = require("../models");
+const tokenConfig = require("../config/tokenConfig.json");
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -51,9 +52,16 @@ router.get(
       // 產生正式 JWT
       const tokenObject = {
         userID: req.user._id,
+        ip: req.ip,
       };
+
+      // 如果需要綁定 IP，則加入 IP 資訊
+      if (tokenConfig.token.bindIP) {
+        tokenObject.ip = req.ip;
+      }
+
       const token = jwt.sign(tokenObject, process.env.PASSPORT_SECRET, {
-        expiresIn: "3d",
+        expiresIn: tokenConfig.token.expiration.accessToken,
       });
 
       // 導回前端的某個頁面，帶上正式 JWT
@@ -65,17 +73,22 @@ router.get(
 
     // 否則就是「尚未完成綁定」的狀況
     // 將 lineID, displayName, pictureUrl 做成「暫時」的 JWT，帶給前端
-    // 注意有效期限可適度縮短，如 10~30 分鐘
     const partialUserPayload = {
       lineID: req.user.lineID,
       displayName: req.user.displayName,
       pictureUrl: req.user.pictureUrl,
     };
+
+    // 如果需要綁定 IP，則加入 IP 資訊
+    if (tokenConfig.token.bindIP) {
+      partialUserPayload.ip = req.ip;
+    }
+
     const tempToken = jwt.sign(
       partialUserPayload,
       process.env.PASSPORT_SECRET,
       {
-        expiresIn: "30m",
+        expiresIn: tokenConfig.token.expiration.tempToken,
       }
     );
 
@@ -111,6 +124,11 @@ router.post("/completeRegistration", async (req, res) => {
     let decoded;
     try {
       decoded = jwt.verify(tempToken, process.env.PASSPORT_SECRET);
+
+      // 檢查 IP 綁定
+      if (tokenConfig.token.bindIP && decoded.ip !== req.ip) {
+        return res.status(400).json({ msg: "IP 位址不匹配，請重新登入" });
+      }
     } catch (err) {
       return res.status(400).json({ msg: "tempToken 無效或已過期" });
     }
@@ -149,8 +167,14 @@ router.post("/completeRegistration", async (req, res) => {
 
       // 產生最終 JWT
       const tokenObject = { userID: existingUser._id };
+
+      // 如果需要綁定 IP，則加入 IP 資訊
+      if (tokenConfig.token.bindIP) {
+        tokenObject.ip = req.ip;
+      }
+
       const finalToken = jwt.sign(tokenObject, process.env.PASSPORT_SECRET, {
-        expiresIn: "3d",
+        expiresIn: tokenConfig.token.expiration.accessToken,
       });
 
       return res.status(200).json({

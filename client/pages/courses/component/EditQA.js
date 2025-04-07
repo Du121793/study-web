@@ -25,6 +25,12 @@ export default function EditQA({ messageControl, setShowEditQAUI, token, questio
   const [previewImage, setPreviewImage] = useState([])
   const fileInputRef = useRef(null)
   const [page_body, setPage_body] = useState([])
+  // get 存取所有主題與標籤
+  const [allTheme, setAllTheme] = useState([])
+  const [allHint, setAllHint] = useState([])
+  // 點擊根據xx新增
+  const [showAllTheme, setShowAllTheme] = useState(false)
+  const [showAllHint, setShowAllHint] = useState(false)
 
   const addNewTheme = () => {
     if (!themeInput) return console.error('主題不能為空')
@@ -59,9 +65,7 @@ export default function EditQA({ messageControl, setShowEditQAUI, token, questio
     themeTemp.forEach((item) => formData.append('resourceCategories', item))
     hintTemp.forEach((item) => formData.append('hints', item))
     oldImageRemoveTemp.forEach((item) => formData.append('rmIMG[]', item))
-    imageTemp
-      .filter((file) => !newImageRemoveTemp.includes(file))
-      .forEach((file) => formData.append('image', file))
+    imageTemp.filter((file) => !newImageRemoveTemp.includes(file)).forEach((file) => formData.append('image', file))
 
     adminService.editQAInfo(token, formData, course_id).then((res) => {
       if (res.success) {
@@ -92,6 +96,15 @@ export default function EditQA({ messageControl, setShowEditQAUI, token, questio
         setOldImageRemoveTemp(oldImageRemoveTemp.filter((item) => item !== value))
       }
     }
+  }
+
+  const getAllThemeHint = () => {
+    adminService.getCourseQAsByTag(token, course_id).then((res) => {
+      if (res?.success) {
+        setAllTheme(res.data.resourceCategories)
+        setAllHint(res.data.hints)
+      }
+    })
   }
 
   useEffect(() => {
@@ -131,11 +144,17 @@ export default function EditQA({ messageControl, setShowEditQAUI, token, questio
   return (
     <div className="edit-QA-main">
       {QAInfo && (
-        <div className="form-area" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="form-area"
+          onClick={(e) => e.stopPropagation()}>
           <div className="title">編輯提問功能</div>
+          {/* 主題區 */}
           <div className="theme-area">
             <div className="content">輸入主題</div>
-            <input type="text" onChange={(e) => setThemeInput(e.target.value)} />
+            <input
+              type="text"
+              onChange={(e) => setThemeInput(e.target.value)}
+            />
             <Image
               src={addIcon}
               className="add-icon"
@@ -144,18 +163,75 @@ export default function EditQA({ messageControl, setShowEditQAUI, token, questio
               width={24}
               height={24}
             />
+            <button
+              className="g-blue-btn"
+              onClick={() => {
+                getAllThemeHint()
+                setShowAllTheme(true)
+                setShowAllHint(false)
+              }}>
+              根據現有主題新增
+            </button>
+            {showAllTheme && (
+              <button
+                className="g-red-btn"
+                onClick={() => {
+                  setShowAllTheme(false)
+                }}>
+                關閉
+              </button>
+            )}
           </div>
-          <div className="themes">
+          {showAllTheme && (
+            <div className="themes">
+              <div className="content">可將主題拖曳至下方區域</div>
+              {allTheme.map((item, index) => (
+                <div
+                  key={index}
+                  className="theme"
+                  onClick={() => {
+                    if (!themeTemp.find((theme) => theme === item)) {
+                      setThemeTemp([...themeTemp, item])
+                    }
+                  }}
+                  draggable
+                  onDragStart={(e) => {
+                    e.dataTransfer.setData('text/plain', item)
+                  }}>
+                  {item}
+                </div>
+              ))}
+            </div>
+          )}
+          {/* 已選擇的主題，設為可拖放區域 */}
+          <div
+            className="themes"
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault()
+              const droppedTheme = e.dataTransfer.getData('text/plain')
+              setThemeTemp((prev) => (prev.includes(droppedTheme) ? prev : [...prev, droppedTheme]))
+            }}>
             {QAInfo.resourceCategories &&
               themeTemp.map((item, index) => (
-                <div className="theme" key={index}>
+                <div
+                  className="theme"
+                  key={index}>
                   {item}
                 </div>
               ))}
           </div>
+          {/* 標籤區 */}
           <div className="hints-area">
-            <div className="content">輸入標籤</div>
-            <input type="text" onChange={(e) => setHintInput(e.target.value)} />
+            <div
+              className="content"
+              onClick={() => console.log(hintTemp)}>
+              輸入標籤
+            </div>
+            <input
+              type="text"
+              onChange={(e) => setHintInput(e.target.value)}
+            />
             <Image
               src={addIcon}
               className="add-icon"
@@ -164,15 +240,64 @@ export default function EditQA({ messageControl, setShowEditQAUI, token, questio
               width={24}
               height={24}
             />
+            <button
+              className="g-blue-btn"
+              onClick={() => {
+                getAllThemeHint()
+                setShowAllTheme(false)
+                setShowAllHint(true)
+              }}>
+              根據現有標籤新增
+            </button>
+            {showAllHint && (
+              <button
+                className="g-red-btn"
+                onClick={() => {
+                  setShowAllHint(false)
+                }}>
+                關閉
+              </button>
+            )}
           </div>
-          <div className="hints">
+          {showAllHint && (
+            <div className="hints">
+              <div className="content">可將標籤拖曳至下方區域</div>
+              {allHint.map((item, index) => (
+                <div
+                  key={index}
+                  className="hint"
+                  onClick={() => {
+                    if (!hintTemp.find((hint) => hint === item)) {
+                      setHintTemp([...hintTemp, item])
+                    }
+                  }}
+                  draggable
+                  onDragStart={(e) => {
+                    e.dataTransfer.setData('text/plain', item)
+                  }}>
+                  {item}
+                </div>
+              ))}
+            </div>
+          )}
+          <div
+            className="hints"
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault()
+              const droppedHint = e.dataTransfer.getData('text/plain')
+              setHintTemp((prev) => (prev.includes(droppedHint) ? prev : [...prev, droppedHint]))
+            }}>
             {QAInfo.hints &&
               hintTemp.map((item, index) => (
-                <div className="hint" key={index}>
+                <div
+                  className="selected-hint hint"
+                  key={index}>
                   {item}
                 </div>
               ))}
           </div>
+          {/* 問題描述 */}
           <div className="description-area">
             <div className="content">問題描述</div>
             <textarea
@@ -182,10 +307,13 @@ export default function EditQA({ messageControl, setShowEditQAUI, token, questio
               className="textarea"
             />
           </div>
+          {/* 圖片區 */}
           <div className="image-area">
             {QAInfo.image &&
               QAInfo.image.map((item, index) => (
-                <div key={index} className="image-container">
+                <div
+                  key={index}
+                  className="image-container">
                   <Image
                     src={`${imageURL}/${item}?token=${splitToken}`}
                     alt="QA images"
@@ -212,7 +340,9 @@ export default function EditQA({ messageControl, setShowEditQAUI, token, questio
               ))}
             {Array.isArray(previewUrl) &&
               previewUrl.map((item, index) => (
-                <div key={index} className="image-container">
+                <div
+                  key={index}
+                  className="image-container">
                   <Image
                     src={item}
                     alt="預覽圖片"
@@ -242,7 +372,12 @@ export default function EditQA({ messageControl, setShowEditQAUI, token, questio
                 className="add-icon"
                 onClick={() => fileInputRef.current.click()}>
                 <div className="content">新增圖片</div>
-                <Image src={addIcon} alt="add image icon" width={24} height={24} />
+                <Image
+                  src={addIcon}
+                  alt="add image icon"
+                  width={24}
+                  height={24}
+                />
               </div>
               <input
                 type="file"
@@ -257,6 +392,7 @@ export default function EditQA({ messageControl, setShowEditQAUI, token, questio
               />
             </div>
           </div>
+          {/* 按鈕區 */}
           <div className="btns-area">
             <button
               onClick={() => {

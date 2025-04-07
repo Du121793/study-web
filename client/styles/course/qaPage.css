@@ -17,6 +17,16 @@
   font-size: 28px;
   padding: 6px 16px 6px 16px;
   background-color: #fff;
+  position: relative;
+  align-items: flex-end;
+}
+.qaPage-main .qa-header .title .hint {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  left: calc(100% + 24px);
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.2);
 }
 .qaPage-main .qa-header .back-btn {
   position: absolute;
@@ -211,6 +221,13 @@
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
+.qaPage-main .qaPage-container .sort-by-area {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 80%;
+}
 .qaPage-main .qaPage-container .title {
   display: flex;
   justify-content: center;
@@ -261,11 +278,30 @@
   font-weight: bold;
   font-size: 18px;
 }
-.qaPage-main .qaPage-container .comment-area .message-info .message-top .delete-comment {
+.qaPage-main .qaPage-container .comment-area .message-info .message-top .function-btn-area {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.qaPage-main .qaPage-container .comment-area .message-info .message-top .function-btn-area .delete-comment {
   cursor: pointer;
   font-weight: bold;
-  color: rgb(148, 0, 0);
+  color: rgb(34, 34, 34);
+  transition: 0.2s;
   font-size: 14px;
+}
+.qaPage-main .qaPage-container .comment-area .message-info .message-top .function-btn-area .delete-comment:hover {
+  color: rgb(148, 0, 0);
+}
+.qaPage-main .qaPage-container .comment-area .message-info .message-top .function-btn-area .set-best-comment-btn {
+  cursor: pointer;
+  font-weight: bold;
+  color: rgb(34, 34, 34);
+  transition: 0.2s;
+  font-size: 14px;
+}
+.qaPage-main .qaPage-container .comment-area .message-info .message-top .function-btn-area .set-best-comment-btn:hover {
+  color: rgb(222, 70, 0);
 }
 .qaPage-main .qaPage-container .comment-area .message-info .message-middle {
   margin-left: 12px;

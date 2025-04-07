@@ -56,30 +56,66 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
     }, 100)
   }, [])
 
-  // 取得 QA 資料
+  // 渲染頁面時取得 QA 資料
   useEffect(() => {
-    if (token && course_id && sortBy && timeSort) {
-      userService
-        .getCourseQAs(token, course_id, sortBy, timeSort)
-        .then((res) => {
-          setCourseQas(res.data)
-          setTimeout(() => {
-            setQaHeight(containerRef.current.scrollHeight)
-          }, 30)
-          setTimeout(() => {
-            setQaHeight(containerRef.current.scrollHeight)
-          }, 30)
-          setTimeout(() => {
-            setQaHeight(containerRef.current.scrollHeight)
-          }, 30)
-        })
-        .catch((err) => console.error('Error:', err.message))
-    }
-  }, [token, course_id, sortBy, timeSort, qaHasUpload, qaOpen])
+    if (token) {
+      const localStorageSortBy = localStorage.getItem('qa_sort_by')
+      const localStorageTimeSortBy = localStorage.getItem('qa_time_sort_by')
 
-  const test = () => {
-    console.log(containerRef.current.scrollHeight)
+      const data = {
+        // 沒有就用預設state
+        sortType: localStorageSortBy ? localStorageSortBy : sortBy,
+        sortOrder: localStorageTimeSortBy ? localStorageTimeSortBy : timeSort,
+      }
+
+      userService.getCourseQAs(token, course_id, data).then((res) => {
+        if (res.success) {
+          setCourseQas(res.data)
+          // 更新nav高度
+          setTimeout(() => {
+            setQaHeight(containerRef.current.scrollHeight)
+          }, 30)
+          setTimeout(() => {
+            setQaHeight(containerRef.current.scrollHeight)
+          }, 30)
+          setTimeout(() => {
+            setQaHeight(containerRef.current.scrollHeight)
+          }, 30)
+          // 沒有就用預設state，有就不變
+          localStorageSortBy ? localStorage.getItem('qa_sort_by') : localStorage.setItem('qa_sort_by', sortBy)
+          localStorageTimeSortBy ? localStorage.getItem('qa_time_sort_by') : localStorage.setItem('qa_time_sort_by', timeSort)
+        }
+      })
+    }
+  }, [token, course_id, qaHasUpload, qaOpen])
+
+  const changeSort = (sortBy, timeSort) => {
+    console.log(timeSort)
+    const data = {
+      sortType: sortBy,
+      sortOrder: timeSort,
+    }
+
+    userService.getCourseQAs(token, course_id, data).then((res) => {
+      if (res.success) {
+        setCourseQas(res.data)
+        // 更新nav高度
+        setTimeout(() => {
+          setQaHeight(containerRef.current.scrollHeight)
+        }, 30)
+        setTimeout(() => {
+          setQaHeight(containerRef.current.scrollHeight)
+        }, 30)
+        setTimeout(() => {
+          setQaHeight(containerRef.current.scrollHeight)
+        }, 30)
+        if (sortBy) localStorage.setItem('qa_sort_by', sortBy)
+        if (timeSort) localStorage.setItem('qa_time_sort_by', timeSort)
+      }
+    })
   }
+
+  const test = () => {}
 
   // 切換 QA 區塊展開/收合
   const toggleQA = () => {
@@ -195,9 +231,12 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
               </span>
               <select
                 className="select"
+                defaultValue={localStorage.getItem('qa_sort_by') ? localStorage.getItem('qa_sort_by') : sortBy}
                 onChange={(e) => {
                   setSortBy(e.target.value)
+                  changeSort(e.target.value, timeSort)
                 }}>
+                <option value="">無</option>
                 <option value="resourceCategories">主題排序</option>
                 <option value="hints">標籤排序</option>
               </select>
@@ -206,8 +245,10 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
               <div>時間</div>
               <select
                 className="select"
+                defaultValue={localStorage.getItem('qa_time_sort_by') ? localStorage.getItem('qa_time_sort_by') : timeSort}
                 onChange={(e) => {
                   setTimeSort(e.target.value)
+                  changeSort(sortBy, e.target.value)
                 }}>
                 <option value="desc">降序</option>
                 <option value="asc">升序</option>

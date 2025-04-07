@@ -21,6 +21,7 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
+  transition: 0.2s;
 }
 .edit-QA-main .form-area .add-icon {
   cursor: pointer;
@@ -45,6 +46,14 @@
   gap: 6px;
   flex-wrap: wrap;
 }
+.edit-QA-main .form-area .title-content {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  margin-bottom: -4px;
+  width: 80%;
+  color: rgba(0, 0, 0, 0.8);
+}
 .edit-QA-main .form-area .themes {
   display: flex;
   gap: 8px;
@@ -53,6 +62,11 @@
   border-radius: 4px;
   padding: 8px;
   min-width: 80%;
+}
+.edit-QA-main .form-area .themes .content {
+  display: flex;
+  align-items: center;
+  color: rgba(0, 0, 0, 0.6);
 }
 .edit-QA-main .form-area .themes .theme {
   -webkit-user-select: none;
@@ -78,6 +92,14 @@
   gap: 8px;
   min-width: 80%;
   flex-wrap: wrap;
+}
+.edit-QA-main .form-area .hints .content {
+  display: flex;
+  align-items: center;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  color: rgba(0, 0, 0, 0.6);
 }
 .edit-QA-main .form-area .hints .hint {
   -webkit-user-select: none;

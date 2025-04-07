@@ -70,6 +70,7 @@ export default function MessageBoard({ qa_id, submitSuccess, setSubmitSuccess })
       setUser_role(role)
     }
   })
+  
   return (
     <div className="msg-board">
       <div

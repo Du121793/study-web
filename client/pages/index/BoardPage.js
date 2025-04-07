@@ -28,9 +28,8 @@ export default function BoardPage() {
 
   // get Board info by id
   useEffect(() => {
-    if (token && board_id) {
-      userService.getBoardsById(token, board_id).then((res) => {
-        console.log(res.data)
+    if (board_id) {
+      userService.getBoardsById(board_id).then((res) => {
         if (res.success) {
           // 根據回傳資料結構不同做處理
           const board = Array.isArray(res.data) ? res.data[0] : res.data.boards ? res.data.boards[0] : res.data
@@ -42,16 +41,8 @@ export default function BoardPage() {
 
   // check sessionStorage
   useEffect(() => {
-    if (!sessionStorage.getItem('user_role') || !sessionStorage.getItem('user_id')) {
-      userService.getUserInfo(token).then((res) => {
-        sessionStorage.setItem('user_lineID', res.data.lineID)
-        sessionStorage.setItem('user_id', res.data._id)
-        sessionStorage.setItem('user_line_shot', res.data.userinfo.pictureUrl)
-        sessionStorage.setItem('user_role', res.data.role)
-      })
-    }
-    const role = sessionStorage.getItem('user_role')
-    if (role) {
+    if (sessionStorage.getItem('user_role')) {
+      const role = sessionStorage.getItem('user_role')
       setUserRole(role)
     }
   }, [])
@@ -94,20 +85,17 @@ export default function BoardPage() {
         </div>
       ) : (
         <div className="g-btn-area">
-          <div className="g-black-btn">回到上一頁</div>
+          <Link
+            href={clientIp}
+            className="g-black-btn">
+            回到上一頁
+          </Link>
         </div>
       )}
       {/* board info area */}
       {boardInfo && (
         <div className="announcement">
           <div className="announcement-header">
-            {/* <div className="poster">
-              <Image
-                src={boardInfo.poster.pictureUrl}
-                width={100}
-                height={100}
-              />
-            </div> */}
             <div className="info">
               <div className="title">{boardInfo.title}</div>
               <div className="subTitle">{boardInfo.subTitle}</div>

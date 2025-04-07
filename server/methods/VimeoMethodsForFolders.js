@@ -192,18 +192,28 @@ async function getAllProjects(forceRefresh = false, perPage = 50) {
  * @returns {Object|null} 找到的資料夾
  */
 function findProjectByNameAndParent(projectsList, folderName, parentUri) {
-  // 先找出所有名称匹配的文件夹（不区分大小写）
-  const matchingFolders = projectsList.filter(
-    (p) => p.name.toLowerCase() === folderName.toLowerCase()
-  );
+  // 先找出所有名稱匹配的資料夾（不區分大小寫）
+  const matchingFolders = projectsList.filter((p) => {
+    // 如果是 WebVideos 或 Course/Question，直接比對名稱
+    if (
+      folderName === "WebVideos" ||
+      folderName === "Course" ||
+      folderName === "Question"
+    ) {
+      return p.name.toLowerCase() === folderName.toLowerCase();
+    }
+    // 如果是 COURSE:ID 或 QUESTION:ID 格式，需要特殊處理
+    const [prefix, id] = folderName.split(":");
+    return p.name.toLowerCase() === folderName.toLowerCase();
+  });
 
   if (matchingFolders.length === 0) {
     return null;
   }
 
-  // 如果在找顶层文件夹
+  // 如果在找頂層資料夾
   if (!parentUri) {
-    // 先找沒有父文件夾的
+    // 先找沒有父資料夾的
     const found = matchingFolders.find((p) => !p.parent_folder);
     if (found) {
       return found;
@@ -212,7 +222,7 @@ function findProjectByNameAndParent(projectsList, folderName, parentUri) {
     return matchingFolders[0];
   }
 
-  // 如果在找子文件夹，检查父文件夹URI
+  // 如果在找子資料夾，檢查父資料夾URI
   const found = matchingFolders.find(
     (p) => p.parent_folder && p.parent_folder.uri === parentUri
   );
@@ -256,21 +266,21 @@ function parseVideoIndex(videoIndex) {
   const upperIndex = {};
   for (const [k, v] of Object.entries(videoIndex)) {
     if (!v) continue;
-    upperIndex[k.toUpperCase()] = v.toString(); // 保持原值，不转大写
+    upperIndex[k.toUpperCase()] = v.toString();
   }
 
   if (upperIndex["COURSEID"]) {
     return {
       isCourse: true,
       subRootName: "Course",
-      targetId: upperIndex["COURSEID"],
+      targetId: `COURSE:${upperIndex["COURSEID"]}`,
     };
   }
   if (upperIndex["QUESTIONID"]) {
     return {
       isCourse: false,
       subRootName: "Question",
-      targetId: upperIndex["QUESTIONID"],
+      targetId: `QUESTION:${upperIndex["QUESTIONID"]}`,
     };
   }
   return null;
@@ -284,32 +294,32 @@ function parseVideoIndex(videoIndex) {
  * @returns {Promise<Object>} 移動後的資料夾
  */
 async function moveFolder(userId, folderId, newParentUri) {
-  console.log(`移動文件夾 ${folderId} 到 ${newParentUri}`);
+  console.log(`移動資料夾 ${folderId} 到 ${newParentUri}`);
 
   const maxRetries = 3;
   let lastError = null;
 
   for (let i = 0; i < maxRetries; i++) {
     try {
-      // 先检查文件夹当前状态
+      // 先檢查資料夾當前狀態
       const beforeCheck = await vimeoRequest({
         method: "GET",
         path: `/users/${userId}/projects/${folderId}`,
       });
 
-      console.log("移動前文件夾狀態:", {
+      console.log("移動前資料夾狀態:", {
         name: beforeCheck.data.name,
         uri: beforeCheck.data.uri,
         parent: beforeCheck.data.parent_folder?.uri,
       });
 
-      // 如果已经在正确位置，直接返回
+      // 如果已經在正確位置，直接返回
       if (beforeCheck.data.parent_folder?.uri === newParentUri) {
-        console.log("文件夾已在正確位置");
+        console.log("資料夾已在正確位置");
         return beforeCheck.data;
       }
 
-      // 执行移动
+      // 執行移動
       const moveResp = await vimeoRequest({
         method: "PATCH",
         path: `/users/${userId}/projects/${folderId}`,
@@ -322,45 +332,45 @@ async function moveFolder(userId, folderId, newParentUri) {
         json: true,
       });
 
-      // 等待移动完成
+      // 等待移動完成
       await new Promise((resolve) => setTimeout(resolve, 3000));
 
-      // 验证移动结果
+      // 驗證移動結果
       const afterCheck = await vimeoRequest({
         method: "GET",
         path: `/users/${userId}/projects/${folderId}`,
       });
 
-      console.log("移動後文件夾狀態:", {
+      console.log("移動後資料夾狀態:", {
         name: afterCheck.data.name,
         uri: afterCheck.data.uri,
         parent: afterCheck.data.parent_folder?.uri,
         raw: JSON.stringify(afterCheck.data, null, 2),
       });
 
-      // 检查移动是否成功
+      // 檢查移動是否成功
       if (!afterCheck.data.parent_folder) {
         throw new Error(
-          `文件夾移動後無父文件夾信息: ${JSON.stringify(afterCheck.data)}`
+          `資料夾移動後無父資料夾資訊: ${JSON.stringify(afterCheck.data)}`
         );
       }
 
       if (afterCheck.data.parent_folder.uri !== newParentUri) {
         throw new Error(
-          `文件夾移動驗證失敗: 期望父文件夾為 ${newParentUri}，實際為 ${afterCheck.data.parent_folder.uri}`
+          `資料夾移動驗證失敗: 期望父資料夾為 ${newParentUri}，實際為 ${afterCheck.data.parent_folder.uri}`
         );
       }
 
-      console.log("文件夾移動成功並驗證通過");
+      console.log("資料夾移動成功並驗證通過");
       return afterCheck.data;
     } catch (err) {
       lastError = err;
-      console.error(`移動文件夾重試 ${i + 1}/${maxRetries} 失敗:`, err);
+      console.error(`移動資料夾重試 ${i + 1}/${maxRetries} 失敗:`, err);
       await new Promise((resolve) => setTimeout(resolve, 3000));
     }
   }
 
-  throw new Error(`移動文件夾失敗 (重試${maxRetries}次): ${lastError.message}`);
+  throw new Error(`移動資料夾失敗 (重試${maxRetries}次): ${lastError.message}`);
 }
 
 /**
@@ -374,31 +384,31 @@ async function findOrCreateFolder(projectsList, userId, folderName, parentUri) {
     return folder;
   }
 
-  // 如果沒找到，直接創建新文件夾
+  // 如果沒找到，直接創建新資料夾
   const created = await createProject(userId, folderName, parentUri);
   projectsList.push(created);
 
-  // 等待文件夹创建完成
+  // 等待資料夾創建完成
   await new Promise((resolve) => setTimeout(resolve, 2000));
 
-  // 验证新创建的文件夹
+  // 驗證新創建的資料夾
   const verifyFolder = await vimeoRequest({
     method: "GET",
     path: `/users/${userId}/projects/${created.uri.split("/").pop()}`,
   });
 
   if (!verifyFolder.data || !verifyFolder.data.uri) {
-    throw new Error("新文件夾創建驗證失敗");
+    throw new Error("新資料夾創建驗證失敗");
   }
 
   return verifyFolder.data;
 }
 
 /**
- * 根據路徑查找文件夾
+ * 根據路徑查找資料夾
  */
 async function findFolderByPath(path) {
-  console.log(`根據路徑查找文件夾: ${path}`);
+  console.log(`根據路徑查找資料夾: ${path}`);
 
   // 分割路徑
   const parts = path.split("/").filter(Boolean);
@@ -413,7 +423,7 @@ async function findFolderByPath(path) {
     currentFolder = findProjectByNameAndParent(projectsList, part, parentUri);
 
     if (!currentFolder) {
-      console.log(`在路徑 ${path} 中找不到文件夾 ${part}`);
+      console.log(`在路徑 ${path} 中找不到資料夾 ${part}`);
       return null;
     }
   }
@@ -422,13 +432,13 @@ async function findFolderByPath(path) {
 }
 
 /**
- * 清理过期的緩存
+ * 清理過期的緩存
  */
 function cleanExpiredCache() {
   const now = Date.now();
   let current = pathCache.WebVideos;
 
-  // 清理 Course 和 Question 的过期緩存
+  // 清理 Course 和 Question 的過期緩存
   ["Course", "Question"].forEach((section) => {
     if (current[section] && current[section].ids) {
       current[section].ids = current[section].ids.filter((item) => {
@@ -444,29 +454,30 @@ function cleanExpiredCache() {
  * 檢查路徑緩存中是否存在指定路徑
  */
 function checkPathInCache(pathArray) {
-  // 清理过期緩存
+  // 清理過期緩存
   cleanExpiredCache();
 
   let current = pathCache;
 
-  // 检查 WebVideos
+  // 檢查 WebVideos
   if (!current.WebVideos) return null;
   current = current.WebVideos;
 
-  // 检查 Course/Question
+  // 檢查 Course/Question
   if (pathArray[1] && current[pathArray[1]]) {
     current = current[pathArray[1]];
 
-    // 如果是查找具体的课程/问题ID
+    // 如果是查找具體的課程/問題ID
     if (pathArray[2]) {
-      const targetId = pathArray[2];
+      // 從 COURSE:ID 或 QUESTION:ID 中提取 ID
+      const targetId = pathArray[2].split(":")[1];
       const found = current.ids.find((item) => item.id === targetId);
       if (found) {
-        // 检查是否过期
+        // 檢查是否過期
         if (found.timestamp && Date.now() - found.timestamp < CACHE_TTL) {
           return { id: found.path };
         } else {
-          // 如果过期，删除该緩存
+          // 如果過期，刪除該緩存
           deletePathFromCache(pathArray);
           return null;
         }
@@ -485,89 +496,82 @@ function checkPathInCache(pathArray) {
 function updatePathCache(pathArray, folderId) {
   let current = pathCache;
 
-  // 确保基本结构存在
+  // 確保基本結構存在
   if (!current.WebVideos) {
-    current.WebVideos = {
-      id: null,
-      Course: { id: null, ids: [] },
-      Question: { id: null, ids: [] },
-    };
+    current.WebVideos = {};
   }
   current = current.WebVideos;
 
-  // 更新 WebVideos 的 ID
+  // 更新 WebVideos ID
   if (pathArray.length === 1) {
     current.id = folderId;
-    writePathCache(pathCache);
-    return;
   }
-
-  // 更新 Course/Question 的 ID
-  if (pathArray.length === 2) {
+  // 更新 Course/Question ID
+  else if (pathArray.length === 2) {
+    if (!current[pathArray[1]]) {
+      current[pathArray[1]] = { ids: [] };
+    }
     current[pathArray[1]].id = folderId;
-    writePathCache(pathCache);
-    return;
   }
-
-  // 更新具体课程/问题的 ID
-  if (pathArray.length === 3) {
-    const section = current[pathArray[1]];
-    const targetId = pathArray[2];
-
-    // 查找是否已存在
-    const existingIndex = section.ids.findIndex((item) => item.id === targetId);
+  // 更新具體的課程/問題ID
+  else if (pathArray.length === 3) {
+    if (!current[pathArray[1]]) {
+      current[pathArray[1]] = { ids: [] };
+    }
+    // 從 COURSE:ID 或 QUESTION:ID 中提取 ID
+    const targetId = pathArray[2].split(":")[1];
+    const existingIndex = current[pathArray[1]].ids.findIndex(
+      (item) => item.id === targetId
+    );
     if (existingIndex !== -1) {
-      // 更新现有记录
-      section.ids[existingIndex] = {
-        id: targetId,
-        path: folderId,
-        timestamp: Date.now(),
-      };
+      current[pathArray[1]].ids[existingIndex].path = folderId;
+      current[pathArray[1]].ids[existingIndex].timestamp = Date.now();
     } else {
-      // 添加新记录
-      section.ids.push({
+      current[pathArray[1]].ids.push({
         id: targetId,
         path: folderId,
         timestamp: Date.now(),
       });
     }
-
-    writePathCache(pathCache);
   }
+
+  // 寫入更新後的緩存
+  writePathCache(pathCache);
 }
 
 /**
- * 刪除路徑緩存
+ * 從緩存中刪除指定路徑
  */
 function deletePathFromCache(pathArray) {
   let current = pathCache;
 
   if (!current.WebVideos) return;
+
   current = current.WebVideos;
 
-  if (pathArray.length === 3) {
-    // 删除特定课程/问题ID
-    const section = current[pathArray[1]];
-    if (section && section.ids) {
-      const targetId = pathArray[2];
-      section.ids = section.ids.filter((item) => item.id !== targetId);
-      writePathCache(pathCache);
-    }
-  } else if (pathArray.length === 2) {
-    // 删除整个 Course/Question 的緩存
-    if (current[pathArray[1]]) {
-      current[pathArray[1]] = { id: null, ids: [] };
-      writePathCache(pathCache);
-    }
-  } else if (pathArray.length === 1) {
-    // 重置整个 WebVideos 緩存
-    pathCache.WebVideos = {
-      id: null,
-      Course: { id: null, ids: [] },
-      Question: { id: null, ids: [] },
-    };
-    writePathCache(pathCache);
+  // 刪除 WebVideos
+  if (pathArray.length === 1) {
+    delete current.id;
   }
+  // 刪除 Course/Question
+  else if (pathArray.length === 2) {
+    if (current[pathArray[1]]) {
+      delete current[pathArray[1]].id;
+    }
+  }
+  // 刪除具體的課程/問題ID
+  else if (pathArray.length === 3) {
+    if (current[pathArray[1]]) {
+      // 從 COURSE:ID 或 QUESTION:ID 中提取 ID
+      const targetId = pathArray[2].split(":")[1];
+      current[pathArray[1]].ids = current[pathArray[1]].ids.filter(
+        (item) => item.id !== targetId
+      );
+    }
+  }
+
+  // 寫入更新後的緩存
+  writePathCache(pathCache);
 }
 
 /**
@@ -621,7 +625,7 @@ async function findOrCreateWebVideosFolder(videoIndex) {
     try {
       const userId = await getUserId();
 
-      // 验证缓存的每一层文件夹
+      // 驗證緩存的每一層資料夾
       let isValid = true;
       let currentPath = [];
 
@@ -648,11 +652,11 @@ async function findOrCreateWebVideosFolder(videoIndex) {
         };
       }
 
-      // 如果验证失败，删除缓存并重新创建
-      console.warn("缓存验证失败，重新创建文件夹结构");
+      // 如果驗證失敗，刪除緩存並重新創建
+      console.warn("緩存驗證失敗，重新創建資料夾結構");
       deletePathFromCache(pathArray);
     } catch (err) {
-      console.error("验证缓存失败:", err.message);
+      console.error("驗證緩存失敗:", err.message);
       deletePathFromCache(pathArray);
     }
   }
@@ -666,7 +670,7 @@ async function findOrCreateWebVideosFolder(videoIndex) {
   let currentParentUri = null;
   let createdFolders = new Set();
 
-  // 遍歷創建文件夾結構
+  // 遍歷創建資料夾結構
   while (pathManager.targetFolders.length > 0) {
     const nextFolderName = pathManager.getNextTarget();
     const currentPath = pathArray.slice(
@@ -674,7 +678,7 @@ async function findOrCreateWebVideosFolder(videoIndex) {
       pathArray.indexOf(nextFolderName) + 1
     );
 
-    // 查找現有文件夾
+    // 查找現有資料夾
     let folder = findProjectByNameAndParent(
       projectsList,
       nextFolderName,
@@ -682,10 +686,10 @@ async function findOrCreateWebVideosFolder(videoIndex) {
     );
 
     if (!folder) {
-      // 檢查是否已在此層級創建過文件夾
+      // 檢查是否已在此層級創建過資料夾
       if (createdFolders.has(nextFolderName)) {
         throw new Error(
-          `無法找到文件夾 ${nextFolderName} 且已在此層級創建過文件夾`
+          `無法找到資料夾 ${nextFolderName} 且已在此層級創建過資料夾`
         );
       }
 
@@ -698,17 +702,17 @@ async function findOrCreateWebVideosFolder(videoIndex) {
       createdFolders.add(nextFolderName);
     }
 
-    // 验证找到的文件夹
+    // 驗證找到的資料夾
     const isValid = await verifyFolder(
       userId,
       folder.uri.split("/").pop(),
       nextFolderName
     );
     if (!isValid) {
-      throw new Error(`文件夾驗證失敗: ${nextFolderName}`);
+      throw new Error(`資料夾驗證失敗: ${nextFolderName}`);
     }
 
-    // 更新路徑信息
+    // 更新路徑資訊
     pathManager.addPath(nextFolderName, folder.uri.split("/").pop());
     currentParentUri = folder.uri;
 
@@ -758,18 +762,40 @@ async function uploadVideo(videoInfo, videoIndex) {
 
     const finalDesc = buildDescription(description, videoIndex);
 
+    // 步驟 3: 創建影片上傳任務
     const createResp = await vimeoRequest({
       method: "POST",
       path: "/me/videos",
       headers: {
         "Content-Type": "application/json",
-        Accept: "application/vnd.vimeo.*+json;version=3.4",
       },
       query: {
-        upload: { approach: "tus", size: fileSize },
+        upload: {
+          approach: "tus",
+          size: fileSize,
+        },
         name: title,
         description: finalDesc,
-        privacy: { view: "nobody" },
+        privacy: {
+          view: "disable",
+          embed: "public",
+        },
+        embed: {
+          buttons: {
+            like: false,
+            watchlater: false,
+            share: false,
+            embed: false,
+          },
+          logos: {
+            vimeo: false,
+          },
+          title: {
+            name: "hide",
+            owner: "hide",
+            portrait: "hide",
+          },
+        },
       },
     });
 
@@ -941,17 +967,17 @@ async function isFolderEmpty(userId, folderId) {
 }
 
 /**
- * 刪除空文件夾
+ * 刪除空資料夾
  */
 async function deleteEmptyFolder(userId, folderId) {
   try {
-    // 先获取文件夹信息，用于后续删除缓存
+    // 先獲取資料夾資訊，用於後續刪除緩存
     const folderInfo = await vimeoRequest({
       method: "GET",
       path: `/users/${userId}/projects/${folderId}`,
     });
 
-    // 执行删除操作
+    // 執行刪除操作
     await vimeoRequest({
       method: "DELETE",
       path: `/users/${userId}/projects/${folderId}`,
@@ -993,7 +1019,7 @@ async function deleteEmptyFolder(userId, folderId) {
 
     return true;
   } catch (err) {
-    console.error("删除文件夹失败:", err);
+    console.error("刪除資料夾失敗:", err);
     return false;
   }
 }

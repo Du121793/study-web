@@ -17,6 +17,7 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const xss = require("xss-clean");
 const hpp = require("hpp");
+const jwt = require("jsonwebtoken");
 
 // =====================
 // 載入配置和路由
@@ -135,6 +136,16 @@ const tokenCheck = (req, res, next) => {
     if (!user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
+
+    // 檢查 IP 是否匹配
+    const tokenPayload = jwt.decode(req.headers.authorization.split(" ")[1]);
+    if (tokenPayload.ip !== req.ip) {
+      return res.status(401).json({
+        message: "IP 不匹配，請重新登入",
+        code: "IP_MISMATCH",
+      });
+    }
+
     req.user = user;
     console.log("用戶認證成功 (JWT)");
     next();

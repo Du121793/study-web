@@ -1,40 +1,49 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import titleIcon from '../../public/index/board/boardTitle.svg'
-import { useUserToken } from '../../method/useUserToken'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import userService from '../../method/userService'
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
 export default function Board({ boardhasChange }) {
-  const token = useUserToken()
   const [boards, setBoards] = useState([])
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(5)
   const [totalPage, setTotalPage] = useState(0)
+  const boardEle = useRef(null)
+
+  const moveToBoardEle = () => {
+    if (boardEle) {
+      boardEle.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
   const test = () => {
     console.log(totalPage)
   }
+
   useEffect(() => {
     const data = {
       page: page,
       pageSize: pageSize,
     }
-    if (token) {
-      userService.getBoards(token, data).then((res) => {
+    if (page && pageSize) {
+      userService.getBoards(data).then((res) => {
         if (res.success) {
           setBoards(res.data.boards)
           setTotalPage(res)
         }
       })
     }
-  }, [token, boardhasChange, pageSize])
+  }, [boardhasChange, pageSize, page])
 
   return (
     <div className="board-main">
-      <div className="board-contianer">
+      <div
+        className="board-contianer"
+        ref={boardEle}>
         <div className="title">
-          <span onClick={test}>最新消息</span>
+          <span onClick={moveToBoardEle}>最新消息</span>
           <Image
             className="icon"
             src={titleIcon}
@@ -42,14 +51,6 @@ export default function Board({ boardhasChange }) {
             width={40}
             height={40}></Image>
         </div>
-        <ul className="news-types-area">
-          <li>
-            <div className="news-type active">班級公告</div>
-          </li>
-          <li>
-            <div className="news-type">教育新聞</div>
-          </li>
-        </ul>
 
         <ul className="news-link-area">
           {boards &&

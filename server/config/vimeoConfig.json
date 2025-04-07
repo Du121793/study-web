@@ -1,4 +1,5 @@
 {
+  "version": "VimeoMethodsForFree",
   "cache": {
     "expireTime": "3d",
     "projectsCacheTime": "3d"

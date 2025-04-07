@@ -329,7 +329,8 @@ router.patch("/uploadVideoStatus", async (req, res) => {
         },
         takeTo: {
           schema: "QAmessage",
-          id: foundItem._id,
+          id: commentID,
+          key: "videoURL",
         },
       });
       newSchedule.save();
@@ -402,7 +403,7 @@ router.delete("/deleteComment", async (req, res) => {
 
 /**
  * 修改留言
- * @route PATCH /patchComment
+ * @route PATCH serverIp + `/course/question/QAMethod/${qa_id}/patchComment`
  * @param {string} commentID - 要修改的留言ID
  * @param {string} [content] - 新的留言內容
  * @param {boolean} [isPrivate] - 是否設為私密留言
@@ -413,6 +414,7 @@ router.delete("/deleteComment", async (req, res) => {
  */
 router.patch("/patchComment", upload.array("image"), async (req, res) => {
   try {
+    console.log(123)
     const { commentID, content, isPrivate, isBest, rmIMG } = req.body;
     if (!commentID) {
       return res.status(400).json({ success: false, msg: "缺少 commentID" });

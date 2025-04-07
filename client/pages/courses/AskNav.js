@@ -50,9 +50,9 @@ export default function AskNav({ qaHasUpload, setQaHasUpload, course_id, courseN
   // 圖片
   const [images, setImages] = useState([])
   // 主題
-  const [theme, setTheme] = useState(['主題'])
+  const [theme, setTheme] = useState([])
   // 標籤 陣列
-  const [hints, setHints] = useState(['標籤'])
+  const [hints, setHints] = useState([])
 
   // 控制訊息
   const [message, setMessage] = useState('無訊息')
@@ -60,7 +60,7 @@ export default function AskNav({ qaHasUpload, setQaHasUpload, course_id, courseN
   const [messageColor, setMessageColor] = useState('')
 
   // 用於預覽圖片
-  const [previewUrl,  setPreviewUrl] = useState([])
+  const [previewUrl, setPreviewUrl] = useState([])
 
   // 控制訊息
   const messageControl = (info, isSuccess) => {
@@ -167,8 +167,8 @@ export default function AskNav({ qaHasUpload, setQaHasUpload, course_id, courseN
   const initInput = () => {
     setDescription('')
     setImages([])
-    setTheme(['主題']) 
-    setHints(['標籤'])
+    setTheme([])
+    setHints([])
     setPreviewUrl([])
   }
 

@@ -22,6 +22,10 @@ import EditQA from './component/EditQA'
 // public
 import anonymous from '../../public/course/anonymous.png'
 import star from '../../public/course/star.png'
+import dbArrowLeft from '../../public/profile/doubleArrowLeft.png'
+import dbArrowRight from '../../public/profile/doubleArrowRight.png'
+import ArrowLeft from '../../public/profile/leftArrow.png'
+import ArrowRight from '../../public/profile/rightArrow.png'
 
 // 用於請求後端圖片的路由
 const getImageUrl = 'http://localhost:8080/resource/questionIMG'
@@ -30,6 +34,10 @@ const getImageUrl = 'http://localhost:8080/resource/questionIMG'
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 // --------------------------------------------------------------------------
 export default function QaPage() {
+  // 請求參數
+  const [sortBy, setSortBy] = useState('asc')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(20)
   // 控制訊息
   const [message, setMessage] = useState('無訊息')
   const [messageStatus, setMessageStatus] = useState(false)
@@ -45,69 +53,35 @@ export default function QaPage() {
   const router = useRouter()
   const { qa_id, courseName, course_id } = router.query
 
-  // const userToeken = window.localStorage.getItem('token').split(' ')[1]
-  // 大部分api需要的token
   const token = useUserToken()
-
   const [userToken, setUserToeken] = useState('')
-  // 請求參數
-  const [isReplied, setIsReplied] = useState(false)
-
   // 請求取得的資料
+  const [totalPage, setTotalPage] = useState(1)
   const [isLogined, setLogined] = useState(false)
-  const [userInfo, setUserInfo] = useState(null)
   const [qaInfo, setQaInfo] = useState(null)
-
   // 獲取的留言
   const [comments, setComments] = useState([])
-
   // 子組件成功留言後刷新留言區
   const [submitSuccess, setSubmitSuccess] = useState(false)
-
   // 是否有圖片狀態
   // 之後要有多張照片狀況
   const [image, serImage] = useState([])
-
   // 控制圖片放大狀態
   const [imageIsZoom, setImageIsZoom] = useState(false)
   const [zoomImage, setZoomImage] = useState()
-
   // 控制圖片數量狀態
   const [manyImages, setManyImages] = useState(null)
-
   // 控制教師功能開啟與否
   const [teacherFunction, setTeacherFunction] = useState(false)
   const [publicComment, setPublicComment] = useState(false)
-
   // 控制編輯qa的ui
   const [showEditQAUI, setShowEditQAUI] = useState(false)
   const [hadEdit, setHadEdit] = useState(false)
-
+  // 從session存取userinfo
   const [userRole, setUserRole] = useState(null)
   const [userId, setUserId] = useState(null)
-
-  useEffect(() => {
-    if (!sessionStorage.getItem('user_role') || !sessionStorage.getItem('user_id')) {
-      userService.getUserInfo(token).then((res) => {
-        sessionStorage.setItem('user_lineID', res.data.lineID)
-        sessionStorage.setItem('user_id', res.data._id)
-        sessionStorage.setItem('user_line_shot', res.data.userinfo.pictureUrl)
-        sessionStorage.setItem('user_role', res.data.role)
-      })
-    }
-    if (sessionStorage.getItem('user_role')) {
-      const user_role = sessionStorage.getItem('user_role')
-      if (user_role) {
-        setUserRole(user_role)
-      }
-    }
-    if (sessionStorage.getItem('user_id')) {
-      const user_id = sessionStorage.getItem('user_role')
-      if (user_id) {
-        setUserId(user_id)
-      }
-    }
-  }, [])
+  // 控制留言區的刷新
+  const [commentHasChange, setCommentHasChange] = useState(false)
 
   // 控制訊息
   const messageControl = (info, isSuccess) => {
@@ -171,16 +145,14 @@ export default function QaPage() {
   // 請求修改問題設定
   const submitTeacherSetting = (pulic, isReplied) => {
     if (qaInfo) {
-      adminService
-        .commentPublicSetting(token, qaInfo.courses, qaInfo._id, pulic, isReplied)
-        .then((res) => {
-          if (res.success) {
-            initQaInfo()
-            messageControl('修改成功', true)
-          } else {
-            messageControl('發生錯誤，修改失敗', false)
-          }
-        })
+      adminService.commentPublicSetting(token, qaInfo.courses, qaInfo._id, pulic, isReplied).then((res) => {
+        if (res.success) {
+          initQaInfo()
+          messageControl('修改成功', true)
+        } else {
+          messageControl('發生錯誤，修改失敗', false)
+        }
+      })
     }
   }
 
@@ -196,19 +168,62 @@ export default function QaPage() {
     )
   }
 
+  // 參數:總頁數，中間頁數，從中間往左右總共要幾頁
+  function getPage(total, thisPage, pageSize = 5) {
+    if (total <= 0 || thisPage <= 0 || thisPage > total) {
+      return []
+    }
+
+    let page = []
+    if (total <= pageSize) {
+      for (let i = 0; i < total; i++) {
+        page.push(i + 1)
+      }
+      return page
+    }
+
+    const leftSize = Math.floor((pageSize - 1) / 2)
+    const rightSize = pageSize - 1 - leftSize
+
+    let start = Math.max(1, thisPage - leftSize)
+    let end = Math.min(total, thisPage + rightSize)
+
+    if (start === 1) {
+      end = Math.min(total, pageSize)
+      start = 1
+    } else if (end === total) {
+      start = Math.max(1, total - pageSize + 1)
+      end = total
+    }
+
+    for (let i = start; i <= end; i++) {
+      page.push(i)
+    }
+
+    return page
+  }
+
+  const setCommentBest = (commentId) => {
+    let data = {
+      commentID: commentId,
+      isBest: true,
+    }
+    if (commentId) {
+      adminService.setCommentBest(token, data, qa_id).then((res) => {
+        if (res.success) {
+          setCommentHasChange(!commentHasChange)
+        } else {
+          messageControl('發生錯誤', false)
+        }
+      })
+    }
+  }
+
   // 請求
-  // 1. 使用者資料
-  // 2. QA的資料
-  // 3. QA的留言區
+  // 1. QA的資料
+  // 2. QA的留言區
   useEffect(() => {
     if (token && qa_id) {
-      userService
-        .getUserInfo(token)
-        .then((res) => {
-          setUserInfo(res.data)
-          setLogined(true)
-        })
-        .catch((err) => console.log(err))
       userService
         .getQaInfo(token, qa_id)
         .then((res) => {
@@ -222,6 +237,7 @@ export default function QaPage() {
       userService
         .getQaComment(token, qa_id)
         .then((res) => {
+          setTotalPage(res.pagination.totalPages)
           setComments(res.data)
         })
         .catch((err) => {
@@ -233,20 +249,63 @@ export default function QaPage() {
     }
   }, [token, qa_id, hadEdit])
 
-  // 子組件留言成功後，重新請求QA的留言資料
   useEffect(() => {
     if (token && qa_id) {
       userService
         .getQaComment(token, qa_id)
         .then((res) => {
+          setTotalPage(res.pagination.totalPages)
           setComments(res.data)
         })
         .catch((err) => {
           console.error(err)
         })
     }
-  }, [submitSuccess, token, qa_id])
+  }, [commentHasChange])
+  // 子組件留言成功後，重新請求QA的留言資料
+  useEffect(() => {
+    if (token && qa_id) {
+      let data = {
+        sortOrder: sortBy,
+        page: page,
+        pageSize: pageSize,
+      }
+      userService
+        .getQaComment(token, qa_id, data)
+        .then((res) => {
+          setTotalPage(res.pagination.totalPages)
+          setComments(res.data)
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+    }
+  }, [submitSuccess, token, qa_id, sortBy, page])
 
+  // session
+  useEffect(() => {
+    if (!sessionStorage.getItem('user_role') || !sessionStorage.getItem('user_id')) {
+      userService.getUserInfo(token).then((res) => {
+        sessionStorage.setItem('user_lineID', res.data.lineID)
+        sessionStorage.setItem('user_id', res.data._id)
+        sessionStorage.setItem('user_line_shot', res.data.userinfo.pictureUrl)
+        sessionStorage.setItem('user_role', res.data.role)
+      })
+    }
+    if (sessionStorage.getItem('user_role')) {
+      setLogined(true)
+      const user_role = sessionStorage.getItem('user_role')
+      if (user_role) {
+        setUserRole(user_role)
+      }
+    }
+    if (sessionStorage.getItem('user_id')) {
+      const user_id = sessionStorage.getItem('user_role')
+      if (user_id) {
+        setUserId(user_id)
+      }
+    }
+  }, [])
   return (
     <div className="qaPage-main">
       <div
@@ -285,6 +344,7 @@ export default function QaPage() {
           className="title"
           onClick={test}>
           {courseName}
+          <div className="hint">{course_id}</div>
         </div>
       </div>
 
@@ -364,6 +424,16 @@ export default function QaPage() {
       {/* 留言區 */}
       <div className="qaPage-container">
         <div className="title">留言區</div>
+        <div className="sort-by-area">
+          <div className="content">排序依據</div>
+          <select
+            onChange={(e) => {
+              setSortBy(e.target.value)
+            }}>
+            <option value="asc">正序</option>
+            <option value="desc">倒序</option>
+          </select>
+        </div>
         {/* 留言區域 */}
         {comments &&
           comments.map((item, index) => (
@@ -395,15 +465,27 @@ export default function QaPage() {
                       <div className="content">置頂</div>
                     </div>
                   )}
-                  {(item.poster._id === userId || userRole === 'teacher' || userRole === 'admin') && (
-                    <div
-                      onClick={() => {
-                        deleteComment(item._id)
-                      }}
-                      className="delete-comment">
-                      刪除留言
-                    </div>
-                  )}
+                  <div className="function-btn-area">
+                    {(userRole === 'teacher' || userRole === 'admin') && item?.isBest !== true && (
+                      <div
+                        onClick={() => {
+                          console.log(item)
+                          setCommentBest(item._id)
+                        }}
+                        className="set-best-comment-btn">
+                        設為置頂
+                      </div>
+                    )}
+                    {(item.poster._id === userId || userRole === 'teacher' || userRole === 'admin') && (
+                      <div
+                        onClick={() => {
+                          deleteComment(item._id)
+                        }}
+                        className="delete-comment">
+                        刪除留言
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div className="message-middle">{item.content}</div>
                 <div className="message-bottom">
@@ -439,6 +521,74 @@ export default function QaPage() {
               </div>
             </div>
           ))}
+        <div className="page-switch">
+          <Image
+            alt="switch back to first page icon"
+            src={dbArrowLeft}
+            className="page-switcher"
+            width={24}
+            height={24}
+            onClick={() => {
+              setPage(1)
+            }}></Image>
+          <Image
+            alt="switch back one page icon"
+            src={ArrowLeft}
+            className="page-switcher"
+            width={24}
+            height={24}
+            onClick={() => {
+              if (page === 1) {
+                return
+              } else {
+                setPage((prop) => prop - 1)
+              }
+            }}></Image>
+          {getPage(totalPage, page).map((item, index) => {
+            if (page === item) {
+              return (
+                <div
+                  key={index}
+                  className="now-page active">
+                  {item}
+                </div>
+              )
+            }
+            return (
+              <div
+                onClick={() => {
+                  setPage(item)
+                }}
+                key={index}
+                className="now-page">
+                {item}
+              </div>
+            )
+          })}
+          <Image
+            alt="switch next to left page icon"
+            src={ArrowRight}
+            className="page-switcher"
+            width={24}
+            height={24}
+            onClick={() => {
+              console.log(totalPage)
+              if (page === totalPage) {
+                return
+              } else {
+                setPage((prop) => prop + 1)
+              }
+            }}></Image>
+          <Image
+            alt="switch next one page icon"
+            src={dbArrowRight}
+            className="page-switcher"
+            width={24}
+            height={24}
+            onClick={() => {
+              setPage(totalPage)
+            }}></Image>
+        </div>
       </div>
     </div>
   )

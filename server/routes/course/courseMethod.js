@@ -48,7 +48,6 @@ async function processThumbnailImage(file, videoId) {
     });
   });
 }
-
 /**
  * 獲取課程成員列表
  * @route GET /members

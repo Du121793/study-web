@@ -37,6 +37,12 @@ const QASchema = new Schema({
     type: [String],
     default: [],
   },
+  folders: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Folder",
+    },
+  ],
   poster: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   lastUpdate: {
     type: Date,
@@ -137,6 +143,98 @@ QASchema.pre("deleteMany", async function (next) {
     for (const doc of docs) {
       await removeQuestionFolder(doc);
       await QAmessage.deleteMany({ pointTo: doc._id });
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 檢查是否需要刪除問題的鉤子 (update 和 updateMany)
+QASchema.pre("update", async function (next) {
+  try {
+    const update = this.getUpdate();
+    if (update.$set) {
+      const { isPublic, courses, folders } = update.$set;
+      if (isPublic || courses || folders) {
+        const docs = await this.model.find(this.getQuery());
+        for (const doc of docs) {
+          const shouldDeletePublic =
+            doc.isPublic === true &&
+            (!courses || courses.length === 0) &&
+            (!folders || folders.length === 0);
+
+          const shouldDeletePrivate =
+            doc.isPublic === false && (!courses || courses.length === 0);
+
+          if (shouldDeletePublic || shouldDeletePrivate) {
+            await mongoose.model("QA").findOneAndDelete({ _id: doc._id });
+          }
+        }
+      }
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+QASchema.pre("updateMany", async function (next) {
+  try {
+    const update = this.getUpdate();
+    if (update.$set) {
+      const { isPublic, courses, folders } = update.$set;
+      if (isPublic || courses || folders) {
+        const docs = await this.model.find(this.getQuery());
+        for (const doc of docs) {
+          const shouldDeletePublic =
+            doc.isPublic === true &&
+            (!courses || courses.length === 0) &&
+            (!folders || folders.length === 0);
+
+          const shouldDeletePrivate =
+            doc.isPublic === false && (!courses || courses.length === 0);
+
+          if (shouldDeletePublic || shouldDeletePrivate) {
+            await mongoose.model("QA").findOneAndDelete({ _id: doc._id });
+          }
+        }
+      }
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 檢查是否需要刪除問題的鉤子 (save)
+QASchema.pre("save", async function (next) {
+  try {
+    if (this.isPublic === false && this.folders.length !== 0) {
+      this.folders = [];
+      await this.save();
+    }
+    if (
+      this.isModified("isPublic") ||
+      this.isModified("courses") ||
+      this.isModified("folders")
+    ) {
+      if (
+        this.isPublic &&
+        this.courses.length === 0 &&
+        (!this.folders || this.folders.length === 0)
+      ) {
+        await mongoose.model("QA").findOneAndDelete({ _id: this._id });
+        return next(
+          new Error("由於QA已經設定為公開，且沒有任何課程或資料夾，因此被刪除")
+        );
+      }
+      if (!this.public && this.courses.length === 0) {
+        await mongoose.model("QA").findOneAndDelete({ _id: this._id });
+        return next(
+          new Error("由於QA已經設定為非公開，且沒有任何課程，因此被刪除")
+        );
+      }
     }
     next();
   } catch (error) {

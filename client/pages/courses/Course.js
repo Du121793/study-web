@@ -82,7 +82,10 @@ export default function Course() {
       <Header loginState={isLogined} />
       <div className="container">
         <div className="header-title-area">
-          <div className="course-title">{courseName}</div>
+          <div className="course-title">
+            {courseName}
+            <div className="hint">{courseId}</div>
+          </div>
           <Link
             className="back-to-course-btn"
             href={backToMyCoursePageUrl}>

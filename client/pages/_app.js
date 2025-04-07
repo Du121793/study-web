@@ -13,17 +13,18 @@ import '../styles/index/board.css'
 import '../styles/index/boardPage.css'
 import '../styles/index/uploadBoardUI.css'
 // profile
-import '../styles/profile/teacher/memberSelector.css'
-import '../styles/profile/teacher/teacherLayout.css'
-import '../styles/profile/teacher/uploadCarousel.css'
-// 通用功能
-import '../styles/profile/teacher/myCourse.css'
-import '../styles/profile/teacher/userProfile.css'
-// 教師功能
+import '../styles/profile/teacherLayout.css'
+// profile/admin
+import '../styles/profile/admin/removeUsers.css'
+import '../styles/profile/admin/preRegister.css'
+// profile/teacher
 import '../styles/profile/teacher/editCourse.css'
 import '../styles/profile/teacher/editMembers.css'
-// 管理員功能
-import '../styles/profile/admin/removeUsers.css'
+import '../styles/profile/teacher/memberSelector.css'
+import '../styles/profile/teacher/uploadCarousel.css'
+// profile/public
+import '../styles/profile/public/myCourse.css'
+import '../styles/profile/public/UserProfile.css'
 // course
 import '../styles/course/course.css'
 import '../styles/course/videoUpload.css'
@@ -38,11 +39,11 @@ import '../styles/course/videoSelector.css'
 // course/component
 import '../styles/course/component/editVideoInfo.css'
 import '../styles/component/QA/editQA.css'
+import '../styles/course/component/uploadOldVimeoVDO.css'
 // videoPlay
 import '../styles/videoPlay/player.css'
 //method的layout
 import '../styles/method/completeInfo.css'
-import '../styles/profile/teacher/preRegister.css'
 
 function MyApp({ Component, pageProps }) {
   return <Component {...pageProps} />

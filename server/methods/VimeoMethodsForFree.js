@@ -44,22 +44,25 @@ function vimeoRequest(options) {
 }
 
 /**
- * 查找或創建 WebVideos 資料夾
+ * 查找或創建指定名稱的資料夾
+ * @param {string} folderName - 資料夾名稱
  * @returns {Promise<{userId: string, folderId: string}>} 用戶 ID 和資料夾 ID
  */
-async function findOrCreateWebVideosFolder() {
+async function findOrCreateFolder(folderName) {
   // 獲取當前用戶資訊
   const meResp = await vimeoRequest({ method: "GET", path: "/me" });
   const me = meResp.data;
   const userId = me.uri.split("/").pop(); // 從 URI 中提取用戶 ID
 
-  // 查詢現有資料夾
+  // 查詢所有資料夾
   const searchResp = await vimeoRequest({
     method: "GET",
     path: "/me/projects",
-    query: { per_page: 50, query: "WebVideos" },
+    query: { per_page: 100 }, // 增加每頁數量以確保能找到所有資料夾
   });
-  let found = searchResp.data.data.find((p) => p.name === "WebVideos");
+
+  // 精確匹配資料夾名稱
+  let found = searchResp.data.data.find((p) => p.name === folderName);
 
   // 如果資料夾不存在，則創建新資料夾
   if (!found) {
@@ -67,7 +70,7 @@ async function findOrCreateWebVideosFolder() {
       method: "POST",
       path: "/me/projects",
       query: {
-        name: "WebVideos",
+        name: folderName,
       },
     });
     found = found.data;
@@ -76,6 +79,36 @@ async function findOrCreateWebVideosFolder() {
   // 從 URI 中提取資料夾 ID
   const folderId = found.uri.split("/").pop();
   return { userId, folderId };
+}
+
+/**
+ * 根據影片索引資訊決定使用哪個資料夾
+ * @param {Object} videoIndex - 影片索引資訊
+ * @returns {Promise<{userId: string, folderId: string}>} 用戶 ID 和資料夾 ID
+ */
+async function findOrCreateWebVideosFolder(videoIndex) {
+  // 將所有鍵名轉換成大寫
+  const upperCaseIndex = Object.fromEntries(
+    Object.entries(videoIndex).map(([key, value]) => [key.toUpperCase(), value])
+  );
+
+  // 檢查是否有 COURSEID 或 QUESTIONID
+  const courseId = upperCaseIndex.COURSEID;
+  const questionId = upperCaseIndex.QUESTIONID;
+
+  if (!courseId && !questionId) {
+    throw new Error("必須提供 COURSEID 或 QUESTIONID");
+  }
+
+  // 決定資料夾名稱
+  let folderName;
+  if (courseId) {
+    folderName = "Course";
+  } else if (questionId) {
+    folderName = "Question";
+  }
+
+  return await findOrCreateFolder(folderName);
 }
 
 /**
@@ -96,6 +129,52 @@ function buildDescription(originalDesc, data) {
 }
 
 /**
+ * 處理網域字串，提取所有可能的網域格式
+ * @param {string} url - 原始 URL
+ * @returns {string[]} 處理後的網域列表
+ */
+function extractDomains(url) {
+  try {
+    // 移除 http:// 或 https://
+    const domainWithPort = url.replace(/^https?:\/\//, "");
+
+    // 分離網域和端口
+    const [domain, port] = domainWithPort.split(":");
+
+    if (port) {
+      // 如果有端口，返回兩種格式
+      return [domainWithPort, domain];
+    } else {
+      // 如果沒有端口，只返回網域
+      return [domain];
+    }
+  } catch (err) {
+    console.error("網域處理錯誤:", err);
+    return [];
+  }
+}
+
+/**
+ * 獲取允許的網域列表
+ * @returns {string[]} 允許的網域列表
+ */
+function getAllowedDomains() {
+  const domains = new Set(["localhost"]); // 預設允許 localhost
+
+  // 從環境變數獲取 URL
+  const urls = [process.env.CLIENT_IP, process.env.SERVER_IP].filter(Boolean); // 過濾掉 undefined 或空值
+
+  // 處理每個 URL
+  urls.forEach((url) => {
+    if (url) {
+      const extractedDomains = extractDomains(url);
+      extractedDomains.forEach((domain) => domains.add(domain));
+    }
+  });
+  return Array.from(domains);
+}
+
+/**
  * 上傳影片到 Vimeo
  * @param {Object} videoInfo - 影片資訊
  * @param {string} videoInfo.title - 影片標題
@@ -109,13 +188,12 @@ async function uploadVideo(videoInfo, videoIndex) {
   const { title, fileSize, description = "", type } = videoInfo;
   try {
     // 驗證檔案大小
-    console.log(fileSize);
     if (!fileSize || isNaN(fileSize)) {
       throw new Error("fileSize錯誤");
     }
 
     // 步驟 1: 找到或創建 WebVideos 資料夾
-    const { userId, folderId } = await findOrCreateWebVideosFolder();
+    const { userId, folderId } = await findOrCreateWebVideosFolder(videoIndex);
 
     // 步驟 2: 合併描述資訊
     const finalDesc = buildDescription(description, videoIndex);
@@ -135,7 +213,24 @@ async function uploadVideo(videoInfo, videoIndex) {
         name: title,
         description: finalDesc,
         privacy: {
-          view: "nobody", // 設定為私密影片
+          view: "disable",
+          embed: "public",
+        },
+        embed: {
+          buttons: {
+            like: false,
+            watchlater: false,
+            share: false,
+            embed: false,
+          },
+          logos: {
+            vimeo: false,
+          },
+          title: {
+            name: "hide",
+            owner: "hide",
+            portrait: "hide",
+          },
         },
       },
     });
@@ -151,7 +246,7 @@ async function uploadVideo(videoInfo, videoIndex) {
       method: "PUT",
       path: `/users/${userId}/projects/${folderId}/videos/${videoId}`,
     });
-    console.log(addFolderResp.APILimit);
+
     // 返回上傳結果
     return {
       success: true,
@@ -194,29 +289,10 @@ async function findVideo(videoIndex = {}) {
       return { success: true, total: 0, data: [], APILimit: {} };
     }
 
-    // 步驟 1: 獲取用戶資訊
-    const meResp = await vimeoRequest({ method: "GET", path: "/me" });
-    const me = meResp.data;
-    const userId = me.uri.split("/").pop();
+    // 步驟 1: 獲取用戶資訊和對應資料夾
+    const { userId, folderId } = await findOrCreateWebVideosFolder(videoIndex);
 
-    // 步驟 2: 查找 WebVideos 資料夾
-    const folderResp = await vimeoRequest({
-      method: "GET",
-      path: "/me/projects",
-      query: { per_page: 50, query: "WebVideos" },
-    });
-    let folder = folderResp.data.data.find((p) => p.name === "WebVideos");
-    if (!folder) {
-      return {
-        success: true,
-        total: 0,
-        data: [],
-        APILimit: folderResp.APILimit,
-      };
-    }
-    const folderId = folder.uri.split("/").pop();
-
-    // 步驟 3: 分頁獲取所有影片
+    // 步驟 2: 分頁獲取所有影片
     let allVideos = [];
     let page = 1;
     let perPage = 100;
@@ -238,7 +314,7 @@ async function findVideo(videoIndex = {}) {
       page++;
     }
 
-    // 步驟 4: 根據描述篩選影片
+    // 步驟 3: 根據描述篩選影片
     function matchDescription(videoDesc, conditions) {
       for (const [key, value] of Object.entries(conditions)) {
         if (value) {
@@ -253,7 +329,6 @@ async function findVideo(videoIndex = {}) {
     const filtered = allVideos.filter((video) =>
       matchDescription(video.description || "", videoIndex)
     );
-    console.log(lastAPILimit);
 
     // 返回查詢結果
     return {
@@ -292,29 +367,10 @@ async function deleteVideo(videoIndex) {
       return { success: true, total: 0, data: [], APILimit: {} };
     }
 
-    // 步驟 1: 獲取用戶資訊
-    const meResp = await vimeoRequest({ method: "GET", path: "/me" });
-    const me = meResp.data;
-    const userId = me.uri.split("/").pop();
+    // 步驟 1: 獲取用戶資訊和對應資料夾
+    const { userId, folderId } = await findOrCreateWebVideosFolder(videoIndex);
 
-    // 步驟 2: 查找 WebVideos 資料夾
-    const folderResp = await vimeoRequest({
-      method: "GET",
-      path: "/me/projects",
-      query: { per_page: 50, query: "WebVideos" },
-    });
-    let folder = folderResp.data.data.find((p) => p.name === "WebVideos");
-    if (!folder) {
-      return {
-        success: true,
-        total: 0,
-        data: [],
-        APILimit: folderResp.APILimit,
-      };
-    }
-    const folderId = folder.uri.split("/").pop();
-
-    // 步驟 3: 分頁獲取所有影片
+    // 步驟 2: 分頁獲取所有影片
     let allVideos = [];
     let page = 1;
     let perPage = 100;
@@ -336,7 +392,7 @@ async function deleteVideo(videoIndex) {
       page++;
     }
 
-    // 步驟 4: 根據描述篩選影片
+    // 步驟 3: 根據描述篩選影片
     function matchDescription(videoDesc, conditions) {
       for (const [key, value] of Object.entries(conditions)) {
         if (value) {
@@ -350,7 +406,7 @@ async function deleteVideo(videoIndex) {
       matchDescription(video.description || "", videoIndex)
     );
 
-    // 步驟 5: 刪除符合條件的影片
+    // 步驟 4: 刪除符合條件的影片
     let lastDeleteAPILimit = {};
     for (const vid of filtered) {
       const deleteResp = await vimeoRequest({

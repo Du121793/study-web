@@ -11,14 +11,19 @@ const path = require("path");
 const fs = require("fs");
 const mongoose = require("mongoose");
 const QA = require("../../../models").QA;
+const Folder = require("../../../models").folder;
 const compressImageBuffer =
   require("../../../methods/imageCompresser").compressImageBuffer;
 const accessChecker = require("../../routesMiddleware/accessChecker");
 const multer = require("multer");
 const { QAmessage } = require("../../../models");
+const publicFolderRouter = require("./publicFolder");
 
 // 設定 multer：指定欄位名稱 "image"，最多上傳 10 張圖片
 const upload = multer().fields([{ name: "image", maxCount: 10 }]);
+
+// 引入 publicFolder 路由
+router.use("/folder", publicFolderRouter);
 
 /* -------------------------------
    共用工具函數
@@ -216,6 +221,7 @@ router.post("/postQuestion", upload, async (req, res) => {
     let {
       course_ids,
       isPublic = false,
+      folders,
       description,
       resourceCategories = ["無特定主題"],
       hints = ["無特定知識點"],
@@ -257,6 +263,16 @@ router.post("/postQuestion", upload, async (req, res) => {
       return res
         .status(400)
         .json({ success: false, msg: "必須提供上傳課程ID" });
+    }
+
+    if (isPublic == false) {
+      folders = [];
+    }
+
+    if (isPublic===true && folders.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "設為公開，必須提供資料夾陣列" });
     }
 
     // 處理圖片上傳
@@ -324,6 +340,7 @@ router.patch(
         hints,
         rmIMG,
         replied,
+        folders,
       } = req.body;
 
       // 驗證問題ID
@@ -387,7 +404,12 @@ router.patch(
         oldQA.resourceCategories = resourceCategories;
       if (hints !== undefined) oldQA.hints = hints;
       if (replied !== undefined) oldQA.replied = replied;
-
+      if (
+        folders !== undefined &&
+        (isPublic === true ||
+          (isPublic !== undefined && oldQA.isPublic === true))
+      )
+        oldQA.folders = folders;
       // 保存更新
       const savedQA = await oldQA.save();
       return res.json({
@@ -424,11 +446,11 @@ router.delete(
       // 刪除相關留言
       const comments = await QAmessage.find({ pointTo: question_id });
       for (const comment of comments) {
-        await QAmessage.findByIdAndDelete(comment._id);
+        await QAmessage.findOneAndDelete({ _id: comment._id });
       }
 
       // 刪除問題（圖片資料夾會由 hook 自動處理）
-      await QA.findByIdAndDelete(question_id);
+      await QA.findOneAndDelete({ _id: question_id });
 
       return res.json({ success: true, msg: "問題刪除成功" });
     } catch (error) {

@@ -200,10 +200,18 @@ async function processGetSchedule() {
           console.error("找不到目標模型：", targetSchema);
           continue;
         }
-        await targetModel.findByIdAndUpdate(targetId, {
-          [targetKey]: videoData.player_embed_url,
-          isUploadSuccess: true,
-        });
+        // 如果是 QAmessage schema，使用 $push 操作符
+        if (targetSchema === "QAmessage") {
+          await targetModel.findByIdAndUpdate(targetId, {
+            $push: { videoURL: videoData.player_embed_url },
+            isUploadSuccess: true,
+          });
+        } else {
+          await targetModel.findByIdAndUpdate(targetId, {
+            [targetKey]: videoData.player_embed_url,
+            isUploadSuccess: true,
+          });
+        }
         await vimeoSchedule.findByIdAndDelete(schedule._id);
         console.log(`GET 排程：成功處理並刪除 _id: ${schedule._id}`);
       }

@@ -15,6 +15,16 @@
       font-size: 28px;
       padding: 6px 16px 6px 16px;
       background-color: #fff;
+      position: relative;
+      align-items: flex-end;
+      .hint {
+        display: flex;
+        align-items: center;
+        position: absolute;
+        left: calc(100% + 24px);
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.2);
+      }
     }
     .back-btn {
       position: absolute;
@@ -177,10 +187,10 @@
         cursor: pointer;
         color: rgb(111, 111, 111);
       }
-      .edit-btn{
+      .edit-btn {
         margin-right: 24px;
       }
-      .submit{
+      .submit {
         cursor: auto;
       }
     }
@@ -204,6 +214,13 @@
     background-color: #fff;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    .sort-by-area {
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      width: 80%;
+    }
     .title {
       display: flex;
       justify-content: center;
@@ -239,7 +256,7 @@
           display: flex;
           align-items: flex-end;
           gap: 6px;
-          .isBest{
+          .isBest {
             display: flex;
             align-items: center;
             gap: 4px;
@@ -253,11 +270,32 @@
             font-weight: bold;
             font-size: 18px;
           }
-          .delete-comment {
-            cursor: pointer;
-            font-weight: bold;
-            color: rgb(148, 0, 0);
-            font-size: 14px;
+          .function-btn-area {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+
+            .delete-comment {
+              cursor: pointer;
+              font-weight: bold;
+              color: rgb(34, 34, 34);
+              transition: .2s;
+              font-size: 14px;
+            }
+            .delete-comment:hover{
+              color: rgb(148, 0, 0);
+
+            }
+            .set-best-comment-btn {
+              cursor: pointer;
+              font-weight: bold;
+              color: rgb(34, 34, 34);
+              transition: .2s;
+              font-size: 14px;
+            }
+            .set-best-comment-btn:hover {
+              color: rgb(222, 70, 0);
+            }
           }
         }
         .message-middle {
