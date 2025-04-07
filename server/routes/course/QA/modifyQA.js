@@ -107,104 +107,6 @@ async function saveUploadedImages(
 }
 
 /**
- * 獲取問題列表
- * @route GET /getQuestion
- * @param {number} [page=1] - 頁碼
- * @param {number} [pageSize=10] - 每頁筆數
- * @param {string} [sortBy="lastUpdate"] - 排序欄位，"createDate"或"lastUpdate"
- * @param {string} [sortOrder="asc"] - 排序方向，"asc"為升序，"desc"為降序
- * @param {string} [sortType="resourceCategories"] - 分群依據，"resourceCategories"或"hints"
- * @returns {Object} 按標籤分組的問題列表及分頁資訊
- */
-router.get("/getQuestion", async (req, res) => {
-  try {
-    // 解析查詢參數，設置默認值
-    const page = parseInt(req.query.page, 10) || 1;
-    const pageSize = parseInt(req.query.pageSize, 10) || 10;
-    const sortByParam = req.query.sortBy || "lastUpdate";
-    const sortOrder = req.query.sortOrder || "asc";
-    const sortType = req.query.sortType || "resourceCategories";
-
-    // 設置排序欄位和方向
-    const sortField = sortByParam === "createDate" ? "date" : "lastUpdate";
-    const sortDirection = sortOrder === "asc" ? 1 : -1;
-
-    // 構建聚合管道
-    const pipeline = [
-      // 添加排序欄位
-      {
-        $addFields: {
-          sortField: `$${sortField}`,
-        },
-      },
-      // 展開標籤陣列
-      {
-        $unwind: `$${sortType}`,
-      },
-      // 按排序欄位排序
-      {
-        $sort: { sortField: sortDirection },
-      },
-      // 按標籤分組
-      {
-        $group: {
-          _id: `$${sortType}`,
-          docs: { $push: "$$ROOT" },
-          representative: { $first: "$sortField" },
-        },
-      },
-      // 限制每組文檔數量
-      {
-        $addFields: {
-          docs: { $slice: ["$docs", 3] },
-        },
-      },
-      // 按代表值排序
-      {
-        $sort: { representative: sortDirection },
-      },
-      // 分頁處理
-      {
-        $skip: (page - 1) * pageSize,
-      },
-      {
-        $limit: pageSize,
-      },
-    ];
-
-    // 執行聚合查詢
-    const groups = await QA.aggregate(pipeline);
-
-    // 處理圖片URL
-    const transformedGroups = groups.map((group) => {
-      const tag = group._id;
-      const docs = group.docs.map((doc) => {
-        if (Array.isArray(doc.image)) {
-          doc.image = doc.image.map((relPath) => {
-            return `${process.env.SERVER_IP}/resource/questionIMG/${relPath}`;
-          });
-        }
-        return doc;
-      });
-      return { tag, docs };
-    });
-
-    return res.json({
-      success: true,
-      data: transformedGroups,
-      page,
-      pageSize,
-      sortBy: sortByParam,
-      sortOrder,
-      sortType,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ success: false, msg: "取得資源時發生錯誤" });
-  }
-});
-
-/**
  * 創建新問題
  * @route POST /postQuestion
  * @param {string[]} course_ids - 課程ID陣列
@@ -265,11 +167,11 @@ router.post("/postQuestion", upload, async (req, res) => {
         .json({ success: false, msg: "必須提供上傳課程ID" });
     }
 
-    if (isPublic == false) {
+    if (isPublic == false || !folders) {
       folders = [];
     }
 
-    if (isPublic===true && folders.length === 0) {
+    if (isPublic && folders.length === 0) {
       return res
         .status(400)
         .json({ success: false, msg: "設為公開，必須提供資料夾陣列" });

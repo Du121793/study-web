@@ -86,98 +86,128 @@ router.get("/getPublicQAs", checkTeacherAccess, async (req, res) => {
  * @param {number} [pageSize=10] - 每頁筆數
  * @param {string} [sortBy="lastUpdate"] - 排序欄位，"createDate"或"lastUpdate"
  * @param {string} [sortOrder="asc"] - 排序方向，"asc"為升序，"desc"為降序
- * @param {string} [sortType="resourceCategories"] - 分群依據，"resourceCategories"或"hints"
+ * @param {string} [sortType="resourceCategories"] - 分群依據，"resourceCategories"、"hints"或"none"
  * @returns {Object} 按標籤分組的課程問題列表及分頁資訊
  */
 router.get("/getCourseQAs/:course_id", async (req, res) => {
   try {
-    // 取得查詢參數，並設定預設值
+    // 解析查詢參數，設置默認值
     const page = parseInt(req.query.page, 10) || 1;
     const pageSize = parseInt(req.query.pageSize, 10) || 10;
-    const sortBy = req.query.sortBy || "lastUpdate"; // 若為 "createDate"，則依據 date 欄位排序
-    const sortOrder = req.query.sortOrder || "asc"; // "asc" 或 "desc"
-    const sortType = req.query.sortType || "resourceCategories"; // 可選 "resourceCategories" 或 "hints"
-    // 決定排序欄位與方向
-    const sortField = sortBy === "createDate" ? "date" : "lastUpdate";
+    const sortByParam = req.query.sortBy || "lastUpdate";
+    const sortOrder = req.query.sortOrder || "asc";
+    const sortType = req.query.sortType || "resourceCategories";
+
+    // 設置排序欄位和方向
+    const sortField = sortByParam === "createDate" ? "date" : "lastUpdate";
     const sortDirection = sortOrder === "asc" ? 1 : -1;
 
-    // 先查詢出該課程所有 QA，並依據指定欄位排序
-    const qas = await QA.find(
-      { courses: req.params.course_id },
-      "_id image description resourceCategories hints replied date lastUpdate"
-    ).sort({ [sortField]: sortDirection });
+    // 如果 sortType 為 none，直接返回分頁後的問題列表
+    if (sortType === "none") {
+      const questions = await QA.find({ courses: req.params.course_id })
+        .sort({ [sortField]: sortDirection })
+        .skip((page - 1) * pageSize)
+        .limit(pageSize);
 
-    // 將 QA 文件轉換成 JS 物件，並處理 image 欄位加上伺服器前綴
-    const transformedQAs = qas.map((qa) => {
-      const qaObj = qa.toObject();
-      if (Array.isArray(qaObj.image)) {
-        qaObj.image = qaObj.image.map(
-          (relPath) =>
-            `${process.env.SERVER_IP}/resource/questionIMG/${relPath}`
-        );
-      }
-      return qaObj;
-    });
-
-    // 依據 sortType（resourceCategories 或 hints）進行分群
-    // 注意：此欄位皆為陣列，所以一筆 QA 可能屬於多個群組
-    const groups = {}; // key: 標籤, value: 陣列（包含屬於該標籤的 QA）
-    transformedQAs.forEach((qa) => {
-      const tags = qa[sortType] || [];
-      tags.forEach((tag) => {
-        if (!groups[tag]) {
-          groups[tag] = [];
+      // 處理圖片URL
+      const transformedQuestions = questions.map((doc) => {
+        if (Array.isArray(doc.image)) {
+          doc.image = doc.image.map((relPath) => {
+            return `${process.env.SERVER_IP}/resource/questionIMG/${relPath}`;
+          });
         }
-        groups[tag].push(qa);
+        return doc;
       });
+
+      return res.json({
+        success: true,
+        data: transformedQuestions,
+        page,
+        pageSize,
+        sortBy: sortByParam,
+        sortOrder,
+        sortType,
+      });
+    }
+
+    // 構建聚合管道
+    const pipeline = [
+      // 添加課程過濾條件
+      {
+        $match: {
+          courses: req.params.course_id,
+        },
+      },
+      // 添加排序欄位
+      {
+        $addFields: {
+          sortField: `$${sortField}`,
+        },
+      },
+      // 展開標籤陣列
+      {
+        $unwind: `$${sortType}`,
+      },
+      // 按排序欄位排序
+      {
+        $sort: { sortField: sortDirection },
+      },
+      // 按標籤分組
+      {
+        $group: {
+          _id: `$${sortType}`,
+          docs: { $push: "$$ROOT" },
+          representative: { $first: "$sortField" },
+        },
+      },
+      // 限制每組文檔數量
+      {
+        $addFields: {
+          docs: { $slice: ["$docs", 3] },
+        },
+      },
+      // 按代表值排序
+      {
+        $sort: { representative: sortDirection },
+      },
+      // 分頁處理
+      {
+        $skip: (page - 1) * pageSize,
+      },
+      {
+        $limit: pageSize,
+      },
+    ];
+
+    // 執行聚合查詢
+    const groups = await QA.aggregate(pipeline);
+
+    // 處理圖片URL
+    const transformedGroups = groups.map((group) => {
+      const tag = group._id;
+      const docs = group.docs.map((doc) => {
+        if (Array.isArray(doc.image)) {
+          doc.image = doc.image.map((relPath) => {
+            return `${process.env.SERVER_IP}/resource/questionIMG/${relPath}`;
+          });
+        }
+        return doc;
+      });
+      return { tag, docs };
     });
 
-    // 對每個群組內的 QA 再次排序，並限制最多 3 筆
-    const groupEntries = Object.entries(groups).map(([tag, qaList]) => {
-      // 依 sortField 與 sortDirection 排序 QA
-      qaList.sort((a, b) => {
-        const timeA = new Date(a[sortField]).getTime();
-        const timeB = new Date(b[sortField]).getTime();
-        return sortDirection * (timeA - timeB);
-      });
-      // 取得該群組內排序後的前三筆資料
-      const limitedQAs = qaList.slice(0, 3);
-      // 以群組代表值排序：取該群組中第一筆 QA 的 sortField 值作為代表
-      const groupSortValue =
-        limitedQAs.length > 0
-          ? new Date(limitedQAs[0][sortField]).getTime()
-          : 0;
-      return { tag, qas: limitedQAs, groupSortValue };
-    });
-
-    // 將群組依代表值進行排序
-    groupEntries.sort(
-      (a, b) => sortDirection * (a.groupSortValue - b.groupSortValue)
-    );
-
-    // 分頁：僅回傳 pageSize 個群組
-    const paginatedGroups = groupEntries.slice(
-      (page - 1) * pageSize,
-      page * pageSize
-    );
-
-    // 回傳結果，包含查詢參數資訊
-    return res.status(200).json({
+    return res.json({
       success: true,
-      msg: "",
+      data: transformedGroups,
       page,
       pageSize,
-      sortBy,
+      sortBy: sortByParam,
       sortOrder,
       sortType,
-      data: paginatedGroups,
     });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
-      success: false,
-      msg: "發生了不可預期的錯誤",
-    });
+    return res.status(500).json({ success: false, msg: "取得資源時發生錯誤" });
   }
 });
 
