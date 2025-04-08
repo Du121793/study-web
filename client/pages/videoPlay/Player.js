@@ -51,6 +51,22 @@ export default function Player() {
     }
   }
 
+  function formatTime(seconds) {
+    // 計算小時
+    const h = Math.floor(seconds / 3600)
+    // 計算剩餘分鐘數
+    const m = Math.floor((seconds % 3600) / 60)
+    // 剩下的秒數
+    const s = seconds % 60
+
+    // 使用 padStart 確保不足兩位的數字前面補零
+    const hours = h.toString().padStart(2, '0')
+    const minutes = m.toString().padStart(2, '0')
+    const secs = s.toString().padStart(2, '0')
+
+    return `${hours}:${minutes}:${secs}`
+  }
+
   // 解析query的JSON
   useEffect(() => {
     if (info) {
@@ -205,6 +221,7 @@ export default function Player() {
                         },
                       }}>
                       {item.title}
+                      <div className="content">{formatTime(item.length)}</div>
                     </Link>
                   )
                 } else {

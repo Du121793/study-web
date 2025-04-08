@@ -28,112 +28,30 @@
       padding: 4px 8px 4px 8px;
       border-radius: 4px;
     }
-    .title {
-      font-size: 24px;
-      font-weight: bold;
-    }
-    .info-container {
+    .input-area {
       display: flex;
-      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+    }
+    .shortcut-area {
+      display: flex;
       gap: 12px;
-      @media screen and (max-width: 800px) {
-        justify-content: center;
+      .content {
+        cursor: pointer;
+        padding: 2px 8px;
+        border: 1px solid rgba(0, 0, 0, 0);
+        transition: .2s;
       }
-      .qa-card {
-        position: relative;
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: column;
-        border: 1px solid rgb(179, 179, 179);
-        padding: 12px;
-        gap: 8px;
-        max-width: 500px;
-        .qa-link {
-          width: 100%;
-          height: 100%;
-          position: absolute;
-        }
-        .tag-area {
-          flex-wrap: wrap;
-          display: flex;
-          gap: 8px;
-          .big-tag-area {
-            display: flex;
-            gap: 6px;
-            .tag-content {
-              font-weight: bold;
-              background-color: #fcc2c2;
-              box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
-              font-size: 18px;
-              padding: 4px;
-              border-radius: 4px;
-            }
-          }
-          .little-tag-area {
-            display: flex;
-            gap: 6px;
-            .tag-content {
-              font-weight: bold;
-              background-color: #b9cdf9;
-              box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
-              font-size: 18px;
-              padding: 4px;
-              border-radius: 4px;
-            }
-          }
-        }
-        .image-area {
-          display: flex;
-          flex-wrap: wrap;
-          .image {
-            border: 1px solid rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
-          }
-        }
-        .content-area {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          width: 100%;
-          .description {
-            width: 90%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-          }
-          .time {
-            display: flex;
-            justify-content: space-between;
-            color: rgba(0, 0, 0, 0.574);
-            font-size: 15px;
-          }
-          .into-qustion-page-btn {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            .add-to-course-btn {
-              cursor: pointer;
-              padding: 4px 6px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              border: 1px solid rgba(0, 0, 0, 0.4);
-              border-radius: 2px;
-            }
-            .link {
-              cursor: pointer;
-              padding: 4px 6px;
-              border-radius: 2px;
-              border: 1px solid rgba(0, 0, 0, 0.4);
-              transition: 0.2s;
-              color: black;
-            }
-            :hover {
-              background-color: #eeeeee;
-            }
-          }
-        }
+      .active {
+        padding: 2px 8px;
+        border: 1px solid rgba(0, 0, 0, 0.211);
+        border-radius: 4px;
+        background-color: #f6f6f6;
+      }
+      .content:hover {
+        border: 1px solid rgba(0, 0, 0, 0.211);
+        border-radius: 4px;
+        background-color: #f6f6f6;
       }
     }
   }

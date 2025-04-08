@@ -331,12 +331,10 @@
   width: 100%;
 }
 .course-main .container .nav .QA-area .container .QA-grid .QA-container {
-  width: 100%;
+  padding: 24px;
   display: flex;
   justify-content: flex-start;
-  padding: 0 32px 24px 32px;
   gap: 12px;
-  margin-right: 24px;
 }
 .course-main .container .nav .QA-area .container .QA-grid .QA-container .QA-list {
   margin-bottom: 32px;
@@ -456,12 +454,51 @@
   padding: 0 4px;
   margin-top: -6px;
 }
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .qa-info-area {
+  padding: 16px;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.2);
+  background-color: #fff;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .qa-info-area .content {
+  font-size: 15px;
+  margin-bottom: -4px;
+}
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .qa-info-area .into-qa-btn {
+  color: black;
+  flex: 1;
+  padding: 4px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  background-color: var(--button-white);
+  transition: 0.2s;
+}
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .qa-info-area .into-qa-btn:hover {
+  background-color: var(--botton-white-hover);
+}
+.course-main .container .nav .QA-area .container .QA-grid .QA-container .qa-info-area .description-area {
+  padding: 8px;
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.06);
+}
 .course-main .container .nav .QA-area .container .QA-grid .QA-container .load-more-btn {
   cursor: pointer;
   padding: 12px;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   background-color: white;
+}
+.course-main .container .nav .QA-area .container .QA-grid .btn-area {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
 }
 .course-main .container .nav .ask-area {
   overflow: scroll;

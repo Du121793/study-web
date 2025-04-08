@@ -292,6 +292,7 @@ router.get("/getMembers", checkTeacherAccess, async (req, res) => {
  */
 router.get("/exportMembers", checkTeacherAccess, async (req, res) => {
   try {
+    console.log(req.query)
     let filter = {};
 
     // 處理選擇的會員過濾

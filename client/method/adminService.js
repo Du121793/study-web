@@ -132,6 +132,7 @@ const adminService = {
         pageSize: pageSize,
     }*/
   async exportMembers(token, data) {
+    console.log(data)
     const authHeader = token ? { Authorization: token } : {}
     const response = await axios
       .get(USER_URL + '/exportMembers', {
@@ -584,12 +585,12 @@ const adminService = {
     }
   },
 
-  // {videoIds}
-  // [VIDEOID]=67f2b3609fc0c947afc46291
-  async updateUrls(token, data) {
+  // data = {videoIds}
+  async updateUrls(token, data, course_id) {
     try {
+      console.log(data)
       const authHeader = token ? { Authorization: token } : {}
-      const response = await axios.patch(API_URL + `/courseMethod/vimeoMigrate/updateUrls`, data, {
+      const response = await axios.patch(API_URL + `/course/${course_id}/vimeoMigrate/updateUrls`, data, {
         headers: authHeader,
       })
       if (response.status === 401) {
@@ -606,6 +607,31 @@ const adminService = {
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.get(serverIp + `/course/question/getCourseTags/${course_id}`, {
+        headers: authHeader,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (e) {
+      if (e?.response?.data) {
+        return e?.response?.data
+      } else {
+        return e
+      }
+    }
+  },
+
+  /*
+   * @param {string} name - 資料夾名稱
+   * @param {string} parentFolder - 父資料夾ID
+   * @returns {Object} 新創建的資料夾
+   */
+  async addNewFolder(token, data) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.post(API_URL + `/course/question/modifyQA/folder/createFolder`, data, {
         headers: authHeader,
       })
       if (response.status === 401) {

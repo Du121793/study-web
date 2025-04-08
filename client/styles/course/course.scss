@@ -325,12 +325,10 @@
           .QA-grid {
             width: 100%;
             .QA-container {
-              width: 100%;
+              padding: 24px;
               display: flex;
               justify-content: flex-start;
-              padding: 0 32px 24px 32px;
               gap: 12px;
-              margin-right: 24px;
               .QA-list {
                 margin-bottom: 32px;
                 padding: 16px;
@@ -449,6 +447,39 @@
                   }
                 }
               }
+              .qa-info-area {
+                padding: 16px;
+                box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.2);
+                background-color: #fff;
+                border-radius: 4px;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                margin-bottom: 12px;
+                .content {
+                  font-size: 15px;
+                  margin-bottom: -4px;
+                }
+                .into-qa-btn {
+                  color: black;
+                  flex: 1;
+                  padding: 4px 6px;
+                  border: 1px solid rgba(0, 0, 0, 0.2);
+                  display: flex;
+                  justify-content: center;
+                  background-color: var(--button-white);
+                  transition: 0.2s;
+                }
+                .into-qa-btn:hover {
+                  background-color: var(--botton-white-hover);
+                }
+                .description-area {
+                  padding: 8px;
+                  border-radius: 2px;
+                  border: 1px solid rgba(0, 0, 0, 0.1);
+                  background-color: rgba(0, 0, 0, 0.06);
+                }
+              }
               .load-more-btn {
                 cursor: pointer;
                 padding: 12px;
@@ -456,6 +487,12 @@
                 border-radius: 4px;
                 background-color: white;
               }
+            }
+            .btn-area {
+              width: 100%;
+              display: flex;
+              justify-content: center;
+              margin-bottom: 24px;
             }
           }
         }

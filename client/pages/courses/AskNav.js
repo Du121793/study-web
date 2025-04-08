@@ -112,21 +112,20 @@ export default function AskNav({ qaHasUpload, setQaHasUpload, course_id, courseN
     }
   }
 
-  // ask，新增標籤功能
+  // ask，新增主題功能
   const addNewTheme = () => {
-    console.log(theme)
-    if (
-      theme.find((item) => {
-        return item === themeInput
-      }) ||
-      themeInput === ''
-    ) {
-      console.log('這個標籤已經有了')
-    } else {
-      console.log('進行增加')
-      setTheme(theme, theme.push(themeInput))
-      setRerander(!rerander)
-    }
+    if (themeInput.length > 19) return
+      if (
+        theme.find((item) => {
+          return item === themeInput
+        }) ||
+        themeInput === ''
+      ) {
+        console.log('這個標籤已經有了')
+      } else {
+        setTheme(theme, theme.push(themeInput))
+        setRerander(!rerander)
+      }
   }
 
   // ask，移除標籤功能
@@ -150,6 +149,7 @@ export default function AskNav({ qaHasUpload, setQaHasUpload, course_id, courseN
 
   // ask，新增標籤功能
   const addNewHint = () => {
+    if (hintInput.length > 19) return
     if (
       hints.find((item) => {
         return item === hintInput
@@ -158,7 +158,6 @@ export default function AskNav({ qaHasUpload, setQaHasUpload, course_id, courseN
     ) {
       console.log('這個標籤已經有了')
     } else {
-      console.log('進行增加')
       setHints(hints, hints.push(hintInput))
       setRerander(!rerander)
     }
@@ -219,6 +218,12 @@ export default function AskNav({ qaHasUpload, setQaHasUpload, course_id, courseN
     fileInputRef.current.click()
   }
 
+  const initScrollHeight = () => {
+    setTimeout(() => {
+      setAskContentHeight(innerEleHeight.current.scrollHeight)
+    }, 10)
+  }
+
   const test = () => {}
 
   // 刪除圖片後，nav更新高度
@@ -226,7 +231,7 @@ export default function AskNav({ qaHasUpload, setQaHasUpload, course_id, courseN
     setTimeout(() => {
       setAskContentHeight(innerEleHeight.current.scrollHeight)
     }, 10)
-  }, [images, count])
+  }, [images, count, theme, hints])
 
   return (
     <div
@@ -321,7 +326,11 @@ export default function AskNav({ qaHasUpload, setQaHasUpload, course_id, courseN
                 type="text"
               />
               <button onClick={addNewTheme}>
-                <div className="content">新增</div>
+                <div
+                  className="content"
+                  onClick={initScrollHeight}>
+                  新增
+                </div>
               </button>
             </div>
             <div className="themes-area">
@@ -351,7 +360,11 @@ export default function AskNav({ qaHasUpload, setQaHasUpload, course_id, courseN
                 type="text"
               />
               <button onClick={addNewHint}>
-                <div className="content">新增</div>
+                <div
+                  className="content"
+                  onClick={initScrollHeight}>
+                  新增
+                </div>
               </button>
             </div>
             {/* 顯示標籤 */}

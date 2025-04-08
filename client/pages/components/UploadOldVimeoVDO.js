@@ -12,8 +12,10 @@ export default function UploadOldVimeoVDO({ course_id, uploadOldVimeoVDOInnerEle
   // 獲得response
   const [videoMsg, setVideoMsg] = useState([])
   const [getResponse, setGetResponse] = useState(false)
+  const [videoIds, setVideoIds] = useState(false)
   // 關閉 UI 的嚴格點擊處理
   const strictClickCloseUI = useStrictClickHandler(() => {
+    // 如果有上傳就不能從點擊外圍關閉
     if (getResponse) return
     setUploadOldVimeoVDOHeight(0)
     setUploadOldVimeoVDOWidht(0)
@@ -72,18 +74,26 @@ export default function UploadOldVimeoVDO({ course_id, uploadOldVimeoVDOInnerEle
     })
     let data = { videos: cardsTemp }
     adminService.batchCreate(token, data, course_id).then((res) => {
-      console.log(res)
       if (res.success) {
         setGetResponse(true)
-        console.log(res.msg)
-        setVideoMsg(res.data)
+        setVideoMsg(res.data.returnInfo)
+        setVideoIds(res.data.videoIds)
       }
     })
     // 可以在這裡調用 adminService.batchCreate 等 API 上傳影片資料
   }
 
+  const patchVideo = () => {
+    let data = {
+      videoIds: videoIds,
+    }
+    const tempId = course_id
+    adminService.updateUrls(token, data, tempId).then((res) => {})
+  }
+
   // 控制頁面 scroll 狀態
   useEffect(() => {
+    console.log(course_id)
     if (typeof document !== 'undefined') {
       setPage_body(document.querySelector('body'))
     }
@@ -118,7 +128,10 @@ export default function UploadOldVimeoVDO({ course_id, uploadOldVimeoVDOInnerEle
               {getResponse && (
                 <div
                   className="g-blue-btn confirm"
-                  onClick={closeWidow}>
+                  onClick={() => {
+                    closeWidow()
+                    patchVideo()
+                  }}>
                   確認完成後點擊此處
                 </div>
               )}
@@ -186,7 +199,9 @@ export default function UploadOldVimeoVDO({ course_id, uploadOldVimeoVDOInnerEle
                     </div>
                   </div>
                 ))}
+
               {getResponse &&
+                videoMsg.length > 0 &&
                 videoMsg.map((item, index) => (
                   <div
                     className="card"

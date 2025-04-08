@@ -37,16 +37,21 @@
   width: 40%;
   padding: 7px;
 }
-.Layout-main .Layout-container .myCourse-main .courses-container .courses {
+.Layout-main .Layout-container .myCourse-main .courses-container .flex-wrapper {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 24px;
+  justify-content: center;
   width: 95%;
 }
-.Layout-main .Layout-container .myCourse-main .courses-container .courses .course {
-  flex: 0 1 calc(50% - 12px);
-  min-height: 360px;
+.Layout-main .Layout-container .myCourse-main .courses-container .flex-wrapper .courses {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+  margin: 0 auto;
+}
+.Layout-main .Layout-container .myCourse-main .courses-container .flex-wrapper .courses .course {
+  width: 24vw;
+  min-height: 244px;
   background-color: #e9e9e9;
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
@@ -54,7 +59,7 @@
   transition: 0.2s;
   overflow: hidden;
 }
-.Layout-main .Layout-container .myCourse-main .courses-container .courses .course .course-header {
+.Layout-main .Layout-container .myCourse-main .courses-container .flex-wrapper .courses .course .course-header {
   height: 60px;
   background-color: #323232;
   display: flex;
@@ -62,7 +67,7 @@
   padding: 6px 12px;
   position: relative;
 }
-.Layout-main .Layout-container .myCourse-main .courses-container .courses .course .course-header .course-fake-shot {
+.Layout-main .Layout-container .myCourse-main .courses-container .flex-wrapper .courses .course .course-header .course-fake-shot {
   width: 48px;
   height: 48px;
   border-radius: 64px;
@@ -73,29 +78,22 @@
   margin-right: 12px;
   overflow: hidden;
 }
-.Layout-main .Layout-container .myCourse-main .courses-container .courses .course .course-header .course-name {
+.Layout-main .Layout-container .myCourse-main .courses-container .flex-wrapper .courses .course .course-header .course-name {
   color: #fff;
   font-weight: bold;
-  font-size: 20px;
+  font-size: clamp(18px, 2vw, 24px);
 }
-.Layout-main .Layout-container .myCourse-main .courses-container .courses .course .course-header .class-number {
-  color: #fff;
-  font-weight: 500;
-  font-size: 20px;
-  position: absolute;
-  right: 24px;
-}
-.Layout-main .Layout-container .myCourse-main .courses-container .courses .course .course-info {
+.Layout-main .Layout-container .myCourse-main .courses-container .flex-wrapper .courses .course .course-info {
   padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  font-size: 18px;
+  font-size: clamp(18px, 1.2vw, 24px);
 }
-.Layout-main .Layout-container .myCourse-main .courses-container .courses .course .course-info .info-area {
+.Layout-main .Layout-container .myCourse-main .courses-container .flex-wrapper .courses .course .course-info .info-area {
   font-weight: bold;
 }
-.Layout-main .Layout-container .myCourse-main .courses-container .courses .course .btn {
+.Layout-main .Layout-container .myCourse-main .courses-container .flex-wrapper .courses .course .btn {
   position: absolute;
   bottom: 15px;
   right: 15px;

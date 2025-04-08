@@ -177,6 +177,10 @@
   height: 64px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
   transition: 0.2s;
+  gap: 24px;
+}
+.video-player-main .player-area .video-info-list .videos-area .video .content {
+  color: #555555;
 }
 .video-player-main .player-area .video-info-list .videos-area .video:hover {
   background-color: #e7e7e7;

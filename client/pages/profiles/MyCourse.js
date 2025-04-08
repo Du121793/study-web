@@ -4,7 +4,7 @@ import shotB from '../../public/profile/shot2.jpg'
 import shotC from '../../public/profile/shot3.jpg'
 import anonymous from '../../public/profile/anonymous.png'
 // 組件庫
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 // 導入methmod
@@ -25,6 +25,9 @@ export default function MyCourse() {
   const curserBaseUrl = `${clientIp}/courses/Course`
   // 假圖片，用於課程左邊頭像
   const shots = [shotA, shotB, shotC, shotA, shotB, shotC, shotA, shotB, shotC, shotA]
+  const coursesEle = useRef(null)
+  const [coursesEleWidth, setCoursesEleWidth] = useState(0)
+  const [innenrEleWidth, setInnerEleWidht] = useState(0)
 
   const randomShot = () => {
     let randomNumber = Math.random()
@@ -37,12 +40,33 @@ export default function MyCourse() {
   }
 
   const test = () => {
-    console.log(getCourses)
+    console.dir(coursesEle.current.clientWidth)
   }
+
+  useEffect(() => {
+    const element = coursesEle.current
+    if (!element) return
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        setCoursesEleWidth(entry.contentRect.width)
+      }
+    })
+    resizeObserver.observe(element)
+
+    // 清理 observer
+    return () => {
+      resizeObserver.unobserve(element)
+    }
+  }, [])
+
+  useEffect(() => {
+    console.log('Width has changed:', coursesEleWidth)
+  }, [coursesEleWidth])
 
   // 請求所有用戶已註冊課程資訊，若為admin則為全部
   useEffect(() => {
-    if (token) { 
+    if (token) {
       setCourseLoading(true)
       userService
         .getUserRegistedCourses(token)
@@ -83,53 +107,57 @@ export default function MyCourse() {
             搜尋
           </button>
         </form>
-        <ul className="courses">
-          {courseLoading && <LoadingAnime />}
-          {getCourses.map((item, index) => (
-            <li
-              className="course"
-              key={index}
-              style={{ height: '80px' }}>
-              <div href={curserBaseUrl + `?courseName=${item.courseName}&courseId=${item._id}`}>
-                <div className="course-header flex align-center">
-                  <div className="course-fake-shot">
-                    <Image
-                      className="shot"
-                      src={anonymous}
-                      alt="cursor shot"
-                      width={30}
-                      height={30}></Image>
+        <div className="flex-wrapper">
+          <ul
+            className="courses"
+            ref={coursesEle}>
+            {courseLoading && <LoadingAnime />}
+            {getCourses.map((item, index) => (
+              <li
+                className="course"
+                key={index}
+                style={{ height: '80px' }}>
+                <div href={curserBaseUrl + `?courseName=${item.courseName}&courseId=${item._id}`}>
+                  <div className="course-header flex align-center">
+                    <div className="course-fake-shot">
+                      <Image
+                        className="shot"
+                        src={anonymous}
+                        alt="cursor shot"
+                        width={30}
+                        height={30}></Image>
+                    </div>
+                    <div className="course-name">{item.courseName}</div>
                   </div>
-                  <div className="course-name">{item.courseName}</div>
                 </div>
-              </div>
 
-              <div className="course-info">
-                <div className="info-area">
-                  <span>科目: </span>
-                  {item.subject}
+                <div className="course-info">
+                  <div className="info-area">
+                    <span>科目: </span>
+                    {item.subject}
+                  </div>
+                  <div className="info-area">
+                    <span>班級: </span>
+                    {item.courseClass}
+                  </div>
+                  <div className="info-area">
+                    <span>年級: </span>
+                    {item.grade}
+                  </div>
+                  <div className="info-area">
+                    <span>學生人數: </span>
+                    {item.members}
+                  </div>
                 </div>
-                <div className="info-area">
-                  <span>班級: </span>
-                  {item.courseClass}
-                </div>
-                <div className="info-area">
-                  <span>年級: </span>
-                  {item.grade}
-                </div>
-                <div className="info-area">
-                  <span>學生人數: </span>
-                  {item.members}
-                </div>
-              </div>
-              <Link
-                className="g-blue-btn btn"
-                href={curserBaseUrl + `?courseName=${item.courseName}&courseId=${item._id}`}>
-                前往課程
-              </Link>
-            </li>
-          ))}
-        </ul>
+                <Link
+                  className="g-blue-btn btn"
+                  href={curserBaseUrl + `?courseName=${item.courseName}&courseId=${item._id}`}>
+                  前往課程
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   )

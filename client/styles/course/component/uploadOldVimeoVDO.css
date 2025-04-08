@@ -11,25 +11,24 @@
   height: 100%;
 }
 .upload-old-vimeo-vdo-area .container {
-  width: 100%;
   height: 100%;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
 }
 .upload-old-vimeo-vdo-area .container .ui {
+  max-height: 90%;
   overflow: auto;
-  padding: 24px;
   background-color: #fff;
   display: flex;
-  align-items: center;
-  justify-content: center;
   position: absolute;
   border-radius: 12px;
   transition: 0.2s;
 }
 .upload-old-vimeo-vdo-area .container .ui .inner-element {
+  padding: 24px;
   height: 100%;
   width: 100%;
   display: flex;
@@ -41,6 +40,7 @@
   position: relative;
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   width: 100%;
   gap: 12px;
 }
@@ -48,22 +48,32 @@
   position: absolute;
   right: 0;
 }
+@media screen and (max-width: 800px) {
+  .upload-old-vimeo-vdo-area .container .ui .inner-element .btn-area .confirm {
+    position: relative;
+  }
+}
 .upload-old-vimeo-vdo-area .container .ui .inner-element .card-area {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
   gap: 24px;
   width: 100%;
-  padding-bottom: 24px;
+}
+@media screen and (max-width: 1350px) {
+  .upload-old-vimeo-vdo-area .container .ui .inner-element .card-area {
+    justify-content: center;
+  }
 }
 .upload-old-vimeo-vdo-area .container .ui .inner-element .card-area .card {
   display: flex;
   flex-wrap: wrap;
   box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
   padding: 24px;
-  width: 27%;
+  width: 20vw;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   gap: 12px;
 }
 .upload-old-vimeo-vdo-area .container .ui .inner-element .card-area .card .uid {
@@ -82,6 +92,7 @@
   font-weight: bold;
 }
 .upload-old-vimeo-vdo-area .container .ui .inner-element .card-area .card .inner-text {
+  width: 95%;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -90,6 +101,7 @@
   border-radius: 8px;
   border: 1px solid rgba(0, 0, 0, 0.4);
   z-index: 1;
+  word-break: break-all;
 }
 .upload-old-vimeo-vdo-area .container .ui .inner-element .card-area .card .inner-text .title-copy-btn {
   position: absolute;
@@ -126,9 +138,10 @@
   background-color: #ebebeb;
 }
 .upload-old-vimeo-vdo-area .container .ui .inner-element .card-area .card .input-area {
-  flex-direction: column;
   display: flex;
-  gap: 4px;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
 }
 .upload-old-vimeo-vdo-area .container .ui .inner-element .card-area .card .input-area textarea {
   width: 100%;

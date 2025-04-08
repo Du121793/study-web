@@ -44,6 +44,10 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
   const [showRemoveBtn, setShowRemoveBtn] = useState(false)
   const [doubleCheck, setDoubleCheck] = useState(false)
 
+  // get參數
+  const [pageSize, setPageSize] = useState(8)
+  const [page, setPage] = useState(1)
+
   // 取得 localStorage 中的 token
   useEffect(() => {
     setTimeout(() => {
@@ -66,8 +70,9 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
         // 沒有就用預設state
         sortType: localStorageSortBy ? localStorageSortBy : sortBy,
         sortOrder: localStorageTimeSortBy ? localStorageTimeSortBy : timeSort,
+        pageSize: pageSize,
+        page: page,
       }
-
       userService.getCourseQAs(token, course_id, data).then((res) => {
         if (res.success) {
           setCourseQas(res.data)
@@ -87,13 +92,14 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
         }
       })
     }
-  }, [token, course_id, qaHasUpload, qaOpen])
+  }, [token, course_id, qaHasUpload, qaOpen, pageSize])
 
   const changeSort = (sortBy, timeSort) => {
-    console.log(timeSort)
     const data = {
       sortType: sortBy,
       sortOrder: timeSort,
+      pageSize: pageSize,
+      page: page,
     }
 
     userService.getCourseQAs(token, course_id, data).then((res) => {
@@ -115,7 +121,9 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
     })
   }
 
-  const test = () => {}
+  const test = () => {
+    console.log(courseQas)
+  }
 
   // 切換 QA 區塊展開/收合
   const toggleQA = () => {
@@ -236,7 +244,7 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
                   setSortBy(e.target.value)
                   changeSort(e.target.value, timeSort)
                 }}>
-                <option value="">無</option>
+                <option value="none">無</option>
                 <option value="resourceCategories">主題排序</option>
                 <option value="hints">標籤排序</option>
               </select>
@@ -295,124 +303,149 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
           <div className="QA-grid">
             <Masonry
               className="QA-container"
-              style={{
-                height: containerHeight,
-              }}
               breakpointCols={breakpointColumnsObj}
               columnClassName="my-masonry-grid_column">
-              {courseQas.map((item, index) => (
-                <div
-                  className="QA-list"
-                  key={index}>
-                  {item.tag !== '' && (
-                    <div className="QA-tag">
-                      <div className="content">{item.tag}</div>
-                    </div>
-                  )}
-                  {item.tag === '' && sortBy === 'resourceCategories' && (
-                    <div className="QA-tag">
-                      <div className="content">無主題</div>
-                    </div>
-                  )}
-                  {item.tag === '' && sortBy === 'hints' && (
-                    <div className="QA-tag">
-                      <div className="content">標籤</div>
-                    </div>
-                  )}
-                  {item.qas.map((qaInfo, idx) => (
-                    <div
-                      key={idx}
-                      className="qa-info">
-                      {qaInfo.hints[0] === '' && sortBy === 'resourceCategories' && (
-                        <div className="qa-info-title">
-                          <div className="content">無標籤</div>
-                        </div>
-                      )}
-                      {qaInfo.resourceCategories[0] === '' && sortBy === 'hints' && (
-                        <div className="qa-info-title">
-                          <div className="content">無主題</div>
-                        </div>
-                      )}
-                      {qaInfo.hints[0] !== '' && sortBy === 'resourceCategories' && (
-                        <div className="qa-info-title">
-                          {qaInfo.hints.map((content, idx2) => (
+              {sortBy && sortBy === null}
+              {localStorage.getItem('qa_sort_by') !== 'none' &&
+                courseQas.map((item, index) => (
+                  <div
+                    className="QA-list"
+                    key={index}>
+                    {item?.tag !== '' && (
+                      <div className="QA-tag">
+                        <div className="content">{item.tag}</div>
+                      </div>
+                    )}
+                    {item?.tag === '' && sortBy === 'resourceCategories' && (
+                      <div className="QA-tag">
+                        <div className="content">無主題</div>
+                      </div>
+                    )}
+                    {item?.tag === '' && sortBy === 'hints' && (
+                      <div className="QA-tag">
+                        <div className="content">標籤</div>
+                      </div>
+                    )}
+                    {item?.docs?.map((doc, idx) => (
+                      <div
+                        key={idx}
+                        className="qa-info">
+                        {doc.hints[0] === '' && sortBy === 'resourceCategories' && (
+                          <div className="qa-info-title">
+                            <div className="content">無標籤</div>
+                          </div>
+                        )}
+                        {doc.resourceCategories[0] === '' && sortBy === 'hints' && (
+                          <div className="qa-info-title">
+                            <div className="content">無主題</div>
+                          </div>
+                        )}
+                        {doc.hints[0] !== '' && sortBy === 'resourceCategories' && (
+                          <div className="qa-info-title">
+                            {doc.hints.map((content, idx2) => (
+                              <div
+                                className="content"
+                                key={idx2}>
+                                {content}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {doc.resourceCategories[0] !== '' && sortBy === 'hints' && (
+                          <div className="qa-info-title">
+                            {doc.resourceCategories.map((content, idx2) => (
+                              <div
+                                className="content"
+                                key={idx2}>
+                                {content}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <div className="btn-area">
+                          <Link
+                            className="into-qa-btn"
+                            href={`${client_URL}/courses/QaPage?qa_id=${doc._id}&courseName=${courseName}&course_id=${course_id}`}>
+                            問題頁面
+                          </Link>
+                          {showRemoveBtn && (
                             <div
-                              className="content"
-                              key={idx2}>
-                              {content}
+                              className="remove-btn"
+                              onClick={(e) => {
+                                if (e.target.innerText === '確認刪除') {
+                                  setDoubleCheck(true)
+                                  removeQuestion(doc._id)
+                                }
+                                if (e.target.innerText === '刪除') {
+                                  e.target.innerText = '確認刪除'
+                                }
+                              }}>
+                              刪除
                             </div>
-                          ))}
+                          )}
                         </div>
-                      )}
-                      {qaInfo.resourceCategories[0] !== '' && sortBy === 'hints' && (
-                        <div className="qa-info-title">
-                          {qaInfo.resourceCategories.map((content, idx2) => (
-                            <div
-                              className="content"
-                              key={idx2}>
-                              {content}
-                            </div>
-                          ))}
+                        <div className="qa-image-area">
+                          {doc.image.length > 0 && userToken.length && (
+                            <Image
+                              key={idx}
+                              className="qa-image"
+                              src={`${doc.image[0]}?token=${userToken}`}
+                              width={200}
+                              height={0}
+                              loading="lazy"
+                              style={{ height: 'auto' }}
+                              alt="qa-image"
+                              onClick={() => clickZoomImage(`${doc.image[0]}`)}
+                            />
+                          )}
                         </div>
-                      )}
-                      <div className="btn-area">
-                        <Link
-                          className="into-qa-btn"
-                          href={`${client_URL}/courses/QaPage?qa_id=${qaInfo._id}&courseName=${courseName}&course_id=${course_id}`}>
-                          問題頁面
-                        </Link>
-                        {showRemoveBtn && (
+                        <div className="time-replied-area">
+                          <div className="time">{new Date(doc.date).toLocaleString()}</div>
+                          <div className="not-replied">{doc.replied === false && '未回覆'}</div>
+                          <div className="is-replied">{doc.replied === true && '已回覆'}</div>
+                        </div>
+                        <div className="qa-description">{doc.description}</div>
+                        {doc.length >= 3 && (
                           <div
-                            className="remove-btn"
-                            onClick={(e) => {
-                              if (e.target.innerText === '確認刪除') {
-                                setDoubleCheck(true)
-                                removeQuestion(qaInfo._id)
-                              }
-                              if (e.target.innerText === '刪除') {
-                                e.target.innerText = '確認刪除'
-                              }
+                            className="load-more-btn"
+                            onClick={() => {
+                              setShowMoreQA(true)
+                              setSelectBy(doc.tag)
                             }}>
-                            刪除
+                            點擊加載全部
                           </div>
                         )}
                       </div>
-                      <div className="qa-image-area">
-                        {qaInfo.image.length > 0 && userToken.length && (
-                          <Image
-                            key={idx}
-                            className="qa-image"
-                            src={`${qaInfo.image[0]}?token=${userToken}`}
-                            width={200}
-                            height={0}
-                            loading="lazy"
-                            style={{ height: 'auto' }}
-                            alt="qa-image"
-                            onClick={() => clickZoomImage(`${qaInfo.image[0]}`)}
-                          />
-                        )}
-                      </div>
-                      <div className="time-replied-area">
-                        <div className="time">{new Date(qaInfo.date).toLocaleString()}</div>
-                        <div className="not-replied">{qaInfo.replied === false && '未回覆'}</div>
-                        <div className="is-replied">{qaInfo.replied === true && '已回覆'}</div>
-                      </div>
-                      <div className="qa-description">{qaInfo.description}</div>
-                    </div>
-                  ))}
-                  {item.qas.length === 3 && (
-                    <div
-                      className="load-more-btn"
-                      onClick={() => {
-                        setShowMoreQA(true)
-                        setSelectBy(item.tag)
-                      }}>
-                      點擊加載全部
-                    </div>
-                  )}
-                </div>
-              ))}
+                    ))}
+                  </div>
+                ))}
+
+              {(localStorage.getItem('qa_sort_by') === 'none' || (sortBy && sortBy === 'none')) &&
+                courseQas.map((item, index) => (
+                  <div
+                    className="qa-info-area"
+                    key={index}>
+                    <Link
+                      className="into-qa-btn"
+                      href={`${client_URL}/courses/QaPage?qa_id=${item._id}&courseName=${courseName}&course_id=${course_id}`}>
+                      問題頁面
+                    </Link>
+                    <div className="content">描述</div>
+                    <div className="description-area">{item.description}</div>
+                  </div>
+                ))}
             </Masonry>
+            <div className="btn-area">
+              {(localStorage.getItem('qa_sort_by') === 'none' || (sortBy && sortBy === 'none')) && (
+                <button
+                  className="g-black-btn"
+                  onClick={() => {
+                    setPageSize(pageSize + 8)
+                  }}>
+                  加載更多
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

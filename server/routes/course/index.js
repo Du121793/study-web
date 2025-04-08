@@ -81,6 +81,7 @@ router.get("/getCourses", checkTeacherAccess, async (req, res) => {
 
     // 獲取總筆數
     const total = await Course.countDocuments(filter);
+    const totalPage = parseInt(total / pageSize)+1
 
     // 處理不分頁的情況
     if (!(page && pageSize)) {
@@ -97,7 +98,7 @@ router.get("/getCourses", checkTeacherAccess, async (req, res) => {
 
     return res.json({
       success: true,
-      data: { total, currentPage, pageSize: limit, courses },
+      data: { total, totalPage , currentPage, pageSize: limit, courses },
     });
   } catch (error) {
     console.error(error);

@@ -171,7 +171,7 @@ router.post("/postQuestion", upload, async (req, res) => {
       folders = [];
     }
 
-    if (isPublic && folders.length === 0) {
+    if (isPublic === true && folders.length === 0) {
       return res
         .status(400)
         .json({ success: false, msg: "設為公開，必須提供資料夾陣列" });

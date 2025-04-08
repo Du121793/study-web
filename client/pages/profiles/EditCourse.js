@@ -37,7 +37,7 @@ export default function EditCourse({ onRefresh }) {
   const [courseNameInput, setCourseNameInput] = useState('')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [totalPage, setTotalPage] = useState(1)
+  const [totalPage, setTotalPage] = useState(0)
   // 更新課程參數
   const [editCourseName, setEditCourseName] = useState(null)
   const [editGrade, setEditGrade] = useState(null)
@@ -245,7 +245,7 @@ export default function EditCourse({ onRefresh }) {
       }
       adminService.getCourses(token, data).then((res) => {
         if (res.success) {
-          setTotalPage(res.data.total)
+          setTotalPage(res.data.totalPage)
           setCoursesInfo(res.data)
           setCourseLoading(false)
         } else {

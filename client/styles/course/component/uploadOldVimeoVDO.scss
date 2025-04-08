@@ -10,23 +10,22 @@
   width: 100%;
   height: 100%;
   .container {
-    width: 100%;
     height: 100%;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
     .ui {
+      max-height: 90%;
       overflow: auto;
-      padding: 24px;
       background-color: #fff;
       display: flex;
-      align-items: center;
-      justify-content: center;
       position: absolute;
       border-radius: 12px;
       transition: 0.2s;
       .inner-element {
+        padding: 24px;
         height: 100%;
         width: 100%;
         display: flex;
@@ -37,11 +36,15 @@
           position: relative;
           display: flex;
           justify-content: center;
+          flex-wrap: wrap;
           width: 100%;
           gap: 12px;
           .confirm {
             position: absolute;
             right: 0;
+            @media screen and (max-width: 800px) {
+              position: relative;
+            }
           }
         }
         .card-area {
@@ -50,15 +53,18 @@
           justify-content: flex-start;
           gap: 24px;
           width: 100%;
-          padding-bottom: 24px;
+          @media screen and (max-width: 1350px) {
+            justify-content: center;
+          }
           .card {
             display: flex;
             flex-wrap: wrap;
             box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
             padding: 24px;
-            width: 27%;
+            width: 20vw;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
             gap: 12px;
             .uid {
               font-size: 20px;
@@ -76,6 +82,7 @@
               font-weight: bold;
             }
             .inner-text {
+              width: 95%;
               position: relative;
               display: flex;
               flex-direction: column;
@@ -84,10 +91,10 @@
               border-radius: 8px;
               border: 1px solid rgba(0, 0, 0, 0.4);
               z-index: 1;
+              word-break: break-all;
               .title-copy-btn {
                 position: absolute;
                 right: 4px;
-
                 border-radius: 4px;
                 border: 1px solid rgba(0, 0, 0, 0.4);
                 padding: 4px;
@@ -117,9 +124,10 @@
               }
             }
             .input-area {
-              flex-direction: column;
               display: flex;
-              gap: 4px;
+              flex-direction: column;
+              gap: 8px;
+              width: 100%;
               textarea {
                 width: 100%;
                 height: 120px;

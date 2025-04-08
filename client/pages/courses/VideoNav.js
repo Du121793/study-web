@@ -21,6 +21,12 @@ const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
 export default function VideoNav({ course_id, courseName, user_role }) {
   const token = useUserToken()
+  // 控制上船影片UI
+
+  const [showUploadVideoUI, setshowUploadVideoUI] = useState(false)
+  const [uploadVideoUIHeight, setUploadVideoUIHeight] = useState(0)
+  const [uploadVideoUIWidth, setUploadVideoUIWidth] = useState(0)
+  const [uploadVideoUIInnerOpacity, setUploadVideoUIInnerOpacity] = useState(0)
   // 控制上傳舊vimeoUI
   const [UploadOldVimeoVDOHeight, setUploadOldVimeoVDOHeight] = useState(0)
   const [showUploadOldVimeoVDOUI, setShowUploadOldVimeoVDOUI] = useState(false)
@@ -137,32 +143,6 @@ export default function VideoNav({ course_id, courseName, user_role }) {
     setChooseSortOrder(e)
   }
 
-  // 關閉上傳影片的介面
-  const closeVideoUploadOnclick = () => {
-    if (isShowVideoUpload) {
-      let videoUpload = document.querySelector('.upload-vidoe-main')
-      let background = document.querySelector('.background')
-      videoUpload.style.height = '0'
-      background.style.display = 'none'
-      setIsShowVideoUpload(false)
-    }
-  }
-
-  // 開啟上傳影片的介面
-  const showVideoUploadComponent = () => {
-    if (!isShowVideoUpload) {
-      let videoUpload = document.querySelector('.upload-vidoe-main')
-      let background = document.querySelector('.background')
-      videoUpload.style.height = '800px'
-      background.style.display = 'block'
-      setIsShowVideoUpload(true)
-    } else {
-      let videoUpload = document.querySelector('.upload-vidoe-main')
-      videoUpload.style.height = '0'
-      setIsShowVideoUpload(false)
-    }
-  }
-
   // 影片長度計算
   const formatSecondsToHMS = (totalSeconds) => {
     // 先把秒數做四捨五入或直接取 floor
@@ -242,17 +222,27 @@ export default function VideoNav({ course_id, courseName, user_role }) {
       className="nav"
       id="video-nav">
       {/* 上傳影片的子組件 */}
-      <VideoUploadComponent
-        messageControl={messageControl}
-        getCourseVideos={getCourseVideos}
-        course_id={course_id}
-        isShowVideoUpload={isShowVideoUpload}
-        setIsShowVideoUpload={setIsShowVideoUpload}
-        setUploadSuccess={setUploadSuccess}
-        uploadSuccess={uploadSuccess}
-        uploadError={uploadError}
-        setUploadError={setUploadError}
-      />
+      {showUploadVideoUI && (
+        <VideoUploadComponent
+          setshowUploadVideoUI={setshowUploadVideoUI}
+          uploadVideoUIHeight={uploadVideoUIHeight}
+          setUploadVideoUIHeight={setUploadVideoUIHeight}
+          uploadVideoUIWidth={uploadVideoUIWidth}
+          setUploadVideoUIWidth={setUploadVideoUIWidth}
+          uploadVideoUIInnerOpacity={uploadVideoUIInnerOpacity}
+          setUploadVideoUIInnerOpacity={setUploadVideoUIInnerOpacity}
+          messageControl={messageControl}
+          getCourseVideos={getCourseVideos}
+          course_id={course_id}
+          isShowVideoUpload={isShowVideoUpload}
+          setIsShowVideoUpload={setIsShowVideoUpload}
+          setUploadSuccess={setUploadSuccess}
+          uploadSuccess={uploadSuccess}
+          uploadError={uploadError}
+          setUploadError={setUploadError}
+        />
+      )}
+
       {/* 編輯影片的子組件 */}
       {editShowVideoInfo && (
         <EditVideoInfo
@@ -269,10 +259,10 @@ export default function VideoNav({ course_id, courseName, user_role }) {
           course_id={course_id}
           UploadOldVimeoVDOHeight={UploadOldVimeoVDOHeight}
           setUploadOldVimeoVDOHeight={setUploadOldVimeoVDOHeight}
-          showUploadOldVimeoVDOUI={showUploadOldVimeoVDOUI}
-          setShowUploadOldVimeoVDOUI={setShowUploadOldVimeoVDOUI}
           uploadOldVimeoVDOWidht={uploadOldVimeoVDOWidht}
           setUploadOldVimeoVDOWidht={setUploadOldVimeoVDOWidht}
+          showUploadOldVimeoVDOUI={showUploadOldVimeoVDOUI}
+          setShowUploadOldVimeoVDOUI={setShowUploadOldVimeoVDOUI}
           uploadOldVimeoVDOInnerEleOpacity={uploadOldVimeoVDOInnerEleOpacity}
           setUploadOldVimeoVDOInnerEleOpacity={setUploadOldVimeoVDOInnerEleOpacity}></UploadOldVimeoVDO>
       )}
@@ -281,9 +271,6 @@ export default function VideoNav({ course_id, courseName, user_role }) {
         className="message">
         {message}
       </div>
-      <div
-        className="background"
-        onClick={closeVideoUploadOnclick}></div>
       <div
         onClick={toggleVideoNav}
         id="video-header"
@@ -306,29 +293,22 @@ export default function VideoNav({ course_id, courseName, user_role }) {
         }}>
         <div className="update-video-area">
           {/* 上傳影片 */}
-          {user_role && user_role === 'teacher' && (
+          {user_role && (user_role === 'teacher' || user_role === 'admin') && (
             <div
               className="button"
-              onClick={showVideoUploadComponent}>
-              上傳影片
-            </div>
-          )}
-          {user_role && user_role === 'admin' && (
-            <div
-              className="button"
-              onClick={showVideoUploadComponent}>
+              onClick={() => {
+                setshowUploadVideoUI(true)
+                setTimeout(() => {
+                  setUploadVideoUIHeight('80%')
+                  setUploadVideoUIWidth('80%')
+                  setUploadVideoUIInnerOpacity(1)
+                }, 10)
+              }}>
               上傳影片
             </div>
           )}
           {/* 移除影片 */}
-          {user_role && user_role === 'teacher' && (
-            <div
-              className="button"
-              onClick={showDeleteBtn}>
-              移除影片
-            </div>
-          )}
-          {user_role && user_role === 'admin' && (
+          {user_role && (user_role === 'teacher' || user_role === 'admin') && (
             <div
               className="button"
               onClick={showDeleteBtn}>
@@ -341,8 +321,8 @@ export default function VideoNav({ course_id, courseName, user_role }) {
               onClick={() => {
                 setShowUploadOldVimeoVDOUI(true)
                 setTimeout(() => {
-                  setUploadOldVimeoVDOHeight(800)
-                  setUploadOldVimeoVDOWidht(1200)
+                  setUploadOldVimeoVDOHeight('auto')
+                  setUploadOldVimeoVDOWidht('80%')
                   setUploadOldVimeoVDOInnerEleOpacity(1)
                 }, 10)
               }}>

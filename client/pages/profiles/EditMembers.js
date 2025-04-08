@@ -309,8 +309,12 @@ export default function EditMembers() {
       let data = {
         page: page,
         pageSize: pageSize,
-        selected_members: selectedStudentId,
+        selected_members: [selectedStudentId],
       }
+
+      console.log(typeof data?.selected_members)
+      console.log([data?.selected_members])
+
       adminService.exportMembers(token, data).then((res) => {})
     }
   }

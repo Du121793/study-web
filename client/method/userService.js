@@ -349,23 +349,50 @@ const userService = {
       return e
     }
   },
+  async getRootFolder(token) {
+    try {
+      let data = {
+        isRoot: true,
+      }
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.get(API_URL + `/course/question/modifyQA/folder/getFolders`, {
+        headers: authHeader,
+        params: data,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (e) {
+      if (e?.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
+    }
+  },
 
-  // 編輯使用者資料
-  // async patchUserInfo(token, id) {
-  //   try {
-  //     const authHeader = token ? { Authorization: token } : {}
-  //     const response = await axios.get(API_URL + `/publicResource/board/${id}`, {
-  //       headers: authHeader,
-  //     })
-  //     if (response.status === 401) {
-  //       signOut()
-  //       return
-  //     }
-  //     return response.data
-  //   } catch (e) {
-  //     return e
-  //   }
-  // },
+  async getChildFolders(token, data) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.get(API_URL + `/course/question/modifyQA/folder/getFolders`, {
+        headers: authHeader,
+        params: data,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (e) {
+      if (e?.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
+    }
+  },
 }
 
 export default userService

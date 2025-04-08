@@ -5,6 +5,7 @@ import Link from 'next/link'
 
 // method
 import userService from '../../../method/userService'
+import adminService from '../../../method/adminService'
 
 // env
 const client_base_URL = process.env.NEXT_PUBLIC_CLIENT_IP
@@ -18,6 +19,31 @@ export default function ShowPublicQA({ courseName, token, course_id, showPublicQ
   const [userRole, setUserRole] = useState(null)
   const [userId, setUserId] = useState(null)
 
+  // get
+  const [rootFolder, setRootFolder] = useState({})
+  const [rootChildFolders, setRootChildFolders] = useState([])
+
+  // 新增資料夾用
+  const [nowFolder, setNowFolder] = useState('')
+  const [addingFolder, setAddingFolder] = useState(false)
+  const [newFolderName, setNewFolderName] = useState('')
+  const [hasAddedFolder, setHasAddedFolder] = useState(false)
+
+  const test = () => {}
+
+  const confirmAdd = () => {
+    let data = {
+      name: newFolderName,
+      parentFolder: nowFolder,
+    }
+    adminService.addNewFolder(token, data).then((res) => {
+      if (res?.success) {
+        setHasAddedFolder(!hasAddedFolder)
+      }
+    })
+  }
+
+  // session setting
   useEffect(() => {
     if (!sessionStorage.getItem('user_role') || !sessionStorage.getItem('user_id')) {
       userService.getUserInfo(token).then((res) => {
@@ -27,8 +53,8 @@ export default function ShowPublicQA({ courseName, token, course_id, showPublicQ
         sessionStorage.setItem('user_role', res.data.role)
       })
     }
-    const role = localStorage.getItem('user_role')
-    const user_id = localStorage.getItem('user_role')
+    const role = sessionStorage.getItem('user_role')
+    const user_id = sessionStorage.getItem('user_role')
     if (role) {
       setUserRole(role)
     }
@@ -37,9 +63,7 @@ export default function ShowPublicQA({ courseName, token, course_id, showPublicQ
     }
   }, [])
 
-  const addQAtoCourse = () => {}
-
-  // 控制頁面scroll狀態
+  // scroll control
   useEffect(() => {
     if (typeof document !== 'undefined') {
       setPage_body(document.querySelector('body'))
@@ -49,7 +73,25 @@ export default function ShowPublicQA({ courseName, token, course_id, showPublicQ
     }
   }, [page_body])
 
-  const test = () => {}
+  useEffect(() => {
+    if (token) {
+      userService.getRootFolder(token).then((res) => {
+        if (!res?.success) return
+        setRootFolder(res.data.find((item) => item?.name === 'root'))
+        setNowFolder(res.data.find((item) => item?.name === 'root')._id)
+        const root = res.data.find((item) => item?.name === 'root')
+        // 檢查是否為root
+        if (root?.isRoot === true) {
+          let data = { folder_id: root._id }
+          userService.getChildFolders(token, data).then((res) => {
+            if (res?.success) {
+              setRootChildFolders(res.data)
+            }
+          })
+        }
+      })
+    }
+  }, [token, hasAddedFolder])
 
   return (
     <div
@@ -64,107 +106,45 @@ export default function ShowPublicQA({ courseName, token, course_id, showPublicQ
           }}>
           關閉
         </div>
-        <div className="title">公開QA</div>
-        <div className="info-container">
-          {publicQAInfo &&
-            publicQAInfo.map((item, index) => (
+        <div className="btn-area">
+          {userRole === 'admin' && (
+            <button
+              className="g-blue-btn"
+              onClick={() => {
+                setAddingFolder(true)
+              }}>
+              新增資料夾
+            </button>
+          )}
+        </div>
+        {userRole === 'admin' && addingFolder && (
+          <div className="input-area">
+            <div className="content">將新增至此資料夾底下</div>
+            <div className="content">，新資料夾名稱:</div>
+            <input
+              type="text"
+              onChange={(e) => {
+                setNewFolderName(e.target.value)
+              }}
+            />
+            <div
+              className="g-blue-btn"
+              onClick={() => {
+                confirmAdd()
+              }}>
+              確定
+            </div>
+          </div>
+        )}
+        <div className="shortcut-area">
+          {nowFolder === rootFolder._id ? <div className="content active">{rootFolder?.name === 'root' && 'root'}</div> : <div className="content">{rootFolder?.name === 'root' && 'root'}</div>}
+
+          {rootChildFolders.length > 0 &&
+            rootChildFolders.map((item, index) => (
               <div
-                className="qa-card"
+                className="content"
                 key={index}>
-                <div className="tag-area">
-                  {/* 大tag */}
-                  {/* 第一個判斷條件為目前選擇的排序(tag)是哪個 */}
-                  {resourceCategory && (
-                    <div className="big-tag-area">
-                      {item.resourceCategories.map((tagName, index) => (
-                        <div
-                          className="tag-content"
-                          key={index}>
-                          {tagName === '' && '無主題'}
-                          {tagName}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {hint && (
-                    <div className="big-tag-area">
-                      {item.hints.map((tagName, index) => (
-                        <div
-                          className="tag-content"
-                          key={index}>
-                          {tagName === '' && '無標籤'}
-                          {tagName}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {/* 小tag */}
-                  {!resourceCategory && (
-                    <div className="little-tag-area">
-                      {item.resourceCategories.map((tagName, index) => (
-                        <div
-                          className="tag-content"
-                          key={index}>
-                          {tagName === '' && '無特定主題'}
-                          {tagName}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {!hint && (
-                    <div className="little-tag-area">
-                      {item.hints.map((tagName, index) => (
-                        <div
-                          className="tag-content"
-                          key={index}>
-                          {tagName === '' && '無特定標籤'}
-                          {tagName}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div className="image-area">
-                  {item.image.map((url, index) => (
-                    <div key={index}>
-                      <Image
-                        src={`${url}?token=${token.split(' ')[1]}`}
-                        className="image"
-                        alt="qa image"
-                        loading="lazy"
-                        width={200}
-                        height={200}
-                        style={{ width: 'auto' }}></Image>
-                    </div>
-                  ))}
-                </div>
-                <div className="content-area">
-                  <div className="time">
-                    <div className="create-time">發布時間 : {new Date(item.date).toLocaleString()}</div>
-                  </div>
-                  <div className="description">{item.description}</div>
-                  <div className="into-qustion-page-btn">
-                    <Link
-                      className="link"
-                      // 恢復滑條
-                      onClick={() => {
-                        page_body.style.overflow = 'scroll'
-                      }}
-                      href={`${client_base_URL}/courses/QaPage?qa_id=${item._id}&courseName=${courseName}`}>
-                      進到問題頁面
-                    </Link>
-                    {userRole === 'teacher' ||
-                      (userRole === 'admin' && (
-                        <div
-                          className="add-to-course-btn"
-                          onClick={() => {
-                            addQAtoCourse()
-                          }}>
-                          將此QA加進此課程
-                        </div>
-                      ))}
-                  </div>
-                </div>
+                {item.name}
               </div>
             ))}
         </div>

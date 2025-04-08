@@ -26,7 +26,7 @@ export default function ShowMoreQA({ courseName, showMoreQA, setShowMoreQA, toke
     pageSize,
   }
 
-  // response狀態
+  // get response
   const [qaInfo, setQaInfo] = useState(null)
 
   // 請求獲得指定的tag的qa
@@ -59,11 +59,7 @@ export default function ShowMoreQA({ courseName, showMoreQA, setShowMoreQA, toke
     }
   }, [page_body])
 
-  const test = () => {
-    qaInfo.map((item) => {
-      console.log(`${image_base_url}${item.image}?token=${token.split(' ')[1]}`)
-    })
-  }
+  const test = () => {}
 
   return (
     <div
