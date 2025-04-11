@@ -115,8 +115,7 @@ export default function MyCourse() {
             {getCourses.map((item, index) => (
               <li
                 className="course"
-                key={index}
-                style={{ height: '80px' }}>
+                key={index}>
                 <div href={curserBaseUrl + `?courseName=${item.courseName}&courseId=${item._id}`}>
                   <div className="course-header flex align-center">
                     <div className="course-fake-shot">
@@ -144,16 +143,18 @@ export default function MyCourse() {
                     <span>年級: </span>
                     {item.grade}
                   </div>
-                  <div className="info-area">
-                    <span>學生人數: </span>
-                    {item.members}
+                  <div className="info-area last-line">
+                    <div className="container">
+                      <span>學生人數: </span>
+                      {item.members}
+                    </div>
+                    <Link
+                      className="g-blue-btn"
+                      href={curserBaseUrl + `?courseName=${item.courseName}&courseId=${item._id}`}>
+                      前往課程
+                    </Link>
                   </div>
                 </div>
-                <Link
-                  className="g-blue-btn btn"
-                  href={curserBaseUrl + `?courseName=${item.courseName}&courseId=${item._id}`}>
-                  前往課程
-                </Link>
               </li>
             ))}
           </ul>

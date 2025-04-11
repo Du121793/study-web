@@ -18,10 +18,13 @@ export default function Board({ setEditHasChange, editHasChange, board_id = null
   const [editTitle, setEditTitle] = useState('')
   const [editContent, setEditContent] = useState('')
   const [editSubTitle, setEditSubTitle] = useState('')
+  // 用於控制ui高度
+  const uiElement = useRef(null)
+  const [getUiHeight, setGetUiHeight] = useState(0)
   // 嚴格onclick
   const strictClickCloseUI = useStrictClickHandler(() => {
     setVisibility('hidden')
-    setUploadBoardUIHeight(0)
+    setGetUiHeight(0)
     page_body.style.overflow = 'auto'
     setTimeout(() => {
       setShowUploadBoardUI(false)
@@ -59,6 +62,9 @@ export default function Board({ setEditHasChange, editHasChange, board_id = null
 
   // 控制頁面scroll狀態
   useEffect(() => {
+    if (uiElement?.current?.scrollHeight) {
+      setGetUiHeight(uiElement.current.scrollHeight)
+    }
     if (typeof document !== 'undefined') {
       setPage_body(document.querySelector('body'))
     }
@@ -73,8 +79,9 @@ export default function Board({ setEditHasChange, editHasChange, board_id = null
       {...strictClickCloseUI}>
       <div
         className="upload-board-ui"
-        onClick={(e) => e.stopPropagation()}
-        style={{ height: uploadBoardUIHeight }}>
+        ref={uiElement}
+        style={{ height: getUiHeight }}
+        onClick={(e) => e.stopPropagation()}>
         {whichMethod === 'edit' ? (
           <div
             className="title"

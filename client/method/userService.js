@@ -349,6 +349,37 @@ const userService = {
       return e
     }
   },
+  /**
+   * 獲取指定資料夾下的所有問題
+   * @route GET /getFolderQuestions
+   * @param {string} folder_id - 資料夾ID
+   * @param {number} [page=1] - 頁碼
+   * @param {number} [pageSize=10] - 每頁筆數
+   * @param {string} [sortBy="lastUpdate"] - 排序欄位，"createDate"或"lastUpdate"
+   * @param {string} [sortOrder="asc"] - 排序方向，"asc"為升序，"desc"為降序
+   * @param {string} [sortType="resourceCategories"] - 分群依據，"resourceCategories"或"hints"
+   * @returns {Object} 按標籤分組的問題列表及分頁資訊
+   */
+  async getFolderQuestions(token, data) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.get(API_URL + `/course/question/modifyQA/folder/getFolderQuestions`, {
+        headers: authHeader,
+        params: data,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (e) {
+      if (e?.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
+    }
+  },
   async getRootFolder(token) {
     try {
       let data = {
@@ -372,7 +403,13 @@ const userService = {
       }
     }
   },
-
+  /**
+   * 獲取資料夾列表
+   * @route GET /getFolders
+   * @param {string} [folder_id] - 要查找子資料夾的父資料夾ID
+   * @param {boolean} [isRoot=false] - 是否只獲取根資料夾
+   * @returns {Object} 資料夾列表
+   */
   async getChildFolders(token, data) {
     try {
       const authHeader = token ? { Authorization: token } : {}

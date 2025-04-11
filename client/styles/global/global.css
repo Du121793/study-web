@@ -93,6 +93,10 @@ a {
   display: none;
 }
 
+.shadow {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
 .btn {
   cursor: pointer;
   -webkit-user-select: none;
@@ -118,6 +122,9 @@ a {
 }
 
 .g-blue-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   background-color: #007bff;
   color: #fff;
@@ -128,13 +135,42 @@ a {
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
+  word-break: keep-all;
+  outline: none;
+  font-size: clamp(16px, 1.1vw, 20px);
 }
 
 .g-blue-btn:hover {
   background-color: #0069d9;
 }
 
+.g-green-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: #29ce34;
+  color: #ffffff;
+  transition: 0.2s;
+  padding: 5px 16px;
+  border-radius: 4px;
+  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  word-break: keep-all;
+  outline: none;
+  font-size: clamp(16px, 1.1vw, 20px);
+}
+
+.g-green-btn:hover {
+  background-color: #24b42e;
+}
+
 .g-red-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   background-color: #f84343;
   color: #fff;
@@ -145,13 +181,66 @@ a {
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
+  word-break: keep-all;
+  outline: none;
+  font-size: clamp(16px, 1.1vw, 20px);
 }
 
 .g-red-btn:hover {
   background-color: #e03535;
 }
 
+.g-light-red-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: #f97676;
+  color: #fff;
+  transition: 0.2s;
+  padding: 5px 16px;
+  border-radius: 4px;
+  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  word-break: keep-all;
+  outline: none;
+  font-size: clamp(16px, 1.1vw, 20px);
+}
+
+.g-light-red-btn:hover {
+  background-color: #e16d6d;
+}
+
+.g-white-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #171717;
+  transition: 0.2s;
+  padding: 5px 16px;
+  border-radius: 4px;
+  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  word-break: keep-all;
+  outline: none;
+  font-size: clamp(16px, 1.1vw, 20px);
+}
+
+.g-white-btn:hover {
+  background-color: #f1f1f1;
+}
+
 .g-black-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   background-color: #545454;
   color: #fff;
@@ -162,10 +251,28 @@ a {
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
+  word-break: keep-all;
+  outline: none;
+  font-size: clamp(16px, 1.1vw, 20px);
 }
 
 .g-black-btn:hover {
   background-color: #323232;
+}
+
+.g-loadmore-btn {
+  margin-bottom: 12px;
+  background-color: #fff;
+  cursor: pointer;
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: 0.2s;
+}
+
+.g-loadmore-btn:hover {
+  background-color: var(--botton-white-hover);
 }
 
 .g-shadow {
@@ -307,6 +414,7 @@ import ArrowRight from '../../public/profile/rightArrow.png'
 */
 .page-switch {
   display: flex;
+  align-items: center;
   gap: 12px;
 }
 .page-switch .page-switcher {
@@ -333,6 +441,7 @@ import ArrowRight from '../../public/profile/rightArrow.png'
   display: flex;
   color: #9a9a9a;
   gap: 4px;
+  font-size: clamp(16px, 1.2vw, 20px);
 }
 .page-switch .now-page .page {
   cursor: pointer;
@@ -340,6 +449,26 @@ import ArrowRight from '../../public/profile/rightArrow.png'
 .page-switch .active {
   font-weight: bold;
   color: rgb(0, 0, 0);
+}
+
+.message {
+  z-index: 99999;
+  background-color: #e2e2e2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  overflow: hidden;
+  left: 50%;
+  top: 45px;
+  transform: translate(-50%, 0);
+  transition: 0.2s;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 18px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
 }
 
 /*
@@ -379,23 +508,4 @@ const messageControl = (info, isSuccess) => {
         className="message">
         {message}
       </div>
-*/
-.message {
-  z-index: 99999;
-  background-color: #e2e2e2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  overflow: hidden;
-  left: 50%;
-  top: 45px;
-  transform: translate(-50%, 0);
-  transition: 0.2s;
-  border-radius: 4px;
-  font-weight: bold;
-  font-size: 18px;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-          user-select: none;
-}/*# sourceMappingURL=global.css.map */
+*//*# sourceMappingURL=global.css.map */

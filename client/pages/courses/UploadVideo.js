@@ -523,8 +523,8 @@ export default function UploadVideoFc({ setshowUploadVideoUI, uploadVideoUIHeigh
               <input
                 type="radio"
                 name="contact"
-                value="confirm"
-                checked={!isPublic}
+                defaultValue="confirm"
+                defaultChecked={!isPublic}
                 onClick={() => {
                   setIsPublic(false)
                 }}
@@ -535,8 +535,8 @@ export default function UploadVideoFc({ setshowUploadVideoUI, uploadVideoUIHeigh
               <input
                 type="radio"
                 name="contact"
-                value="reject"
-                checked={isPublic}
+                defaultValue="reject"
+                defaultChecked={isPublic}
                 onClick={() => {
                   setIsPublic(true)
                 }}

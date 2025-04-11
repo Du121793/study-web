@@ -40,6 +40,9 @@ import '../styles/course/videoSelector.css'
 import '../styles/course/component/editVideoInfo.css'
 import '../styles/component/QA/editQA.css'
 import '../styles/course/component/uploadOldVimeoVDO.css'
+import '../styles/course/component/askQA.css'
+import '../styles/course/component/videoNav.css'
+import '../styles/course/component/QANav.css'
 // videoPlay
 import '../styles/videoPlay/player.css'
 //method的layout

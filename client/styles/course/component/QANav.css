@@ -1,0 +1,255 @@
+@charset "UTF-8";
+.QA-area {
+  background-color: #f5f5f5;
+}
+.QA-area .container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px; /* 區塊間距 */
+}
+.QA-area .container .QA-header {
+  width: 100%;
+  padding-top: 16px;
+  display: flex;
+  gap: 24px;
+}
+.QA-area .container .QA-header .sort-by-area {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+.QA-area .container .QA-header .time-sort-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.QA-area .container .QA-header .select {
+  height: 32px;
+}
+.QA-area .container .QA-header .show-public-QA {
+  cursor: pointer;
+  padding: 4px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  background-color: #cbf6ff;
+  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
+  transition: 0.2s;
+}
+.QA-area .container .QA-header .show-public-QA:hover {
+  background-color: #bae1e9;
+}
+.QA-area .container .QA-header .show-delete-btn {
+  cursor: pointer;
+  padding: 4px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  background-color: #ffb7b7;
+  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
+  transition: 0.2s;
+}
+.QA-area .container .QA-header .show-delete-btn:hover {
+  background-color: #e7a5a5;
+}
+.QA-area .container .sort-title {
+  margin-left: 24px;
+}
+.QA-area .container .QA-grid {
+  width: 100%;
+}
+.QA-area .container .QA-grid .QA-container {
+  padding: 24px;
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+}
+.QA-area .container .QA-grid .QA-container .QA-list {
+  margin-bottom: 32px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #bebebe;
+  border-radius: 2px;
+  gap: 18px;
+  background-color: rgb(235, 235, 235);
+}
+.QA-area .container .QA-grid .QA-container .QA-list .QA-tag {
+  display: flex;
+}
+.QA-area .container .QA-grid .QA-container .QA-list .QA-tag .content {
+  font-weight: bold;
+  font-size: 22px;
+  padding: 4px 8px;
+  background-color: #f6b594;
+  border-radius: 4px;
+  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
+}
+.QA-area .container .QA-grid .QA-container .QA-list .qa-info {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 90%;
+  border: 1px solid #ababab;
+  padding: 12px;
+  border-radius: 4px;
+  gap: 8px;
+  background-color: #ffffff;
+  transition: 0.2s;
+}
+.QA-area .container .QA-grid .QA-container .QA-list .qa-info .btn-area {
+  display: flex;
+  gap: 12px;
+}
+.QA-area .container .QA-grid .QA-container .QA-list .qa-info .btn-area .into-qa-btn {
+  color: black;
+  flex: 1;
+  padding: 4px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  background-color: var(--button-white);
+  transition: 0.2s;
+}
+.QA-area .container .QA-grid .QA-container .QA-list .qa-info .btn-area .into-qa-btn:hover {
+  background-color: var(--botton-white-hover);
+}
+.QA-area .container .QA-grid .QA-container .QA-list .qa-info .btn-area .remove-btn {
+  color: black;
+  padding: 4px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  background-color: #ffdada;
+  transition: 0.2s;
+  cursor: pointer;
+}
+.QA-area .container .QA-grid .QA-container .QA-list .qa-info .btn-area .remove-btn:hover {
+  background-color: #ebc1c1;
+}
+.QA-area .container .QA-grid .QA-container .QA-list .qa-info .qa-info-title {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.QA-area .container .QA-grid .QA-container .QA-list .qa-info .qa-info-title .content {
+  font-weight: bold;
+  font-size: 18px;
+  padding: 4px 8px;
+  background-color: #b9cdf9;
+  border-radius: 4px;
+  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
+  color: black;
+}
+.QA-area .container .QA-grid .QA-container .QA-list .qa-info .qa-image-area {
+  display: flex;
+  flex-wrap: wrap;
+}
+.QA-area .container .QA-grid .QA-container .QA-list .qa-info .qa-image-area .qa-image {
+  width: 100%;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+.QA-area .container .QA-grid .QA-container .QA-list .qa-info .qa-image-area .qa-images {
+  width: 33%;
+}
+.QA-area .container .QA-grid .QA-container .QA-list .qa-info .time-replied-area {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15px;
+}
+.QA-area .container .QA-grid .QA-container .QA-list .qa-info .time-replied-area .time {
+  color: rgba(0, 0, 0, 0.5);
+}
+.QA-area .container .QA-grid .QA-container .QA-list .qa-info .time-replied-area .not-replied {
+  color: blue;
+}
+.QA-area .container .QA-grid .QA-container .QA-list .qa-info .time-replied-area .is-replied {
+  color: rgb(114, 37, 255);
+}
+.QA-area .container .QA-grid .QA-container .QA-list .qa-info .qa-description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: black;
+  width: 90%;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  background-color: #f1f1f1;
+  padding: 4px 8px;
+  margin-top: -6px;
+}
+.QA-area .container .QA-grid .QA-container .QA-list .qa-info:hover {
+  background-color: #f6f6f6;
+}
+.QA-area .container .QA-grid .QA-container .qa-info-area {
+  color: black;
+  cursor: pointer;
+  padding: 16px;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.2);
+  background-color: #fff;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+  transition: 0.2s;
+}
+.QA-area .container .QA-grid .QA-container .qa-info-area .content {
+  font-size: clamp(16px, 1.2vw, 18px);
+  display: flex;
+  word-break: keep-all;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: -4px;
+}
+.QA-area .container .QA-grid .QA-container .qa-info-area .content .is-replied {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.QA-area .container .QA-grid .QA-container .qa-info-area .content .time {
+  color: rgb(122, 122, 122);
+  word-break: keep-all;
+  font-size: 12px;
+}
+.QA-area .container .QA-grid .QA-container .qa-info-area .into-qa-btn {
+  color: black;
+  flex: 1;
+  padding: 4px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  background-color: var(--button-white);
+  transition: 0.2s;
+}
+.QA-area .container .QA-grid .QA-container .qa-info-area .into-qa-btn:hover {
+  background-color: var(--botton-white-hover);
+}
+.QA-area .container .QA-grid .QA-container .qa-info-area .description-area {
+  padding: 8px;
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.06);
+}
+.QA-area .container .QA-grid .QA-container .qa-info-area:hover {
+  background-color: #f5f5f5;
+}
+.QA-area .container .QA-grid .QA-container .load-more-btn {
+  cursor: pointer;
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  background-color: white;
+}
+.QA-area .container .QA-grid .btn-area {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.QA-area .container .QA-grid .btn-area .g-black-btn {
+  margin-bottom: 24px;
+}/*# sourceMappingURL=QANav.css.map */

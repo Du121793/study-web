@@ -1,16 +1,19 @@
+// 組件庫
 import { useEffect, useRef, useState } from 'react'
 import Masonry from 'react-masonry-css'
 import Image from 'next/image'
 import Link from 'next/link'
-
+// method
 import { useUserToken } from '../../method/useUserToken'
 import userService from '../../method/userService'
 import adminService from '../../method/adminService'
-
+// public
 import downArrow from '../../public/course/downArrow.png'
 import ShowMoreQA from './component/ShowMoreQA'
 import ShowPublicQA from './component/ShowPublicQA'
 import ImageZoom from './component/ImageZoom'
+// 子組件
+import AskNav from './component/AskQA'
 
 const client_URL = process.env.NEXT_PUBLIC_CLIENT_IP
 
@@ -41,58 +44,18 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
   const [showMoreQA, setShowMoreQA] = useState(false)
   const [showPublicQA, setShowPublicQA] = useState(false)
   const [selectBy, setSelectBy] = useState(null)
-  const [showRemoveBtn, setShowRemoveBtn] = useState(false)
   const [doubleCheck, setDoubleCheck] = useState(false)
 
   // get參數
   const [pageSize, setPageSize] = useState(8)
   const [page, setPage] = useState(1)
 
-  // 取得 localStorage 中的 token
-  useEffect(() => {
-    setTimeout(() => {
-      if (typeof window !== 'undefined') {
-        const localToken = window.localStorage.getItem('token')
-        if (localToken) {
-          setUserToken(localToken.split(' ')[1])
-        }
-      }
-    }, 100)
-  }, [])
+  // 刪除qa
+  const [removeingQA, setRemoveingQA] = useState(false)
 
-  // 渲染頁面時取得 QA 資料
-  useEffect(() => {
-    if (token) {
-      const localStorageSortBy = localStorage.getItem('qa_sort_by')
-      const localStorageTimeSortBy = localStorage.getItem('qa_time_sort_by')
-
-      const data = {
-        // 沒有就用預設state
-        sortType: localStorageSortBy ? localStorageSortBy : sortBy,
-        sortOrder: localStorageTimeSortBy ? localStorageTimeSortBy : timeSort,
-        pageSize: pageSize,
-        page: page,
-      }
-      userService.getCourseQAs(token, course_id, data).then((res) => {
-        if (res.success) {
-          setCourseQas(res.data)
-          // 更新nav高度
-          setTimeout(() => {
-            setQaHeight(containerRef.current.scrollHeight)
-          }, 30)
-          setTimeout(() => {
-            setQaHeight(containerRef.current.scrollHeight)
-          }, 30)
-          setTimeout(() => {
-            setQaHeight(containerRef.current.scrollHeight)
-          }, 30)
-          // 沒有就用預設state，有就不變
-          localStorageSortBy ? localStorage.getItem('qa_sort_by') : localStorage.setItem('qa_sort_by', sortBy)
-          localStorageTimeSortBy ? localStorage.getItem('qa_time_sort_by') : localStorage.setItem('qa_time_sort_by', timeSort)
-        }
-      })
-    }
-  }, [token, course_id, qaHasUpload, qaOpen, pageSize])
+  // 提問區
+  const [showAskQA, setShowAskQA] = useState(false)
+  const [askQAHeight, setAskQAHeight] = useState(0)
 
   const changeSort = (sortBy, timeSort) => {
     const data = {
@@ -162,23 +125,41 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
     }, 2000)
   }
 
-  // 刪除 QA
-  const removeQuestion = (question_id) => {
-    adminService.removeQuestion(token, question_id).then((res) => {
-      userService
-        .getCourseQAs(token, course_id, sortBy)
-        .then((res) => {
-          if (res.success) {
-            messageControl('刪除成功', true)
+  const removeQAFromCourse = (qaInfo) => {
+    let course_ids_temp = []
+    course_ids_temp = qaInfo?.courses.filter((item) => item !== course_id)
 
+    if (qaInfo) {
+      let data = {
+        question_id: qaInfo._id,
+        course_ids: course_ids_temp,
+      }
+      adminService.patchQaToFolders(token, data).then((res) => {
+        console.log(res)
+        const tempData = {
+          // 沒有就用預設state
+          sortType: sortBy,
+          sortOrder: timeSort,
+          pageSize: pageSize,
+          page: page,
+        }
+        userService.getCourseQAs(token, course_id, tempData).then((res) => {
+          if (res?.success) {
+            setCourseQas(res.data)
+            // 更新nav高度
+            setTimeout(() => {
+              setQaHeight(containerRef.current.scrollHeight)
+            }, 30)
+            setTimeout(() => {
+              setQaHeight(containerRef.current.scrollHeight)
+            }, 30)
             setTimeout(() => {
               setQaHeight(containerRef.current.scrollHeight)
             }, 30)
           }
-          setCourseQas(res.data)
         })
-        .catch((err) => console.error('Error:', err.message))
-    })
+      })
+    }
   }
 
   const showPublicQAClick = () => {
@@ -188,6 +169,55 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
       setShowPublicQA(true)
     })
   }
+
+  // 取得 localStorage 中的 token
+  useEffect(() => {
+    setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        const localToken = window.localStorage.getItem('token')
+        if (localToken) {
+          setUserToken(localToken.split(' ')[1])
+        }
+      }
+    }, 100)
+  }, [])
+
+  // 渲染頁面時取得 QA 資料
+  useEffect(() => {
+    if (token) {
+      const localStorageSortBy = localStorage.getItem('qa_sort_by')
+      const localStorageTimeSortBy = localStorage.getItem('qa_time_sort_by')
+
+      const data = {
+        // 沒有就用預設state
+        sortType: localStorageSortBy ? localStorageSortBy : sortBy,
+        sortOrder: localStorageTimeSortBy ? localStorageTimeSortBy : timeSort,
+        pageSize: pageSize,
+        page: page,
+      }
+      userService.getCourseQAs(token, course_id, data).then((res) => {
+        if (res.success) {
+          messageControl('加載完成', true)
+          setCourseQas(res.data)
+          // 更新nav高度
+          setTimeout(() => {
+            setQaHeight(containerRef.current.scrollHeight)
+          }, 30)
+          setTimeout(() => {
+            setQaHeight(containerRef.current.scrollHeight)
+          }, 30)
+          setTimeout(() => {
+            setQaHeight(containerRef.current.scrollHeight)
+          }, 30)
+          // 沒有就用預設state，有就不變
+          localStorageSortBy ? localStorage.getItem('qa_sort_by') : localStorage.setItem('qa_sort_by', sortBy)
+          localStorageTimeSortBy ? localStorage.getItem('qa_time_sort_by') : localStorage.setItem('qa_time_sort_by', timeSort)
+        } else {
+          messageControl('加載失敗', true)
+        }
+      })
+    }
+  }, [token, course_id, qaHasUpload, qaOpen, pageSize])
 
   return (
     <div
@@ -204,15 +234,17 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
         />
         <span>Q & A</span>
       </div>
-      <div
-        style={{
-          height: messageStatus ? '20px' : '0',
-          padding: messageStatus ? '24px' : '0',
-          backgroundColor: messageColor,
-        }}
-        className="message">
-        {message}
-      </div>
+      {qaOpen && (
+        <div
+          style={{
+            height: messageStatus ? '20px' : '0',
+            padding: messageStatus ? '24px' : '0',
+            backgroundColor: messageColor,
+          }}
+          className="message">
+          {message}
+        </div>
+      )}
       {imageIsZoom && (
         <ImageZoom
           setImageIsZoom={setImageIsZoom}
@@ -264,17 +296,33 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
             </div>
             {((user_role && user_role === 'teacher') || (user_role && user_role === 'admin')) && (
               <div
-                className="show-public-QA"
+                className="g-blue-btn"
                 onClick={showPublicQAClick}>
-                顯示公開QA
+                公共問題區
               </div>
             )}
             {((user_role && user_role === 'teacher') || (user_role && user_role === 'admin')) && (
               <div
-                className="show-delete-btn"
-                onClick={() => setShowRemoveBtn(!showRemoveBtn)}>
+                className="g-red-btn"
+                onClick={() => setRemoveingQA(!removeingQA)}>
                 刪除QA
               </div>
+            )}
+            <div
+              className="g-black-btn"
+              onClick={() => {
+                setShowAskQA(true)
+              }}>
+              提問
+            </div>
+            {showAskQA && (
+              <AskNav
+                showAskQA={showAskQA}
+                setShowAskQA={setShowAskQA}
+                qaHasUpload={qaHasUpload}
+                setQaHasUpload={setQaHasUpload}
+                course_id={course_id}
+              />
             )}
             {showPublicQA && (
               <ShowPublicQA
@@ -286,6 +334,7 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
                 courseName={courseName}
                 token={token}
                 course_id={course_id}
+                course_name={courseName}
               />
             )}
             {showMoreQA && (
@@ -311,6 +360,7 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
                   <div
                     className="QA-list"
                     key={index}>
+                    {/* 主標題 */}
                     {item?.tag !== '' && (
                       <div className="QA-tag">
                         <div className="content">{item.tag}</div>
@@ -326,58 +376,31 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
                         <div className="content">標籤</div>
                       </div>
                     )}
-                    {item?.docs?.map((doc, idx) => (
-                      <div
+                    {/* 副標題 */}
+                    {item?.docs.map((doc, idx) => (
+                      <Link
+                        href={`${client_URL}/courses/QaPage?qa_id=${doc._id}&courseName=${courseName}&course_id=${course_id}`}
                         key={idx}
                         className="qa-info">
-                        {doc.hints[0] === '' && sortBy === 'resourceCategories' && (
-                          <div className="qa-info-title">
-                            <div className="content">無標籤</div>
-                          </div>
-                        )}
-                        {doc.resourceCategories[0] === '' && sortBy === 'hints' && (
-                          <div className="qa-info-title">
-                            <div className="content">無主題</div>
-                          </div>
-                        )}
-                        {doc.hints[0] !== '' && sortBy === 'resourceCategories' && (
-                          <div className="qa-info-title">
-                            {doc.hints.map((content, idx2) => (
-                              <div
-                                className="content"
-                                key={idx2}>
-                                {content}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                        {doc.resourceCategories[0] !== '' && sortBy === 'hints' && (
-                          <div className="qa-info-title">
-                            {doc.resourceCategories.map((content, idx2) => (
-                              <div
-                                className="content"
-                                key={idx2}>
-                                {content}
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                        {sortBy === 'resourceCategories' && <div className="qa-info-title">{doc?.hints.length > 0 && Array.isArray(doc?.hints) && doc?.hints.map((hint) => <div className="content">{hint}</div>)}</div>}
+                        {sortBy === 'hints' && <div className="qa-info-title">{doc?.resourceCategories.length > 0 && Array.isArray(doc?.resourceCategories) && doc?.resourceCategories.map((resourceCategories) => <div className="content">{resourceCategories}</div>)}</div>}
+
                         <div className="btn-area">
-                          <Link
-                            className="into-qa-btn"
-                            href={`${client_URL}/courses/QaPage?qa_id=${doc._id}&courseName=${courseName}&course_id=${course_id}`}>
-                            問題頁面
-                          </Link>
-                          {showRemoveBtn && (
+                          {removeingQA && (
                             <div
+                              style={{ width: '100%' }}
                               className="remove-btn"
                               onClick={(e) => {
-                                if (e.target.innerText === '確認刪除') {
-                                  setDoubleCheck(true)
-                                  removeQuestion(doc._id)
-                                }
+                                e.preventDefault()
+                                e.stopPropagation()
                                 if (e.target.innerText === '刪除') {
                                   e.target.innerText = '確認刪除'
+                                  e.target.className = 'g-red-btn'
+                                  return
+                                }
+                                if (e.target.innerText === '確認刪除') {
+                                  // 刪除function
+                                  removeQAFromCourse(doc)
                                 }
                               }}>
                               刪除
@@ -415,28 +438,75 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
                             點擊加載全部
                           </div>
                         )}
-                      </div>
+                      </Link>
                     ))}
+                    {item?.docs.length >= 3 && (
+                      <div
+                        className="g-blue-btn"
+                        onClick={() => {
+                          setShowMoreQA(true)
+                          setSelectBy(item.tag)
+                        }}>
+                        點擊加載全部
+                      </div>
+                    )}
                   </div>
                 ))}
 
+              {/* 沒有主題 */}
               {(localStorage.getItem('qa_sort_by') === 'none' || (sortBy && sortBy === 'none')) &&
                 courseQas.map((item, index) => (
-                  <div
+                  <Link
+                    href={`${client_URL}/courses/QaPage?qa_id=${item._id}&courseName=${courseName}&course_id=${course_id}`}
                     className="qa-info-area"
                     key={index}>
-                    <Link
-                      className="into-qa-btn"
-                      href={`${client_URL}/courses/QaPage?qa_id=${item._id}&courseName=${courseName}&course_id=${course_id}`}>
-                      問題頁面
-                    </Link>
-                    <div className="content">描述</div>
+                    {removeingQA && (
+                      <button
+                        className="g-light-red-btn"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          if (e.target.innerText === '刪除') {
+                            e.target.innerText = '確認刪除'
+                            e.target.className = 'g-red-btn'
+                            return
+                          }
+                          if (e.target.innerText === '確認刪除') {
+                            // 刪除function
+                            removeQAFromCourse(item)
+                          }
+                        }}>
+                        刪除
+                      </button>
+                    )}
+                    <div className="content">
+                      <div
+                        className="is-replied"
+                        style={{ color: item.replied ? 'purple' : 'blue' }}>
+                        <div
+                          className="title"
+                          style={{ color: 'black' }}>
+                          描述
+                        </div>
+                        {item.replied ? '已回覆' : '未回覆'}
+                      </div>
+                      <div className="time">{new Date(item.date).toLocaleString()}</div>
+                    </div>
                     <div className="description-area">{item.description}</div>
-                  </div>
+                  </Link>
                 ))}
             </Masonry>
             <div className="btn-area">
               {(localStorage.getItem('qa_sort_by') === 'none' || (sortBy && sortBy === 'none')) && (
+                <button
+                  className="g-loadmore-btn "
+                  onClick={() => {
+                    setPageSize(pageSize + 8)
+                  }}>
+                  加載更多問題
+                </button>
+              )}
+              {localStorage.getItem('qa_sort_by') !== 'none' && (
                 <button
                   className="g-black-btn"
                   onClick={() => {

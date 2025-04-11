@@ -12,7 +12,7 @@
   width: 75%;
 
   .member-select-header {
-    font-size: 24px;
+    font-size: clamp(28px, 2vw, 34px);
   }
   .classification {
     position: relative;
@@ -28,6 +28,7 @@
       align-items: center;
       gap: 12px;
       flex-wrap: wrap;
+      font-size: clamp(16px, 1.2vw, 20px);
       span {
         font-weight: 500;
         color: #333;
@@ -91,8 +92,10 @@
     margin-top: 12px;
     width: 100%;
     .title-area {
+      font-size: clamp(16px, 1.2vw, 20px);
       margin-bottom: -8px;
       display: flex;
+      justify-content: center;
       width: 100%;
       #username {
         margin-left: 50px;
@@ -123,6 +126,7 @@
       width: 97.5%;
       display: flex;
       align-items: center;
+      justify-content: center;
       position: relative;
       padding: 4px 8px;
       border: 2px solid rgb(0, 0, 0, 0.2);
@@ -147,18 +151,23 @@
           margin-left: 24px;
           width: 120px;
           text-align: left;
+          font-size: clamp(16px, 1.2vw, 20px);
         }
         #realname {
           width: 80px;
+          font-size: clamp(16px, 1.2vw, 20px);
         }
         #phone-number {
           width: 120px;
+          font-size: clamp(16px, 1.2vw, 20px);
         }
         #role {
           width: 80px;
+          font-size: clamp(16px, 1.2vw, 20px);
         }
         #grade {
           width: 80px;
+          font-size: clamp(16px, 1.2vw, 20px);
         }
       }
     }

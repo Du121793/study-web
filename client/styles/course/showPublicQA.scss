@@ -10,6 +10,9 @@
   width: 100%;
   height: 100%;
   z-index: 998;
+  .clamp {
+    font-size: clamp(16px, 1.2vw, 24px);
+  }
   .qa-info-area {
     overflow: auto;
     width: 80%;
@@ -21,26 +24,64 @@
     z-index: 999;
     border-radius: 4px;
     gap: 12px;
-    padding: 12px;
-    .close-ui-btn {
-      background-color: #ffe0e0;
-      font-size: 18px;
-      padding: 4px 8px 4px 8px;
-      border-radius: 4px;
+    padding: 24px;
+    transition: 0.2s;
+
+    .top-left-btn-area {
+      display: flex;
+      gap: 12px;
     }
+
+    .btn-area {
+      display: flex;
+      justify-content: space-between;
+    }
+
     .input-area {
       display: flex;
       gap: 4px;
       align-items: center;
+      flex-wrap: wrap;
     }
+
     .shortcut-area {
       display: flex;
+      align-items: center;
+      flex-wrap: wrap;
       gap: 12px;
+      .shortcut {
+        display: flex;
+        align-items: center;
+        .home-icon {
+          border-radius: 64px;
+          background-color: #fff;
+          transition: 0.2s;
+          padding: 2px;
+        }
+        .home-icon:hover {
+          background-color: #e0e0e0;
+        }
+        .folder-area {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          border: 1px solid rgba(0, 0, 0, 0.211);
+          border-radius: 4px;
+          padding: 2px 8px;
+          transition: 0.2s;
+          .name {
+            font-size: clamp(16px, 1.2vw, 24px);
+          }
+        }
+        .folder-area:hover {
+          background-color: #e0e0e0;
+        }
+      }
       .content {
         cursor: pointer;
         padding: 2px 8px;
         border: 1px solid rgba(0, 0, 0, 0);
-        transition: .2s;
+        transition: 0.2s;
       }
       .active {
         padding: 2px 8px;
@@ -52,6 +93,116 @@
         border: 1px solid rgba(0, 0, 0, 0.211);
         border-radius: 4px;
         background-color: #f6f6f6;
+      }
+    }
+
+    .folder-area {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      .folder-btn {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        min-width: 230px;
+        height: 60px;
+        border: 1px solid rgba(0, 0, 0, 0.211);
+        border-radius: 4px;
+        transition: 0.2s;
+        .inner-content {
+          width: 100%;
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+          position: relative;
+          gap: 8px;
+          padding: 0 16px;
+          .g-green-btn {
+            position: absolute;
+            right: 14px;
+          }
+          .g-light-red-btn {
+            position: absolute;
+            right: 14px;
+          }
+        }
+      }
+      .folder-btn:hover {
+        background-color: #f6f6f6;
+      }
+    }
+
+    .sort-setting-area {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      .space {
+        width: 4px;
+      }
+    }
+
+    .selected-folder-area {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      .slected-folder {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        min-width: 180px;
+        height: 55px;
+        border: 1px solid rgba(0, 0, 0, 0.211);
+        border-radius: 4px;
+        transition: 0.2s;
+        padding: 0 8px;
+        font-size: clamp(16px, 1.2vw, 24px);
+        .g-red-btn {
+          position: absolute;
+          right: 12px;
+        }
+      }
+    }
+
+    .qa-card-area {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      .card {
+        color: black;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        cursor: pointer;
+        width: 230px;
+        border: 1px solid rgba(0, 0, 0, 0.211);
+        border-radius: 4px;
+        transition: 0.2s;
+        .into-qa-btn {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 80%;
+          border: 1px solid rgba(0, 0, 0, 0.211);
+        }
+        .description-area {
+          width: 90%;
+          display: flex;
+          align-items: center;
+          border: 1px solid rgba(0, 0, 0, 0.211);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          padding: 8px;
+          background-color: #ffffff;
+        }
+      }
+      .card:hover {
+        background-color: #efefef;
       }
     }
   }

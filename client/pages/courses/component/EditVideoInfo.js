@@ -1,12 +1,15 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import adminService from '../../../method/adminService'
+import Image from 'next/image'
 
-export default function EditVideoInfo({ getCourseVideos, messageControl, setShowEditVideoInfo, token, video_id, course_id }) {
+export default function EditVideoInfo({ video_info, getCourseVideos, messageControl, setShowEditVideoInfo, token, video_id, course_id }) {
   // 請求參數
-  const [thumbnail, setThumbnail] = useState(null)
-  const [title, setTitle] = useState(null)
-  const [description, setDescription] = useState(null)
-  const [isPrivate, setIsPrivate] = useState(false)
+  const [thumbnail, setThumbnail] = useState(video_info.thumbnail)
+  const [title, setTitle] = useState(video_info.title)
+  const [description, setDescription] = useState(video_info.description)
+  const [isPrivate, setIsPrivate] = useState(video_info.isPrivate)
+  // 預覽圖片
+  const [preViewImage, setPreViewImage] = useState('')
 
   const submitEdit = () => {
     if (title === null) {
@@ -35,6 +38,16 @@ export default function EditVideoInfo({ getCourseVideos, messageControl, setShow
       }
     })
   }
+
+  const test = () => {}
+
+  // 設定預覽圖
+  useEffect(() => {
+    if (video_info) {
+      setPreViewImage(thumbnail)
+    }
+  }, [video_info])
+
   return (
     <div
       className="edit-video-main"
@@ -46,12 +59,17 @@ export default function EditVideoInfo({ getCourseVideos, messageControl, setShow
         onClick={(e) => {
           e.stopPropagation()
         }}>
-        <div className="title">編輯影片</div>
+        <div
+          className="title"
+          onClick={test}>
+          編輯影片
+        </div>
         <div className="title-area">
           <div className="content">影片標題:</div>
           <input
             type="text"
-            placeholder='必填'
+            placeholder="必填"
+            defaultValue={video_info.title}
             onChange={(e) => {
               setTitle(e.target.value)
             }}
@@ -68,11 +86,21 @@ export default function EditVideoInfo({ getCourseVideos, messageControl, setShow
             }}
           />
         </div>
+        {preViewImage && preViewImage !== '' && (
+          <div className="pre-view-image-area">
+            <Image
+              alt="pre view image"
+              src={preViewImage}
+              layout="fill"></Image>
+          </div>
+        )}
+
         <div className="description-area">
           <div className="content">影片描述:</div>
           <textarea
             className="textarea"
-            placeholder='選填'
+            defaultValue={video_info.description}
+            placeholder="選填"
             onChange={(e) => {
               setDescription(e.target.value)
             }}></textarea>
@@ -83,8 +111,8 @@ export default function EditVideoInfo({ getCourseVideos, messageControl, setShow
             <label>是</label>
             <input
               type="radio"
-              name="contact"
-              value=""
+              name="isPublic"
+              defaultChecked={video_info.isPrivate ? true : false}
               onClick={() => {
                 setIsPrivate(false)
               }}
@@ -94,9 +122,8 @@ export default function EditVideoInfo({ getCourseVideos, messageControl, setShow
             <label>否</label>
             <input
               type="radio"
-              name="contact"
-              value=""
-              defaultChecked={true}
+              name="isPublic"
+              defaultChecked={!video_info.isPrivate ? true : false}
               onClick={(e) => {
                 setIsPrivate(true)
               }}

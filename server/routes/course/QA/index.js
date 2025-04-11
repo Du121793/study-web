@@ -23,8 +23,9 @@ router.use("/QAMethod/:question_id", checkQuestionAccess, QAMethodRoute);
  * @route GET /getPublicQAs
  * @param {number} [page=1] - 頁碼
  * @param {number} [pageSize=10] - 每頁筆數
- * @param {string} [sortBy="lastUpdate"] - 排序欄位
+ * @param {string} [sortBy="lastUpdate"] - 排序欄位，"createDate"或"lastUpdate"
  * @param {string} [sortOrder="desc"] - 排序方向，"asc"為升序，"desc"為降序
+ * @param {string} [sortType="resourceCategories"] - 分群依據，"resourceCategories"、"hints"或"none"
  * @returns {Object} 公開問題列表及分頁資訊
  */
 router.get("/getPublicQAs", checkTeacherAccess, async (req, res) => {
@@ -37,37 +38,113 @@ router.get("/getPublicQAs", checkTeacherAccess, async (req, res) => {
     const pageSize = parseInt(req.query.pageSize, 10) || 10;
     const sortBy = req.query.sortBy || "lastUpdate";
     const sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
+    const sortType = req.query.sortType || "resourceCategories";
 
-    // 取得符合條件的 QA 筆數（總數）
-    const total = await QA.countDocuments({ isPublic: true });
+    // 設置排序欄位
+    const sortField = sortBy === "createDate" ? "date" : "lastUpdate";
 
-    // 查詢所有公開的 QA，並依據 sortBy 與 sortOrder 進行排序，
-    // 並依照分頁參數進行跳過與限制
-    const foundQAs = await QA.find({ isPublic: true })
-      .sort({ [sortBy]: sortOrder })
-      .skip((page - 1) * pageSize)
-      .limit(pageSize);
+    // 如果 sortType 為 none，直接返回分頁後的問題列表
+    if (sortType === "none") {
+      const questions = await QA.find({ isPublic: true })
+        .sort({ [sortField]: sortOrder })
+        .skip((page - 1) * pageSize)
+        .limit(pageSize);
 
-    // 轉換 QA 資料，並將 image 路徑補上伺服器前綴
-    const updatedQAs = foundQAs.map((qa) => {
-      const qaObj = qa.toObject();
-      if (Array.isArray(qaObj.image)) {
-        qaObj.image = qaObj.image.map(
-          (relPath) =>
-            `${process.env.SERVER_IP}/resource/questionIMG/${relPath}`
-        );
-      }
-      return qaObj;
+      // 處理圖片URL
+      const transformedQuestions = questions.map((doc) => {
+        if (Array.isArray(doc.image)) {
+          doc.image = doc.image.map((relPath) => {
+            return `${process.env.SERVER_IP}/resource/questionIMG/${relPath}`;
+          });
+        }
+        return doc;
+      });
+
+      return res.json({
+        success: true,
+        data: transformedQuestions,
+        page,
+        pageSize,
+        sortBy,
+        sortOrder,
+        sortType,
+      });
+    }
+
+    // 構建聚合管道
+    const pipeline = [
+      // 添加公開過濾條件
+      {
+        $match: {
+          isPublic: true,
+        },
+      },
+      // 添加排序欄位
+      {
+        $addFields: {
+          sortField: `$${sortField}`,
+        },
+      },
+      // 展開標籤陣列
+      {
+        $unwind: `$${sortType}`,
+      },
+      // 按排序欄位排序
+      {
+        $sort: { sortField: sortOrder },
+      },
+      // 按標籤分組
+      {
+        $group: {
+          _id: `$${sortType}`,
+          docs: { $push: "$$ROOT" },
+          representative: { $first: "$sortField" },
+        },
+      },
+      // 限制每組文檔數量
+      {
+        $addFields: {
+          docs: { $slice: ["$docs", 3] },
+        },
+      },
+      // 按代表值排序
+      {
+        $sort: { representative: sortOrder },
+      },
+      // 分頁處理
+      {
+        $skip: (page - 1) * pageSize,
+      },
+      {
+        $limit: pageSize,
+      },
+    ];
+
+    // 執行聚合查詢
+    const groups = await QA.aggregate(pipeline);
+
+    // 處理圖片URL
+    const transformedGroups = groups.map((group) => {
+      const tag = group._id;
+      const docs = group.docs.map((doc) => {
+        if (Array.isArray(doc.image)) {
+          doc.image = doc.image.map((relPath) => {
+            return `${process.env.SERVER_IP}/resource/questionIMG/${relPath}`;
+          });
+        }
+        return doc;
+      });
+      return { tag, docs };
     });
 
-    // 回傳結果包含分頁資訊與排序參數
     return res.json({
       success: true,
-      msg: "",
+      data: transformedGroups,
       page,
       pageSize,
-      total,
-      data: updatedQAs,
+      sortBy,
+      sortOrder,
+      sortType,
     });
   } catch (error) {
     console.error(error);

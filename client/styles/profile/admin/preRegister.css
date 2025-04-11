@@ -13,7 +13,7 @@
   justify-content: center;
 }
 .preRegister-main .header .title {
-  font-size: 28px;
+  font-size: clamp(28px, 2vw, 34px);
 }
 .preRegister-main .chose-courses-card-area {
   display: flex;
@@ -61,6 +61,7 @@
   align-items: center;
   justify-content: center;
   gap: 32px;
+  font-size: clamp(16px, 1.2vw, 20px);
 }
 .preRegister-main .form .form-line .form-selects select {
   border: 1px solid rgba(0, 0, 0, 0.4);
@@ -90,21 +91,23 @@
   gap: 12px;
   display: flex;
   justify-content: center;
+  align-items: center;
+  font-size: clamp(16px, 1.2vw, 20px);
 }
 .preRegister-main .form .form-line .copy-area div .input {
   width: 200px;
 }
 .preRegister-main .form .form-line .copy-area div .name-input {
-  width: 90px;
+  width: 9vw;
 }
 .preRegister-main .form .form-line .copy-area div .grade-input {
-  width: 90px;
+  width: 9vw;
 }
 .preRegister-main .form .form-line .copy-area div .name-title {
   width: 96px;
 }
 .preRegister-main .form .form-line .copy-area div .phone-title {
-  width: 64px;
+  width: 7vw;
 }
 .preRegister-main .form-submit {
   position: relative;
@@ -114,15 +117,5 @@
   justify-content: center;
 }
 .preRegister-main .form-submit .submit {
-  outline: none;
-  padding: 8px 24px;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-  transition: border-color 0.2s;
-  background-color: #fff;
-  transition: 0.3s;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-}
-.preRegister-main .form-submit .submit:hover {
-  background-color: #efefef;
+  padding: 6px 64px;
 }/*# sourceMappingURL=preRegister.css.map */

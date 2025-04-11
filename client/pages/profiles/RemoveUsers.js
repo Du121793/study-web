@@ -243,18 +243,17 @@ export default function RemoveUsers() {
       {/* 按鈕區域 */}
       <div className="header-btns">
         <div
-          className="button"
+          className="g-black-btn"
           onClick={clearSelectedMemebers}>
-          清除選項
+          清空選項
         </div>
         <div
-          className="button"
+          className="g-blue-btn"
           onClick={searchMemebers}>
           搜尋
         </div>
         <div
-          className="button"
-          id="delete-btn"
+          className="g-red-btn"
           onClick={deleteSelectedUsers}>
           刪除
         </div>

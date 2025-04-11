@@ -319,7 +319,7 @@ export default function PreRegister() {
       {/* 送出按鈕 */}
       <div className="form-submit">
         <button
-          className="submit"
+          className="g-black-btn submit"
           onClick={submitBtnClick}>
           送出
         </button>

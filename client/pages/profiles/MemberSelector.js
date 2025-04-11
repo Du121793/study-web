@@ -284,17 +284,17 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
         {/* 三個按鈕 */}
         <div className="btns">
           <button
-            className="search-option-btn"
+            className="g-black-btn"
             onClick={selectAllStudent}>
             全選
           </button>
           <button
-            className="search-option-btn"
+            className="g-red-btn"
             onClick={clearSearch}>
             取消全選
           </button>
           <button
-            className="search-option-btn"
+            className="g-blue-btn"
             style={{ cursor: 'pointer' }}
             onClick={() => {
               searchStudentButton()

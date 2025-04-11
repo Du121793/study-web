@@ -38,6 +38,7 @@
   color: #fff;
   cursor: pointer;
   transition: 0.3s;
+  font-size: clamp(16px, 1.1vw, 20px);
 }
 .qaPage-main .qa-header .back-btn:hover {
   background-color: #545454;
@@ -189,23 +190,19 @@
 }
 .qaPage-main .qa-info-area .edit-qa-function-area {
   display: flex;
-  gap: 4px;
-}
-.qaPage-main .qa-info-area .edit-qa-function-area .content {
-  cursor: pointer;
-  color: rgb(111, 111, 111);
-}
-.qaPage-main .qa-info-area .edit-qa-function-area .edit-btn {
-  margin-right: 24px;
+  align-items: center;
+  gap: 8px;
+  font-size: clamp(14px, 1.1vw, 20px);
 }
 .qaPage-main .qa-info-area .edit-qa-function-area .submit {
   cursor: auto;
 }
 .qaPage-main .qa-info-area .time {
-  font-size: 14px;
+  font-size: clamp(14px, 1.1vw, 18px);
   color: #656565;
 }
 .qaPage-main .qa-info-area .description {
+  font-size: clamp(16px, 1.1vw, 20px);
   width: 100%;
   word-wrap: break-word;
 }

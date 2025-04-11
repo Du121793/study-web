@@ -9,13 +9,13 @@
   gap: 12px;
 }
 .edit-members-main .title {
-  font-size: 24px;
-  font-weight: bold;
+  font-size: clamp(28px, 2vw, 34px);
 }
 .edit-members-main .input-area {
   display: flex;
   align-items: center;
   gap: 12px;
+  font-size: clamp(16px, 1.2vw, 20px);
 }
 .edit-members-main .member-selector-area {
   display: flex;
@@ -29,6 +29,7 @@
   justify-content: center;
   gap: 24px;
   font-weight: bold;
+  font-size: clamp(16px, 1.2vw, 20px);
 }
 .edit-members-main .member-selector-area .option-area .button {
   cursor: pointer;
@@ -48,6 +49,8 @@
   margin-bottom: -8px;
   display: flex;
   width: 100%;
+  font-size: clamp(16px, 1.2vw, 20px);
+  word-break: keep-all;
 }
 .edit-members-main .member-selector-area .member-area .title-area #username {
   margin-left: 50px;
@@ -102,17 +105,22 @@
   margin-left: 24px;
   width: 120px;
   text-align: left;
+  font-size: clamp(16px, 1.2vw, 20px);
 }
 .edit-members-main .member-selector-area .member-area li .searched-info #realname {
   width: 80px;
+  font-size: clamp(16px, 1.2vw, 20px);
 }
 .edit-members-main .member-selector-area .member-area li .searched-info #phone-number {
+  font-size: clamp(16px, 1.2vw, 20px);
   width: 120px;
 }
 .edit-members-main .member-selector-area .member-area li .searched-info #role {
+  font-size: clamp(16px, 1.2vw, 20px);
   width: 80px;
 }
 .edit-members-main .member-selector-area .member-area li .searched-info #grade {
+  font-size: clamp(16px, 1.2vw, 20px);
   width: 80px;
 }
 .edit-members-main .member-selector-area .member-area .select-active {

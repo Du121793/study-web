@@ -41,8 +41,10 @@
         flex-wrap: wrap;
         flex-direction: column;
         border: 1px solid rgb(179, 179, 179);
-        padding: 12px;
+        border-radius: 8px;
+        padding: 18px;
         gap: 8px;
+        transition: .2s;
         .qa-link {
           width: 100%;
           height: 100%;
@@ -92,27 +94,42 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            padding: 4px 8px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            background-color: #efefef;
+            font-size: clamp(16px, 1.1vw, 20px);
           }
           .time {
             display: flex;
             justify-content: space-between;
             color: rgba(0, 0, 0, 0.574);
-            font-size: 15px;
+            font-size: clamp(16px, 1.1vw, 20px);
+          }
+          .is-replied {
+            font-size: clamp(16px, 1.1vw, 20px);
+            font-weight: bold;
           }
           .into-qustion-page-btn {
             display: flex;
+            font-size: clamp(16px, 1.1vw, 20px);
             .link {
-              padding: 4px 6px;
-              border-radius: 4px;
-              border: 1px solid rgba(0, 0, 0, 0.4);
-              transition: 0.2s;
               color: black;
+              flex: 1;
+              padding: 4px 6px;
+              border: 1px solid rgba(0, 0, 0, 0.2);
+              display: flex;
+              justify-content: center;
+              background-color: var(--button-white);
+              transition: 0.2s;
             }
             :hover {
               background-color: #eeeeee;
             }
           }
         }
+      }
+      .qa-card:hover{
+        background-color: #f3f3f3;
       }
     }
   }

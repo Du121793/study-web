@@ -19,7 +19,6 @@ import leftArrow from '../../public/course/leftArrow.png'
 // nav組件
 import VideoNav from './VideoNav'
 import QaNav from './QaNav'
-import AskNav from './AskNav'
 
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
@@ -114,15 +113,6 @@ export default function Course() {
             user_role={userRole}
             course_id={courseId}
             courseName={courseName}></QaNav>
-        )}
-        {/* Ask 組件 */}
-        {userRole && (
-          <AskNav
-            qaHasUpload={qaHasUpload}
-            setQaHasUpload={setQaHasUpload}
-            user_role={userRole}
-            course_id={courseId}
-            courseName={courseName}></AskNav>
         )}
       </div>
       <Footer></Footer>

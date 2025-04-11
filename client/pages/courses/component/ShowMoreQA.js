@@ -66,19 +66,24 @@ export default function ShowMoreQA({ courseName, showMoreQA, setShowMoreQA, toke
       className="show-more-qa-main"
       onClick={test}>
       <div className="qa-info-area">
-        <div
-          className="close-ui-btn"
-          onClick={() => {
-            page_body.style.overflow = 'scroll'
-            setShowMoreQA(!showMoreQA)
-          }}>
-          關閉
+        <div className="top-btn-area">
+          <button
+            className="g-red-btn"
+            onClick={() => {
+              page_body.style.overflow = 'scroll'
+              setShowMoreQA(!showMoreQA)
+            }}>
+            關閉
+          </button>
         </div>
+
         <div className="info-container">
           {qaInfo &&
             qaInfo.map((item, index) => (
-              <div
+              <Link
+                style={{ color: 'black' }}
                 className="qa-card"
+                href={`${client_base_URL}/courses/QaPage?qa_id=${item._id}&courseName=${courseName}`}
                 key={index}>
                 <div className="tag-area">
                   {/* 大tag */}
@@ -148,21 +153,23 @@ export default function ShowMoreQA({ courseName, showMoreQA, setShowMoreQA, toke
                 </div>
                 <div className="content-area">
                   <div className="time">
-                    <div className="create-time">發布時間 : {new Date(item.date).toLocaleString()}</div>
-                  </div>
-                  <div className="description">{item.description}</div>
-                  <div className="into-qustion-page-btn">
-                    <Link
-                      className="link"
+                    <div
+                      className="create-time"
                       onClick={() => {
-                        page_body.style.overflow = 'scroll'
-                      }}
-                      href={`${client_base_URL}/courses/QaPage?qa_id=${item._id}&courseName=${courseName}`}>
-                      進到問題頁面
-                    </Link>
+                        console.log(item)
+                      }}>
+                      發布時間 : {new Date(item.date).toLocaleString()}
+                    </div>
                   </div>
+                  <div
+                    style={{ color: item?.replied === true ? 'rgb(114, 37, 255)' : 'blue' }}
+                    className="is-replied">
+                    {item?.replied === true ? '已回覆' : '未回覆'}
+                  </div>
+
+                  <div className="description">{item.description}</div>
                 </div>
-              </div>
+              </Link>
             ))}
         </div>
       </div>

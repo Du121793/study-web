@@ -7,7 +7,7 @@
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.15);
-  z-index: 2;
+  z-index: 3;
 }
 .upload-board-main .upload-board-ui {
   position: relative;
@@ -15,11 +15,12 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  overflow: hidden;
+  overflow: auto;
   transition: 0.2s;
   background-color: #fff;
   border-radius: 8px;
   padding: 24px;
+  max-height: 90vh;
 }
 .upload-board-main .upload-board-ui .input-container {
   display: flex;
@@ -51,8 +52,4 @@
   width: 320px;
   height: 240px;
   resize: none;
-}
-.upload-board-main .upload-board-ui .g-btn-area .submit {
-  position: absolute;
-  bottom: 15px;
 }/*# sourceMappingURL=uploadBoardUI.css.map */

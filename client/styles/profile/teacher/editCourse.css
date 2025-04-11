@@ -15,8 +15,7 @@
   padding: 24px 0;
 }
 .edit-course-main .title {
-  font-size: 24px;
-  font-weight: bold;
+  font-size: clamp(28px, 2vw, 34px);
 }
 .edit-course-main .edit-course-function-area {
   display: flex;
@@ -102,6 +101,7 @@
   justify-content: center;
   width: 100%;
   gap: 6px;
+  font-size: clamp(16px, 1.2vw, 20px);
 }
 .edit-course-main .edit-course-function-area .input-area .grade-input {
   width: 10%;
@@ -131,7 +131,8 @@
   flex-direction: column;
   align-items: center;
 }
-.edit-course-main .edit-course-function-area .checkbox-area div {
+.edit-course-main .edit-course-function-area .checkbox-area .hint {
+  font-size: clamp(16px, 1.2vw, 20px);
   gap: 4px;
   align-items: center;
   display: flex;
@@ -146,6 +147,7 @@
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
   border-radius: 8px;
   gap: 12px;
+  font-size: clamp(16px, 1.2vw, 20px);
 }
 .edit-course-main .edit-course-function-area .courses-info-list .courses-info-area {
   width: 80%;
@@ -160,8 +162,10 @@
 .edit-course-main .edit-course-function-area .courses-info-list .courses-info-area .count {
   font-weight: bold;
   width: 32px;
+  font-size: clamp(16px, 1.2vw, 20px);
 }
 .edit-course-main .edit-course-function-area .courses-info-list .courses-info-area .course-name {
+  font-size: clamp(16px, 1.2vw, 20px);
   display: flex;
   align-items: center;
   height: 100%;
@@ -176,6 +180,7 @@
   width: 128px;
   border-left: 1px solid rgba(0, 0, 0, 0.2);
   padding-left: 4px;
+  font-size: clamp(16px, 1.2vw, 20px);
 }
 .edit-course-main .edit-course-function-area .courses-info-list .courses-info-area .course-subject {
   display: flex;
@@ -184,6 +189,7 @@
   width: 128px;
   border-left: 1px solid rgba(0, 0, 0, 0.2);
   padding-left: 4px;
+  font-size: clamp(16px, 1.2vw, 20px);
 }
 .edit-course-main .edit-course-function-area .courses-info-list .courses-info-area .course-class {
   display: flex;
@@ -192,29 +198,35 @@
   width: 128px;
   border-left: 1px solid rgba(0, 0, 0, 0.2);
   padding-left: 4px;
+  font-size: clamp(16px, 1.2vw, 20px);
 }
 .edit-course-main .edit-course-function-area .courses-info-list .courses-info-area .course-name-input {
   width: 32%;
   border-left: 1px solid rgba(0, 0, 0, 0.2);
+  font-size: clamp(16px, 1.2vw, 20px);
 }
 .edit-course-main .edit-course-function-area .courses-info-list .courses-info-area .course-grade-input {
   width: 15%;
   border-left: 1px solid rgba(0, 0, 0, 0.2);
+  font-size: clamp(16px, 1.2vw, 20px);
   margin-left: 4px;
 }
 .edit-course-main .edit-course-function-area .courses-info-list .courses-info-area .course-subject-input {
   width: 15%;
   border-left: 1px solid rgba(0, 0, 0, 0.2);
+  font-size: clamp(16px, 1.2vw, 20px);
   margin-left: 4px;
 }
 .edit-course-main .edit-course-function-area .courses-info-list .courses-info-area .course-class-input {
   width: 15%;
   border-left: 1px solid rgba(0, 0, 0, 0.2);
+  font-size: clamp(16px, 1.2vw, 20px);
   margin-left: 4px;
 }
 .edit-course-main .edit-course-function-area .courses-info-list .courses-info-area .image-area {
   display: flex;
   gap: 12px;
+  font-size: clamp(16px, 1.2vw, 20px);
 }
 .edit-course-main .edit-course-function-area .courses-info-list .courses-info-area .image-area .complate-course-button {
   cursor: pointer;
@@ -251,7 +263,7 @@
 }
 .edit-course-main .edit-course-function-area .courses-info-list #title-area div {
   font-weight: bold;
-  font-size: 18px;
+  font-size: clamp(16px, 1.2vw, 20px);
   border: none;
 }
 .edit-course-main .edit-course-function-area .courses-info-list #title-area .image {

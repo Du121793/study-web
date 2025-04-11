@@ -11,11 +11,14 @@
     align-items: center;
     gap: 4px;
     .member-id-input {
-      width: 240px;
+      width: 24vw;
+    }
+    .title {
+      font-size: clamp(16px, 1.2vw, 20px);
     }
   }
   .remove-users-title {
-    font-size: 28px;
+    font-size: clamp(28px, 2vw, 34px);
   }
   .remove-user-header {
     display: flex;
@@ -32,6 +35,9 @@
       }
       .grade-input {
         width: 100px;
+      }
+      .title {
+        font-size: clamp(16px, 1.2vw, 20px);
       }
     }
   }
@@ -56,11 +62,47 @@
       background-color: #e0aaaa;
     }
   }
+  .user-list-title {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 80%;
+    .container {
+      display: flex;
+      align-items: center;
+      border-radius: 4px;
+      padding: 4px 0 4px 0;
+      gap: 12px;
+      font-size: clamp(16px, 1.2vw, 20px);
+      word-break: keep-all;
+      .username {
+        width: 80px;
+        margin-left: 6px;
+      }
+      .grade {
+        pointer-events: none;
+        width: 70px;
+      }
+      .realname {
+        width: 70px;
+      }
+      .phone {
+        width: 140px;
+      }
+      .userid {
+        width: 30%;
+      }
+      .role {
+        width: 70px;
+      }
+    }
+  }
   .user-list {
     display: flex;
     flex-direction: column;
     gap: 12px;
     width: 80%;
+    font-size: clamp(16px, 1.2vw, 20px);
     .container {
       cursor: pointer;
       display: flex;
@@ -93,39 +135,6 @@
       }
       .role {
         pointer-events: none;
-        width: 70px;
-      }
-    }
-  }
-  .user-list-title {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 80%;
-    .container {
-      display: flex;
-      align-items: center;
-      border-radius: 4px;
-      padding: 4px 0 4px 0;
-      gap: 12px;
-      .username {
-        width: 80px;
-        margin-left: 6px;
-      }
-      .grade {
-        pointer-events: none;
-        width: 70px;
-      }
-      .realname {
-        width: 70px;
-      }
-      .phone {
-        width: 140px;
-      }
-      .userid {
-        width: 30%;
-      }
-      .role {
         width: 70px;
       }
     }

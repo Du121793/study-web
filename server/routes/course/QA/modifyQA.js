@@ -118,6 +118,7 @@ async function saveUploadedImages(
  * @returns {Object} 新創建的問題
  */
 router.post("/postQuestion", upload, async (req, res) => {
+  console.log(res.body)
   try {
     // 解析請求參數
     let {
@@ -217,7 +218,7 @@ router.post("/postQuestion", upload, async (req, res) => {
  * 修改問題
  * @route PATCH /patchQuestion
  * @param {string} question_id - 問題ID
- * @param {string[]} [course_ids] - 課程ID陣列，不傳則保留原有資料
+ * @param {string[]} [course_ids] - 課程ID陣列
  * @param {boolean} [isPublic] - 是否公開，不傳則保留原有資料
  * @param {string} [description] - 問題描述，不傳則保留原有資料
  * @param {string[]} [resourceCategories] - 資源類別標籤，不傳則保留原有資料
@@ -225,6 +226,7 @@ router.post("/postQuestion", upload, async (req, res) => {
  * @param {number[]} [rmIMG] - 要刪除的圖片索引陣列
  * @param {boolean} [replied] - 是否已回覆，不傳則保留原有資料
  * @param {Object[]} [image] - 上傳的新圖片檔案
+ * @param {string[]} [folders] - 預上傳的資料夾位置
  * @returns {Object} 更新後的問題ID
  */
 router.patch(
@@ -244,15 +246,15 @@ router.patch(
         replied,
         folders,
       } = req.body;
-
+      console.log(folders)
       // 驗證問題ID
       if (!mongoose.Types.ObjectId.isValid(question_id)) {
         return res.status(400).json({ success: false, msg: "無效的問題ID" });
       }
 
       // 驗證課程ID陣列
-      if (course_ids !== null) {
-        if (!Array.isArray(course_ids) || course_ids.length === 0) {
+      if (course_ids !== undefined) {
+        if (!Array.isArray(course_ids)) {
           return res
             .status(400)
             .json({ success: false, msg: "請提供有效的課程陣列" });
@@ -309,7 +311,7 @@ router.patch(
       if (
         folders !== undefined &&
         (isPublic === true ||
-          (isPublic !== undefined && oldQA.isPublic === true))
+          (isPublic == undefined && oldQA.isPublic === true))
       )
         oldQA.folders = folders;
       // 保存更新

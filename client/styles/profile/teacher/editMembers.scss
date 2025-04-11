@@ -8,13 +8,13 @@
   padding: 24px 0;
   gap: 12px;
   .title {
-    font-size: 24px;
-    font-weight: bold;
+    font-size: clamp(28px, 2vw, 34px);
   }
   .input-area {
     display: flex;
     align-items: center;
     gap: 12px;
+    font-size: clamp(16px, 1.2vw, 20px);
   }
   .member-selector-area {
     display: flex;
@@ -27,6 +27,7 @@
       justify-content: center;
       gap: 24px;
       font-weight: bold;
+      font-size: clamp(16px, 1.2vw, 20px);
       .button {
         cursor: pointer;
         transition: 0.2s;
@@ -45,6 +46,8 @@
         margin-bottom: -8px;
         display: flex;
         width: 100%;
+        font-size: clamp(16px, 1.2vw, 20px);
+        word-break: keep-all;
         #username {
           margin-left: 50px;
           width: 120px;
@@ -98,17 +101,22 @@
             margin-left: 24px;
             width: 120px;
             text-align: left;
+            font-size: clamp(16px, 1.2vw, 20px);
           }
           #realname {
             width: 80px;
+            font-size: clamp(16px, 1.2vw, 20px);
           }
           #phone-number {
+            font-size: clamp(16px, 1.2vw, 20px);
             width: 120px;
           }
           #role {
+            font-size: clamp(16px, 1.2vw, 20px);
             width: 80px;
           }
           #grade {
+            font-size: clamp(16px, 1.2vw, 20px);
             width: 80px;
           }
         }

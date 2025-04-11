@@ -1,0 +1,159 @@
+@charset "UTF-8";
+.ask-area {
+  overflow: auto;
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding-left: 12px;
+  padding-right: 80px;
+}
+.ask-area .ask-form {
+  display: flex;
+  justify-content: center;
+  background-color: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  overflow: auto;
+  height: 60vh;
+}
+.ask-area .ask-form .upload-img-area {
+  min-width: 40vw;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+.ask-area .ask-form .upload-img-area span {
+  font-size: 18px;
+}
+.ask-area .ask-form .upload-img-area .upload-img-btn {
+  cursor: pointer;
+  border: 1px solid #ccc;
+  padding: 6px;
+  border-radius: 4px;
+  background-color: #414141;
+  color: #e9e9e9;
+  font-weight: bold;
+  font-size: 18px;
+}
+.ask-area .ask-form .upload-img-area .preview-img {
+  margin-bottom: 24px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: auto;
+  width: 400px;
+  min-height: 40px;
+  gap: 24px;
+}
+.ask-area .ask-form .upload-img-area .preview-img .preview-images-container {
+  position: relative;
+}
+.ask-area .ask-form .upload-img-area .preview-img .preview-images-container .remove-image-btn {
+  position: absolute;
+  right: 2%;
+  top: 2%;
+  cursor: pointer;
+}
+.ask-area .ask-form .upload-img-area .preview-img .preview-images-container .preview-images {
+  border-radius: 4px;
+}
+.ask-area .ask-form .qa-info-area {
+  flex: 1;
+  min-width: 30vw;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  gap: 8px;
+  /* 已加入的標籤列表 */
+  /* 問題描述 */
+}
+.ask-area .ask-form .qa-info-area .sortType-input-area {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+  gap: 12px;
+}
+.ask-area .ask-form .qa-info-area .sortType-input-area .title {
+  font-weight: bold;
+  font-size: clamp(16px, 1.2vw, 20px);
+}
+.ask-area .ask-form .qa-info-area .sortType-input-area .input {
+  flex: 1;
+}
+.ask-area .ask-form .qa-info-area .themes-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.ask-area .ask-form .qa-info-area .themes-area .theme {
+  display: flex;
+  align-items: center;
+  background-color: #eee;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  font-size: 15px;
+  gap: 0.3rem;
+  border: 1px solid #ccc;
+}
+.ask-area .ask-form .qa-info-area .themes-area .delete-theme {
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+}
+.ask-area .ask-form .qa-info-area .hints-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.ask-area .ask-form .qa-info-area .hints-area .hint {
+  display: flex;
+  align-items: center;
+  background-color: #eee;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  font-size: 15px;
+  gap: 0.3rem;
+  border: 1px solid #ccc;
+}
+.ask-area .ask-form .qa-info-area .hints-area .hint span {
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+}
+.ask-area .ask-form .qa-info-area .description-input-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.ask-area .ask-form .qa-info-area .description-input-area span {
+  margin-bottom: 0.3rem;
+  font-size: 18px;
+}
+.ask-area .ask-form .qa-info-area .description-input-area .ask-text-area {
+  outline: none;
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: none;
+}
+.ask-area .ask-form .qa-info-area .submit-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+.ask-area .ask-form .qa-info-area .submit-area .g-green-btn {
+  width: 100%;
+}/*# sourceMappingURL=askQA.css.map */

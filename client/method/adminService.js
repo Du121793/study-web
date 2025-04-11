@@ -647,6 +647,46 @@ const adminService = {
       }
     }
   },
+
+  async patchQaToFolders(token, data) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.patch(QA_URL + `/patchQuestion`, data, {
+        headers: authHeader,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (err) {
+      console.error(err.response.data)
+    }
+  },
+
+  /**
+   * 刪除資料夾
+   * @route DELETE /deleteFolder
+   * @param {string} folder_id - 要刪除的資料夾ID
+   * @returns {Object} 刪除結果
+   */
+  async deleteFolder(token, data) {
+    console.log(token)
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.delete(API_URL + `/course/question/modifyQA/folder/deleteFolder`, {
+        headers: authHeader,
+        params: data,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (err) {
+      console.error(err.response.data)
+    }
+  },
 }
 
 export default adminService

@@ -154,7 +154,11 @@ export default function UserProfile() {
           </div>
           <div className="content-area">
             <div className="content">身分組</div>
-            <div className="content-info">{userInfo?.role}</div>
+            <div className="content-info">
+              {userInfo?.role}
+              <button style={{ border: '1px solid rgba(0, 0, 0, 0.2)' }}>Teacher</button>
+              <button style={{ border: '1px solid rgba(0, 0, 0, 0.2)' }}>Student</button>
+            </div>
           </div>
           <div className="content-area">
             <div className="content">電話</div>

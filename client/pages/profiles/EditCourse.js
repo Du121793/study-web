@@ -364,7 +364,7 @@ export default function EditCourse({ onRefresh }) {
         </div>
         {/* 是否要在新增課程時也將選擇的成員加入課程 */}
         <div className="checkbox-area">
-          <div>
+          <div className='hint'>
             是否要在新增課程時也將選擇的成員加入課程
             <input
               onChange={(e) => {

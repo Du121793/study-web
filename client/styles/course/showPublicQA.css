@@ -11,6 +11,9 @@
   height: 100%;
   z-index: 998;
 }
+.show-more-public-main .clamp {
+  font-size: clamp(16px, 1.2vw, 24px);
+}
 .show-more-public-main .qa-info-area {
   overflow: auto;
   width: 80%;
@@ -22,22 +25,56 @@
   z-index: 999;
   border-radius: 4px;
   gap: 12px;
-  padding: 12px;
+  padding: 24px;
+  transition: 0.2s;
 }
-.show-more-public-main .qa-info-area .close-ui-btn {
-  background-color: #ffe0e0;
-  font-size: 18px;
-  padding: 4px 8px 4px 8px;
-  border-radius: 4px;
+.show-more-public-main .qa-info-area .top-left-btn-area {
+  display: flex;
+  gap: 12px;
+}
+.show-more-public-main .qa-info-area .btn-area {
+  display: flex;
+  justify-content: space-between;
 }
 .show-more-public-main .qa-info-area .input-area {
   display: flex;
   gap: 4px;
   align-items: center;
+  flex-wrap: wrap;
 }
 .show-more-public-main .qa-info-area .shortcut-area {
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
+}
+.show-more-public-main .qa-info-area .shortcut-area .shortcut {
+  display: flex;
+  align-items: center;
+}
+.show-more-public-main .qa-info-area .shortcut-area .shortcut .home-icon {
+  border-radius: 64px;
+  background-color: #fff;
+  transition: 0.2s;
+  padding: 2px;
+}
+.show-more-public-main .qa-info-area .shortcut-area .shortcut .home-icon:hover {
+  background-color: #e0e0e0;
+}
+.show-more-public-main .qa-info-area .shortcut-area .shortcut .folder-area {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.211);
+  border-radius: 4px;
+  padding: 2px 8px;
+  transition: 0.2s;
+}
+.show-more-public-main .qa-info-area .shortcut-area .shortcut .folder-area .name {
+  font-size: clamp(16px, 1.2vw, 24px);
+}
+.show-more-public-main .qa-info-area .shortcut-area .shortcut .folder-area:hover {
+  background-color: #e0e0e0;
 }
 .show-more-public-main .qa-info-area .shortcut-area .content {
   cursor: pointer;
@@ -55,4 +92,110 @@
   border: 1px solid rgba(0, 0, 0, 0.211);
   border-radius: 4px;
   background-color: #f6f6f6;
+}
+.show-more-public-main .qa-info-area .folder-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.show-more-public-main .qa-info-area .folder-area .folder-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  min-width: 230px;
+  height: 60px;
+  border: 1px solid rgba(0, 0, 0, 0.211);
+  border-radius: 4px;
+  transition: 0.2s;
+}
+.show-more-public-main .qa-info-area .folder-area .folder-btn .inner-content {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  position: relative;
+  gap: 8px;
+  padding: 0 16px;
+}
+.show-more-public-main .qa-info-area .folder-area .folder-btn .inner-content .g-green-btn {
+  position: absolute;
+  right: 14px;
+}
+.show-more-public-main .qa-info-area .folder-area .folder-btn .inner-content .g-light-red-btn {
+  position: absolute;
+  right: 14px;
+}
+.show-more-public-main .qa-info-area .folder-area .folder-btn:hover {
+  background-color: #f6f6f6;
+}
+.show-more-public-main .qa-info-area .sort-setting-area {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.show-more-public-main .qa-info-area .sort-setting-area .space {
+  width: 4px;
+}
+.show-more-public-main .qa-info-area .selected-folder-area {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.show-more-public-main .qa-info-area .selected-folder-area .slected-folder {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  min-width: 180px;
+  height: 55px;
+  border: 1px solid rgba(0, 0, 0, 0.211);
+  border-radius: 4px;
+  transition: 0.2s;
+  padding: 0 8px;
+  font-size: clamp(16px, 1.2vw, 24px);
+}
+.show-more-public-main .qa-info-area .selected-folder-area .slected-folder .g-red-btn {
+  position: absolute;
+  right: 12px;
+}
+.show-more-public-main .qa-info-area .qa-card-area {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.show-more-public-main .qa-info-area .qa-card-area .card {
+  color: black;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  cursor: pointer;
+  width: 230px;
+  border: 1px solid rgba(0, 0, 0, 0.211);
+  border-radius: 4px;
+  transition: 0.2s;
+}
+.show-more-public-main .qa-info-area .qa-card-area .card .into-qa-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80%;
+  border: 1px solid rgba(0, 0, 0, 0.211);
+}
+.show-more-public-main .qa-info-area .qa-card-area .card .description-area {
+  width: 90%;
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.211);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 8px;
+  background-color: #ffffff;
+}
+.show-more-public-main .qa-info-area .qa-card-area .card:hover {
+  background-color: #efefef;
 }/*# sourceMappingURL=showPublicQA.css.map */

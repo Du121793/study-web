@@ -32,7 +32,7 @@ export default function Index() {
       userService
         .getUserInfo(token)
         .then((res) => {
-          if (!res.data.userinfo) {
+          if (!res?.data?.userinfo) {
             return
           }
           if (!sessionStorage.getItem('user_role') || !sessionStorage.getItem('user_lineID') || !sessionStorage.getItem('user_line_shot') || sessionStorage.getItem('user_id')) {

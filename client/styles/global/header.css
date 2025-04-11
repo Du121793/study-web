@@ -135,7 +135,7 @@
   background-color: rgba(0, 0, 0, 0);
 }
 .header-container .header-main .header-right .btn-area:hover {
-  box-shadow: 0px 0px 6px 4px rgb(167, 167, 167);
+  border: 1px solid rgba(0, 0, 0, 0.8);
 }
 .header-container .header-main .header-right .member-img {
   display: flex;
@@ -162,8 +162,10 @@
   box-shadow: 0px 0px 6px 6px rgb(149, 193, 230);
 }
 .header-container .header-main .header-right .sign-out-area {
+  cursor: pointer;
   border: 1px solid rgba(0, 0, 0, 0.337);
 }
 .header-container .header-main .header-right .sign-out-area .sign-out-btn {
+  cursor: pointer;
   font-weight: bold;
 }/*# sourceMappingURL=header.css.map */

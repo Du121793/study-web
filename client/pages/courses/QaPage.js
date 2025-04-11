@@ -18,7 +18,7 @@ import QaMessageBoard from './component/MessageBoard'
 import ImageZoom from './component/ImageZoom'
 import adminService from '../../method/adminService'
 import EditQA from './component/EditQA'
-
+import EditPublicQA from './component/EditPublicQA'
 // public
 import anonymous from '../../public/course/anonymous.png'
 import star from '../../public/course/star.png'
@@ -34,10 +34,14 @@ const getImageUrl = 'http://localhost:8080/resource/questionIMG'
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 // --------------------------------------------------------------------------
 export default function QaPage() {
+  const token = useUserToken()
+  const [userToken, setUserToeken] = useState('')
+
   // 請求參數
   const [sortBy, setSortBy] = useState('asc')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(20)
+
   // 控制訊息
   const [message, setMessage] = useState('無訊息')
   const [messageStatus, setMessageStatus] = useState(false)
@@ -52,9 +56,8 @@ export default function QaPage() {
   // 從url獲取參數
   const router = useRouter()
   const { qa_id, courseName, course_id } = router.query
-
-  const token = useUserToken()
-  const [userToken, setUserToeken] = useState('')
+  // 顯示公開提問ui
+  const [showPublicQASetting, setShowPublicQASetting] = useState(false)
   // 請求取得的資料
   const [totalPage, setTotalPage] = useState(1)
   const [isLogined, setLogined] = useState(false)
@@ -314,6 +317,7 @@ export default function QaPage() {
         {message}
       </div>
 
+      {/* 編輯提問UI */}
       {showEditQAUI && (
         <EditQA
           messageControl={messageControl}
@@ -324,6 +328,16 @@ export default function QaPage() {
           hadEdit={hadEdit}
           setHadEdit={setHadEdit}></EditQA>
       )}
+      {/* 公開提問UI */}
+      {showPublicQASetting && (
+        <EditPublicQA
+          token={token}
+          setShowPublicQASetting={setShowPublicQASetting}
+          question_id={qa_id}
+          course_id={course_id}
+        />
+      )}
+      {/* 放大圖片功能 */}
       {imageIsZoom && (
         <ImageZoom
           setImageIsZoom={setImageIsZoom}
@@ -385,22 +399,21 @@ export default function QaPage() {
         {/* 若是學生只有在30分鐘內可以編輯QA */}
         {qaInfo && userRole && (userRole === 'teacher' || userRole === 'admin' || (userRole === 'student' && new Date(qaInfo.date).getTime() >= thirtyMinutes)) && (
           <div className="edit-qa-function-area">
-            <div
+            <button
               onClick={() => {
                 setShowEditQAUI(true)
               }}
-              className="content edit-btn">
+              className="g-blue-btn">
               編輯提問
-            </div>
-            <div className="content submit">公開提問</div>
-            <input
-              type="checkbox"
-              checked={qaInfo.isPublic}
-              onChange={() => {
-                submitTeacherSetting(!qaInfo.isPublic, qaInfo.replied)
-              }}
-            />
-            <div className="content submit">，已回覆</div>
+            </button>
+            <button
+              className="g-blue-btn"
+              onClick={() => {
+                setShowPublicQASetting(true)
+              }}>
+              公開提問
+            </button>
+            <div className="content submit">已回覆</div>
             <input
               type="checkbox"
               checked={qaInfo.replied}
