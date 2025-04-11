@@ -81,11 +81,14 @@ router.get("/getCourses", checkTeacherAccess, async (req, res) => {
 
     // 獲取總筆數
     const total = await Course.countDocuments(filter);
-    const totalPage = parseInt(total / pageSize)+1
+    const totalPage = parseInt(total / pageSize) + 1;
 
     // 處理不分頁的情況
     if (!(page && pageSize)) {
-      const courses = await Course.find(filter);
+      const courses = await Course.find(filter).populate(
+        "teacher",
+        "_id username picture"
+      );
       return res.json({
         success: true,
         data: { total, currentPage: 1, pageSize: null, courses },
@@ -94,11 +97,14 @@ router.get("/getCourses", checkTeacherAccess, async (req, res) => {
 
     // 執行分頁查詢
     const skip = (currentPage - 1) * limit;
-    const courses = await Course.find(filter).skip(skip).limit(limit);
+    const courses = await Course.find(filter)
+      .populate("teacher", "_id username picture")
+      .skip(skip)
+      .limit(limit);
 
     return res.json({
       success: true,
-      data: { total, totalPage , currentPage, pageSize: limit, courses },
+      data: { total, totalPage, currentPage, pageSize: limit, courses },
     });
   } catch (error) {
     console.error(error);

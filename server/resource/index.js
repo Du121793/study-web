@@ -14,6 +14,7 @@ const passport = require("passport");
 require("../config/passport")(passport);
 const accessChecker = require("./resourceMiddleware/accessChecker");
 require("dotenv");
+const jwt = require("jsonwebtoken");
 
 /**
  * 從 URL query 參數中驗證 JWT token
@@ -28,6 +29,15 @@ const tokenCheckFromQuery = (req, res, next) => {
     if (!user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
+
+    const tokenPayload = jwt.decode(req.headers.authorization.split(" ")[1]);
+    if (tokenPayload.ip !== req.ip) {
+      return res.status(401).json({
+        message: "IP 不匹配，請重新登入",
+        code: "IP_MISMATCH",
+      });
+    }
+
     req.user = user;
     next();
   })(req, res, next);

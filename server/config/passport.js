@@ -73,7 +73,7 @@ passport.deserializeUser(async (serialized, done) => {
  * LINE OAuth 驗證策略
  * @description 使用 LINE 帳號進行身份驗證
  * - 檢查使用者是否已存在
- * - 若存在則直接登入
+ * - 若存在則檢查並更新頭像
  * - 若不存在則建立部分使用者資訊
  */
 passport.use(
@@ -90,12 +90,20 @@ passport.use(
       // 查找是否已存在使用者
       let foundUser = await User.findOne({ lineID: profile.id }).exec();
       if (foundUser) {
-        // 若使用者存在，直接回傳使用者資訊
-        console.log("使用者已存在，直接登入");
+        // 若使用者存在，檢查頭像是否需要更新
+        if (foundUser.userinfo.pictureUrl !== profile.pictureUrl) {
+          try {
+            // 更新頭像
+            foundUser.userinfo.pictureUrl = profile.pictureUrl;
+
+            await foundUser.save();
+          } catch (error) {
+            console.error("更新用戶頭像時發生錯誤:", error);
+          }
+        }
         return done(null, foundUser);
       } else {
         // 若使用者不存在，建立部分使用者資訊
-        console.log("偵測到新用戶，尚未完整綁定");
         const partialUser = {
           lineID: profile.id,
           displayName: profile.displayName,

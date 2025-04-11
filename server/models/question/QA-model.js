@@ -225,15 +225,16 @@ QASchema.pre("save", async function (next) {
         (!this.folders || this.folders.length === 0)
       ) {
         await mongoose.model("QA").findOneAndDelete({ _id: this._id });
-        return next(
-          new Error("由於QA已經設定為公開，且沒有任何課程或資料夾，因此被刪除")
-        );
+
+        console.log("由於QA已經設定為公開，且沒有任何課程或資料夾，因此被刪除");
+        return next();
       }
       if (!this.public && this.courses.length === 0) {
         await mongoose.model("QA").findOneAndDelete({ _id: this._id });
-        return next(
-          new Error("由於QA已經設定為非公開，且沒有任何課程，因此被刪除")
-        );
+
+        console.log("由於QA已經設定為非公開，且沒有任何課程，因此被刪除");
+
+        return next();
       }
     }
     next();

@@ -28,6 +28,11 @@ const courseSchema = new Schema({
     type: String,
     required: true,
   },
+  teacher: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   date: {
     type: Date,
     default: Date.now,

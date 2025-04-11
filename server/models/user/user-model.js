@@ -24,6 +24,10 @@ const userSchema = new Schema({
     pictureUrl: {
       type: String,
     },
+    makePictureAnonymous: {
+      type: Boolean,
+      default: false,
+    },
   },
   courses: {
     type: [Schema.Types.ObjectId],

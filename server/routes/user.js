@@ -200,6 +200,7 @@ router.get("/registedCourse", async (req, res) => {
  * @param {string} _id - 用戶ID過濾
  * @param {string} role - 角色過濾
  * @param {string} courses - 課程過濾
+ * @param {string} withoutCourses - 排除特定課程的使用者
  * @param {string} grade - 年級過濾
  * @param {number} page - 頁碼
  * @param {number} pageSize - 每頁筆數
@@ -210,8 +211,16 @@ router.get("/registedCourse", async (req, res) => {
 router.get("/getMembers", checkTeacherAccess, async (req, res) => {
   try {
     // 解析查詢參數
-    const { username, realname, phoneNumber, _id, role, courses, grade } =
-      req.query;
+    const {
+      username,
+      realname,
+      phoneNumber,
+      _id,
+      role,
+      courses,
+      withoutCourses,
+      grade,
+    } = req.query;
     const { page = 1, pageSize = 10, sortBy, sortOrder = "asc" } = req.query;
     const parsedPage = parseInt(page);
     const parsedPageSize = parseInt(pageSize);
@@ -235,6 +244,9 @@ router.get("/getMembers", checkTeacherAccess, async (req, res) => {
     }
     if (courses) {
       filter.courses = courses;
+    }
+    if (withoutCourses) {
+      filter.courses = { $nin: [withoutCourses] };
     }
     if (grade) {
       filter["userinfo.grade"] = new RegExp(grade, "i");
@@ -292,7 +304,7 @@ router.get("/getMembers", checkTeacherAccess, async (req, res) => {
  */
 router.get("/exportMembers", checkTeacherAccess, async (req, res) => {
   try {
-    console.log(req.query)
+    console.log(req.query);
     let filter = {};
 
     // 處理選擇的會員過濾
@@ -495,6 +507,198 @@ router.post("/preRegisterUser", checkAdminAccess, async (req, res) => {
 });
 
 /**
+ * 修改用戶資料
+ * @route PATCH /updateProfile
+ * @param {string} username - 可選，用戶暱稱
+ * @param {string} realname - 可選，真實姓名（僅限教師以上）
+ * @param {string} phoneNumber - 可選，電話號碼（僅限教師以上）
+ * @param {boolean} makeAnonymous - 可選，是否將圖片設為匿名
+ * @returns {Object} 更新結果
+ */
+router.patch("/updateProfile", async (req, res) => {
+  try {
+    const { username, realname, phoneNumber, makeAnonymous } = req.body;
+    const userRole = req.user.role;
+
+    // 建立更新物件
+    const updateData = {};
+
+    // 所有角色都可以更新暱稱
+    if (username) {
+      updateData["userinfo.username"] = username;
+    }
+
+    // 只有教師以上可以更新真實姓名和電話
+    if (userRole === "teacher" || userRole === "admin") {
+      if (realname) {
+        updateData["userinfo.realname"] = realname;
+      }
+      if (phoneNumber) {
+        updateData["userinfo.phoneNumber"] = phoneNumber;
+      }
+    }
+
+    // 處理匿名化
+    if (makeAnonymous === true) {
+      updateData["userinfo.makePictureAnonymous"] = true;
+    }
+
+    // 如果沒有要更新的資料
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({
+        success: false,
+        msg: "沒有提供要更新的資料",
+      });
+    }
+
+    // 更新用戶資料
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { $set: updateData },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        msg: "找不到該用戶",
+      });
+    }
+
+    return res.json({
+      success: true,
+      msg: "成功更新用戶資料",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      msg: "更新用戶資料時發生錯誤",
+    });
+  }
+});
+
+/**
+ * 批量修改會員資料
+ * @route PATCH /patchMembers
+ * @param {Array} members - 要修改的會員ID陣列
+ * @param {Object} updateData - 要更新的資料
+ * @param {string} updateData.username - 可選，用戶暱稱
+ * @param {string} updateData.realname - 可選，真實姓名
+ * @param {string} updateData.phoneNumber - 可選，電話號碼
+ * @param {string} updateData.grade - 可選，年級
+ * @param {string} updateData.role - 可選，角色
+ * @returns {Object} 更新結果統計
+ */
+router.patch("/patchMembers", checkAdminAccess, async (req, res) => {
+  try {
+    const { members, updateData } = req.body;
+
+    // 驗證必要參數
+    if (!Array.isArray(members) || members.length === 0) {
+      return res.status(400).json({
+        success: false,
+        msg: "請提供要修改的會員ID陣列",
+      });
+    }
+
+    if (!updateData || Object.keys(updateData).length === 0) {
+      return res.status(400).json({
+        success: false,
+        msg: "請提供要更新的資料",
+      });
+    }
+
+    // 建立更新物件
+    const updateObject = {};
+    if (updateData.username) {
+      updateObject["userinfo.username"] = updateData.username;
+    }
+    if (updateData.realname) {
+      updateObject["userinfo.realname"] = updateData.realname;
+    }
+    if (updateData.phoneNumber) {
+      updateObject["userinfo.phoneNumber"] = updateData.phoneNumber;
+    }
+    if (updateData.grade) {
+      updateObject["userinfo.grade"] = updateData.grade;
+    }
+    if (updateData.role) {
+      updateObject.role = updateData.role;
+    }
+
+    // 初始化結果追蹤
+    let successCount = 0;
+    let successUserIds = [];
+    let notFoundUsers = [];
+    let invalidUsers = [];
+    let serverErrorUsers = [];
+
+    // 逐一處理每個會員
+    for (const memberId of members) {
+      try {
+        // 檢查 memberId 是否有效
+        if (!mongoose.Types.ObjectId.isValid(memberId)) {
+          invalidUsers.push(memberId);
+          continue;
+        }
+
+        // 更新會員資料
+        const updatedUser = await User.findByIdAndUpdate(
+          memberId,
+          { $set: updateObject },
+          { new: true }
+        );
+
+        if (!updatedUser) {
+          notFoundUsers.push(memberId);
+          continue;
+        }
+
+        successCount++;
+        successUserIds.push(memberId);
+      } catch (error) {
+        serverErrorUsers.push(memberId);
+        continue;
+      }
+    }
+
+    // 組合回應訊息
+    let responseMessage = `成功更新 ${successCount} 位會員資料。\n`;
+    if (notFoundUsers.length > 0) {
+      responseMessage += `以下會員不存在：${notFoundUsers.join(", ")}。\n`;
+    }
+    if (invalidUsers.length > 0) {
+      responseMessage += `以下會員ID無效：${invalidUsers.join(", ")}。\n`;
+    }
+    if (serverErrorUsers.length > 0) {
+      responseMessage += `以下會員由於伺服器錯誤更新失敗：${serverErrorUsers.join(
+        ", "
+      )}。\n`;
+    }
+
+    return res.json({
+      success: true,
+      msg: responseMessage,
+      data: {
+        successCount,
+        successUserIds,
+        notFoundUsers,
+        invalidUsers,
+        serverErrorUsers,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      msg: "批量更新會員資料時發生錯誤",
+    });
+  }
+});
+
+/**
  * 刪除使用者，直接將 req.body 當作陣列來處理，每個元素應為使用者的 _id。
  * 刪除時不再需要從該使用者所註冊的課程中移除該使用者的 _id，
  * 因為課程資料結構中已不包含 members 欄位。
@@ -571,6 +775,52 @@ router.delete("/deleteMember", checkAdminAccess, async (req, res) => {
       serverErrorUsers,
     },
   });
+});
+
+/**
+ * 臨時測試用路由 - 更改用戶身分
+ * @route POST /changeRole
+ * @param {string} role - 要更改的身分 (user/admin/teacher)
+ * @returns {Object} 更新結果
+ */
+router.post("/changeRole", async (req, res) => {
+  try {
+    const { role } = req.body;
+
+    // 檢查傳入的身分是否有效
+    if (!["user", "admin", "teacher"].includes(role)) {
+      return res.status(400).json({
+        success: false,
+        msg: "無效的身分，請傳入 user、admin 或 teacher",
+      });
+    }
+
+    // 更新用戶身分
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { role },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        msg: "找不到該用戶",
+      });
+    }
+
+    return res.json({
+      success: true,
+      msg: "成功更新用戶身分",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      msg: "更新用戶身分時發生錯誤",
+    });
+  }
 });
 
 module.exports = router;

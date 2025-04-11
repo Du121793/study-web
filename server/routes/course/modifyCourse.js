@@ -44,12 +44,13 @@ router.use("/videoAccess", accessChecker.teacher, videoAccessRoute);
  * @param {string} subject - 科目
  * @param {string} grade - 年級
  * @param {string} courseClass - 班級
+ * @param {string} [teacherId] - 指定教師ID（僅管理員可指定）
  * @returns {Object} 創建結果
  */
 router.post("/createNewCourse", async (req, res) => {
   try {
-    const { courseName, subject, grade, courseClass } = req.body;
-    console.log(courseName, subject, grade, courseClass);
+    const { courseName, subject, grade, courseClass, teacherId } = req.body;
+    console.log(courseName, subject, grade, courseClass, teacherId);
 
     // 驗證必要參數
     if (!(courseName && subject && grade && courseClass))
@@ -69,18 +70,43 @@ router.post("/createNewCourse", async (req, res) => {
         msg: "你已經有一樣名稱，科目，年級，班級的課程了",
       });
 
+    let teacherToAssign;
+
+    // 如果是管理員且有指定教師
+    if (req.user.role === "admin" && teacherId) {
+      // 檢查指定的教師是否存在且具有適當的角色
+      const specifiedTeacher = await User.findById(teacherId);
+      if (!specifiedTeacher) {
+        return res.status(400).json({
+          success: false,
+          msg: "指定的教師不存在",
+        });
+      }
+      if (!["teacher", "admin"].includes(specifiedTeacher.role)) {
+        return res.status(400).json({
+          success: false,
+          msg: "指定的用戶必須是教師或管理員",
+        });
+      }
+      teacherToAssign = teacherId;
+    }
+    // 其他類型則使用自己的ID
+    teacherToAssign = req.user._id;
+
     // 創建新課程
     let newCourse = new Course({
       courseName,
       subject,
       grade,
       courseClass,
+      teacher: teacherToAssign,
     });
     let savedCourse = await newCourse.save();
 
     // 更新教師的課程列表
-    req.user.courses.push(savedCourse._id);
-    await req.user.save();
+    const teacher = await User.findById(teacherToAssign);
+    teacher.courses.push(savedCourse._id);
+    await teacher.save();
 
     return res.json({
       success: true,
@@ -155,7 +181,9 @@ router.post("/register", async (req, res) => {
 
       // 處理每個學生
       for (const user_id of user_ids) {
-        let foundStudent = await User.findOne({ _id: user_id }).exec();
+        let foundStudent = await User.findOne({ _id: user_id })
+          .select("_id userinfo.username userinfo.pictureUrl")
+          .exec();
         if (!foundStudent) {
           invalidUsers.push(user_id);
           continue;
@@ -323,20 +351,22 @@ router.post("/unRegister", async (req, res) => {
  * @param {string} [subject] - 新的科目（可選）
  * @param {string} [grade] - 新的年級（可選）
  * @param {string} [courseClass] - 新的班級（可選）
+ * @param {string} [teacherId] - 新的教師ID（僅管理員可指定）
  * @returns {Object} 更新後的課程信息
  */
 router.patch("/patchCourse", async (req, res) => {
   try {
-    const { courseId, courseName, subject, grade, courseClass } = req.body;
-    console.log(courseId);
-    console.log(courseName);
-    console.log(subject);
-    console.log(grade);
-    console.log(courseClass);
+    const { courseId, courseName, subject, grade, courseClass, teacherId } =
+      req.body;
 
     // 驗證課程ID
     if (!courseId)
       return res.status(400).json({ success: false, msg: "缺少課程ID" });
+
+    // 獲取課程信息
+    let foundCourse = await Course.findById(courseId).exec();
+    if (!foundCourse)
+      return res.status(404).json({ success: false, msg: "找不到課程" });
 
     // 檢查權限
     if (
@@ -347,11 +377,6 @@ router.patch("/patchCourse", async (req, res) => {
         .status(401)
         .json({ success: false, msg: "你沒有修改此課程的權限" });
     }
-
-    // 獲取課程信息
-    let foundCourse = await Course.findById(courseId).exec();
-    if (!foundCourse)
-      return res.status(404).json({ success: false, msg: "找不到課程" });
 
     // 準備更新數據
     const newCourseName =
@@ -375,6 +400,35 @@ router.patch("/patchCourse", async (req, res) => {
         success: false,
         msg: "已有其他課程具有相同名稱、科目、年級及班級",
       });
+
+    // 處理教師變更（僅管理員可操作）
+    if (teacherId) {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({
+          success: false,
+          msg: "只有管理員可以更改課程教師",
+        });
+      }
+
+      // 檢查指定的教師是否存在且具有適當的角色
+      const specifiedTeacher = await User.findById(teacherId);
+      if (!specifiedTeacher) {
+        return res.status(400).json({
+          success: false,
+          msg: "指定的教師不存在",
+        });
+      }
+      if (!["teacher", "admin"].includes(specifiedTeacher.role)) {
+        return res.status(400).json({
+          success: false,
+          msg: "指定的用戶必須是教師或管理員",
+        });
+      }
+
+      // 更新教師
+      const oldTeacherId = foundCourse.teacher;
+      foundCourse.teacher = teacherId;
+    }
 
     // 更新課程信息
     foundCourse.courseName = newCourseName;
