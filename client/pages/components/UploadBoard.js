@@ -71,7 +71,7 @@ export default function Board({ setEditHasChange, editHasChange, board_id = null
     if (page_body && page_body.style) {
       page_body.style.overflow = 'hidden'
     }
-  }, [page_body])
+  }, [page_body,uiElement])
 
   return (
     <div

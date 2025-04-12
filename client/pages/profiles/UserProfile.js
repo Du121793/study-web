@@ -3,6 +3,7 @@ import LoadingAnime from '../../components/global/LoadingAnime'
 import { useUserToken } from '../../method/useUserToken'
 import userService from '../../method/userService'
 import Image from 'next/image'
+import adminService from '../../method/adminService'
 
 export default function UserProfile() {
   const [userInfoLoading, setUserInfoLoading] = useState(false)
@@ -11,15 +12,18 @@ export default function UserProfile() {
   // 切換編輯狀態
   const avatarHandler = useRef(null)
   const [editState, setEditState] = useState(false)
-  // 儲存參數
-  const [avatar, setAvatar] = useState(null)
-  const [username, setUsername] = useState(null)
   // 訊息相關
   const [message, setMessage] = useState('無訊息')
   const [messageStatus, setMessageStatus] = useState(false)
   const [messageColor, setMessageColor] = useState('')
   const messageTimer = useRef(null)
   const resetTimer = useRef(null)
+
+  // patch userinfo payload
+  const [username, setUsername] = useState('')
+  const [realname, setRealname] = useState(false)
+  const [phoneNumber, setPhoneNumber] = useState(false)
+  const [hideAvatar, setHideAvatar] = useState(false)
 
   // 控制訊息外觀與隱藏計時
   const messageControl = (info, isSuccess) => {
@@ -39,7 +43,57 @@ export default function UserProfile() {
     }, 2000)
   }
 
-  const test = () => {}
+  const test = () => {
+    console.log(userInfo)
+  }
+
+  const changeUserRole = (role) => {
+    console.log(role)
+    let data = {
+      role,
+    }
+    adminService.changeRole(token, data).then((res) => {
+      if (res?.success) {
+        if (sessionStorage.getItem('user_lineID')) {
+          sessionStorage.removeItem('user_lineID')
+        }
+        if (sessionStorage.getItem('user_role')) {
+          sessionStorage.removeItem('user_role')
+        }
+        if (sessionStorage.getItem('user_id')) {
+          sessionStorage.removeItem('user_id')
+        }
+        if (sessionStorage.getItem('user_role')) {
+          sessionStorage.removeItem('user_role')
+        }
+        localStorage.removeItem('token')
+        window.location.replace('/')
+      }
+    })
+  }
+
+  // 編輯成員資訊
+  const patchUserInfo = () => {
+    let data = {
+      username,
+      makeAnonymous: hideAvatar,
+    }
+    adminService.patchUserInfo(token, data).then((res) => {
+      if (res?.success) {
+        setEditState(false)
+        setUserInfoLoading(true)
+        userService.getUserInfo(token).then((res) => {
+          if (res && res.success) {
+            setHideAvatar(res.data.userinfo.makePictureAnonymous)
+            setUserInfo(res.data)
+            setUserInfoLoading(false)
+          } else {
+            messageControl('發生錯誤，即將跳轉至首頁', false)
+          }
+        })
+      }
+    })
+  }
 
   // 載入使用者資訊
   useEffect(() => {
@@ -47,6 +101,8 @@ export default function UserProfile() {
       setUserInfoLoading(true)
       userService.getUserInfo(token).then((res) => {
         if (res && res.success) {
+          console.log(res.data.userinfo)
+          setHideAvatar(res.data.userinfo.makePictureAnonymous)
           setUserInfo(res.data)
           setUserInfoLoading(false)
         } else {
@@ -79,31 +135,17 @@ export default function UserProfile() {
       </div>
 
       <div className="top-section">
-        {/* 圓形頭像區塊 */}
-        {editState && (
-          <div
-            className="edit avatar"
-            onClick={() => {
-              avatarHandler.current.click()
-            }}>
-            {userInfo?.userinfo?.pictureUrl && (
-              <Image
-                alt="user avatar"
-                className="image"
-                src={userInfo.userinfo.pictureUrl}
-                width={100}
-                height={100}
-                objectFit="cover"></Image>
-            )}
-            <div className="content">選擇圖片</div>
-            <input
-              ref={avatarHandler}
-              style={{ display: 'none' }}
-              type="file"
-            />
-          </div>
-        )}
-        {!editState && (
+        <div className="hide-avatar">
+          <input
+            className="checkbox"
+            onChange={(e) => {
+              setHideAvatar(e.target.checked)
+            }}
+            type="checkbox"
+          />
+          <div className="content">隱藏頭像</div>
+        </div>
+        {hideAvatar === false && (
           <div className="avatar">
             {userInfo?.userinfo?.pictureUrl && (
               <Image
@@ -136,6 +178,9 @@ export default function UserProfile() {
                 type="text"
                 className="content-info"
                 defaultValue={userInfo?.userinfo?.username && userInfo?.userinfo?.username}
+                onChange={(e) => {
+                  setUsername(e.target.value)
+                }}
               />
             </div>
           )}
@@ -156,8 +201,33 @@ export default function UserProfile() {
             <div className="content">身分組</div>
             <div className="content-info">
               {userInfo?.role}
-              <button style={{ border: '1px solid rgba(0, 0, 0, 0.2)' }}>Teacher</button>
-              <button style={{ border: '1px solid rgba(0, 0, 0, 0.2)' }}>Student</button>
+              {userInfo?.role !== 'admin' && (
+                <button
+                  onClick={(e) => {
+                    changeUserRole(e.target.innerText)
+                  }}
+                  style={{ border: '1px solid rgba(0, 0, 0, 0.2)' }}>
+                  admin
+                </button>
+              )}
+              {userInfo?.role !== 'teacher' && (
+                <button
+                  onClick={(e) => {
+                    changeUserRole(e.target.innerText)
+                  }}
+                  style={{ border: '1px solid rgba(0, 0, 0, 0.2)' }}>
+                  teacher
+                </button>
+              )}
+              {userInfo?.role !== 'student' && (
+                <button
+                  onClick={(e) => {
+                    changeUserRole(e.target.innerText)
+                  }}
+                  style={{ border: '1px solid rgba(0, 0, 0, 0.2)' }}>
+                  student
+                </button>
+              )}
             </div>
           </div>
           <div className="content-area">
@@ -186,7 +256,7 @@ export default function UserProfile() {
             <button
               className="g-blue-btn"
               onClick={() => {
-                setEditState(false)
+                patchUserInfo()
               }}>
               儲存
             </button>

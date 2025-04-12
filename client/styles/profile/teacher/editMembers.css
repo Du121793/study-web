@@ -88,6 +88,9 @@
   background-color: #fafafa;
   transition: 0.2s;
 }
+.edit-members-main .member-selector-area .member-area li input[type=checkbox] {
+  transform: scale(1.2);
+}
 .edit-members-main .member-selector-area .member-area li .student-checkbox {
   width: 16px;
   height: 16px;

@@ -129,6 +129,7 @@
 .edit-course-main .edit-course-function-area .checkbox-area {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
 }
 .edit-course-main .edit-course-function-area .checkbox-area .hint {
@@ -136,6 +137,9 @@
   gap: 4px;
   align-items: center;
   display: flex;
+}
+.edit-course-main .edit-course-function-area .checkbox-area input[type=checkbox] {
+  transform: scale(1.2);
 }
 .edit-course-main .edit-course-function-area .courses-info-list {
   display: flex;
@@ -158,6 +162,9 @@
   border: 1px solid rgba(0, 0, 0, 0.2);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   border-radius: 6px;
+}
+.edit-course-main .edit-course-function-area .courses-info-list .courses-info-area input[type=checkbox] {
+  transform: scale(1.4);
 }
 .edit-course-main .edit-course-function-area .courses-info-list .courses-info-area .count {
   font-weight: bold;

@@ -4,10 +4,10 @@ import Image from 'next/image'
 
 export default function EditVideoInfo({ video_info, getCourseVideos, messageControl, setShowEditVideoInfo, token, video_id, course_id }) {
   // 請求參數
-  const [thumbnail, setThumbnail] = useState(video_info.thumbnail)
-  const [title, setTitle] = useState(video_info.title)
-  const [description, setDescription] = useState(video_info.description)
-  const [isPrivate, setIsPrivate] = useState(video_info.isPrivate)
+  const [thumbnail, setThumbnail] = useState(video_info?.thumbnail)
+  const [title, setTitle] = useState(video_info?.title)
+  const [description, setDescription] = useState(video_info?.description)
+  const [isPrivate, setIsPrivate] = useState(video_info?.isPrivate)
   // 預覽圖片
   const [preViewImage, setPreViewImage] = useState('')
 
@@ -69,7 +69,7 @@ export default function EditVideoInfo({ video_info, getCourseVideos, messageCont
           <input
             type="text"
             placeholder="必填"
-            defaultValue={video_info.title}
+            defaultValue={video_info?.title}
             onChange={(e) => {
               setTitle(e.target.value)
             }}
@@ -91,7 +91,9 @@ export default function EditVideoInfo({ video_info, getCourseVideos, messageCont
             <Image
               alt="pre view image"
               src={preViewImage}
-              layout="fill"></Image>
+              width={300}
+              height={0}
+              style={{ height: 'auto' }}></Image>
           </div>
         )}
 
@@ -99,7 +101,7 @@ export default function EditVideoInfo({ video_info, getCourseVideos, messageCont
           <div className="content">影片描述:</div>
           <textarea
             className="textarea"
-            defaultValue={video_info.description}
+            defaultValue={video_info?.description}
             placeholder="選填"
             onChange={(e) => {
               setDescription(e.target.value)
@@ -112,7 +114,7 @@ export default function EditVideoInfo({ video_info, getCourseVideos, messageCont
             <input
               type="radio"
               name="isPublic"
-              defaultChecked={video_info.isPrivate ? true : false}
+              defaultChecked={video_info?.isPrivate ? true : false}
               onClick={() => {
                 setIsPrivate(false)
               }}
@@ -123,7 +125,7 @@ export default function EditVideoInfo({ video_info, getCourseVideos, messageCont
             <input
               type="radio"
               name="isPublic"
-              defaultChecked={!video_info.isPrivate ? true : false}
+              defaultChecked={!video_info?.isPrivate ? true : false}
               onClick={(e) => {
                 setIsPrivate(true)
               }}

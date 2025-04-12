@@ -18,6 +18,18 @@
   align-items: center;
   justify-content: center;
   padding: 0 128px;
+  gap: 8px;
+}
+.user-profile .top-section .hide-avatar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.user-profile .top-section .hide-avatar .checkbox {
+  transform: scale(1.4);
+}
+.user-profile .top-section .hide-avatar .content {
+  font-size: clamp(16px, 1.2vw, 20px);
 }
 .user-profile .top-section .avatar {
   display: flex;

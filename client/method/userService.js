@@ -303,6 +303,7 @@ const userService = {
     }
   },
 
+  // get輪播圖
   async getCarousels(token) {
     try {
       const authHeader = token ? { Authorization: token } : {}
@@ -319,6 +320,7 @@ const userService = {
     }
   },
 
+  // get公告
   async getBoards(token, data = null) {
     try {
       const authHeader = token ? { Authorization: token } : {}

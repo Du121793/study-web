@@ -101,13 +101,14 @@ const adminService = {
 
   // 獲得課程內的成員
   /* const data = {
-        realname: nameInput,
-        phoneNumber: phoneInput,
-        gradeInput: gradeInput,
-        role: roleInput,
-        courses: selectCourse,
-        page: page,
-        pageSize: pageSize,
+        realname,
+        phoneNumber,
+        gradeInput,
+        role,
+        courses,
+        page,
+        pageSize,
+        withoutCourses: null,
     }*/
   async getMembers(token, data) {
     const authHeader = token ? { Authorization: token } : {}
@@ -648,6 +649,21 @@ const adminService = {
     }
   },
 
+  /**
+   * 修改問題
+   * @route PATCH /patchQuestion
+   * @param {string} question_id - 問題ID
+   * @param {string[]} [course_ids] - 課程ID陣列
+   * @param {boolean} [isPublic] - 是否公開，不傳則保留原有資料
+   * @param {string} [description] - 問題描述，不傳則保留原有資料
+   * @param {string[]} [resourceCategories] - 資源類別標籤，不傳則保留原有資料
+   * @param {string[]} [hints] - 提示標籤，不傳則保留原有資料
+   * @param {number[]} [rmIMG] - 要刪除的圖片索引陣列
+   * @param {boolean} [replied] - 是否已回覆，不傳則保留原有資料
+   * @param {Object[]} [image] - 上傳的新圖片檔案
+   * @param {string[]} [folders] - 預上傳的資料夾位置
+   * @returns {Object} 更新後的問題ID
+   */
   async patchQaToFolders(token, data) {
     try {
       const authHeader = token ? { Authorization: token } : {}
@@ -677,6 +693,50 @@ const adminService = {
       const response = await axios.delete(API_URL + `/course/question/modifyQA/folder/deleteFolder`, {
         headers: authHeader,
         params: data,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (err) {
+      console.error(err.response.data)
+    }
+  },
+
+  /**
+   * 修改用戶資料
+   * @route PATCH /updateProfile
+   * @param {string} username - 可選，用戶暱稱
+   * @param {string} realname - 可選，真實姓名（僅限教師以上）
+   * @param {string} phoneNumber - 可選，電話號碼（僅限教師以上）
+   * @param {boolean} makeAnonymous - 可選，是否將圖片設為匿名
+   * @returns {Object} 更新結果
+   */
+  async patchUserInfo(token, data) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.patch(API_URL + `/user/updateProfile`, data, {
+        headers: authHeader,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (err) {
+      console.error(err.response.data)
+    }
+  },
+
+  /*
+  role
+  */
+  async changeRole(token, data) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.post(API_URL + `/user/changeRole`, data, {
+        headers: authHeader,
       })
       if (response.status === 401) {
         signOut()

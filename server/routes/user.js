@@ -780,7 +780,7 @@ router.delete("/deleteMember", checkAdminAccess, async (req, res) => {
 /**
  * 臨時測試用路由 - 更改用戶身分
  * @route POST /changeRole
- * @param {string} role - 要更改的身分 (user/admin/teacher)
+ * @param {string} role - 要更改的身分 (student/admin/teacher)
  * @returns {Object} 更新結果
  */
 router.post("/changeRole", async (req, res) => {
@@ -788,10 +788,10 @@ router.post("/changeRole", async (req, res) => {
     const { role } = req.body;
 
     // 檢查傳入的身分是否有效
-    if (!["user", "admin", "teacher"].includes(role)) {
+    if (!["student", "admin", "teacher"].includes(role)) {
       return res.status(400).json({
         success: false,
-        msg: "無效的身分，請傳入 user、admin 或 teacher",
+        msg: "無效的身分，請傳入 student、admin 或 teacher",
       });
     }
 

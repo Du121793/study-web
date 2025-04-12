@@ -157,6 +157,7 @@
   border-radius: 4px;
 }
 #video-nav .video-area .video-card .bottom-container {
+  flex: 1;
   height: 40%;
   background-color: #fff;
   display: flex;

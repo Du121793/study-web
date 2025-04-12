@@ -127,12 +127,16 @@
     .checkbox-area {
       display: flex;
       flex-direction: column;
+      justify-content: center;
       align-items: center;
       .hint {
         font-size: clamp(16px, 1.2vw, 20px);
         gap: 4px;
         align-items: center;
         display: flex;
+      }
+      input[type="checkbox"] {
+        transform: scale(1.2);
       }
     }
     .courses-info-list {
@@ -155,6 +159,9 @@
         border: 1px solid rgba(0, 0, 0, 0.2);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); // 柔和陰影
         border-radius: 6px;
+        input[type="checkbox"] {
+          transform: scale(1.4);
+        }
         .count {
           font-weight: bold;
           width: 32px;

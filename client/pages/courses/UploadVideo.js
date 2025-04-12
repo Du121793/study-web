@@ -1,5 +1,5 @@
 // 組件庫
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
 // TSU
 import { Upload } from 'tus-js-client'
 // method
@@ -7,7 +7,7 @@ import videoUploader from '../../method/videoUploader'
 import { useUserToken } from '../../method/useUserToken'
 import userService from '../../method/userService'
 import { useStrictClickHandler } from '../../method/userful'
-export default function UploadVideoFc({ setshowUploadVideoUI, uploadVideoUIHeight, setUploadVideoUIHeight, uploadVideoUIWidth, setUploadVideoUIWidth, uploadVideoUIInnerOpacity, setUploadVideoUIInnerOpacity, messageControl, getCourseVideos, isShowVideoUpload, setIsShowVideoUpload, course_id, setUploadSuccess, uploadSuccess, uploadError, setUploadError }) {
+export default function UploadVideoFc({ setshowUploadVideoUI, showUploadVideoUI, uploadVideoUIInnerOpacity, setUploadVideoUIInnerOpacity, messageControl, getCourseVideos, isShowVideoUpload, setIsShowVideoUpload, course_id, setUploadSuccess, uploadSuccess, uploadError, setUploadError }) {
   const token = useUserToken()
   const [videoFiles, setVideoFiles] = useState([])
   const [isPublic, setIsPublic] = useState(false)
@@ -24,14 +24,12 @@ export default function UploadVideoFc({ setshowUploadVideoUI, uploadVideoUIHeigh
   const [type, setType] = useState('MainClass')
   const [duration, setDuration] = useState(0)
   const [fileSize, setFileSize] = useState(0)
+  // ui控制
+  const uiRef = useRef(null)
 
   const strictClickCloseUI = useStrictClickHandler(() => {
-    setUploadVideoUIHeight('0')
-    setUploadVideoUIWidth('0')
     setUploadVideoUIInnerOpacity(0)
-    setTimeout(() => {
-      setshowUploadVideoUI(false)
-    }, 200)
+    setshowUploadVideoUI(false)
   })
 
   useEffect(() => {
@@ -45,9 +43,13 @@ export default function UploadVideoFc({ setshowUploadVideoUI, uploadVideoUIHeigh
     setDuration(0)
     setFileSize(0)
     setIsPublic(false)
-    fileInput.current.value = ''
-    fileAvatarInput.current.value = ''
-  }, [isShowVideoUpload])
+    if (fileInput?.current) {
+      fileInput.current.value = ''
+    }
+    if (fileAvatarInput?.current) {
+      fileAvatarInput.current.value = ''
+    }
+  }, [isShowVideoUpload, fileInput, fileAvatarInput])
 
   // ★ 第一次載入：從 sessionStorage 讀取先前的上傳狀態
   useEffect(() => {
@@ -236,12 +238,8 @@ export default function UploadVideoFc({ setshowUploadVideoUI, uploadVideoUIHeigh
     })
 
     // 建立完所有任務後，關閉上傳視窗
-    setUploadVideoUIHeight('0')
-    setUploadVideoUIWidth('0')
+    setshowUploadVideoUI(false)
     setUploadVideoUIInnerOpacity(0)
-    setTimeout(() => {
-      setshowUploadVideoUI(false)
-    }, 200)
   }
 
   // STEP 4: 開始 TUS 上傳
@@ -434,138 +432,140 @@ export default function UploadVideoFc({ setshowUploadVideoUI, uploadVideoUIHeigh
   return (
     <div>
       {/* 上傳視窗 */}
-      <div
-        className="upload-vidoe-main"
-        {...strictClickCloseUI}>
+      {showUploadVideoUI && (
         <div
-          className="container"
-          style={{ height: uploadVideoUIHeight, width: uploadVideoUIWidth }}
-          onClick={(e) => {
-            e.stopPropagation()
-          }}>
-          <div className="section title-section">
-            <label className="label">影片檔案上傳</label>
-            <button
-              className="g-blue-btn"
-              onClick={() => {
-                fileInput.current.click()
-              }}>
-              選擇檔案
-            </button>
-            {fileInput.current?.value.length > 0 && <div className="content">{fileInput.current.value}</div>}
-            <input
-              style={{ display: 'none' }}
-              ref={fileInput}
-              type="file"
-              accept="video/*"
-              multiple
-              onChange={handleVideoSelect}
-              className="input"
-            />
-          </div>
-
-          <div className="section title-section">
-            <label className="label">影片縮圖上傳 (可選)</label>
-            <button
-              className="g-blue-btn"
-              onClick={() => {
-                fileAvatarInput.current.click()
-              }}>
-              選擇檔案
-            </button>
-            {fileAvatarInput.current?.value.length > 0 && <div className="content">{fileAvatarInput.current.value}</div>}
-            <input
-              style={{ display: 'none' }}
-              ref={fileAvatarInput}
-              type="file"
-              accept="image/*"
-              onChange={handleThumbSelect}
-              className="input"
-            />
-          </div>
-
-          <div className="section">
-            <label className="label">錄影日期 (可選)</label>
-            <input
-              id="video-record-date"
-              type="datetime-local"
-              value={recordDate}
-              onChange={(e) => setRecordDate(e.target.value)}
-              className="input"
-            />
-          </div>
-
-          <div className="section">
-            <label className="label">影片標題</label>
-            <input
-              id="video-title"
-              placeholder="此處輸入標題"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="input"
-            />
-          </div>
-
-          <div className="section">
-            <label className="label">影片描述</label>
-            <textarea
-              rows={3}
-              placeholder="此處輸入影片描述"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="textarea"></textarea>
-          </div>
-
-          <div className="public-setting">
-            <div className="content">是否公開此影片:</div>
-            <div className="confirm">
-              <label>是</label>
-              <input
-                type="radio"
-                name="contact"
-                defaultValue="confirm"
-                defaultChecked={!isPublic}
+          className="upload-vidoe-main"
+          {...strictClickCloseUI}>
+          <div
+            className="container"
+            ref={uiRef}
+            onClick={(e) => {
+              e.stopPropagation()
+            }}>
+            <div className="section title-section">
+              <label className="label">影片檔案上傳</label>
+              <button
+                className="g-blue-btn"
                 onClick={() => {
-                  setIsPublic(false)
-                }}
+                  fileInput.current.click()
+                }}>
+                選擇檔案
+              </button>
+              {fileInput.current?.value.length > 0 && <div className="content">{fileInput.current.value}</div>}
+              <input
+                style={{ display: 'none' }}
+                ref={fileInput}
+                type="file"
+                accept="video/*"
+                multiple
+                onChange={handleVideoSelect}
+                className="input"
               />
             </div>
-            <div className="reject">
-              <label>否</label>
-              <input
-                type="radio"
-                name="contact"
-                defaultValue="reject"
-                defaultChecked={isPublic}
+
+            <div className="section title-section">
+              <label className="label">影片縮圖上傳 (可選)</label>
+              <button
+                className="g-blue-btn"
                 onClick={() => {
-                  setIsPublic(true)
-                }}
+                  fileAvatarInput.current.click()
+                }}>
+                選擇檔案
+              </button>
+              {fileAvatarInput.current?.value.length > 0 && <div className="content">{fileAvatarInput.current.value}</div>}
+              <input
+                style={{ display: 'none' }}
+                ref={fileAvatarInput}
+                type="file"
+                accept="image/*"
+                onChange={handleThumbSelect}
+                className="input"
               />
             </div>
-          </div>
 
-          <div className="section">
-            <p>
-              <strong>影片時長:</strong> {duration.toFixed(2)} 秒
-            </p>
-            <p>
-              <strong>檔案大小:</strong> {fileSize >= 1024 * 1024 ? `${(fileSize / (1024 * 1024)).toFixed(1)} MB` : fileSize >= 1024 ? `${(fileSize / 1024).toFixed(1)} KB` : `${fileSize} B`}
-            </p>
-          </div>
+            <div className="section">
+              <label className="label">錄影日期 (可選)</label>
+              <input
+                id="video-record-date"
+                type="datetime-local"
+                value={recordDate}
+                onChange={(e) => setRecordDate(e.target.value)}
+                className="input"
+              />
+            </div>
 
-          <div className="buttonContainer">
-            <button
-              onClick={() => {
-                if (isUserHasInputVideoTitle()) {
-                  handleCreateUploadLink()
-                }
-              }}
-              className="button">
-              建立上傳連結並上傳
-            </button>
+            <div className="section">
+              <label className="label">影片標題</label>
+              <input
+                id="video-title"
+                placeholder="此處輸入標題"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="input"
+              />
+            </div>
+
+            <div className="section">
+              <label className="label">影片描述</label>
+              <textarea
+                rows={3}
+                placeholder="此處輸入影片描述"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="textarea"></textarea>
+            </div>
+
+            <div className="public-setting">
+              <div className="content">是否公開此影片:</div>
+              <div className="confirm">
+                <label>是</label>
+                <input
+                  type="radio"
+                  name="contact"
+                  defaultValue="confirm"
+                  defaultChecked={!isPublic}
+                  onClick={() => {
+                    setIsPublic(false)
+                  }}
+                />
+              </div>
+              <div className="reject">
+                <label>否</label>
+                <input
+                  type="radio"
+                  name="contact"
+                  defaultValue="reject"
+                  defaultChecked={isPublic}
+                  onClick={() => {
+                    setIsPublic(true)
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="section">
+              <p>
+                <strong>影片時長:</strong> {duration.toFixed(2)} 秒
+              </p>
+              <p>
+                <strong>檔案大小:</strong> {fileSize >= 1024 * 1024 ? `${(fileSize / (1024 * 1024)).toFixed(1)} MB` : fileSize >= 1024 ? `${(fileSize / 1024).toFixed(1)} KB` : `${fileSize} B`}
+              </p>
+            </div>
+
+            <div className="buttonContainer">
+              <button
+                onClick={() => {
+                  if (isUserHasInputVideoTitle()) {
+                    handleCreateUploadLink()
+                  }
+                }}
+                className="g-blue-btn">
+                建立上傳連結並上傳
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* 右下角的多檔上傳進度（含暫停、終止、刪除等功能） */}
       <UploadProgressDisplay uploads={uploads} />

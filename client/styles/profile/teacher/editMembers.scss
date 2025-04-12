@@ -84,7 +84,9 @@
         height: 40px;
         background-color: #fafafa;
         transition: 0.2s;
-
+        input[type="checkbox"] {
+          transform: scale(1.2);
+        }
         .student-checkbox {
           width: 16px;
           height: 16px;

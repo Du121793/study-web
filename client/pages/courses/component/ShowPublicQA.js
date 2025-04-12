@@ -16,7 +16,7 @@ import rightArrow from '../../../public/course/rightArrow.png'
 // env
 const client_URL = process.env.NEXT_PUBLIC_CLIENT_IP
 const server_base_URL = process.env.NEXT_PUBLIC_SERVER_IP
-export default function ShowPublicQA({ token, showPublicQA, setShowPublicQA, course_name, course_id }) {
+export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, showPublicQA, setShowPublicQA, course_name, course_id }) {
   const image_base_url = `${server_base_URL}/resource/questionIMG/`
   const [page_body, setPage_body] = useState([])
   const [userInfo, setUserInfo] = useState({})
@@ -170,6 +170,20 @@ export default function ShowPublicQA({ token, showPublicQA, setShowPublicQA, cou
       }
     })
     setShortcut(foldersTemp)
+  }
+
+  const pushQAtoCourse = (qa_info) => {
+    let courseIdsTemp = qa_info?.courses
+    courseIdsTemp.push(course_id)
+    let data = {
+      question_id: qa_info._id,
+      course_ids: courseIdsTemp,
+    }
+    adminService.patchQaToFolders(token, data).then((res) => {
+      if (res?.success) {
+        setQaHasUpload(!qaHasUpload)
+      }
+    })
   }
 
   // session setting
@@ -337,12 +351,12 @@ export default function ShowPublicQA({ token, showPublicQA, setShowPublicQA, cou
                 ) : (
                   <div
                     className="folder-area"
-                    style={{ cursor: 'pointer' }}>
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => {
+                      getChildFoldersById(item._id, item)
+                      initShortcut(item)
+                    }}>
                     <Image
-                      onClick={() => {
-                        getChildFoldersById(item._id, item)
-                        initShortcut(item)
-                      }}
                       src={folder}
                       width={24}
                       height={24}
@@ -442,6 +456,12 @@ export default function ShowPublicQA({ token, showPublicQA, setShowPublicQA, cou
               <Link
                 href={`${client_URL}/courses/QaPage?qa_id=${item._id}&courseName=${course_name}&course_id=${course_id}`}
                 className="card"
+                onMouseOver={(e) => {
+                  e.target.style.backgroundColor = ' #efefef'
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.backgroundColor = 'rgb(255, 255, 255)'
+                }}
                 key={index}>
                 {removeingQA && (
                   <div
@@ -459,6 +479,15 @@ export default function ShowPublicQA({ token, showPublicQA, setShowPublicQA, cou
                   </div>
                 )}
                 <div className="content">課程描述</div>
+                <div
+                  className="g-white-btn"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    e.preventDefault()
+                    pushQAtoCourse(item)
+                  }}>
+                  加進此課程
+                </div>
                 <div className="description-area">{item.description}</div>
               </Link>
             ))}

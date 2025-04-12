@@ -30,6 +30,13 @@ export default function EditMembers() {
   // 請求參數
   const [getedCourse, setGetedCourse] = useState({ courses: [] })
   const [page, setPage] = useState(1)
+  // allMemberPage
+  // courseMemberPage
+  // ousideMemberPage
+  const [method, setMethod] = useState({
+    name: '',
+    page: 1,
+  })
   const [pageSize, setPageSize] = useState(10)
   const [totalPage, setTotalPage] = useState(1)
   const [courseId, setCourseId] = useState('')
@@ -38,7 +45,6 @@ export default function EditMembers() {
   const isExporting = useRef(false)
   // 目前成員的顯示狀態
   const [showMembersState, setShowMembersState] = useState('all')
-
   // 獲取資料
   const [members, setMembers] = useState([])
   const [userRole, setUserRole] = useState('')
@@ -105,7 +111,7 @@ export default function EditMembers() {
         .then((res) => {
           if (res.success) {
             setMemberloading(false)
-            showAllCourseMemebers(false)
+            methods.showAllMembers(false)
             initSelector()
             messageControl('加入到課程', true)
           } else {
@@ -131,7 +137,7 @@ export default function EditMembers() {
         if (res.success) {
           setMemberloading(false)
           messageControl('移除成功', true)
-          showAllCourseMemebers(false)
+          methods.showAllMembers(false)
           initSelector()
         } else {
           setMemberloading(false)
@@ -191,114 +197,6 @@ export default function EditMembers() {
     return page
   }
 
-  // 顯示所有成員
-  const showAllCourseMemebers = (needMessage) => {
-    setMemberloading(true)
-    let data = {
-      page: page,
-      pageSize: pageSize,
-    }
-    adminService.getMembers(token, data).then((res) => {
-      if (res.success) {
-        setMemberloading(false)
-        if (needMessage) {
-          messageControl('顯示所有成員', true)
-        }
-        setShowMembersState('all')
-        setMembers(res.data)
-        initSelector()
-      } else {
-        setMemberloading(false)
-        initSelector()
-        messageControl('發生錯誤', false)
-      }
-    })
-  }
-
-  // 顯示課程成員
-  const showCourseMembers = () => {
-    if (courseId !== '') {
-      setMemberloading(true)
-      let data = {
-        page: page,
-        pageSize: pageSize,
-        courses: courseId,
-      }
-      adminService.getMembers(token, data).then((res) => {
-        if (res.success) {
-          setMemberloading(false)
-          setShowMembersState('course members')
-          setMembers(res.data)
-          initSelector()
-          messageControl('顯示課程成員', true)
-        } else {
-          setMemberloading(false)
-          initSelector()
-          messageControl('發生錯誤', false)
-        }
-      })
-    } else {
-      messageControl('請先選擇課程', false)
-    }
-  }
-
-  // 顯示課程以外的成員
-  const showElseCourseMemebers = () => {
-    // 檢查是否有選擇課程
-    if (courseId !== '') {
-      setMemberloading(true)
-      let allMembers = ''
-      let courseMembers = ''
-      let getAllMemberData = {
-        page: page,
-        pageSize: pageSize,
-      }
-      adminService.getMembers(token, getAllMemberData).then((res) => {
-        if (res.success) {
-          setMemberloading(true)
-          initSelector()
-          allMembers = res.data
-        }
-      })
-
-      let getCourseMemberData = {
-        page: page,
-        pageSize: pageSize,
-        courses: courseId,
-      }
-      adminService
-        .getMembers(token, getCourseMemberData)
-        .then((res) => {
-          if (res.success) {
-            setMemberloading(false)
-            courseMembers = res.data
-          }
-        })
-        .then(() => {
-          if (courseMembers !== '' && allMembers !== '') {
-            // 檢查 courseMembers 與 allMembers 是否完全相同
-            const isIdentical = courseMembers.length === allMembers.length && courseMembers.every((courseMember) => allMembers.some((member) => member._id === courseMember._id))
-
-            if (isIdentical) {
-              setMembers([]) // 如果兩個陣列資料一模一樣，就設成空陣列
-            } else {
-              setMembers(allMembers.filter((obj1) => courseMembers.every((obj2) => obj2._id !== obj1._id)))
-            }
-            setShowMembersState('all')
-          }
-          messageControl('顯示課程以外成員', true)
-        })
-    } else {
-      messageControl('請先選擇課程', false)
-      setMemberloading(false)
-    }
-  }
-
-  // 初始化已選擇的成員
-  const initSelectedId = () => {
-    setSelectedStudentId([])
-  }
-
   // 導出成csv
   const exportCSV = (by) => {
     if (by === 'search') {
@@ -311,14 +209,142 @@ export default function EditMembers() {
         pageSize: pageSize,
         selected_members: [selectedStudentId],
       }
-
-      console.log(typeof data?.selected_members)
-      console.log([data?.selected_members])
-
       adminService.exportMembers(token, data).then((res) => {})
     }
   }
 
+  const getMembers = () => {
+    switch (method.name) {
+      case 'allMemberPage':
+        setMemberloading(true)
+        let data = {
+          page: method.page,
+          pageSize: pageSize,
+        }
+        adminService.getMembers(token, data).then((res) => {
+          if (res.success) {
+            setMemberloading(false)
+            setTotalPage(res.totalPage)
+            setShowMembersState('all')
+            setMembers(res.data)
+            initSelector()
+          } else {
+            setMemberloading(false)
+            initSelector()
+            messageControl('發生錯誤', false)
+          }
+        })
+        break
+      case 'courseMemberPage':
+        if (courseId !== '') {
+          setMemberloading(true)
+          let data = {
+            page: method.page,
+            pageSize: pageSize,
+            courses: courseId,
+          }
+          adminService.getMembers(token, data).then((res) => {
+            if (res.success) {
+              messageControl('顯示該課程成員', true)
+              setMemberloading(false)
+              setTotalPage(res.totalPage)
+              setShowMembersState('all')
+              setMembers(res.data)
+              initSelector()
+            } else {
+              setMemberloading(false)
+              initSelector()
+              messageControl('發生錯誤', false)
+            }
+          })
+        } else {
+          messageControl('請選擇課程', false)
+        }
+        break
+      case 'ousideMemberPage':
+        if (courseId !== '') {
+          setMemberloading(true)
+          let data = {
+            page: method.page,
+            pageSize: pageSize,
+            withoutCourses: courseId,
+          }
+          adminService.getMembers(token, data).then((res) => {
+            if (res.success) {
+              messageControl('顯示課程以外成員', true)
+              setMemberloading(false)
+              setTotalPage(res.totalPage)
+              setShowMembersState('all')
+              setMembers(res.data)
+              initSelector()
+            } else {
+              setMemberloading(false)
+              initSelector()
+              messageControl('發生錯誤', false)
+            }
+          })
+        } else {
+          messageControl('請選擇課程', false)
+        }
+        break
+      default:
+        break
+    }
+  }
+
+  useEffect(() => {
+    if (method.name !== 'courseMemberPage') {
+      setMethod({ name: 'courseMemberPage', page: 1 })
+      return
+    }
+    if (courseId !== '') {
+      setMemberloading(true)
+      let data = {
+        page: method.page,
+        pageSize: pageSize,
+        courses: courseId,
+      }
+      adminService.getMembers(token, data).then((res) => {
+        if (res.success) {
+          messageControl('顯示該課程成員', true)
+          setMemberloading(false)
+          setTotalPage(res.totalPage)
+          setShowMembersState('all')
+          setMembers(res.data)
+          initSelector()
+        } else {
+          setMemberloading(false)
+          initSelector()
+          messageControl('發生錯誤', false)
+        }
+      })
+    }
+  }, [courseId])
+
+  useEffect(() => {
+    getMembers()
+  }, [method])
+
+  // 獲得所有課程，用於select
+  useEffect(() => {
+    /* data ={ courseName, subject, grade, courseClass, members, _id, page, pageSize}*/
+    let data = {
+      pageSize: Infinity,
+    }
+    if (token) {
+      adminService.getCourses(token, data).then((res) => {
+        if (res.success) {
+          setGetedCourse(res.data)
+        } else {
+          setMemberloading(false)
+          initSelector()
+          messageControl('發生錯誤', false)
+        }
+      })
+    }
+  }, [token])
+
+  // session
   useEffect(() => {
     const user_role = sessionStorage.getItem('user_role')
     setUserRole(user_role)
@@ -354,40 +380,6 @@ export default function EditMembers() {
     }
   }, [pageSize, token])
 
-  // 獲取所有課程
-  useEffect(() => {
-    if (token) {
-      let data = {
-        page: page,
-        pageSize: pageSize,
-      }
-      adminService.getCourses(token).then((res) => {
-        setGetedCourse(res.data)
-      })
-      adminService.getMembers(token, data).then((res) => {
-        setTotalPage(res.totalPage)
-        setMembers(res.data)
-      })
-    }
-    // 顯示該課程成員
-    if (token && courseId) {
-      setMemberloading(true)
-      let data = {
-        page: page,
-        pageSize: pageSize,
-        courses: courseId,
-      }
-      adminService.getMembers(token, data).then((res) => {
-        if (res.success) {
-          setMemberloading(false)
-          setMembers(res.data)
-          setTotalPage(res.totalPage)
-          messageControl('顯示該課程成員', true)
-        }
-      })
-    }
-  }, [token, courseId, page, pageSize])
-
   const test = () => {
     console.log(selectedStudentId)
   }
@@ -412,8 +404,6 @@ export default function EditMembers() {
           onChange={(e) => {
             setCourseId(e.target.value)
             if (e.target.value === '') {
-              console.log('all')
-              showAllCourseMemebers()
               setShowMembersState('all')
             } else {
               setShowMembersState('course members')
@@ -436,17 +426,32 @@ export default function EditMembers() {
         <div className="option-area">
           <div
             className="button show-all-members-btn"
-            onClick={showElseCourseMemebers}>
+            onClick={() => {
+              setMethod({
+                name: 'ousideMemberPage',
+                page: 1,
+              })
+            }}>
             顯示課程以外成員
           </div>
           <div
             className="button show-all-members-btn"
-            onClick={showAllCourseMemebers}>
+            onClick={() => {
+              setMethod({
+                name: 'allMemberPage',
+                page: 1,
+              })
+            }}>
             顯示所有成員
           </div>
           <div
             className="button show-course-members-btn"
-            onClick={showCourseMembers}>
+            onClick={() => {
+              setMethod({
+                name: 'courseMemberPage',
+                page: 1,
+              })
+            }}>
             顯示該課程成員
           </div>
           {showMembersState === 'all' && (
@@ -551,21 +556,28 @@ export default function EditMembers() {
             src={dbArrowLeft}
             className="page-switcher"
             onClick={() => {
-              setPage(1)
+              setMethod((prop) => {
+                return { name: prop.name, page: 1 }
+              })
             }}></Image>
           <Image
             alt="switch back one page icon"
             src={ArrowLeft}
             className="page-switcher"
             onClick={() => {
-              if (page === 1) {
+              if (method.page === 1) {
                 return
               } else {
-                setPage((prop) => prop - 1)
+                setMethod((prop) => {
+                  return {
+                    name: prop.name,
+                    page: prop.page - 1,
+                  }
+                })
               }
             }}></Image>
-          {getPage(totalPage, page).map((item, index) => {
-            if (page === item) {
+          {getPage(totalPage, method.page).map((item, index) => {
+            if (method.page === item) {
               return (
                 <div
                   key={index}
@@ -577,7 +589,9 @@ export default function EditMembers() {
             return (
               <div
                 onClick={() => {
-                  setPage(item)
+                  setMethod((prop) => {
+                    return { name: prop.name, page: item }
+                  })
                 }}
                 key={index}
                 className="now-page">
@@ -590,11 +604,15 @@ export default function EditMembers() {
             src={ArrowRight}
             className="page-switcher"
             onClick={() => {
-              console.log(totalPage)
-              if (page === totalPage) {
+              if (method.page === totalPage) {
                 return
               } else {
-                setPage((prop) => prop + 1)
+                setMethod((prop) => {
+                  return {
+                    name: prop.name,
+                    page: prop.page + 1,
+                  }
+                })
               }
             }}></Image>
           <Image
@@ -602,6 +620,9 @@ export default function EditMembers() {
             src={dbArrowRight}
             className="page-switcher"
             onClick={() => {
+              setMethod((prop) => {
+                return { name: prop.name, page: totalPage }
+              })
               setPage(totalPage)
             }}></Image>
         </div>

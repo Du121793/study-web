@@ -233,26 +233,21 @@ export default function VideoNav({ course_id, courseName, user_role }) {
       className="nav"
       id="video-nav">
       {/* 上傳影片的子組件 */}
-      {showUploadVideoUI && (
-        <VideoUploadComponent
-          setshowUploadVideoUI={setshowUploadVideoUI}
-          uploadVideoUIHeight={uploadVideoUIHeight}
-          setUploadVideoUIHeight={setUploadVideoUIHeight}
-          uploadVideoUIWidth={uploadVideoUIWidth}
-          setUploadVideoUIWidth={setUploadVideoUIWidth}
-          uploadVideoUIInnerOpacity={uploadVideoUIInnerOpacity}
-          setUploadVideoUIInnerOpacity={setUploadVideoUIInnerOpacity}
-          messageControl={messageControl}
-          getCourseVideos={getCourseVideos}
-          course_id={course_id}
-          isShowVideoUpload={isShowVideoUpload}
-          setIsShowVideoUpload={setIsShowVideoUpload}
-          setUploadSuccess={setUploadSuccess}
-          uploadSuccess={uploadSuccess}
-          uploadError={uploadError}
-          setUploadError={setUploadError}
-        />
-      )}
+      <VideoUploadComponent
+        setshowUploadVideoUI={setshowUploadVideoUI}
+        showUploadVideoUI={showUploadVideoUI}
+        uploadVideoUIInnerOpacity={uploadVideoUIInnerOpacity}
+        setUploadVideoUIInnerOpacity={setUploadVideoUIInnerOpacity}
+        messageControl={messageControl}
+        getCourseVideos={getCourseVideos}
+        course_id={course_id}
+        isShowVideoUpload={isShowVideoUpload}
+        setIsShowVideoUpload={setIsShowVideoUpload}
+        setUploadSuccess={setUploadSuccess}
+        uploadSuccess={uploadSuccess}
+        uploadError={uploadError}
+        setUploadError={setUploadError}
+      />
       {/* 編輯影片的子組件 */}
       {editShowVideoInfo && (
         <EditVideoInfo
