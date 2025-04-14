@@ -21,7 +21,6 @@
   border-radius: 8px;
   padding: 24px;
   max-height: 90vh;
-  min-height: 10px;
 }
 .upload-board-main .upload-board-ui .input-container {
   display: flex;

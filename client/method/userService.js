@@ -33,40 +33,41 @@ const userService = {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.get(USER_URL, { headers: authHeader })
 
-      if (response.status === 401) {
+      return response.data
+    } catch (error) {
+      if (response?.status === 401) {
         signOut()
         return
       }
-
-      return response.data
-    } catch (error) {
       console.log(error)
     }
   },
 
-  // 獲得使用者註冊過的所有課程的內容，可以依據 course_id 與 filter 進行查詢
-  // 參數說明：
-  // token      : 使用者驗證的 token
-  // course_id  : 課程的 ID，若傳入則只查詢該筆課程資料（非 teacher 時需先檢查是否已註冊該課程）
-  //              若 course_id 為 null 或其他 falsy 值，則不傳入此參數
-  // filter     : 過濾條件與分頁參數，格式範例如下：
-  //              {
-  //                courseName: true,   // 若傳入 true，表示只回傳 courseName 欄位（其他允許的欄位：subject, grade, courseClass, members, date）
-  //                page: 1,            // 分頁頁數，預設為 1
-  //                pageSize: 10        // 每頁筆數，若未傳入則回傳所有資料
-  //              }
-  async getUserRegistedCourses(token, course_id, filter) {
+  async getUserRegistedCourses(token, filter, course_id) {
+    /**
+     * 獲取用戶已註冊的課程
+     * @route GET /registedCourse
+     * @param {string} course_id - 可選，指定課程ID
+     * @param {string|Object} filter - 可選，過濾條件（JSON格式）
+     * @param {string} filter.search - 可選，搜索關鍵字，會同時搜索課程名稱和ID
+     * @param {number} filter.page - 可選，分頁頁碼
+     * @param {number} filter.pageSize - 可選，每頁筆數
+     * @param {string} filter.courseName - 可選，課程名稱過濾
+     * @param {string} filter.subject - 可選，科目過濾
+     * @param {string} filter.grade - 可選，年級過濾
+     * @param {string} filter.courseClass - 可選，班級過濾
+     * @param {string} filter.date - 可選，日期過濾
+     * @returns {Object} 課程資訊列表或單一課程詳情
+     */
     try {
       // 設定 Authorization 標頭，若 token 存在則加入
       const authHeader = token ? { Authorization: token } : {}
-
       // 若 filter 為物件，則轉換為 JSON 字串傳遞給後端
       if (filter && typeof filter === 'object') {
         filter = JSON.stringify(filter)
       }
-
       // 構建 axios GET 請求的參數物件
-      // 若 course_id 為 falsy 則不加入該參數
+      // 若 course_id 為 false 則不加入該參數
       const params = { filter }
       if (course_id) {
         params.course_id = course_id
@@ -77,15 +78,15 @@ const userService = {
         headers: authHeader,
         params,
       })
-      if (response.status === 401) {
-        signOut()
-        return
-      }
+
       // 回傳 API 回應的完整資料 (包含查詢結果與分頁資訊)
       return response.data
     } catch (e) {
+      if (response?.status === 401) {
+        signOut()
+        return
+      }
       console.error(e)
-      throw e
     }
   },
 
@@ -101,13 +102,18 @@ const userService = {
         headers: authHeader,
         params: filter,
       })
-      if (response.status === 401) {
+
+      return response.data
+    } catch (e) {
+      if (response?.status === 401) {
         signOut()
         return
       }
-      return response.data
-    } catch (e) {
-      console.log(e.response.data)
+      if (e?.response?.data) {
+        console.log(e.response.data)
+      } else {
+        console.log(e)
+      }
     }
   },
 
@@ -121,32 +127,45 @@ const userService = {
         headers: authHeader,
         params: { videoId: video_id },
       })
-      if (response.status === 401) {
+
+      return response.data
+    } catch (e) {
+      if (response?.status === 401) {
         signOut()
         return
       }
-      return response.data
-    } catch (e) {
-      console.log(e)
+
+      if (e?.response?.data) {
+        console.log(e.response.data)
+      } else {
+        console.log(e)
+      }
     }
   },
 
   // 註冊使用者
   async registerUser(tempToken, realname, phoneNumber) {
+    let response = ''
     try {
-      const response = await axios.post(API_URL + '/auth/completeRegistration', {
+      response = await axios.post(API_URL + '/auth/completeRegistration', {
         tempToken,
-
         realname,
         phoneNumber,
       })
-      if (response.status === 401) {
+      if (response?.data) {
+        return response.data
+      }
+      return response
+    } catch (e) {
+      if (response?.status === 401) {
         signOut()
         return
       }
-      return response.data
-    } catch (e) {
-      return e.response.data
+      if (e?.response?.data) {
+        return response
+      } else {
+        return response
+      }
     }
   },
 
@@ -156,14 +175,19 @@ const userService = {
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.post(QA_URL + '/modifyQA/postQuestion', formData, { headers: authHeader, 'Content-Type': 'multipart/form-data' })
-      if (response.status === 401) {
+
+      return response.data
+    } catch (e) {
+      if (response?.status === 401) {
         signOut()
         return
       }
-      return response.data
-    } catch (e) {
-      console.log(e)
-      return e.response.data
+
+      if (e?.response?.data) {
+        console.log(e.response.data)
+      } else {
+        console.log(e)
+      }
     }
   },
 
@@ -174,13 +198,19 @@ const userService = {
       const response = await axios.get(QA_URL + '/getPublicQAs', {
         header: authHeader,
       })
-      if (response.status === 401) {
+
+      return response.data
+    } catch (e) {
+      if (response?.status === 401) {
         signOut()
         return
       }
-      return response.data
-    } catch (e) {
-      return e.response.data
+
+      if (e?.response?.data) {
+        console.log(e.response.data)
+      } else {
+        console.log(e)
+      }
     }
   },
 
@@ -192,12 +222,13 @@ const userService = {
         headers: authHeader,
         params: data,
       })
-      if (response.status === 401) {
+
+      return response.data
+    } catch (e) {
+      if (response?.status === 401) {
         signOut()
         return
       }
-      return response.data
-    } catch (e) {
       if (e?.response?.data) {
         console.log(e.response.data)
       } else {
@@ -221,13 +252,19 @@ const userService = {
         headers: authHeader,
         params: data,
       })
-      if (response.status === 401) {
+
+      return response.data
+    } catch (err) {
+      if (response?.status === 401) {
         signOut()
         return
       }
-      return response.data
-    } catch (err) {
-      return err.response.data
+
+      if (e?.response?.data) {
+        console.log(e.response.data)
+      } else {
+        console.log(e)
+      }
     }
   },
 
@@ -240,13 +277,19 @@ const userService = {
         headers: authHeader,
         params: data,
       })
-      if (response.status === 401) {
+
+      return response.data
+    } catch (e) {
+      if (response?.status === 401) {
         signOut()
         return
       }
-      return response.data
-    } catch (e) {
-      return e
+
+      if (e?.response?.data) {
+        console.log(e.response.data)
+      } else {
+        console.log(e)
+      }
     }
   },
 
@@ -255,13 +298,19 @@ const userService = {
     const authHeader = token ? { Authorization: token } : {}
     try {
       const response = await axios.post(QA_URL + `/QAMethod/${question_id}/postNewComment`, reqBody, { headers: authHeader })
-      if (response.status === 401) {
+
+      return response.data
+    } catch (e) {
+      if (response?.status === 401) {
         signOut()
         return
       }
-      return response.data
-    } catch (e) {
-      return e.response.data
+
+      if (e?.response?.data) {
+        console.log(e.response.data)
+      } else {
+        console.log(e)
+      }
     }
   },
 
@@ -272,13 +321,19 @@ const userService = {
       const response = await axios.get(QA_URL + `/QAMethod/${question_id}`, {
         headers: authHeader,
       })
-      if (response.status === 401) {
+
+      return response.data
+    } catch (e) {
+      if (response?.status === 401) {
         signOut()
         return
       }
-      return response.data
-    } catch (e) {
-      return e
+
+      if (e?.response?.data) {
+        console.log(e.response.data)
+      } else {
+        console.log(e)
+      }
     }
   },
 
@@ -293,13 +348,18 @@ const userService = {
         headers: authHeader,
         params: payload,
       })
-      if (response.status === 401) {
+
+      return response.data
+    } catch (e) {
+      if (response?.status === 401) {
         signOut()
         return
       }
-      return response.data
-    } catch (e) {
-      return e.response.data
+      if (e?.response?.data) {
+        console.log(e.response.data)
+      } else {
+        console.log(e)
+      }
     }
   },
 
@@ -310,30 +370,42 @@ const userService = {
       const response = await axios.get(API_URL + `/publicResource/carousel/all`, {
         headers: authHeader,
       })
-      if (response.status === 401) {
+
+      return response.data
+    } catch (e) {
+      if (response?.status === 401) {
         signOut()
         return
       }
-      return response.data
-    } catch (e) {
+
+      if (e?.response?.data) {
+        console.log(e.response.data)
+      } else {
+        console.log(e)
+      }
       return e
     }
   },
 
   // get公告
-  async getBoards(token, data = null) {
+  async getBoards(data) {
     try {
-      const authHeader = token ? { Authorization: token } : {}
       const response = await axios.get(API_URL + `/publicResource/board`, {
-        headers: authHeader,
         params: data,
       })
-      if (response.status === 401) {
+
+      return response.data
+    } catch (e) {
+      if (response?.status === 401) {
         signOut()
         return
       }
-      return response.data
-    } catch (e) {
+
+      if (e?.response?.data) {
+        console.log(e.response.data)
+      } else {
+        console.log(e)
+      }
       return e
     }
   },
@@ -342,43 +414,52 @@ const userService = {
   async getBoardsById(id) {
     try {
       const response = await axios.get(API_URL + `/publicResource/board/${id}`)
-      if (response.status === 401) {
+
+      return response.data
+    } catch (e) {
+      if (response?.status === 401) {
         signOut()
         return
       }
-      return response.data
-    } catch (e) {
+
+      if (e?.response?.data) {
+        console.log(e.response.data)
+      } else {
+        console.log(e)
+      }
       return e
     }
   },
-  /**
-   * 獲取指定資料夾下的所有問題
-   * @route GET /getFolderQuestions
-   * @param {string} folder_id - 資料夾ID
-   * @param {number} [page=1] - 頁碼
-   * @param {number} [pageSize=10] - 每頁筆數
-   * @param {string} [sortBy="lastUpdate"] - 排序欄位，"createDate"或"lastUpdate"
-   * @param {string} [sortOrder="asc"] - 排序方向，"asc"為升序，"desc"為降序
-   * @param {string} [sortType="resourceCategories"] - 分群依據，"resourceCategories"或"hints"
-   * @returns {Object} 按標籤分組的問題列表及分頁資訊
-   */
+
   async getFolderQuestions(token, data) {
+    /**
+     * 獲取指定資料夾下的所有問題
+     * @route GET /getFolderQuestions
+     * @param {string} folder_id - 資料夾ID
+     * @param {number} [page=1] - 頁碼
+     * @param {number} [pageSize=10] - 每頁筆數
+     * @param {string} [sortBy="lastUpdate"] - 排序欄位，"createDate"或"lastUpdate"
+     * @param {string} [sortOrder="asc"] - 排序方向，"asc"為升序，"desc"為降序
+     * @param {string} [sortType="resourceCategories"] - 分群依據，"resourceCategories"或"hints"
+     * @returns {Object} 按標籤分組的問題列表及分頁資訊
+     */
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.get(API_URL + `/course/question/modifyQA/folder/getFolderQuestions`, {
         headers: authHeader,
         params: data,
       })
-      if (response.status === 401) {
+
+      return response.data
+    } catch (e) {
+      if (response?.status === 401) {
         signOut()
         return
       }
-      return response.data
-    } catch (e) {
       if (e?.response?.data) {
-        return e.response.data
+        console.log(e.response.data)
       } else {
-        return e
+        console.log(e)
       }
     }
   },
@@ -392,43 +473,48 @@ const userService = {
         headers: authHeader,
         params: data,
       })
-      if (response.status === 401) {
+
+      return response.data
+    } catch (e) {
+      if (response?.status === 401) {
         signOut()
         return
       }
-      return response.data
-    } catch (e) {
+
       if (e?.response?.data) {
-        return e.response.data
+        console.log(e.response.data)
       } else {
-        return e
+        console.log(e)
       }
     }
   },
-  /**
-   * 獲取資料夾列表
-   * @route GET /getFolders
-   * @param {string} [folder_id] - 要查找子資料夾的父資料夾ID
-   * @param {boolean} [isRoot=false] - 是否只獲取根資料夾
-   * @returns {Object} 資料夾列表
-   */
+
   async getChildFolders(token, data) {
+    /**
+     * 獲取資料夾列表
+     * @route GET /getFolders
+     * @param {string} [folder_id] - 要查找子資料夾的父資料夾ID
+     * @param {boolean} [isRoot=false] - 是否只獲取根資料夾
+     * @returns {Object} 資料夾列表
+     */
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.get(API_URL + `/course/question/modifyQA/folder/getFolders`, {
         headers: authHeader,
         params: data,
       })
-      if (response.status === 401) {
+
+      return response.data
+    } catch (e) {
+      if (response?.status === 401) {
         signOut()
         return
       }
-      return response.data
-    } catch (e) {
+
       if (e?.response?.data) {
-        return e.response.data
+        console.log(e.response.data)
       } else {
-        return e
+        console.log(e)
       }
     }
   },

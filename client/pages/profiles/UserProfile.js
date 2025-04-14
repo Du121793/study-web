@@ -1,12 +1,16 @@
+// 庫
 import { useEffect, useState, useRef } from 'react'
-import LoadingAnime from '../../components/global/LoadingAnime'
+import Image from 'next/image'
+// method
 import { useUserToken } from '../../method/useUserToken'
 import userService from '../../method/userService'
-import Image from 'next/image'
 import adminService from '../../method/adminService'
+// global
+import LoadingAnime from '../../components/global/LoadingAnime'
+// public
+import anonymous from '../../public/course/anonymous.png'
 
 export default function UserProfile() {
-  const [userInfoLoading, setUserInfoLoading] = useState(false)
   const token = useUserToken()
   const [userInfo, setUserInfo] = useState([])
   // 切換編輯狀態
@@ -18,6 +22,9 @@ export default function UserProfile() {
   const [messageColor, setMessageColor] = useState('')
   const messageTimer = useRef(null)
   const resetTimer = useRef(null)
+
+  // loading anime
+  const [loading, setLoading] = useState(false)
 
   // patch userinfo payload
   const [username, setUsername] = useState('')
@@ -43,9 +50,7 @@ export default function UserProfile() {
     }, 2000)
   }
 
-  const test = () => {
-    console.log(userInfo)
-  }
+  const test = () => {}
 
   const changeUserRole = (role) => {
     console.log(role)
@@ -78,15 +83,16 @@ export default function UserProfile() {
       username,
       makeAnonymous: hideAvatar,
     }
+    setLoading(true)
     adminService.patchUserInfo(token, data).then((res) => {
       if (res?.success) {
         setEditState(false)
-        setUserInfoLoading(true)
+        setLoading(false)
         userService.getUserInfo(token).then((res) => {
           if (res && res.success) {
             setHideAvatar(res.data.userinfo.makePictureAnonymous)
             setUserInfo(res.data)
-            setUserInfoLoading(false)
+            setLoading(false)
           } else {
             messageControl('發生錯誤，即將跳轉至首頁', false)
           }
@@ -98,13 +104,13 @@ export default function UserProfile() {
   // 載入使用者資訊
   useEffect(() => {
     if (token) {
-      setUserInfoLoading(true)
+      setLoading(true)
       userService.getUserInfo(token).then((res) => {
         if (res && res.success) {
           console.log(res.data.userinfo)
           setHideAvatar(res.data.userinfo.makePictureAnonymous)
           setUserInfo(res.data)
-          setUserInfoLoading(false)
+          setLoading(false)
         } else {
           messageControl('發生錯誤，即將跳轉至首頁', false)
         }
@@ -114,6 +120,11 @@ export default function UserProfile() {
 
   return (
     <div className="user-profile">
+      {loading && (
+        <div className="loading-main">
+          <div className="loader"></div>
+        </div>
+      )}
       {/* 訊息框 */}
       <div
         className="message"
@@ -124,9 +135,6 @@ export default function UserProfile() {
         }}>
         {message}
       </div>
-
-      {/* Loading轉圈動畫 */}
-      {userInfoLoading && <LoadingAnime />}
 
       <div
         className="title"
@@ -153,6 +161,20 @@ export default function UserProfile() {
                 className="image"
                 loading="lazy"
                 src={userInfo.userinfo.pictureUrl}
+                width={100}
+                height={100}
+                objectFit="cover"></Image>
+            )}
+          </div>
+        )}
+        {hideAvatar === true && (
+          <div className="avatar">
+            {userInfo?.userinfo?.pictureUrl && (
+              <Image
+                alt="user avatar"
+                className="image"
+                loading="lazy"
+                src={anonymous}
                 width={100}
                 height={100}
                 objectFit="cover"></Image>

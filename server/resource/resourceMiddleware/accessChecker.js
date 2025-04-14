@@ -6,6 +6,7 @@
  */
 
 const QA = require("../../models").QA;
+const { logError } = require("../../utils/logger");
 
 /**
  * 問題資源存取權限檢查
@@ -66,11 +67,18 @@ const question = async (req, res, next) => {
     // 通過所有檢查，進入下一個中間件
     return next();
   } catch (e) {
-    // 錯誤處理
-    console.error(e);
-    return res
-      .status(500)
-      .json({ success: false, msg: "很抱歉，伺服器無法處理此請求" });
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user?._id,
+        userName: req.user?.userinfo?.realname,
+      },
+      "accessChecker.js",
+      "question middleware",
+      {},
+      e
+    );
+    return res.status(500).json({ success: false, msg: "伺服器發生問題" });
   }
 };
 

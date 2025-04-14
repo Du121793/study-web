@@ -9,6 +9,17 @@ import AdminLayout from '../../components/profile/AdminLayout'
 import Unlogined from '../../components/global/Unlogined'
 import Header from '../../components/global/Header'
 import Head from '../../components/global/Globla'
+// list
+import List from './List'
+
+// component
+import MyCourse from '../../pages/profiles/MyCourse'
+import UserProfile from '../../pages/profiles/UserProfile'
+import PreRegister from '../../pages/profiles/PreRegister'
+import RemoveUsers from '../../pages/profiles/RemoveUsers'
+import EditCourse from '../../pages/profiles/EditCourse'
+import EditMembers from '../../pages/profiles/EditMembers'
+import EditMembersInfo from '../../pages/profiles/EditMembersInfo'
 // 原生組件庫
 import { useEffect, useState } from 'react'
 
@@ -20,6 +31,18 @@ export default function Profile() {
   const [userRole, setUserRole] = useState(null)
   // 傳給header用於渲染
   const [userShot, setUserShot] = useState(null)
+
+  const [switchState, setSwitchState] = useState('myCourse')
+
+  const changeRightItemState = () => {
+    if (switchState === 'myCourse') return <MyCourse />
+    if (switchState === 'profile') return <UserProfile />
+    if (switchState === 'editCourse') return <EditCourse />
+    if (switchState === 'editCourseMember') return <EditMembers />
+    if (switchState === 'editMemberInfo') return <EditMembersInfo />
+    if (switchState === 'preRegisterMember') return <PreRegister />
+    if (switchState === 'deletMember') return <RemoveUsers />
+  }
 
   useEffect(() => {
     if (!sessionStorage.getItem('user_role') || !sessionStorage.getItem('user_id')) {
@@ -43,15 +66,21 @@ export default function Profile() {
 
   return (
     <div className="profile-main">
-      <Head></Head>
-      <Header
-        user_line_shot={userShot}
-        loginState={isLogined}></Header>
-      {userRole && userRole === 'student' && <StudentLayout user_role={userRole}></StudentLayout>}
-      {userRole && userRole === 'teacher' && <TeacherLayout user_role={userRole}></TeacherLayout>}
-      {userRole && userRole === 'admin' && <AdminLayout user_role={userRole}></AdminLayout>}
-      {!isLogined && <Unlogined></Unlogined>}
-      <span></span>
+      <div className="top">
+        <Header
+          user_line_shot={userShot}
+          loginState={isLogined}></Header>
+        {!isLogined && <Unlogined></Unlogined>}
+      </div>
+      <div className="bottom">
+        <div className="left-item">
+          <List
+            switchState={switchState}
+            setSwitchState={setSwitchState}
+          />
+        </div>
+        <div className="right-item">{changeRightItemState()}</div>
+      </div>
     </div>
   )
 }

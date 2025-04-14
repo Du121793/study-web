@@ -4,6 +4,7 @@ import titleIcon from '../../public/index/board/boardTitle.svg'
 import { useEffect, useRef, useState } from 'react'
 import userService from '../../method/userService'
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
+const serverIp = process.env.NEXT_PUBLIC_SERVER_IP
 
 export default function Board({ boardhasChange }) {
   const [boards, setBoards] = useState([])
@@ -27,15 +28,15 @@ export default function Board({ boardhasChange }) {
       page: page,
       pageSize: pageSize,
     }
-    if (page && pageSize) {
-      userService.getBoards(data).then((res) => {
-        if (res.success) {
-          setBoards(res.data.boards)
-          setTotalPage(res)
-        }
-      })
-    }
-  }, [boardhasChange, pageSize, page])
+    userService.getBoards(data).then((res) => {
+      if (res.success) {
+        setBoards(res.data.boards)
+        setTotalPage(res)
+      } else {
+        console.log(res)
+      }
+    })
+  }, [boardhasChange, pageSize])
 
   return (
     <div className="board-main">
@@ -76,11 +77,11 @@ export default function Board({ boardhasChange }) {
         <div
           className="more-news-link"
           onClick={() => {
-            setPageSize(pageSize + 5)
+            setPageSize(pageSize + 10)
           }}>
           <span
             onClick={() => {
-              setPageSize(pageSize + 5)
+              setPageSize(pageSize + 10)
             }}>
             查看更多最新消息 {'>>>'}
           </span>

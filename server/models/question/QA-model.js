@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 const fs = require("fs");
 const path = require("path");
 const QAmessage = require("./QAmessage-model");
+const { logError, log } = require("../../utils/logger");
 
 const QASchema = new Schema({
   image: {
@@ -79,10 +80,15 @@ function getQuestionFolder(questionId) {
  */
 async function removeQuestionFolder(doc) {
   if (doc) {
-    QAmessage.deleteMany({ pointTo: doc._id });
-    const questionFolder = getQuestionFolder(doc._id);
-    if (fs.existsSync(questionFolder)) {
-      fs.rmSync(questionFolder, { recursive: true, force: true });
+    try {
+      await QAmessage.deleteMany({ pointTo: doc._id });
+      const questionFolder = getQuestionFolder(doc._id);
+      if (fs.existsSync(questionFolder)) {
+        fs.rmSync(questionFolder, { recursive: true, force: true });
+      }
+    } catch (error) {
+      logError({}, "QA-model.js", "清理問題資源", {}, error);
+      throw error;
     }
   }
 }
@@ -100,6 +106,7 @@ QASchema.pre("findOneAndDelete", async function (next) {
     }
     next();
   } catch (error) {
+    logError({}, "QA-model.js", "刪除問題", {}, error);
     next(error);
   }
 });
@@ -114,6 +121,7 @@ QASchema.pre("remove", async function (next) {
     await removeQuestionFolder(this);
     next();
   } catch (error) {
+    logError({}, "QA-model.js", "移除問題", {}, error);
     next(error);
   }
 });
@@ -128,6 +136,7 @@ QASchema.pre("deleteOne", async function (next) {
     await removeQuestionFolder(this);
     next();
   } catch (error) {
+    logError({}, "QA-model.js", "刪除問題", {}, error);
     next(error);
   }
 });
@@ -146,6 +155,7 @@ QASchema.pre("deleteMany", async function (next) {
     }
     next();
   } catch (error) {
+    logError({}, "QA-model.js", "批次刪除問題", {}, error);
     next(error);
   }
 });
@@ -175,6 +185,7 @@ QASchema.pre("update", async function (next) {
     }
     next();
   } catch (error) {
+    logError({}, "QA-model.js", "更新問題", {}, error);
     next(error);
   }
 });
@@ -203,6 +214,7 @@ QASchema.pre("updateMany", async function (next) {
     }
     next();
   } catch (error) {
+    logError({}, "QA-model.js", "批次更新問題", {}, error);
     next(error);
   }
 });
@@ -225,20 +237,28 @@ QASchema.pre("save", async function (next) {
         (!this.folders || this.folders.length === 0)
       ) {
         await mongoose.model("QA").findOneAndDelete({ _id: this._id });
-
-        console.log("由於QA已經設定為公開，且沒有任何課程或資料夾，因此被刪除");
-        return next();
+        log(
+          {},
+          "QA-model.js",
+          "儲存問題",
+          "由於QA已經設定為公開，且沒有任何課程或資料夾，因此被刪除"
+        );
+        next();
       }
       if (!this.public && this.courses.length === 0) {
         await mongoose.model("QA").findOneAndDelete({ _id: this._id });
-
-        console.log("由於QA已經設定為非公開，且沒有任何課程，因此被刪除");
-
-        return next();
+        log(
+          {},
+          "QA-model.js",
+          "儲存問題",
+          "由於QA已經設定為非公開，且沒有任何課程，因此被刪除"
+        );
+        next();
       }
     }
     next();
   } catch (error) {
+    logError({}, "QA-model.js", "儲存問題", {}, error);
     next(error);
   }
 });

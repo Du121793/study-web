@@ -75,10 +75,8 @@ export default function UploadCarousel({ showCarouselEdit, setShowCarouselEdit, 
 
   // 刪除輪播圖
   const deleteCarousel = () => {
-    let number = []
-    number.push(dbCheckTemp)
     const data = {
-      numbers: number,
+      numbers: dbCheckTemp,
     }
     adminService.deleteCarousels(token, data).then((res) => {
       if (res.success) {
@@ -113,9 +111,6 @@ export default function UploadCarousel({ showCarouselEdit, setShowCarouselEdit, 
     }
   }, [token])
 
-  const test = () => {
-  }
-
   // 控制頁面scroll狀態
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -125,6 +120,8 @@ export default function UploadCarousel({ showCarouselEdit, setShowCarouselEdit, 
       page_body.style.overflow = 'hidden'
     }
   }, [page_body])
+
+  const test = () => {}
 
   return (
     <div

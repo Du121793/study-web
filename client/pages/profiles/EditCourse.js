@@ -21,7 +21,7 @@ import LoadingAnime from '../../components/global/LoadingAnime'
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
-export default function EditCourse({ onRefresh }) {
+export default function EditCourse() {
   const [courseLoading, setCourseLoading] = useState(false)
   const token = useUserToken()
   const [editStatusIndex, setEditStatusIndex] = useState(null)
@@ -30,11 +30,12 @@ export default function EditCourse({ onRefresh }) {
   const [loading, setLoading] = useState(false)
   // 子組件參數
   const [selectedStudentId, setSelectedStudentId] = useState([])
-  // 搜尋請求參數
+  // post course payload
   const [gradeInput, setGradeInput] = useState('')
   const [subjectInput, setSubjectInput] = useState('')
   const [classInput, setClassInput] = useState('')
   const [courseNameInput, setCourseNameInput] = useState('')
+  const [seletedTeacher, setSeletedTeacher] = useState('')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [totalPage, setTotalPage] = useState(0)
@@ -46,9 +47,10 @@ export default function EditCourse({ onRefresh }) {
   let courseInfo = {}
   let registerInfo = {}
   const [needToDeleteCourseId, setNeedToDeleteCourseId] = useState('')
-  // 獲得參數
+  // get req
   const [coursesInfo, setCoursesInfo] = useState(null)
-  // 將成員新增到新課程，參數
+  const [teachers, setTeachers] = useState([])
+  // register member to new course payload
   const [courses, setCourses] = useState([])
   // 是否要在新增課程時也將選擇的成員加入課程
   const [addThenRegister, setAddThenRegister] = useState(false)
@@ -128,7 +130,11 @@ export default function EditCourse({ onRefresh }) {
       page: page,
       pageSize: pageSize,
     }
-    adminService.getCourses(token, data).then((res) => setCoursesInfo(res.data))
+    adminService.getCourses(token, data).then((res) => {
+      setTeachers()
+
+      setCoursesInfo(res.data)
+    })
   }
 
   // 1. 新增課程
@@ -140,14 +146,15 @@ export default function EditCourse({ onRefresh }) {
         subject: subjectInput.trim(),
         courseClass: classInput.trim(),
         courseName: courseNameInput.trim(),
+        teacherId: teachers !== '' ? seletedTeacher : undefined,
       }
+      console.log(courseInfo)
       adminService.createANewCourse(token, courseInfo).then((res) => {
         let data = {
           page: page,
           pageSize: pageSize,
         }
         if (res.success && !addThenRegister) {
-          onRefresh()
           messageControl(res.msg, true)
         } else {
           messageControl(res.data.msg, false)
@@ -191,7 +198,6 @@ export default function EditCourse({ onRefresh }) {
       setLoading(true)
       adminService.deleteCourse(token, needToDeleteCourseId).then((res) => {
         if (res.success) {
-          onRefresh()
           messageControl('移除成功', true)
         } else {
           messageControl('移除失敗', false)
@@ -223,19 +229,20 @@ export default function EditCourse({ onRefresh }) {
         subject: subjectInput,
         courseClass: classInput,
       }
-      if (res.success && !addThenRegister) {
+      if (res?.success && !addThenRegister) {
         adminService.getCourses(token, secData).then((res) => setCoursesInfo(res.data))
         messageControl('編輯完成', true)
-        onRefresh()
       } else {
-        messageControl(res.data.msg, false)
+        messageControl('編輯失敗', false)
       }
     })
   }
 
-  const test = () => {}
+  const test = () => {
+    console.log(teachers)
+  }
 
-  // 獲取課程資料
+  // 獲取課程資料，老師資訊
   useEffect(() => {
     if (token) {
       setCourseLoading(true)
@@ -253,6 +260,17 @@ export default function EditCourse({ onRefresh }) {
           setTimeout(() => {
             window.location(clientIp)
           }, 3000)
+        }
+      })
+      adminService.getMembers(token).then((res) => {
+        if (res?.success) {
+          let idTemp = []
+          res.data.forEach((item) => {
+            if (item.role === 'teacher') {
+              idTemp.push(item)
+            }
+          })
+          setTeachers(idTemp)
         }
       })
     }
@@ -308,6 +326,7 @@ export default function EditCourse({ onRefresh }) {
           onClick={test}>
           編輯課程
         </div>
+
         <div className="input-area">
           <div className="grade-title">年級:</div>
           <input
@@ -336,6 +355,25 @@ export default function EditCourse({ onRefresh }) {
             }}
             value={classInput}
           />
+          <div className="content">選擇老師</div>
+          <select
+            onChange={(e) => {
+              setSeletedTeacher(e.target.value)
+            }}>
+            <option value="">請選擇</option>
+            {teachers &&
+              teachers.length > 0 &&
+              teachers.map((item, idx) => (
+                <option
+                  key={idx}
+                  value={item._id}>
+                  {item?.userinfo?.realname}
+                </option>
+              ))}
+          </select>
+        </div>
+
+        <div className="input-area">
           <div className="course-name-title">課名:</div>
           <input
             type="text"
@@ -345,26 +383,20 @@ export default function EditCourse({ onRefresh }) {
               setCourseNameInput(e.target.value)
             }}
           />
-          <Image
-            onClick={searchCourse}
-            className="button"
-            src={searchIcon}
-            alt="search button"
-            width={20}
-            height={20}></Image>
-          <Image
-            className="button"
-            src={addIcon}
-            onClick={() => {
-              addNewCourse()
-            }}
-            alt="search button"
-            width={20}
-            height={20}></Image>
+          <div
+            className="g-blue-btn"
+            onClick={searchCourse}>
+            搜尋
+          </div>
+          <div
+            className="g-green-btn"
+            onClick={addNewCourse}>
+            新增
+          </div>
         </div>
         {/* 是否要在新增課程時也將選擇的成員加入課程 */}
         <div className="checkbox-area">
-          <div className='hint'>
+          <div className="hint">
             是否要在新增課程時也將選擇的成員加入課程
             <input
               onChange={(e) => {

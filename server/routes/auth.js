@@ -15,6 +15,7 @@ const User = require("../models").user;
 const jwt = require("jsonwebtoken");
 const { user } = require("../models");
 const tokenConfig = require("../config/tokenConfig.json");
+const { log, logError } = require("../utils/logger");
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -153,6 +154,16 @@ router.post("/completeRegistration", async (req, res) => {
     if (existingUser) {
       // 該使用者若已經有 lineID ，則註冊失敗
       if (existingUser.lineID) {
+        logError(
+          {
+            userIp: req.ip,
+            userName: realname,
+          },
+          "auth.js",
+          "completeRegistration",
+          `[${realname}] 嘗試重複綁定 LINE 帳戶`,
+          new Error("此真實姓名與電話已經綁定過 Line 帳戶")
+        );
         return res.status(400).json({
           success: false,
           msg: "此真實姓名與電話已經綁定過 Line 帳戶，註冊失敗。",
@@ -164,6 +175,15 @@ router.post("/completeRegistration", async (req, res) => {
       existingUser.userinfo.pictureUrl = pictureUrl;
 
       await existingUser.save();
+
+      log(
+        {
+          userIp: req.ip,
+          userId: existingUser._id,
+          userName: realname,
+        },
+        `完成 LINE 帳戶綁定`
+      );
 
       // 產生最終 JWT
       const tokenObject = { userID: existingUser._id };
@@ -207,7 +227,16 @@ router.post("/completeRegistration", async (req, res) => {
       });
     }
   } catch (error) {
-    console.error(error);
+    logError(
+      {
+        userIp: req.ip,
+        userName: req.body.realname,
+      },
+      "auth.js",
+      "completeRegistration",
+      `[${req.body.realname}] 註冊失敗`,
+      error
+    );
     return res.status(500).json({ success: false, msg: "伺服器處理失敗" });
   }
 });
@@ -233,6 +262,7 @@ router.post("/preRegisterUser", checkTeacherAccess, async (req, res) => {
     let alreadyRegisteredUsers = [];
     let invalidUsers = [];
     let serverSavedErrorUsers = [];
+    let successStudentId = [];
 
     for (const userinfo of userinfos) {
       if (!userinfo.realname || !userinfo.phoneNumber || !userinfo.grade) {
@@ -260,7 +290,16 @@ router.post("/preRegisterUser", checkTeacherAccess, async (req, res) => {
         });
         let savedUser = await newUser.save();
         if (savedUser) {
+          log(
+            {
+              userIp: req.ip,
+              userId: req.user._id,
+              userName: req.user.userinfo.realname,
+            },
+            `預註冊用戶 ${userinfo.realname}`
+          );
           successCount++;
+          successStudentId.push(savedUser._id);
         } else {
           serverSavedErrorUsers.push(userinfo.realname);
         }
@@ -290,7 +329,18 @@ router.post("/preRegisterUser", checkTeacherAccess, async (req, res) => {
 
     return res.status(200).json({ msg: responseMessage });
   } catch (error) {
-    return res.status(500).json({ msg: "伺服器處裡失敗", error });
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "auth.js",
+      "preRegisterUser",
+      `[${req.user.userinfo.realname}] 批量預註冊失敗`,
+      error
+    );
+    return res.status(500).json({ success: false, msg: "伺服器處理失敗" });
   }
 });
 

@@ -82,6 +82,7 @@ export default function BoardPage() {
             }}>
             編輯公告
           </div>
+          <div className="g-red-btn">刪除公告</div>
         </div>
       ) : (
         <div className="g-btn-area">

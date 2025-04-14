@@ -6,6 +6,7 @@
  */
 
 const sharp = require("sharp");
+const { logError } = require("../utils/logger");
 
 /**
  * 壓縮並轉換 base64 圖片，使最終檔案大小不超過指定大小，
@@ -68,15 +69,26 @@ async function compressBase64Image(base64Input, MAX_MB = 1) {
   const maxIterations = 10;
 
   while (iteration < maxIterations) {
-    // 使用 sharp 進行圖片處理
-    outputBuffer = await sharp(inputBuffer)
-      .resize({
-        width: currentWidth,
-        height: currentHeight,
-        fit: "inside", // 保持比例
-      })
-      .jpeg({ quality: currentQuality })
-      .toBuffer();
+    try {
+      // 使用 sharp 進行圖片處理
+      outputBuffer = await sharp(inputBuffer)
+        .resize({
+          width: currentWidth,
+          height: currentHeight,
+          fit: "inside", // 保持比例
+        })
+        .jpeg({ quality: currentQuality })
+        .toBuffer();
+    } catch (err) {
+      logError(
+        {},
+        "imageCompresser.js",
+        "compressBase64Image",
+        { base64Input, MAX_MB },
+        err
+      );
+      throw new Error("圖片處理失敗：" + err.message);
+    }
 
     // 檢查壓縮結果
     if (outputBuffer.length <= MAX_SIZE) {
@@ -141,15 +153,26 @@ async function compressImageBuffer(inputBuffer, MAX_MB = 1) {
   const maxIterations = 10;
 
   while (iteration < maxIterations) {
-    // 使用 sharp 進行圖片處理
-    outputBuffer = await sharp(inputBuffer)
-      .resize({
-        width: currentWidth,
-        height: currentHeight,
-        fit: "inside", // 保持比例
-      })
-      .jpeg({ quality: currentQuality })
-      .toBuffer();
+    try {
+      // 使用 sharp 進行圖片處理
+      outputBuffer = await sharp(inputBuffer)
+        .resize({
+          width: currentWidth,
+          height: currentHeight,
+          fit: "inside", // 保持比例
+        })
+        .jpeg({ quality: currentQuality })
+        .toBuffer();
+    } catch (err) {
+      logError(
+        {},
+        "imageCompresser.js",
+        "compressImageBuffer",
+        { inputBuffer, MAX_MB },
+        err
+      );
+      throw new Error("圖片處理失敗：" + err.message);
+    }
 
     // 檢查壓縮結果
     if (outputBuffer.length <= MAX_SIZE) {

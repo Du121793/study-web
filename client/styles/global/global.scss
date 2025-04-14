@@ -4,17 +4,6 @@
   --botton-white-hover: #efefef;
 }
 
-// 樣式
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans&display=swap");
-
-* {
-  font-family: "Open Sans", "Iansui", sans-serif;
-  // font-family: 'Nunito', 'Swei Gothic', sans-serif;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font-size: 100%;
-}
 textarea {
   outline: none;
   border: 1px solid rgba(0, 0, 0, 0.2);
@@ -412,6 +401,12 @@ import ArrowRight from '../../public/profile/rightArrow.png'
   }
 }
 
+.meesage-area {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
 .message {
   z-index: 99999;
   background-color: #e2e2e2;
@@ -419,10 +414,9 @@ import ArrowRight from '../../public/profile/rightArrow.png'
   align-items: center;
   justify-content: center;
   position: absolute;
+  top: 30%;
   overflow: hidden;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, 0);
+  pointer-events: none;
   transition: 0.2s;
   border-radius: 4px;
   font-weight: bold;

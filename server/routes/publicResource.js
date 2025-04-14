@@ -9,6 +9,7 @@ const router = require("express").Router();
 const Board = require("../models").board;
 const path = require("path");
 const fs = require("fs");
+const { log, logError } = require("../utils/logger");
 
 // 定義輪轉圖存放路徑
 const carouselPath = path.join(__dirname, "../resource/public/carousel");
@@ -24,7 +25,15 @@ router.get("/carousel/all", (req, res) => {
     // 讀取輪轉圖目錄下的所有檔案
     fs.readdir(carouselPath, (err, files) => {
       if (err) {
-        console.error("讀取資料夾失敗:", err);
+        logError(
+          {
+            userIp: req.ip,
+          },
+          "publicResource.js",
+          "GET /carousel/all",
+          {},
+          err
+        );
         return res.status(500).json({ error: "讀取資料夾失敗" });
       }
 
@@ -43,7 +52,15 @@ router.get("/carousel/all", (req, res) => {
       return res.json({ success: true, data: imageUrls });
     });
   } catch (e) {
-    // 發生錯誤時回傳500錯誤
+    logError(
+      {
+        userIp: req.ip,
+      },
+      "publicResource.js",
+      "GET /carousel/all",
+      {},
+      e
+    );
     return res
       .status(500)
       .json({ success: false, msg: "伺服器讀取輪轉圖失敗" });
@@ -109,8 +126,15 @@ router.get("/board", async (req, res) => {
       },
     });
   } catch (e) {
-    // 發生錯誤時記錄並回傳500錯誤
-    console.error(e);
+    logError(
+      {
+        userIp: req.ip,
+      },
+      "publicResource.js",
+      "GET /board",
+      req.query,
+      e
+    );
     return res
       .status(500)
       .json({ success: false, msg: "伺服器處理公告列表獲取失敗" });
@@ -160,8 +184,15 @@ router.get("/board/:board_id", async (req, res) => {
     // 回傳成功狀態和公告完整資訊
     return res.json({ success: true, data: boardData });
   } catch (e) {
-    // 發生錯誤時記錄並回傳500錯誤
-    console.error(e);
+    logError(
+      {
+        userIp: req.ip,
+      },
+      "publicResource.js",
+      "GET /board/:board_id",
+      { board_id: req.params.board_id },
+      e
+    );
     return res.status(500).json({ success: false, msg: "伺服器讀取公告失敗" });
   }
 });

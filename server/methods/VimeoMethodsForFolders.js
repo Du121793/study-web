@@ -4,7 +4,7 @@
  * @author StudyWeb Team
  * @date 2024-03-30
  */
-
+const { log, logError } = require("../utils/logger");
 require("dotenv").config();
 const { Vimeo } = require("@vimeo/vimeo");
 const VideoInfo = require("../models/").courseVideoInfo;
@@ -837,14 +837,33 @@ async function uploadVideo(videoInfo, videoIndex) {
       try {
         await deleteVideo({ videoID: videoIndex.videoID });
       } catch (delErr) {
-        console.error("刪除失敗的影片時出錯:", delErr);
+        logError(
+          {},
+          "VimeoMethodsForFolders.js",
+          "uploadVideo",
+          { videoIndex },
+          delErr
+        );
       }
       try {
         await VideoInfo.findOneAndDelete({ _id: videoIndex.videoID });
       } catch (dbErr) {
-        console.error("從數據庫刪除影片記錄時出錯:", dbErr);
+        logError(
+          {},
+          "VimeoMethodsForFolders.js",
+          "uploadVideo",
+          { videoIndex },
+          dbErr
+        );
       }
     }
+    logError(
+      {},
+      "VimeoMethodsForFolders.js",
+      "uploadVideo",
+      { videoIndex },
+      err
+    );
     return {
       success: false,
       msg: "Vimeo API 錯誤：" + (err.message || err.toString()),
@@ -941,6 +960,7 @@ async function findVideo(videoIndex = {}) {
     } catch (_) {
       errorObj = { error: err.message };
     }
+    logError({}, "VimeoMethodsForFolders.js", "findVideo", { videoIndex }, err);
     return {
       success: false,
       message: "搜尋失敗：" + err.message,
@@ -1127,6 +1147,13 @@ async function deleteVideo(videoIndex) {
     } catch (_) {
       errorObj = { error: err.message };
     }
+    logError(
+      {},
+      "VimeoMethodsForFolders.js",
+      "deleteVideo",
+      { videoIndex },
+      err
+    );
     return {
       success: false,
       message: "刪除失敗：" + err.message,

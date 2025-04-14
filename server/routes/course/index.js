@@ -11,6 +11,7 @@ const QA = require("../../models").QA;
 const courseMethodRouter = require("./courseMethod");
 const modifyCourseRouter = require("./modifyCourse");
 const QARouter = require("./QA");
+const { log, logError } = require("../../utils/logger");
 
 const accessChecker = require("../routesMiddleware/accessChecker");
 
@@ -83,11 +84,11 @@ router.get("/getCourses", checkTeacherAccess, async (req, res) => {
     const total = await Course.countDocuments(filter);
     const totalPage = parseInt(total / pageSize) + 1;
 
-    // 處理不分頁的情況
-    if (!(page && pageSize)) {
+     // 處理不分頁的情況
+     if (!(page && pageSize)) {
       const courses = await Course.find(filter).populate(
         "teacher",
-        "_id username picture"
+        "_id userinfo.username userinfo.pictureUrl"
       );
       return res.json({
         success: true,
@@ -95,22 +96,30 @@ router.get("/getCourses", checkTeacherAccess, async (req, res) => {
       });
     }
 
-    // 執行分頁查詢
-    const skip = (currentPage - 1) * limit;
-    const courses = await Course.find(filter)
-      .populate("teacher", "_id username picture")
-      .skip(skip)
-      .limit(limit);
+     // 執行分頁查詢
+     const skip = (currentPage - 1) * limit;
+     const courses = await Course.find(filter)
+       .populate("teacher", "_id userinfo.username userinfo.pictureUrl")
+       .skip(skip)
+       .limit(limit);
 
     return res.json({
       success: true,
       data: { total, totalPage, currentPage, pageSize: limit, courses },
     });
-  } catch (error) {
-    console.error(error);
-    return res
-      .status(500)
-      .json({ success: false, msg: "發生了不可預期的錯誤" });
+  } catch (e) {
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "course/index.js",
+      "GET /getCourses",
+      req.query,
+      e
+    );
+    return res.status(500).json({ success: false, msg: "伺服器發生問題" });
   }
 });
 

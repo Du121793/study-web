@@ -1,6 +1,6 @@
 /**
  * @file courseMethod.js
- * @description 課程方法相關路由處理，包含視頻上傳、管理、訪問權限等功能
+ * @description 課程方法相關路由處理，包含影片上傳、管理、訪問權限等功能
  * @author StudyWeb Team
  * @date 2024-03-30
  */
@@ -18,6 +18,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const mongoose = require("mongoose");
+const { logError, log } = require("../../utils/logger");
 
 router.use("/videoAccess", accessChecker.teacher, videoAccessRoute);
 router.use("/vimeoMigrate", accessChecker.teacher, vimeoMigrateRoute);
@@ -103,7 +104,17 @@ router.get("/members", async (req, res) => {
       total,
     });
   } catch (e) {
-    console.error(e);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "courseMethod.js",
+      "getMembers",
+      `獲取課程成員列表失敗`,
+      e
+    );
     return res.status(500).json({
       success: false,
       msg: "很抱歉，伺服器目前無法處理您的要求",
@@ -112,14 +123,14 @@ router.get("/members", async (req, res) => {
 });
 
 /**
- * 獲取課程視頻信息
+ * 獲取課程影片信息
  * @route GET /videoInfo
- * @param {string} type - 視頻類型（必填）
+ * @param {string} type - 影片類型（必填）
  * @param {number} [page=1] - 頁碼
  * @param {string} [sortBy] - 排序欄位
  * @param {string} [sortOrder] - 排序方向
  * @param {boolean} [noImg] - 是否不返回縮略圖
- * @returns {Object} 視頻信息列表
+ * @returns {Object} 影片信息列表
  */
 router.get("/videoInfo", async (req, res) => {
   try {
@@ -171,7 +182,7 @@ router.get("/videoInfo", async (req, res) => {
         let hasAccess = true;
         let accessRecord = null;
 
-        // 處理私有視頻的訪問權限
+        // 處理私有影片的訪問權限
         if (plainItem.isPrivate) {
           const records = await VideoAccess.aggregate([
             {
@@ -218,26 +229,39 @@ router.get("/videoInfo", async (req, res) => {
 
     return res.json({ success: true, data: foundVideoInfo });
   } catch (e) {
-    console.log(e);
-    return res.status(500).json({ msg: "很抱歉，伺服器目前無法處理您的要求" });
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "courseMethod.js",
+      "getVideoInfo",
+      `獲取課程影片信息失敗`,
+      e
+    );
+    return res.status(500).json({
+      success: false,
+      msg: "很抱歉，伺服器目前無法處理您的要求",
+    });
   }
 });
 
 /**
- * 獲取視頻URI
+ * 獲取影片URI
  * @route GET /videoUri
- * @param {string} videoId - 視頻ID
- * @returns {Object} 視頻嵌入鏈接
+ * @param {string} videoId - 影片ID
+ * @returns {Object} 影片嵌入鏈接
  */
 router.get("/videoUri", async (req, res) => {
   try {
-    // 獲取視頻ID
+    // 獲取影片ID
     const { videoId } = req.query;
     if (!videoId) {
       return res.status(400).json({ success: false, msg: "videoId 必須提供" });
     }
 
-    // 查找視頻信息
+    // 查找影片信息
     const foundVideo = await VideoInfo.findOne({ _id: videoId });
     if (!foundVideo) {
       return res.status(404).json({ success: false, msg: "找不到該影片資料" });
@@ -258,7 +282,7 @@ router.get("/videoUri", async (req, res) => {
       }
     }
 
-    // 返回視頻信息
+    // 返回影片信息
     return res.json({
       success: true,
       data: {
@@ -266,7 +290,17 @@ router.get("/videoUri", async (req, res) => {
       },
     });
   } catch (err) {
-    console.error(err);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "courseMethod.js",
+      "GET /videoUri",
+      req.query,
+      err
+    );
     return res.status(500).json({
       success: false,
       msg: "很抱歉，伺服器目前無法處理您的要求",
@@ -276,13 +310,13 @@ router.get("/videoUri", async (req, res) => {
 });
 
 /**
- * 上傳視頻
+ * 上傳影片
  * @route POST /uploadVideo
- * @param {Object} thumbnail - 視頻縮略圖文件
- * @param {string} title - 視頻標題
- * @param {string} description - 視頻描述
- * @param {string} type - 視頻類型
- * @param {boolean} isPrivate - 是否為私有視頻
+ * @param {Object} thumbnail - 影片縮略圖文件
+ * @param {string} title - 影片標題
+ * @param {string} description - 影片描述
+ * @param {string} type - 影片類型
+ * @param {boolean} isPrivate - 是否為私有影片
  * @returns {Object} 上傳結果
  */
 router.post(
@@ -372,19 +406,41 @@ router.post(
           msg: "目前請求繁忙請稍等一分鐘後再進行請求",
         });
 
+      log(
+        {
+          userIp: req.ip,
+          userId: req.user._id,
+          userName: req.user.userinfo.realname,
+        },
+        `上傳影片 ${title}`
+      );
+
       return res.json({ success: true, data: uploadUri });
     } catch (e) {
-      console.error(e);
-      return res.status(500).json({ success: false, msg: "視頻上傳失敗" });
+      logError(
+        {
+          userIp: req.ip,
+          userId: req.user._id,
+          userName: req.user.userinfo.realname,
+        },
+        "courseMethod.js",
+        "uploadVideo",
+        `上傳影片失敗`,
+        e
+      );
+      return res.status(500).json({
+        success: false,
+        msg: "很抱歉，伺服器目前無法處理您的要求",
+      });
     }
   }
 );
 
 /**
- * 更新視頻上傳狀態
+ * 更新影片上傳狀態
  * @route PATCH /uploadVideoStatus
  * @param {boolean} isUploadSuccess - 上傳是否成功
- * @param {string} videoId - 視頻ID
+ * @param {string} videoId - 影片ID
  * @returns {Object} 更新結果
  */
 router.patch("/uploadVideoStatus", accessChecker.teacher, async (req, res) => {
@@ -410,6 +466,16 @@ router.patch("/uploadVideoStatus", accessChecker.teacher, async (req, res) => {
       });
       newSchedule.save();
       await VideoInfo.findByIdAndDelete(videoId);
+
+      log(
+        {
+          userIp: req.ip,
+          userId: req.user._id,
+          userName: req.user.userinfo.realname,
+        },
+        `刪除上傳失敗的影片 ${foundItem.title} (${videoId})`
+      );
+
       return res.json({ success: true, msg: "已將此資源刪除" });
     }
 
@@ -420,10 +486,20 @@ router.patch("/uploadVideoStatus", accessChecker.teacher, async (req, res) => {
       videoId: videoId.toString(),
     });
 
-    console.log(foundVideo);
-
     if (foundVideo.success && foundVideo.total !== 0) {
       foundItem.videoURL = foundVideo.data[0].player_embed_url;
+      await foundItem.save();
+
+      log(
+        {
+          userIp: req.ip,
+          userId: req.user._id,
+          userName: req.user.userinfo.realname,
+        },
+        `更新影片上傳狀態 ${foundItem.title} (${videoId})`
+      );
+
+      return res.json({ success: true, msg: "已收到您的回傳結果，影片已就緒" });
     } else {
       const newSchedule = new vimeoSchedule({
         method: "get",
@@ -438,13 +514,21 @@ router.patch("/uploadVideoStatus", accessChecker.teacher, async (req, res) => {
         },
       });
       newSchedule.save();
+
+      log(
+        {
+          userIp: req.ip,
+          userId: req.user._id,
+          userName: req.user.userinfo.realname,
+        },
+        `創建影片更新排程 ${foundItem.title} (${videoId})`
+      );
+
       return res.json({
         success: true,
         msg: "已收到您的回傳結果，15分鐘後若無看到影片表示上傳失敗",
       });
     }
-    await foundItem.save();
-    return res.json({ success: true, msg: "已收到您的回傳結果，影片已就緒" });
   } catch (e) {
     console.error(e);
     return res
@@ -454,14 +538,14 @@ router.patch("/uploadVideoStatus", accessChecker.teacher, async (req, res) => {
 });
 
 /**
- * 更新視頻信息
+ * 更新影片信息
  * @route PATCH /patchVideo
- * @param {string} videoID - 視頻ID
- * @param {Object} [thumbnail] - 新的視頻縮略圖文件
- * @param {string} [title] - 新的視頻標題
- * @param {string} [description] - 新的視頻描述
- * @param {boolean} [isPrivate] - 是否為私有視頻
- * @returns {Object} 更新後的視頻信息
+ * @param {string} videoID - 影片ID
+ * @param {Object} [thumbnail] - 新的影片縮略圖文件
+ * @param {string} [title] - 新的影片標題
+ * @param {string} [description] - 新的影片描述
+ * @param {boolean} [isPrivate] - 是否為私有影片
+ * @returns {Object} 更新後的影片信息
  */
 router.patch(
   "/patchVideo",
@@ -555,18 +639,40 @@ router.patch(
       if (!updatedVideo)
         return res.status(404).json({ success: false, msg: "找不到該影片" });
 
+      log(
+        {
+          userIp: req.ip,
+          userId: req.user._id,
+          userName: req.user.userinfo.realname,
+        },
+        `更新影片信息 ${updatedVideo.title} (${videoID})`
+      );
+
       return res.json({ success: true, data: updatedVideo });
     } catch (e) {
-      console.error(e);
-      return res.status(500).json({ success: false, msg: "伺服器錯誤" });
+      logError(
+        {
+          userIp: req.ip,
+          userId: req.user._id,
+          userName: req.user.userinfo.realname,
+        },
+        "courseMethod.js",
+        "updateVideo",
+        `更新影片信息失敗`,
+        e
+      );
+      return res.status(500).json({
+        success: false,
+        msg: "很抱歉，伺服器目前無法處理您的要求",
+      });
     }
   }
 );
 
 /**
- * 刪除視頻
+ * 刪除影片
  * @route DELETE /deleteVideo
- * @param {string} videoId - 要刪除的視頻ID
+ * @param {string} videoId - 要刪除的影片ID
  * @returns {Object} 刪除結果
  */
 router.delete("/deleteVideo", accessChecker.teacher, async (req, res) => {
@@ -586,10 +692,32 @@ router.delete("/deleteVideo", accessChecker.teacher, async (req, res) => {
       return res.status(404).json({ success: false, msg: "找不到影片資料" });
     }
 
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      `刪除影片 ${foundVideoInfo.title} (${videoId})`
+    );
+
     return res.json({ success: true, msg: "已刪除影片並更新資料庫" });
   } catch (e) {
-    console.error(e);
-    return res.status(500).json({ success: false, msg: "伺服器處理失敗" });
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "courseMethod.js",
+      "deleteVideo",
+      `刪除影片失敗`,
+      e
+    );
+    return res.status(500).json({
+      success: false,
+      msg: "很抱歉，伺服器目前無法處理您的要求",
+    });
   }
 });
 

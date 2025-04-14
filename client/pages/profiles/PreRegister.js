@@ -24,6 +24,9 @@ export default function PreRegister() {
   const [messageStatus, setMessageStatus] = useState(false)
   const [messageColor, setMessageColor] = useState('')
 
+  // loading anime
+  const [loading, setLoading] = useState(false)
+
   // 儲存最後要提交的使用者資料
   let users = []
   let Busers = []
@@ -90,7 +93,7 @@ export default function PreRegister() {
       return
     }
     if (!inputRows) {
-      messageControl(`請輸入預註冊學生資訊`, false)
+      messageControl(`請輸入欲註冊的用戶資訊`, false)
       return
     }
 
@@ -105,13 +108,13 @@ export default function PreRegister() {
         role: chooseRole,
       }))
     if (userArray.length === 0) {
-      messageControl('請輸入欲註冊學生的資訊', false)
+      messageControl('請完整輸入欲註冊的用戶資訊', false)
       return
     }
     // 用some檢查物件內是否有重複資料
     const duplicateFound = userArray.some((newUser) => users.some((existingUser) => existingUser.realname === newUser.realname && existingUser.phoneNumber === newUser.phoneNumber && existingUser.role === newUser.role))
     if (duplicateFound) {
-      alert('警告：已有相同的使用者資料')
+      messageControl('註冊失敗，已有相同的用戶資料', false)
       return
     }
 
@@ -135,12 +138,12 @@ export default function PreRegister() {
         Busers.push({ userinfo: teachertInfo, role: item.role })
       }
     })
-
+    setLoading(true)
     // 預註冊請求
     adminService
       .preRegisterUser(token, Busers)
       .then((res) => {
-        console.log(res)
+        setLoading(false)
         // 如果有成員是被註冊過的
         if (res.data.successMsg.alreadyRegistered !== '') {
           let content = res.data.successMsg.alreadyRegistered
@@ -153,6 +156,7 @@ export default function PreRegister() {
         return res
       })
       .then((res) => {
+        setLoading(false)
         if (chooseCourses.length > 0 && res.data.successMsg.alreadyRegistered !== '') {
           registerCourseToNewMember(res.data.successMsg.successStudentId, res.data.successMsg.alreadyRegistered)
         } else {
@@ -186,13 +190,15 @@ export default function PreRegister() {
   // 獲取課程給select
   useEffect(() => {
     if (token) {
-      try {
-        adminService.getCourses(token).then((res) => {
+      setLoading(true)
+      adminService.getCourses(token).then((res) => {
+        if (res?.success) {
           setGetCourses(res.data.courses)
-        })
-      } catch (e) {
-        console.error(e)
-      }
+        } else {
+          messageControl('發生錯誤')
+        }
+        setLoading(false)
+      })
     }
   }, [token])
 
@@ -204,6 +210,11 @@ export default function PreRegister() {
         className="message">
         {message}
       </div>
+      {loading && (
+        <div className="loading-main">
+          <div className="loader"></div>
+        </div>
+      )}
       <div className="header">
         <div className="title">預註冊系統</div>
       </div>
@@ -244,13 +255,13 @@ export default function PreRegister() {
               {chooseRole === 'student' && (
                 <>
                   <div className="form-title">年級</div>
-                  <select
+                  <input
+                    type="text"
+                    style={{ width: 120 }}
                     onChange={(e) => {
                       setChooseGrade(e.target.value)
-                    }}>
-                    <option value="111">111</option>
-                    <option value="112">112</option>
-                  </select>
+                    }}
+                  />
                 </>
               )}
             </div>
@@ -319,7 +330,7 @@ export default function PreRegister() {
       {/* 送出按鈕 */}
       <div className="form-submit">
         <button
-          className="g-black-btn submit"
+          className="g-blue-btn submit"
           onClick={submitBtnClick}>
           送出
         </button>

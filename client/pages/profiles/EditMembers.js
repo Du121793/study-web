@@ -34,9 +34,10 @@ export default function EditMembers() {
   // courseMemberPage
   // ousideMemberPage
   const [method, setMethod] = useState({
-    name: '',
+    name: 'allMemberPage',
     page: 1,
   })
+  const [methodTemp, setMethodTemp] = useState('allMemberPage')
   const [pageSize, setPageSize] = useState(10)
   const [totalPage, setTotalPage] = useState(1)
   const [courseId, setCourseId] = useState('')
@@ -48,6 +49,10 @@ export default function EditMembers() {
   // 獲取資料
   const [members, setMembers] = useState([])
   const [userRole, setUserRole] = useState('')
+  // loading anime
+  const [loading, setLoading] = useState(false)
+  // rander lock
+  const [randerLock, setRanderLock] = useState(0)
 
   // 控制訊息
   const messageControl = (info, isSuccess) => {
@@ -91,12 +96,13 @@ export default function EditMembers() {
 
   // 全選功能
   const selectAll = () => {
-    let allSelect = document.querySelectorAll('.select-area')
-    if (allSelect) {
-      Array.from(allSelect).forEach((item) => {
-        item.click()
-      })
-    }
+    console.log(members)
+    console.log(selectedStudentId)
+    let idTemp = []
+    members.forEach((item) => {
+      idTemp.push(item._id)
+    })
+    setSelectedStudentId([...selectedStudentId, ...idTemp])
   }
 
   // 按下"加入到課程"的函式，將選擇的人加入到指定課程
@@ -111,8 +117,8 @@ export default function EditMembers() {
         .then((res) => {
           if (res.success) {
             setMemberloading(false)
-            methods.showAllMembers(false)
             initSelector()
+            getMembers()
             messageControl('加入到課程', true)
           } else {
             setMemberloading(false)
@@ -137,7 +143,7 @@ export default function EditMembers() {
         if (res.success) {
           setMemberloading(false)
           messageControl('移除成功', true)
-          methods.showAllMembers(false)
+          getMembers()
           initSelector()
         } else {
           setMemberloading(false)
@@ -221,16 +227,18 @@ export default function EditMembers() {
           page: method.page,
           pageSize: pageSize,
         }
+        if (method.name !== methodTemp) {
+          initSelector()
+          setMethodTemp(method.name)
+        }
         adminService.getMembers(token, data).then((res) => {
           if (res.success) {
             setMemberloading(false)
             setTotalPage(res.totalPage)
             setShowMembersState('all')
             setMembers(res.data)
-            initSelector()
           } else {
             setMemberloading(false)
-            initSelector()
             messageControl('發生錯誤', false)
           }
         })
@@ -243,17 +251,19 @@ export default function EditMembers() {
             pageSize: pageSize,
             courses: courseId,
           }
+
+          if (method.name !== methodTemp) {
+            initSelector()
+            setMethodTemp(method.name)
+          }
           adminService.getMembers(token, data).then((res) => {
             if (res.success) {
-              messageControl('顯示該課程成員', true)
               setMemberloading(false)
               setTotalPage(res.totalPage)
-              setShowMembersState('all')
+              setShowMembersState('course members')
               setMembers(res.data)
-              initSelector()
             } else {
               setMemberloading(false)
-              initSelector()
               messageControl('發生錯誤', false)
             }
           })
@@ -269,17 +279,19 @@ export default function EditMembers() {
             pageSize: pageSize,
             withoutCourses: courseId,
           }
+
+          if (method.name !== methodTemp) {
+            initSelector()
+            setMethodTemp(method.name)
+          }
           adminService.getMembers(token, data).then((res) => {
             if (res.success) {
-              messageControl('顯示課程以外成員', true)
               setMemberloading(false)
               setTotalPage(res.totalPage)
               setShowMembersState('all')
               setMembers(res.data)
-              initSelector()
             } else {
               setMemberloading(false)
-              initSelector()
               messageControl('發生錯誤', false)
             }
           })
@@ -293,37 +305,14 @@ export default function EditMembers() {
   }
 
   useEffect(() => {
-    if (method.name !== 'courseMemberPage') {
-      setMethod({ name: 'courseMemberPage', page: 1 })
-      return
+    if (token) {
+      getMembers()
     }
-    if (courseId !== '') {
-      setMemberloading(true)
-      let data = {
-        page: method.page,
-        pageSize: pageSize,
-        courses: courseId,
-      }
-      adminService.getMembers(token, data).then((res) => {
-        if (res.success) {
-          messageControl('顯示該課程成員', true)
-          setMemberloading(false)
-          setTotalPage(res.totalPage)
-          setShowMembersState('all')
-          setMembers(res.data)
-          initSelector()
-        } else {
-          setMemberloading(false)
-          initSelector()
-          messageControl('發生錯誤', false)
-        }
-      })
-    }
-  }, [courseId])
+  }, [method, token])
 
   useEffect(() => {
-    getMembers()
-  }, [method])
+    if (courseId !== '') setMethod({ name: 'courseMemberPage', page: 1 })
+  }, [courseId])
 
   // 獲得所有課程，用於select
   useEffect(() => {
@@ -511,11 +500,7 @@ export default function EditMembers() {
             members.map((item, index) => (
               <li
                 style={{
-                  border: selectedStudentId.find((id) => {
-                    return id === item._id
-                  })
-                    ? '2px solid rgb(124, 225, 180)'
-                    : '2px solid rgb(0, 0, 0,0.2)',
+                  border: selectedStudentId.find((id) => id === item._id) ? '2px solid rgb(124, 225, 180)' : '2px solid rgba(0, 0, 0, 0.2)',
                 }}
                 key={index}
                 className="select-area"
@@ -526,9 +511,7 @@ export default function EditMembers() {
                 <input
                   className="student-checkbox"
                   type="checkbox"
-                  checked={selectedStudentId.find((id) => {
-                    return id === item._id
-                  })}
+                  checked={!!(selectedStudentId && selectedStudentId.find((id) => id === item._id))}
                   onChange={(e) => {
                     checkboxClickEvent(e.target)
                     setSelectedStudentId((prev) => {

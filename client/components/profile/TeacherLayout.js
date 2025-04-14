@@ -298,7 +298,7 @@ export default function AdminLayout({ user_role }) {
                       className="turn-right-icon"
                       src={dotIcon}
                       alt="nav option icon"></Image>
-                    編輯課程
+                    編輯課程資訊
                   </div>
                   {/* 成員編輯 */}
                   <div
@@ -312,7 +312,7 @@ export default function AdminLayout({ user_role }) {
                       className="turn-right-icon"
                       src={dotIcon}
                       alt="nav option icon"></Image>
-                    成員編輯
+                    編輯課程成員
                   </div>
                 </div>
               </li>

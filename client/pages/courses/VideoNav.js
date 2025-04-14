@@ -19,6 +19,7 @@ import EditVideoInfo from './component/EditVideoInfo'
 import UploadOldVimeoVDO from '../components/UploadOldVimeoVDO'
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
+const serverIp = process.env.NEXT_PUBLIC_SERVER_IP
 
 export default function VideoNav({ course_id, courseName, user_role }) {
   const token = useUserToken()
@@ -212,12 +213,18 @@ export default function VideoNav({ course_id, courseName, user_role }) {
           type: 'MainClass',
           page: videosShowPage,
           pageSize: videosPageSize,
+          // 類型
           sortBy: chooseType,
+          // 順序
           sortOrder: chooseSortOrder,
         })
         .then((res) => {
-          // 這行經常在剛npm run dev時出錯，有可能是api還沒啟動
-          setVideos(res.data)
+          if (res?.isSuccess) {
+            setVideos(res.data)
+            messageControl('加載成功', true)
+          } else {
+            messageControl('發生錯誤', false)
+          }
         })
     }
   }, [token, course_id, chooseType, chooseSortOrder, uploadSuccess, videosShowPage, videosPageSize, hasChange])
@@ -272,14 +279,7 @@ export default function VideoNav({ course_id, courseName, user_role }) {
           uploadOldVimeoVDOInnerEleOpacity={uploadOldVimeoVDOInnerEleOpacity}
           setUploadOldVimeoVDOInnerEleOpacity={setUploadOldVimeoVDOInnerEleOpacity}></UploadOldVimeoVDO>
       )}
-      {/* 頂部訊息 */}
-      {videoNavOpen && (
-        <div
-          style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
-          className="message">
-          {message}
-        </div>
-      )}
+
       {/* nav 黑底頂部*/}
       <div
         onClick={toggleVideoNav}
@@ -367,6 +367,16 @@ export default function VideoNav({ course_id, courseName, user_role }) {
             </select>
           </div>
         </div>
+
+        {videoNavOpen && (
+          <div className="meesage-area">
+            <div
+              style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
+              className="message">
+              {message}
+            </div>
+          </div>
+        )}
         {/* 影片顯示區 */}
         <div className="video-area-container">
           <div className="video-area">

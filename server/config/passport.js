@@ -9,6 +9,7 @@ const passport = require("passport");
 const LineStrategy = require("passport-line");
 const User = require("../models").user;
 const dotenv = require("dotenv");
+const { logError } = require("../utils/logger");
 dotenv.config();
 let JwtStrategy = require("passport-jwt").Strategy;
 let ExtractJwt = require("passport-jwt").ExtractJwt;
@@ -25,7 +26,6 @@ let ExtractJwt = require("passport-jwt").ExtractJwt;
  * @param {Function} done - 回調函數
  */
 passport.serializeUser((user, done) => {
-  console.log("Serialize user ...");
   // 檢查是否為已存在使用者（有 _id）
   if (user && user._id) {
     return done(null, user._id.toString());
@@ -58,6 +58,7 @@ passport.deserializeUser(async (serialized, done) => {
       const foundUser = await User.findById(serialized);
       return done(null, foundUser);
     } catch (error) {
+      logError({}, "passport.js", "deserializeUser", { serialized }, error);
       return done(error, null);
     }
   }
@@ -98,6 +99,7 @@ passport.use(
 
             await foundUser.save();
           } catch (error) {
+            logError({}, "passport.js", "LineStrategy", { profile }, error);
             console.error("更新用戶頭像時發生錯誤:", error);
           }
         }
@@ -146,7 +148,7 @@ passport.use(
         return done(null, false);
       }
     } catch (e) {
-      // 若發生錯誤，回傳錯誤
+      logError({}, "passport.js", "JwtStrategy", { jwt_payload }, e);
       return done(e, false);
     }
   })
@@ -183,7 +185,7 @@ passport.use(
         return done(null, false);
       }
     } catch (e) {
-      // 若發生錯誤，回傳錯誤
+      logError({}, "passport.js", "JwtQueryStrategy", { jwt_payload }, e);
       return done(e, false);
     }
   })

@@ -11,8 +11,10 @@ import { useUserToken } from '../../method/useUserToken'
 import adminService from '../../method/adminService'
 export default function RemoveUsers() {
   const token = useUserToken()
+  // get members
   const [getUsers, setGetUsers] = useState([])
-  // 請求用餐數
+  const [membersTemp, setMembersTemp] = useState([])
+  // 請求參數
   const [selectedUserId, setSelectedUserId] = useState([])
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
@@ -23,11 +25,16 @@ export default function RemoveUsers() {
   const [memberId, setMemberId] = useState(null)
   const [grade, setGrade] = useState(null)
   // 初始化所有資料的邊框
-  const [optionBorder, setOptionBorder] = useState('1px solid rgba(0, 0, 0, 0.2)')
+  const [optionBorder, setOptionBorder] = useState('2px solid rgba(0, 0, 0, 0.2)')
   // 控制訊息
   const [message, setMessage] = useState('無訊息')
   const [messageStatus, setMessageStatus] = useState(false)
   const [messageColor, setMessageColor] = useState('')
+
+  const checkSelectedMembers = () => {
+    console.log(getUsers)
+    console.log(selectedUserId)
+  }
 
   // 參數:總頁數，中間頁數，從中間往左右總共要幾頁
   function getPage(total, thisPage, pageSize = 5) {
@@ -103,12 +110,6 @@ export default function RemoveUsers() {
       )
     } else {
       setSelectedUserId([...selectedUserId, _id])
-    }
-
-    if (e.target.style.border != '1px solid rgb(113, 231, 63)') {
-      e.target.style.border = '1px solid rgb(113, 231, 63)'
-    } else {
-      e.target.style.border = '1px solid rgba(0, 0, 0, 0.2)'
     }
   }
 
@@ -280,7 +281,7 @@ export default function RemoveUsers() {
                   selectedUser(e, item._id)
                 }}
                 className="container member-info"
-                style={{ border: optionBorder }}>
+                style={{ border: selectedUserId.find((id) => item._id === id) ? '2px solid rgb(113, 231, 63)' : '2px solid rgba(0, 0, 0, 0.2)' }}>
                 <div className="username">{!item.userinfo.username ? '無' : item.userinfo.username}</div>
                 <div className="realname">{item.userinfo.realname}</div>
                 <div className="grade">{item.userinfo.grade}</div>
@@ -301,6 +302,7 @@ export default function RemoveUsers() {
           width={24}
           height={24}
           onClick={() => {
+            checkSelectedMembers()
             setPage(1)
           }}></Image>
         <Image
@@ -313,6 +315,7 @@ export default function RemoveUsers() {
             if (page === 1) {
               return
             } else {
+              checkSelectedMembers()
               setPage((prop) => prop - 1)
             }
           }}></Image>
@@ -330,6 +333,7 @@ export default function RemoveUsers() {
             <div
               onClick={() => {
                 setPage(item)
+                checkSelectedMembers()
               }}
               key={index}
               className="now-page">
@@ -349,6 +353,7 @@ export default function RemoveUsers() {
               return
             } else {
               setPage((prop) => prop + 1)
+              checkSelectedMembers()
             }
           }}></Image>
         <Image
@@ -359,6 +364,7 @@ export default function RemoveUsers() {
           height={24}
           onClick={() => {
             setPage(totalPage)
+            checkSelectedMembers()
           }}></Image>
       </div>
     </div>

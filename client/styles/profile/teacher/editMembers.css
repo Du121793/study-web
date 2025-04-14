@@ -64,7 +64,7 @@
   width: 120px;
 }
 .edit-members-main .member-selector-area .member-area .title-area #grade {
-  width: 80px;
+  width: 120px;
 }
 .edit-members-main .member-selector-area .member-area .title-area #role {
   width: 80px;
@@ -105,26 +105,41 @@
   align-items: flex-end;
 }
 .edit-members-main .member-selector-area .member-area li .searched-info #username {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   margin-left: 24px;
   width: 120px;
   text-align: left;
   font-size: clamp(16px, 1.2vw, 20px);
 }
 .edit-members-main .member-selector-area .member-area li .searched-info #realname {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   width: 80px;
   font-size: clamp(16px, 1.2vw, 20px);
 }
 .edit-members-main .member-selector-area .member-area li .searched-info #phone-number {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   font-size: clamp(16px, 1.2vw, 20px);
   width: 120px;
 }
 .edit-members-main .member-selector-area .member-area li .searched-info #role {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   font-size: clamp(16px, 1.2vw, 20px);
   width: 80px;
 }
 .edit-members-main .member-selector-area .member-area li .searched-info #grade {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   font-size: clamp(16px, 1.2vw, 20px);
-  width: 80px;
+  width: 120px;
 }
 .edit-members-main .member-selector-area .member-area .select-active {
   border: 2px solid rgb(124, 225, 180);

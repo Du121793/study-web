@@ -8,6 +8,7 @@
 const Course = require("../../models").course;
 const QA = require("../../models").QA;
 const mongoose = require("mongoose");
+const { logError } = require("../../utils/logger");
 
 /**
  * 檢查用戶是否有權限訪問指定課程
@@ -37,17 +38,38 @@ const course = async (req, res, next) => {
         !req.user.courses.find(
           (n) => n.toString() == foundCourse._id.toString()
         )
-      )
+      ) {
+        logError(
+          {
+            userIp: req.ip,
+            userId: req.user._id,
+            userName: req.user.userinfo.realname,
+          },
+          "accessChecker.js",
+          "course",
+          `嘗試訪問未授權課程 ${course_id}`
+        );
         return res
           .status(403)
           .json({ success: false, msg: "你沒有訪問此課程的權限" });
+      }
     }
 
     // 將找到的課程添加到請求對象中，供後續中間件使用
     req.course = foundCourse;
     next();
   } catch (e) {
-    console.error(e);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user?._id,
+        userName: req.user?.userinfo?.realname,
+      },
+      "accessChecker.js",
+      "course middleware",
+      {},
+      e
+    );
     return res
       .status(500)
       .json({ success: false, msg: "很抱歉，伺服器無法訪問此課程" });
@@ -85,6 +107,16 @@ const question = async (req, res, next) => {
 
       // 如果用戶沒有相關課程權限且問題不是公開的，則拒絕訪問
       if (commonElements.length === 0 && !foundQuestion.isPublic) {
+        logError(
+          {
+            userIp: req.ip,
+            userId: req.user._id,
+            userName: req.user.userinfo.realname,
+          },
+          "accessChecker.js",
+          "question",
+          `嘗試訪問未授權問題 ${question_id}`
+        );
         return res
           .status(403)
           .json({ success: false, msg: "你沒有訪問此問題的權限" });
@@ -92,6 +124,16 @@ const question = async (req, res, next) => {
 
       // 如果是公開問題，學生無法訪問（僅教師可以訪問）
       if (foundQuestion.isPublic && req.user.role === "student") {
+        logError(
+          {
+            userIp: req.ip,
+            userId: req.user._id,
+            userName: req.user.userinfo.realname,
+          },
+          "accessChecker.js",
+          "question",
+          `學生嘗試訪問公開問題 ${question_id}`
+        );
         return res
           .status(403)
           .json({ success: false, msg: "你沒有訪問此問題的權限" });
@@ -102,7 +144,17 @@ const question = async (req, res, next) => {
     req.question = foundQuestion;
     next();
   } catch (e) {
-    console.error(e);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user?._id,
+        userName: req.user?.userinfo?.realname,
+      },
+      "accessChecker.js",
+      "question middleware",
+      {},
+      e
+    );
     return res
       .status(500)
       .json({ success: false, msg: "很抱歉，伺服器無法訪問此問題" });
@@ -144,6 +196,16 @@ const updateAndDeleteQuestion = async (req, res, next) => {
     if (role === "student") {
       // 檢查學生是否為問題的發布者
       if (resource.poster != req.user._id) {
+        logError(
+          {
+            userIp: req.ip,
+            userId: req.user._id,
+            userName: req.user.userinfo.realname,
+          },
+          "accessChecker.js",
+          "updateAndDeleteQuestion",
+          `非發布者嘗試修改問題 ${qaId}`
+        );
         return res.status(403).json({
           success: false,
           msg: `你沒有變更此問題的權限`,
@@ -156,6 +218,16 @@ const updateAndDeleteQuestion = async (req, res, next) => {
         forbiddenKeys.includes(key)
       );
       if (invalidKeys.length > 0) {
+        logError(
+          {
+            userIp: req.ip,
+            userId: req.user._id,
+            userName: req.user.userinfo.realname,
+          },
+          "accessChecker.js",
+          "updateAndDeleteQuestion",
+          `嘗試修改未授權欄位: ${invalidKeys.join(", ")}`
+        );
         return res.status(403).json({
           success: false,
           msg: `學生不能修改這些欄位: ${invalidKeys.join(", ")}`,
@@ -164,6 +236,16 @@ const updateAndDeleteQuestion = async (req, res, next) => {
 
       // 檢查問題是否已被回覆，已回覆的問題學生無法修改或刪除
       if (resource.replied === true) {
+        logError(
+          {
+            userIp: req.ip,
+            userId: req.user._id,
+            userName: req.user.userinfo.realname,
+          },
+          "accessChecker.js",
+          "updateAndDeleteQuestion",
+          `嘗試修改已回覆問題 ${qaId}`
+        );
         return res.status(403).json({
           success: false,
           msg: "資源已被回覆，無法修改或刪除",
@@ -300,7 +382,17 @@ const updateAndDeleteQuestion = async (req, res, next) => {
     // 如果用戶角色不是 admin、student 或 teacher，返回錯誤
     return res.status(403).json({ success: false, msg: "無法辨識的權限" });
   } catch (error) {
-    console.error(error);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user?._id,
+        userName: req.user?.userinfo?.realname,
+      },
+      "accessChecker.js",
+      "updateAndDeleteQuestion middleware",
+      {},
+      error
+    );
     return res
       .status(500)
       .json({ success: false, msg: "發生了不可預期的錯誤" });
@@ -314,13 +406,28 @@ const updateAndDeleteQuestion = async (req, res, next) => {
  * @param {Function} next - Express 下一個中間件函數
  * @returns {void|Object} 如果用戶是教師，調用 next()；否則返回錯誤響應
  */
-const teacher = (req, res, next) => {
-  // 檢查用戶是否為學生，如果是則拒絕訪問
-  if (req.user.role == "student")
-    return res
-      .status(403)
-      .json({ success: false, msg: "只有老師可以使用此資源" });
-  next();
+const teacher = async (req, res, next) => {
+  try {
+    // 檢查用戶是否為學生，如果是則拒絕訪問
+    if (req.user.role == "student")
+      return res
+        .status(403)
+        .json({ success: false, msg: "只有老師可以使用此資源" });
+    next();
+  } catch (e) {
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user?._id,
+        userName: req.user?.userinfo?.realname,
+      },
+      "accessChecker.js",
+      "teacher middleware",
+      {},
+      e
+    );
+    return res.status(500).json({ success: false, msg: "伺服器發生問題" });
+  }
 };
 
 /**
@@ -330,13 +437,28 @@ const teacher = (req, res, next) => {
  * @param {Function} next - Express 下一個中間件函數
  * @returns {void|Object} 如果用戶是管理員，調用 next()；否則返回錯誤響應
  */
-const admin = (req, res, next) => {
-  // 檢查用戶是否為管理員，如果不是則拒絕訪問
-  if (req.user.role != "admin")
-    return res
-      .status(403)
-      .json({ success: false, msg: "只有管理員可以使用此資源" });
-  next();
+const admin = async (req, res, next) => {
+  try {
+    // 檢查用戶是否為管理員，如果不是則拒絕訪問
+    if (req.user.role != "admin")
+      return res
+        .status(403)
+        .json({ success: false, msg: "只有管理員可以使用此資源" });
+    next();
+  } catch (e) {
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user?._id,
+        userName: req.user?.userinfo?.realname,
+      },
+      "accessChecker.js",
+      "admin middleware",
+      {},
+      e
+    );
+    return res.status(500).json({ success: false, msg: "伺服器發生問題" });
+  }
 };
 
 module.exports = {

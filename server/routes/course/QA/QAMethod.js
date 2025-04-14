@@ -18,6 +18,7 @@ const VimeoMethods = require("../../../methods").vimeoMethods;
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
+const { logError, log } = require("../../../utils/logger");
 
 /**
  * 設定 multer 中間件，使用 memoryStorage 來接收檔案
@@ -87,10 +88,18 @@ router.get("/", async (req, res) => {
   try {
     return res.json({ success: true, data: req.question, msg: "" });
   } catch (error) {
-    console.error(error);
-    return res
-      .status(500)
-      .json({ success: false, msg: "發生了不可預期的錯誤" });
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "QAMethod.js",
+      "getQuestion",
+      `獲取問題詳情失敗`,
+      error
+    );
+    return res.status(500).json({ success: false, msg: "伺服器發生問題" });
   }
 });
 
@@ -186,8 +195,18 @@ router.get("/getComment", async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ success: false, msg: "取得資源時發生錯誤" });
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "QAMethod.js",
+      "getComment",
+      `獲取留言列表失敗`,
+      error
+    );
+    return res.status(500).json({ success: false, msg: "伺服器發生問題" });
   }
 });
 
@@ -243,6 +262,17 @@ router.post("/postNewComment", upload.array("image"), async (req, res) => {
       await newComment.save();
     }
 
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "QAMethod.js",
+      "postNewComment",
+      `新增留言 ${newComment._id}`
+    );
+
     // 處理留言影片上傳（若有提供 fileSize）
     let uploadLink = {};
     if (fileSize) {
@@ -273,10 +303,19 @@ router.post("/postNewComment", upload.array("image"), async (req, res) => {
       msg: "留言成功發布，若有影片上傳請使用上傳連結",
       data: { uploadLink, commentID: newComment._id },
     });
-  } catch (e) {
-    return res
-      .status(500)
-      .json({ success: false, msg: "發生錯誤，無法成功留言" });
+  } catch (error) {
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "QAMethod.js",
+      "postNewComment",
+      `新增留言失敗`,
+      error
+    );
+    return res.status(500).json({ success: false, msg: "伺服器發生問題" });
   }
 });
 
@@ -310,6 +349,18 @@ router.patch("/uploadVideoStatus", async (req, res) => {
       });
       newSchedule.save();
       await QAmessage.findByIdAndDelete(commentID);
+
+      log(
+        {
+          userIp: req.ip,
+          userId: req.user._id,
+          userName: req.user.userinfo.realname,
+        },
+        "QAMethod.js",
+        "uploadVideoStatus",
+        `刪除上傳失敗的影片 ${commentID}`
+      );
+
       return res.json({ success: true, msg: "已將此資源刪除" });
     }
     foundItem.isUploadSuccess = true;
@@ -336,12 +387,32 @@ router.patch("/uploadVideoStatus", async (req, res) => {
       newSchedule.save();
     }
     await foundItem.save();
+
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "QAMethod.js",
+      "uploadVideoStatus",
+      `更新影片上傳狀態 ${commentID}`
+    );
+
     return res.json({ success: true, msg: "更新成功" });
   } catch (error) {
-    console.error(error);
-    return res
-      .status(500)
-      .json({ success: false, msg: "發生了不可預期的錯誤" });
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "QAMethod.js",
+      "uploadVideoStatus",
+      `更新影片上傳狀態失敗`,
+      error
+    );
+    return res.status(500).json({ success: false, msg: "伺服器發生問題" });
   }
 });
 
@@ -388,12 +459,33 @@ router.delete("/deleteComment", async (req, res) => {
     // 呼叫 findByIdAndDelete，刪除前會先執行 pre hook 的資源清理邏輯
     await QAmessage.findByIdAndDelete(commentID);
 
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "QAMethod.js",
+      "deleteComment",
+      `刪除留言 ${commentID}`
+    );
+
     return res.json({
       success: true,
       msg: "成功刪除留言",
     });
-  } catch (e) {
-    console.error(e);
+  } catch (error) {
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "QAMethod.js",
+      "deleteComment",
+      `刪除留言失敗`,
+      error
+    );
     return res.status(500).json({
       success: false,
       msg: "發生了不可預期的錯誤",
@@ -414,7 +506,6 @@ router.delete("/deleteComment", async (req, res) => {
  */
 router.patch("/patchComment", upload.array("image"), async (req, res) => {
   try {
-    console.log(123)
     const { commentID, content, isPrivate, isBest, rmIMG } = req.body;
     if (!commentID) {
       return res.status(400).json({ success: false, msg: "缺少 commentID" });
@@ -494,15 +585,36 @@ router.patch("/patchComment", upload.array("image"), async (req, res) => {
 
     await foundComment.save();
 
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "QAMethod.js",
+      "patchComment",
+      `更新留言 ${commentID}`
+    );
+
     return res.json({
       success: true,
       msg: "成功修改留言",
     });
-  } catch (e) {
-    console.error(e);
+  } catch (error) {
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "QAMethod.js",
+      "patchComment",
+      `更新留言失敗`,
+      error
+    );
     return res.status(500).json({
       success: false,
-      msg: "發生了不可預期的錯誤",
+      msg: "伺服器發生問題",
     });
   }
 });

@@ -18,6 +18,7 @@ const accessChecker = require("../../routesMiddleware/accessChecker");
 const multer = require("multer");
 const { QAmessage } = require("../../../models");
 const publicFolderRouter = require("./publicFolder");
+const { logError, log } = require("../../../utils/logger");
 
 // 設定 multer：指定欄位名稱 "image"，最多上傳 10 張圖片
 const upload = multer().fields([{ name: "image", maxCount: 10 }]);
@@ -118,7 +119,6 @@ async function saveUploadedImages(
  * @returns {Object} 新創建的問題
  */
 router.post("/postQuestion", upload, async (req, res) => {
-  console.log(res.body)
   try {
     // 解析請求參數
     let {
@@ -207,10 +207,32 @@ router.post("/postQuestion", upload, async (req, res) => {
     });
 
     const savedQA = await newQA.save();
-    return res.status(201).json({ success: true, data: savedQA });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ success: false, msg: "建立問題時發生錯誤" });
+
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "modifyQA.js",
+      "postQuestion",
+      `新增問題 ${qaId}`
+    );
+
+    return res.json({ success: true, data: savedQA });
+  } catch (e) {
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "modifyQA.js",
+      "postQuestion",
+      `新增問題失敗`,
+      e
+    );
+    return res.status(500).json({ success: false, msg: "伺服器發生問題" });
   }
 });
 
@@ -246,7 +268,6 @@ router.patch(
         replied,
         folders,
       } = req.body;
-      console.log(folders)
       // 驗證問題ID
       if (!mongoose.Types.ObjectId.isValid(question_id)) {
         return res.status(400).json({ success: false, msg: "無效的問題ID" });
@@ -316,16 +337,36 @@ router.patch(
         oldQA.folders = folders;
       // 保存更新
       const savedQA = await oldQA.save();
+
+      log(
+        {
+          userIp: req.ip,
+          userId: req.user._id,
+          userName: req.user.userinfo.realname,
+        },
+        "modifyQA.js",
+        "patchQuestion",
+        `更新問題 ${question_id}`
+      );
+
       return res.json({
         success: true,
         msg: "問題修改成功",
         data: { QA_id: savedQA._id },
       });
-    } catch (error) {
-      console.error(error);
-      return res
-        .status(500)
-        .json({ success: false, msg: "發生了不可預期的錯誤" });
+    } catch (e) {
+      logError(
+        {
+          userIp: req.ip,
+          userId: req.user._id,
+          userName: req.user.userinfo.realname,
+        },
+        "modifyQA.js",
+        "patchQuestion",
+        `更新問題失敗`,
+        e
+      );
+      return res.status(500).json({ success: false, msg: "伺服器發生問題" });
     }
   }
 );
@@ -356,12 +397,31 @@ router.delete(
       // 刪除問題（圖片資料夾會由 hook 自動處理）
       await QA.findOneAndDelete({ _id: question_id });
 
+      log(
+        {
+          userIp: req.ip,
+          userId: req.user._id,
+          userName: req.user.userinfo.realname,
+        },
+        "modifyQA.js",
+        "deleteQuestion",
+        `刪除問題 ${question_id}`
+      );
+
       return res.json({ success: true, msg: "問題刪除成功" });
-    } catch (error) {
-      console.error(error);
-      return res
-        .status(500)
-        .json({ success: false, msg: "發生了不可預期的錯誤" });
+    } catch (e) {
+      logError(
+        {
+          userIp: req.ip,
+          userId: req.user._id,
+          userName: req.user.userinfo.realname,
+        },
+        "modifyQA.js",
+        "deleteQuestion",
+        `刪除問題失敗`,
+        e
+      );
+      return res.status(500).json({ success: false, msg: "伺服器發生問題" });
     }
   }
 );

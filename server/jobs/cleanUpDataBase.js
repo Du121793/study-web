@@ -13,6 +13,7 @@ const VideoInfo = require("../models/").courseVideoInfo;
 const QAmessage = require("../models/").QAmessage;
 const vimeoSchedule = require("../models").vimeoSchedule;
 const VimeoMethods = require("../methods").vimeoMethods;
+const { logError } = require("../utils/logger");
 
 // 讀取config
 const scheduleConfig = require("../config/scheduleConfig.json");
@@ -75,7 +76,13 @@ async function processExpiredVideos() {
         await VideoInfo.findByIdAndDelete(doc._id);
         console.log(`將 VideoInfo_id: ${doc._id} 轉移到待刪除影片`);
       } catch (err) {
-        console.error(`轉移失敗，VideoInfo_id: ${doc._id}`, err);
+        logError(
+          {},
+          "cleanUpDataBase.js",
+          "processExpiredVideos",
+          { videoId: doc._id },
+          err
+        );
       }
     }
   } else {
@@ -110,7 +117,13 @@ async function processExpiredVideos() {
         await QAmessage.findByIdAndDelete(doc._id);
         console.log(`將 QAmessage_id: ${doc._id} 轉移到待刪除影片`);
       } catch (err) {
-        console.error(`轉移失敗，QAmessage_id: ${doc._id}`, err);
+        logError(
+          {},
+          "cleanUpDataBase.js",
+          "processExpiredVideos",
+          { qaId: doc._id },
+          err
+        );
       }
     }
   } else {
@@ -338,7 +351,7 @@ cron.schedule(
       await processExpiredVideos();
       console.log("過期影片清理排程執行完畢");
     } catch (err) {
-      console.error("過期影片清理排程發生錯誤:", err);
+      logError({}, "cleanUpDataBase.js", "processExpiredVideos", {}, err);
     }
   },
   { timezone: "Asia/Taipei" }
@@ -356,7 +369,7 @@ cron.schedule(
         console.log("GET 排程因 API 回傳失敗而跳過本輪處理");
       }
     } catch (err) {
-      console.error("GET 排程執行錯誤:", err);
+      logError({}, "cleanUpDataBase.js", "processGetSchedule", {}, err);
     }
   },
   { timezone: "Asia/Taipei" }
@@ -388,7 +401,7 @@ cron.schedule(
         console.log("DELETE 排程因 API 回傳失敗而跳過本輪處理");
       }
     } catch (err) {
-      console.error("DELETE 排程執行錯誤:", err);
+      logError({}, "cleanUpDataBase.js", "processDeleteSchedule", {}, err);
     }
   },
   { timezone: "Asia/Taipei" }

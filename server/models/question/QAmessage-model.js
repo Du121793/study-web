@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 const fs = require("fs");
 const path = require("path");
 const vimeoSchedule = require("../gc/vimeoSchedule-model");
+const { logError } = require("../../utils/logger");
 
 const QAmessageSchema = new Schema({
   pointTo: { type: mongoose.Schema.Types.ObjectId, ref: "QA", required: true },
@@ -74,6 +75,7 @@ async function cleanupDocument(doc) {
       });
       await newSchedule.save();
     } catch (err) {
+      logError({}, "QAmessage-model.js", "建立 Vimeo 刪除排程", {}, err);
       throw new Error("建立 Vimeo 刪除排程失敗");
     }
   }
@@ -92,6 +94,7 @@ QAmessageSchema.pre("findOneAndDelete", async function (next) {
     }
     next();
   } catch (error) {
+    logError({}, "QAmessage-model.js", "刪除留言", {}, error);
     next(error);
   }
 });
@@ -106,6 +109,7 @@ QAmessageSchema.pre("remove", async function (next) {
     await cleanupDocument(this);
     next();
   } catch (error) {
+    logError({}, "QAmessage-model.js", "移除留言", {}, error);
     next(error);
   }
 });
@@ -120,6 +124,7 @@ QAmessageSchema.pre("deleteOne", async function (next) {
     await cleanupDocument(this);
     next();
   } catch (error) {
+    logError({}, "QAmessage-model.js", "刪除留言", {}, error);
     next(error);
   }
 });
@@ -137,6 +142,7 @@ QAmessageSchema.pre("deleteMany", async function (next) {
     }
     next();
   } catch (error) {
+    logError({}, "QAmessage-model.js", "批次刪除留言", {}, error);
     next(error);
   }
 });

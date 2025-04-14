@@ -5,6 +5,7 @@ import PreRegister from '../../pages/profiles/PreRegister'
 import RemoveUsers from '../../pages/profiles/RemoveUsers'
 import EditCourse from '../../pages/profiles/EditCourse'
 import EditMembers from '../../pages/profiles/EditMembers'
+import EditMembersInfo from '../../pages/profiles/EditMembersInfo'
 
 // 引用組件庫
 import Image from 'next/image'
@@ -36,12 +37,24 @@ export default function AdminLayout({ user_role }) {
 
   // 取得使用者已註冊的課程
   const [getCourses, setGetCourses] = useState([])
-  
+
   // -----------------------------------------------------------------
   // 1. 將 navSelecter 改為 [功能分類, 頁面名稱]
   //    預設帶出 MyCourse 頁面 => ["publicFunction", "MyCourse"]
   // -----------------------------------------------------------------
   const [navSelecter, setNavSelecter] = useState(['publicFunction', 'MyCourse'])
+
+  // 用於切換nav list的下拉顯示
+  const [myCourseNavListSwitcher, setMyCourseNavListSwitcher] = useState('')
+  const [teacherFuntionNavListSwitcher, setTeacherFuntionNavListSwitcher] = useState('')
+  const [adminFuntionNavListSwitcher, setAdminFuntionNavListSwitcher] = useState('')
+
+  // 選單的 leftMargin
+  const [listLeftMargin, setListLeftMargin] = useState('0')
+  const [listSwitchBtnWidth, setListSwitchBtnWidth] = useState('0')
+  const [listSwitchBtnBorder, setListSwitchBtnBorder] = useState('none')
+  const [listHeight, setListHeight] = useState('0')
+  const rightItemtRef = useRef(null)
 
   // 給子組件刷新其他子組件用
   const [refresh, setRefresh] = useState(0)
@@ -90,20 +103,12 @@ export default function AdminLayout({ user_role }) {
         component: <RemoveUsers user_role={user_role} />,
         className: 'right-item',
       },
+      EditMembersInfo: {
+        component: <EditMembersInfo />,
+        className: 'right-item',
+      },
     },
   }
-
-  // 用於切換nav list的下拉顯示
-  const [myCourseNavListSwitcher, setMyCourseNavListSwitcher] = useState('')
-  const [teacherFuntionNavListSwitcher, setTeacherFuntionNavListSwitcher] = useState('')
-  const [adminFuntionNavListSwitcher, setAdminFuntionNavListSwitcher] = useState('')
-
-  // 選單的 leftMargin
-  const [listLeftMargin, setListLeftMargin] = useState('0')
-  const [listSwitchBtnWidth, setListSwitchBtnWidth] = useState('0')
-  const [listSwitchBtnBorder, setListSwitchBtnBorder] = useState('none')
-  const [listHeight, setListHeight] = useState('0')
-  const rightItemtRef = useRef(null)
 
   // 左邊選單顯示/隱藏
   const showLeftNav = () => {
@@ -150,7 +155,7 @@ export default function AdminLayout({ user_role }) {
     initNavActive()
     target.classList.add('active')
   }
-  
+
   const initNavActive = () => {
     const findActive = document.querySelector('.active')
     if (findActive) {
@@ -315,7 +320,7 @@ export default function AdminLayout({ user_role }) {
                       src={dotIcon}
                       alt="icon"
                     />
-                    編輯課程
+                    編輯課程資訊
                   </div>
 
                   {/* EditMembers */}
@@ -330,7 +335,7 @@ export default function AdminLayout({ user_role }) {
                       src={dotIcon}
                       alt="icon"
                     />
-                    成員編輯
+                    編輯課程成員
                   </div>
                 </div>
               </li>
@@ -381,7 +386,6 @@ export default function AdminLayout({ user_role }) {
                     />
                     預註冊使用者
                   </div>
-                  {/* RemoveUsers */}
                   <div
                     className="option"
                     onClick={(e) => {
@@ -394,6 +398,19 @@ export default function AdminLayout({ user_role }) {
                       alt="icon"
                     />
                     移除成員
+                  </div>
+                  <div
+                    className="option"
+                    onClick={(e) => {
+                      setNavSelecter(['adminFunction', 'EditMembersInfo'])
+                      switchNavActive(e.target)
+                    }}>
+                    <Image
+                      className="turn-right-icon"
+                      src={dotIcon}
+                      alt="icon"
+                    />
+                    編輯成員資訊
                   </div>
                 </div>
               </li>

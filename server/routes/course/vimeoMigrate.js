@@ -14,6 +14,7 @@ const accessChecker = require("../routesMiddleware/accessChecker");
 const fs = require("fs");
 const path = require("path");
 const vimeoConfig = require("../../config/vimeoConfig.json");
+const { logError, log } = require("../../utils/logger");
 
 router.use(accessChecker.admin);
 
@@ -62,9 +63,9 @@ router.post("/batchCreate", accessChecker.teacher, async (req, res) => {
         });
 
         await videoInfo.save();
-        let newObj = videoInfo
-        newObj.uid = uid
-        return newObj
+        let newObj = videoInfo;
+        newObj.uid = uid;
+        return newObj;
       })
     );
 
@@ -84,18 +85,37 @@ router.post("/batchCreate", accessChecker.teacher, async (req, res) => {
         videoObj.movePath = `WebVideos/Course/COURSE:${video._id}`;
       }
       videoObj.uid = video.uid;
-      
-      returnInfo.push(videoObj)
-      videoIds.push(video._id)
+
+      returnInfo.push(videoObj);
+      videoIds.push(video._id);
     });
+
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      `批量創建 ${videos.length} 個影片資訊`
+    );
 
     return res.json({
       success: true,
-      data: {returnInfo, videoIds},
+      data: { returnInfo, videoIds },
       msg: "已成功創建影片資訊",
     });
   } catch (e) {
-    console.error(e);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "vimeoMigrate.js",
+      "batchCreate",
+      `批量創建影片資訊失敗`,
+      e
+    );
     return res.status(500).json({
       success: false,
       msg: "批量創建影片資訊時發生錯誤",
@@ -137,12 +157,31 @@ router.patch("/updateUrls", accessChecker.teacher, async (req, res) => {
     // 批量創建排程
     await vimeoSchedule.insertMany(schedules);
 
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      `創建 ${videoIds.length} 個影片更新排程`
+    );
+
     return res.json({
       success: true,
       msg: "已成功創建更新排程，系統將在背景處理更新操作",
     });
   } catch (e) {
-    console.error(e);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "vimeoMigrate.js",
+      "updateUrls",
+      `創建影片更新排程失敗`,
+      e
+    );
     return res.status(500).json({
       success: false,
       msg: "創建更新排程時發生錯誤",

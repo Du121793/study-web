@@ -1,7 +1,4 @@
 // 導入public
-import shotA from '../../public/profile/shot1.jpg'
-import shotB from '../../public/profile/shot2.jpg'
-import shotC from '../../public/profile/shot3.jpg'
 import anonymous from '../../public/profile/anonymous.png'
 // 組件庫
 import { useState, useEffect, useRef } from 'react'
@@ -24,23 +21,25 @@ export default function MyCourse() {
   // 請求課程網址
   const curserBaseUrl = `${clientIp}/courses/Course`
   // 假圖片，用於課程左邊頭像
-  const shots = [shotA, shotB, shotC, shotA, shotB, shotC, shotA, shotB, shotC, shotA]
   const coursesEle = useRef(null)
   const [coursesEleWidth, setCoursesEleWidth] = useState(0)
-  const [innenrEleWidth, setInnerEleWidht] = useState(0)
 
-  const randomShot = () => {
-    let randomNumber = Math.random()
-    randomNumber = randomNumber * 10
-    return shots[parseInt(randomNumber)]
-  }
-
-  const formSubmit = (e) => {
-    console.log(searchInput)
+  const searchCourse = () => {
+    setCourseLoading(true)
+    let filter = {
+      courseName: searchInput,
+    }
+    userService.getUserRegistedCourses(token, filter).then((res) => {
+      setCourseLoading(false)
+      if (res?.success) {
+        console.log(res)
+        setGetCourses(res.data)
+      }
+    })
   }
 
   const test = () => {
-    console.dir(coursesEle.current.clientWidth)
+    console.dir(getCourses)
   }
 
   useEffect(() => {
@@ -59,10 +58,6 @@ export default function MyCourse() {
       resizeObserver.unobserve(element)
     }
   }, [])
-
-  useEffect(() => {
-    console.log('Width has changed:', coursesEleWidth)
-  }, [coursesEleWidth])
 
   // 請求所有用戶已註冊課程資訊，若為admin則為全部
   useEffect(() => {
@@ -92,7 +87,7 @@ export default function MyCourse() {
           className="search-area"
           onSubmit={(e) => {
             e.preventDefault()
-            formSubmit()
+            searchCourse()
           }}>
           <input
             type="text"
@@ -112,51 +107,57 @@ export default function MyCourse() {
             className="courses"
             ref={coursesEle}>
             {courseLoading && <LoadingAnime />}
-            {getCourses.map((item, index) => (
-              <li
-                className="course"
-                key={index}>
-                <div href={curserBaseUrl + `?courseName=${item.courseName}&courseId=${item._id}`}>
-                  <div className="course-header flex align-center">
-                    <div className="course-fake-shot">
-                      <Image
-                        className="shot"
-                        src={anonymous}
-                        alt="cursor shot"
-                        width={30}
-                        height={30}></Image>
+            {getCourses &&
+              getCourses.length > 0 &&
+              getCourses.map((item, index) => (
+                <li
+                  className="course"
+                  key={index}>
+                  <div href={curserBaseUrl + `?courseName=${item.courseName}&courseId=${item._id}`}>
+                    <div className="course-header flex align-center">
+                      <div className="course-fake-shot">
+                        <Image
+                          className="shot"
+                          src={item?.teacher?.userinfo?.pictureUrl ? item.teacher.userinfo.pictureUrl : anonymous}
+                          alt="course's teacher avatar"
+                          width={30}
+                          height={30}></Image>
+                      </div>
+                      <div className="course-name">{item.courseName}</div>
                     </div>
-                    <div className="course-name">{item.courseName}</div>
                   </div>
-                </div>
 
-                <div className="course-info">
-                  <div className="info-area">
-                    <span>科目: </span>
-                    {item.subject}
-                  </div>
-                  <div className="info-area">
-                    <span>班級: </span>
-                    {item.courseClass}
-                  </div>
-                  <div className="info-area">
-                    <span>年級: </span>
-                    {item.grade}
-                  </div>
-                  <div className="info-area last-line">
-                    <div className="container">
-                      <span>學生人數: </span>
-                      {item.members}
+                  <div className="course-info">
+                    <div className="info-area">
+                      <span>教師: </span>
+                      {item?.teacher?.userinfo?.username}
                     </div>
-                    <Link
-                      className="g-blue-btn"
-                      href={curserBaseUrl + `?courseName=${item.courseName}&courseId=${item._id}`}>
-                      前往課程
-                    </Link>
+                    <div className="info-area">
+                      <span>科目: </span>
+                      {item.subject}
+                    </div>
+                    <div className="info-area">
+                      <span>班級: </span>
+                      {item.courseClass}
+                    </div>
+                    <div className="info-area">
+                      <span>年級: </span>
+                      {item.grade}
+                    </div>
+                    <div className="info-area last-line">
+                      <div className="container">
+                        <span>學生人數: </span>
+                        {item.members}
+                      </div>
+                      <Link
+                        className="g-blue-btn"
+                        href={curserBaseUrl + `?courseName=${item.courseName}&courseId=${item._id}`}>
+                        前往課程
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              </li>
-            ))}
+                </li>
+              ))}
           </ul>
         </div>
       </div>

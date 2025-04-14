@@ -10,6 +10,7 @@ const mongoose = require("mongoose");
 const Course = require("../models").course;
 const User = require("../models/").user;
 const { Parser } = require("json2csv");
+const { log, logError } = require("../utils/logger");
 
 const accessChecker = require("./routesMiddleware/accessChecker");
 
@@ -29,6 +30,17 @@ router.get("/", (req, res) => {
   try {
     return res.json({ success: true, data: req.user });
   } catch (e) {
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user?._id,
+        userName: req.user?.userinfo?.realname,
+      },
+      "user.js",
+      "GET /",
+      {},
+      e
+    );
     return res.status(500).json({ success: false, msg: "伺服器發生問題" });
   }
 });
@@ -42,27 +54,24 @@ router.get("/", (req, res) => {
  * @route GET /registedCourse
  * @param {string} course_id - 可選，指定課程ID
  * @param {string|Object} filter - 可選，過濾條件（JSON格式）
+ * @param {string} filter.search - 可選，搜索關鍵字，會同時搜索課程名稱和ID
+ * @param {number} filter.page - 可選，分頁頁碼
+ * @param {number} filter.pageSize - 可選，每頁筆數
+ * @param {string} filter.courseName - 可選，課程名稱過濾
+ * @param {string} filter.subject - 可選，科目過濾
+ * @param {string} filter.grade - 可選，年級過濾
+ * @param {string} filter.courseClass - 可選，班級過濾
+ * @param {string} filter.date - 可選，日期過濾
  * @returns {Object} 課程資訊列表或單一課程詳情
  */
 router.get("/registedCourse", async (req, res) => {
   try {
-    // 解析查詢參數
     const { course_id, filter } = req.query;
-    let projection = {};
     let page, pageSize;
 
-    // 定義可過濾的欄位
-    const allowedFields = [
-      "courseName",
-      "subject",
-      "grade",
-      "courseClass",
-      "date",
-    ];
-
-    // 處理過濾條件
+    // 將 filter 轉成可用物件
+    let parsedFilter = {};
     if (filter) {
-      let parsedFilter = {};
       try {
         parsedFilter = typeof filter === "string" ? JSON.parse(filter) : filter;
       } catch (e) {
@@ -71,51 +80,64 @@ router.get("/registedCourse", async (req, res) => {
           msg: "filter 格式錯誤，請傳入合法的 JSON 字串",
         });
       }
-
-      // 處理分頁參數
-      if (parsedFilter.hasOwnProperty("page")) {
-        page = parseInt(parsedFilter.page) || 1;
-        delete parsedFilter.page;
-      }
-      if (parsedFilter.hasOwnProperty("pageSize")) {
-        pageSize = parseInt(parsedFilter.pageSize);
-        delete parsedFilter.pageSize;
-      }
-
-      // 建立投影物件
-      allowedFields.forEach((field) => {
-        if (parsedFilter.hasOwnProperty(field)) {
-          projection[field] = 1;
-        }
-      });
     }
 
-    // 處理單一課程查詢
+    // 可透過 filter 指定要「投影」(顯示) 的欄位
+    const allowedFields = ["courseName", "subject", "grade", "courseClass", "date"];
+    let projection = {};
+
+    // 如果 filter 中有對應到想顯示的欄位，就加到 projection
+    allowedFields.forEach((field) => {
+      if (field in parsedFilter) {
+        projection[field] = 1;
+      }
+    });
+
+    // 取得分頁參數
+    if (parsedFilter.hasOwnProperty("page")) {
+      page = parseInt(parsedFilter.page, 10) || 1;
+      delete parsedFilter.page;
+    }
+    if (parsedFilter.hasOwnProperty("pageSize")) {
+      pageSize = parseInt(parsedFilter.pageSize, 10) || 0;
+      delete parsedFilter.pageSize;
+    }
+
+    /**
+     * ============================
+     *   A. 查詢「單一課程」的情況
+     * ============================
+     */
     if (course_id) {
-      // 權限檢查
-      if (
-        !req.user.courses.includes(course_id) &&
-        req.user.role !== "teacher"
-      ) {
-        return res
-          .status(404)
-          .json({ success: false, msg: "您尚未註冊此課程" });
+      // 權限檢查：若使用者不是 teacher，且 course_id 不在自己的 courses 清單裡
+      // 就返回 404
+      if (!req.user.courses.includes(course_id) && req.user.role !== "teacher") {
+        return res.status(404).json({
+          success: false,
+          msg: "您尚未註冊此課程",
+        });
       }
 
-      // 查詢課程資訊
+      // 查詢課程（若有指定 projection 就用，否則回傳整份文件）
       const foundCourse =
         Object.keys(projection).length > 0
-          ? await Course.findOne({ _id: course_id }, projection)
-          : await Course.findOne({ _id: course_id });
+          ? await Course.findOne({ _id: course_id }, projection).populate(
+              "teacher",
+              "_id userinfo.username userinfo.pictureUrl userinfo.makePictureAnonymous"
+            )
+          : await Course.findOne({ _id: course_id }).populate(
+              "teacher",
+              "_id userinfo.username userinfo.pictureUrl userinfo.makePictureAnonymous"
+            );
 
       if (!foundCourse) {
         return res.status(404).json({ success: false, msg: "找不到該課程" });
       }
 
-      // 計算成員數量
+      // 計算成員人數（一次 countDocuments）
       const memberCount = await User.countDocuments({ courses: course_id });
 
-      // 轉換為純物件並添加成員數
+      // 整理輸出資料
       const courseData =
         typeof foundCourse.toObject === "function"
           ? foundCourse.toObject()
@@ -125,51 +147,104 @@ router.get("/registedCourse", async (req, res) => {
       return res.json({ success: true, data: courseData });
     }
 
-    // 處理課程列表查詢
+    /**
+     * ==============================
+     *   B. 查詢「多課程列表」的情況
+     * ==============================
+     */
     else {
-      let courseIds = req.user.courses;
-      const totalCourses = courseIds.length;
+      // 組合查詢條件：僅限於該用戶已註冊的課程
+      const query = { _id: { $in: req.user.courses } };
 
-      // 處理分頁
-      if (pageSize) {
-        const currentPage = page || 1;
-        const start = (currentPage - 1) * pageSize;
-        courseIds = courseIds.slice(start, start + pageSize);
+      // 若有搜索關鍵字 search -> 針對 courseName 或 _id
+      if (parsedFilter.search) {
+        const searchTerm = parsedFilter.search;
+        const regex = new RegExp(searchTerm, "i");
+        // 注意 _id 是 ObjectId 型態，若要比對字串則需特別處理
+        // 這裡範例寫法：courseName 用 regex, _id 直接用字串比對
+        query.$or = [{ courseName: regex }, { _id: searchTerm }];
+        delete parsedFilter.search;
       }
 
-      // 獲取課程詳細資訊
-      const coursesInfo = await Promise.all(
-        courseIds.map(async (courseID) => {
-          const courseInfo =
-            Object.keys(projection).length > 0
-              ? await Course.findOne({ _id: courseID }, projection)
-              : await Course.findOne({ _id: courseID });
+      // 其餘欄位 (subject, grade, courseClass, date 等)，如果有帶就放進 query 過濾
+      const filterFields = ["courseName", "subject", "grade", "courseClass", "date"];
+      filterFields.forEach((field) => {
+        if (parsedFilter[field]) {
+          query[field] = parsedFilter[field];
+        }
+      });
 
-          if (courseInfo) {
-            const memberCount = await User.countDocuments({
-              courses: courseID,
-            });
-            const courseData =
-              typeof courseInfo.toObject === "function"
-                ? courseInfo.toObject()
-                : courseInfo;
-            courseData.members = memberCount;
-            return courseData;
-          }
-          return null;
-        })
-      );
+      // 計算總筆數（供分頁返回 total）
+      const totalCourses = await Course.countDocuments(query);
 
-      // 過濾無效課程
-      const filteredCoursesInfo = coursesInfo.filter(
-        (course) => course !== null
-      );
+      // 分頁處理
+      let skipCount = 0;
+      let limitCount = 0;
+      if (pageSize) {
+        skipCount = (page ? page - 1 : 0) * pageSize;
+        limitCount = pageSize;
+      }
 
-      // 返回結果
+      // 第一次查詢：一次拿出對應所有課程資料
+      const foundCourses = await Course.find(query, projection)
+        .skip(skipCount)
+        .limit(limitCount)
+        .populate(
+          "teacher",
+          "_id userinfo.username userinfo.pictureUrl userinfo.makePictureAnonymous"
+        );
+
+      // 如果查到 0 筆課程，直接返回
+      if (!foundCourses.length) {
+        const emptyData = [];
+        if (pageSize) {
+          return res.json({
+            success: true,
+            data: emptyData,
+            pagination: {
+              total: totalCourses,
+              page: page || 1,
+              pageSize,
+            },
+          });
+        }
+        return res.json({ success: true, data: emptyData });
+      }
+
+      /**
+       * 第二次查詢：用 aggregation 一次拿到所有課程的 members 數量
+       * （比逐筆 countDocuments 快多了，減少大量 DB 請求）
+       */
+      const courseIds = foundCourses.map((c) => c._id);
+      const membersResult = await User.aggregate([
+        { $match: { courses: { $in: courseIds } } },
+        { $unwind: "$courses" },
+        {
+          $group: {
+            _id: "$courses",
+            count: { $sum: 1 },
+          },
+        },
+      ]);
+      // 整理成  { courseId: count } 格式
+      const memberCountMap = {};
+      membersResult.forEach((item) => {
+        memberCountMap[item._id.toString()] = item.count;
+      });
+
+      // 組合輸出：把 members 數帶到每個課程
+      const coursesInfo = foundCourses.map((course) => {
+        const courseObj =
+          typeof course.toObject === "function" ? course.toObject() : course;
+        courseObj.members = memberCountMap[courseObj._id.toString()] || 0;
+        return courseObj;
+      });
+
+      // 返回結果（帶分頁資訊）
       if (pageSize) {
         return res.json({
           success: true,
-          data: filteredCoursesInfo,
+          data: coursesInfo,
           pagination: {
             total: totalCourses,
             page: page || 1,
@@ -177,15 +252,27 @@ router.get("/registedCourse", async (req, res) => {
           },
         });
       }
-      return res.json({ success: true, data: filteredCoursesInfo });
+
+      // 不用分頁就直接回傳
+      return res.json({ success: true, data: coursesInfo });
     }
   } catch (error) {
-    console.error(error);
-    return res
-      .status(500)
-      .json({ success: false, msg: "發生了不可預期的錯誤" });
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "user.js",
+      "GET /registedCourse",
+      req.query,
+      error
+    );
+    return res.status(500).json({ success: false, msg: "發生了不可預期的錯誤" });
   }
 });
+
+
 
 // =====================
 // 成員管理路由
@@ -282,7 +369,17 @@ router.get("/getMembers", checkTeacherAccess, async (req, res) => {
       totalPage,
     });
   } catch (error) {
-    console.error(error);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "user.js",
+      "GET /getMembers",
+      req.query,
+      error
+    );
     return res
       .status(500)
       .json({ success: false, msg: "發生了不可預期的錯誤" });
@@ -395,7 +492,17 @@ router.get("/exportMembers", checkTeacherAccess, async (req, res) => {
       .set("Content-Disposition", 'attachment; filename="members.csv"')
       .send(Buffer.from(csvDataWithBOM, "utf8"));
   } catch (error) {
-    console.error(error);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "user.js",
+      "GET /exportMembers",
+      req.query,
+      error
+    );
     return res
       .status(500)
       .json({ success: false, msg: "發生了不可預期的錯誤" });
@@ -457,6 +564,14 @@ router.post("/preRegisterUser", checkAdminAccess, async (req, res) => {
         });
         let savedUser = await newUser.save();
         if (savedUser) {
+          log(
+            {
+              userIp: req.ip,
+              userId: req.user._id,
+              userName: req.user.userinfo.realname,
+            },
+            `預註冊用戶 ${userinfo.realname}`
+          );
           successCount++;
           successStudentId.push(savedUser._id);
         } else {
@@ -498,6 +613,17 @@ router.post("/preRegisterUser", checkAdminAccess, async (req, res) => {
       data: { successMsg: detailedMsg },
     });
   } catch (error) {
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "user.js",
+      "POST /preRegisterUser",
+      req.body,
+      error
+    );
     return res.status(500).json({
       success: false,
       msg: "伺服器處理失敗",
@@ -539,8 +665,8 @@ router.patch("/updateProfile", async (req, res) => {
     }
 
     // 處理匿名化
-    if (makeAnonymous === true) {
-      updateData["userinfo.makePictureAnonymous"] = true;
+    if (makeAnonymous !== undefined) {
+      updateData["userinfo.makePictureAnonymous"] = !!makeAnonymous;
     }
 
     // 如果沒有要更新的資料
@@ -565,13 +691,32 @@ router.patch("/updateProfile", async (req, res) => {
       });
     }
 
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      `更新了個人資料：${Object.keys(updateData).join(", ")}`
+    );
+
     return res.json({
       success: true,
       msg: "成功更新用戶資料",
       data: updatedUser,
     });
   } catch (error) {
-    console.error(error);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "user.js",
+      "PATCH /updateProfile",
+      req.body,
+      error
+    );
     return res.status(500).json({
       success: false,
       msg: "更新用戶資料時發生錯誤",
@@ -580,26 +725,26 @@ router.patch("/updateProfile", async (req, res) => {
 });
 
 /**
- * 批量修改會員資料
- * @route PATCH /patchMembers
- * @param {Array} members - 要修改的會員ID陣列
+ * 修改單一會員資料
+ * @route PATCH /patchMember
+ * @param {string} memberId - 要修改的會員ID
  * @param {Object} updateData - 要更新的資料
  * @param {string} updateData.username - 可選，用戶暱稱
  * @param {string} updateData.realname - 可選，真實姓名
  * @param {string} updateData.phoneNumber - 可選，電話號碼
  * @param {string} updateData.grade - 可選，年級
  * @param {string} updateData.role - 可選，角色
- * @returns {Object} 更新結果統計
+ * @returns {Object} 更新結果
  */
-router.patch("/patchMembers", checkAdminAccess, async (req, res) => {
+router.patch("/patchMember", checkAdminAccess, async (req, res) => {
   try {
-    const { members, updateData } = req.body;
+    const { memberId, updateData } = req.body;
 
     // 驗證必要參數
-    if (!Array.isArray(members) || members.length === 0) {
+    if (!memberId) {
       return res.status(400).json({
         success: false,
-        msg: "請提供要修改的會員ID陣列",
+        msg: "請提供要修改的會員ID",
       });
     }
 
@@ -610,90 +755,121 @@ router.patch("/patchMembers", checkAdminAccess, async (req, res) => {
       });
     }
 
+    // 檢查 memberId 是否有效
+    if (!mongoose.Types.ObjectId.isValid(memberId)) {
+      return res.status(400).json({
+        success: false,
+        msg: "無效的會員ID",
+      });
+    }
+
+    // 檢查是否所有欄位都是 undefined
+    const allUndefined = Object.values(updateData).every(
+      (value) => value === undefined
+    );
+    if (allUndefined) {
+      return res.status(400).json({
+        success: false,
+        msg: "沒有需要修改的資料",
+      });
+    }
+
     // 建立更新物件
     const updateObject = {};
-    if (updateData.username) {
-      updateObject["userinfo.username"] = updateData.username;
+    const errors = [];
+
+    // 檢查並處理每個欄位
+    if (updateData.username !== undefined) {
+      if (!updateData.username) {
+        errors.push("用戶暱稱不能為空");
+      } else {
+        updateObject["userinfo.username"] = updateData.username;
+      }
     }
-    if (updateData.realname) {
-      updateObject["userinfo.realname"] = updateData.realname;
+    if (updateData.realname !== undefined) {
+      if (!updateData.realname) {
+        errors.push("真實姓名不能為空");
+      } else {
+        updateObject["userinfo.realname"] = updateData.realname;
+      }
     }
-    if (updateData.phoneNumber) {
-      updateObject["userinfo.phoneNumber"] = updateData.phoneNumber;
+    if (updateData.phoneNumber !== undefined) {
+      if (!updateData.phoneNumber) {
+        errors.push("電話號碼不能為空");
+      } else {
+        updateObject["userinfo.phoneNumber"] = updateData.phoneNumber;
+      }
     }
-    if (updateData.grade) {
+    if (updateData.grade !== undefined) {
       updateObject["userinfo.grade"] = updateData.grade;
     }
-    if (updateData.role) {
-      updateObject.role = updateData.role;
-    }
-
-    // 初始化結果追蹤
-    let successCount = 0;
-    let successUserIds = [];
-    let notFoundUsers = [];
-    let invalidUsers = [];
-    let serverErrorUsers = [];
-
-    // 逐一處理每個會員
-    for (const memberId of members) {
-      try {
-        // 檢查 memberId 是否有效
-        if (!mongoose.Types.ObjectId.isValid(memberId)) {
-          invalidUsers.push(memberId);
-          continue;
-        }
-
-        // 更新會員資料
-        const updatedUser = await User.findByIdAndUpdate(
-          memberId,
-          { $set: updateObject },
-          { new: true }
-        );
-
-        if (!updatedUser) {
-          notFoundUsers.push(memberId);
-          continue;
-        }
-
-        successCount++;
-        successUserIds.push(memberId);
-      } catch (error) {
-        serverErrorUsers.push(memberId);
-        continue;
+    if (updateData.role !== undefined) {
+      if (!updateData.role) {
+        errors.push("角色不能為空");
+      } else {
+        updateObject.role = updateData.role;
       }
     }
 
-    // 組合回應訊息
-    let responseMessage = `成功更新 ${successCount} 位會員資料。\n`;
-    if (notFoundUsers.length > 0) {
-      responseMessage += `以下會員不存在：${notFoundUsers.join(", ")}。\n`;
+    // 如果有錯誤，返回錯誤訊息
+    if (errors.length > 0) {
+      return res.status(400).json({
+        success: false,
+        msg: errors.join("、"),
+      });
     }
-    if (invalidUsers.length > 0) {
-      responseMessage += `以下會員ID無效：${invalidUsers.join(", ")}。\n`;
+
+    // 如果沒有要更新的欄位
+    if (Object.keys(updateObject).length === 0) {
+      return res.status(400).json({
+        success: false,
+        msg: "沒有需要修改的資料",
+      });
     }
-    if (serverErrorUsers.length > 0) {
-      responseMessage += `以下會員由於伺服器錯誤更新失敗：${serverErrorUsers.join(
-        ", "
-      )}。\n`;
+
+    // 更新會員資料
+    const updatedUser = await User.findByIdAndUpdate(
+      memberId,
+      { $set: updateObject },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        msg: "找不到該會員",
+      });
     }
+
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      `更新了會員 ${memberId} 的資料`
+    );
 
     return res.json({
       success: true,
-      msg: responseMessage,
-      data: {
-        successCount,
-        successUserIds,
-        notFoundUsers,
-        invalidUsers,
-        serverErrorUsers,
-      },
+      msg: "成功更新會員資料",
+      data: updatedUser,
     });
   } catch (error) {
-    console.error(error);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "user.js",
+      "PATCH /patchMember",
+      req.body,
+      error
+    );
     return res.status(500).json({
       success: false,
-      msg: "批量更新會員資料時發生錯誤",
+      msg: "更新會員資料時發生錯誤",
     });
   }
 });
@@ -744,6 +920,15 @@ router.delete("/deleteMember", checkAdminAccess, async (req, res) => {
       await User.findByIdAndDelete(userId);
       successCount++;
       successUserIds.push(userId);
+
+      log(
+        {
+          userIp: req.ip,
+          userId: req.user._id,
+          userName: req.user.userinfo.realname,
+        },
+        `刪除用戶 ${userId}`
+      );
     } catch (err) {
       serverErrorUsers.push(userId);
       continue;
@@ -809,13 +994,32 @@ router.post("/changeRole", async (req, res) => {
       });
     }
 
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      `更改身分為 ${role}`
+    );
+
     return res.json({
       success: true,
       msg: "成功更新用戶身分",
       data: updatedUser,
     });
   } catch (error) {
-    console.error(error);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "user.js",
+      "POST /changeRole",
+      req.body,
+      error
+    );
     return res.status(500).json({
       success: false,
       msg: "更新用戶身分時發生錯誤",

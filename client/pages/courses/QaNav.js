@@ -245,17 +245,7 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
         />
         <span>Q & A</span>
       </div>
-      {qaOpen && (
-        <div
-          style={{
-            height: messageStatus ? '20px' : '0',
-            padding: messageStatus ? '24px' : '0',
-            backgroundColor: messageColor,
-          }}
-          className="message">
-          {message}
-        </div>
-      )}
+
       {imageIsZoom && (
         <ImageZoom
           setImageIsZoom={setImageIsZoom}
@@ -362,6 +352,17 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
               />
             )}
           </div>
+          {qaOpen && (
+            <div
+              style={{
+                height: messageStatus ? '20px' : '0',
+                padding: messageStatus ? '24px' : '0',
+                backgroundColor: messageColor,
+              }}
+              className="message">
+              {message}
+            </div>
+          )}
           <div className="QA-grid">
             <Masonry
               className="QA-container"

@@ -1,6 +1,8 @@
 // 組件庫
-import { useRouter } from 'next/router'
+
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
+
 // global組件
 import Header from '../../../components/global/Header'
 // method
@@ -15,6 +17,17 @@ export default function ComplateInfo() {
   const [message, setMessage] = useState('')
   const [hasMessage, setHasMessage] = useState(false)
   const baseUrl = `${clientIp}/`
+
+  const router = useRouter()
+  const { token } = router.query
+
+  useEffect(() => {
+    if (!router.isReady) return
+    if (!token) {
+      window.location.href = `${baseUrl}`
+    }
+  }, [router.isReady, token])
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search)
@@ -26,8 +39,18 @@ export default function ComplateInfo() {
   const postRequest = async (tempToken, realname, phoneNumber) => {
     if ((tempToken, realname, phoneNumber)) {
       userService.registerUser(tempToken, realname, phoneNumber).then((res) => {
-        console.log(res)
-        if (res.success === false) {
+        if (res === '') {
+          setMessage('請輸入正確資訊')
+          setHasMessage(true)
+          setTimeout(() => {
+            setHasMessage(false)
+            setTimeout(() => {
+              setMessage('')
+            }, 200)
+          }, 2000)
+          return
+        }
+        if (res?.success === false) {
           // 欄位為空的處理
           setMessage(res.msg)
           setHasMessage(true)
@@ -39,11 +62,10 @@ export default function ComplateInfo() {
           }, 2000)
           return
         }
-        if (res.token) {
+        if (res?.success === true) {
           localStorage.setItem('token', `JWT ${res.token}`)
-          window.location.href = `${baseUrl}profiles/profile`
-        } else {
-          console.log('沒有token')
+          window.location.href = `${clientIp}`
+          return
         }
       })
     } else {

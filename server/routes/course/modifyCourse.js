@@ -12,6 +12,7 @@ const Course = require("../../models").course;
 const User = require("../../models").user;
 const videoAccessRoute = require("./videoAccess");
 const accessChecker = require("../routesMiddleware/accessChecker");
+const { logError, log } = require("../../utils/logger");
 
 /**
  * 獲取問題圖片基礎路徑
@@ -34,7 +35,7 @@ function getQuestionFolder(questionId) {
 // 路由配置
 // =====================
 
-// 視頻訪問權限相關路由（需要教師權限）
+// 影片訪問權限相關路由（需要教師權限）
 router.use("/videoAccess", accessChecker.teacher, videoAccessRoute);
 
 /**
@@ -50,8 +51,7 @@ router.use("/videoAccess", accessChecker.teacher, videoAccessRoute);
 router.post("/createNewCourse", async (req, res) => {
   try {
     const { courseName, subject, grade, courseClass, teacherId } = req.body;
-    console.log(courseName, subject, grade, courseClass, teacherId);
-
+    console.log(teacherId)
     // 驗證必要參數
     if (!(courseName && subject && grade && courseClass))
       return res.status(400).json({ success: false, msg: "資料提供不完整" });
@@ -72,6 +72,9 @@ router.post("/createNewCourse", async (req, res) => {
 
     let teacherToAssign;
 
+    // 其他類型則使用自己的ID
+    teacherToAssign = req.user._id;
+    
     // 如果是管理員且有指定教師
     if (req.user.role === "admin" && teacherId) {
       // 檢查指定的教師是否存在且具有適當的角色
@@ -90,8 +93,6 @@ router.post("/createNewCourse", async (req, res) => {
       }
       teacherToAssign = teacherId;
     }
-    // 其他類型則使用自己的ID
-    teacherToAssign = req.user._id;
 
     // 創建新課程
     let newCourse = new Course({
@@ -108,13 +109,32 @@ router.post("/createNewCourse", async (req, res) => {
     teacher.courses.push(savedCourse._id);
     await teacher.save();
 
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      `創建課程 ${courseName}`
+    );
+
     return res.json({
       success: true,
       msg: "課程創建完畢",
       data: savedCourse,
     });
   } catch (e) {
-    console.log(e);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "modifyCourse.js",
+      "createNewCourse",
+      `創建課程失敗`,
+      e
+    );
     return res.status(500).json({
       success: false,
       msg: "很抱歉，伺服器儲存失敗",
@@ -181,14 +201,17 @@ router.post("/register", async (req, res) => {
 
       // 處理每個學生
       for (const user_id of user_ids) {
-        let foundStudent = await User.findOne({ _id: user_id })
-          .select("_id userinfo.username userinfo.pictureUrl")
-          .exec();
+        let foundStudent = await User.findOne({ _id: user_id }).exec();
         if (!foundStudent) {
           invalidUsers.push(user_id);
           continue;
         }
-        if (foundStudent.courses.includes(foundCourse._id)) {
+        // 確保 courses 字段存在
+        if (!foundStudent.courses) {
+          foundStudent.courses = [];
+        }
+        // 檢查是否已經註冊
+        if (foundStudent.courses.includes(course_id)) {
           alreadyRegistered.push(user_id);
           continue;
         }
@@ -196,38 +219,45 @@ router.post("/register", async (req, res) => {
         foundStudent.courses.push(course_id);
         await foundStudent.save();
         successCount++;
+        globalSuccessCount++;
       }
 
-      globalSuccessCount += successCount;
-
-      // 記錄課程處理結果
       successMsg[course_id] = {
-        registerSuccess: `成功註冊 ${successCount} 位學生到課程 ${foundCourse.courseName}。`,
-        alreadyRegistered:
-          alreadyRegistered.length > 0
-            ? `以下學生已經註冊過：${alreadyRegistered.join(", ")}。`
-            : "",
-        invalidUsers:
-          invalidUsers.length > 0
-            ? `以下學生 ID 無效：${invalidUsers.join(", ")}。`
-            : "",
+        successCount,
+        alreadyRegistered,
+        invalidUsers,
       };
     }
 
-    // 生成總體結果消息
-    let globalMsg =
-      globalSuccessCount === totalPossibleRegistrations
-        ? `成功註冊全部學生。`
-        : `成功註冊 ${globalSuccessCount} 位學生。`;
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      `註冊 ${globalSuccessCount} 名學生到 ${course_ids.length} 個課程`
+    );
 
-    return res
-      .status(200)
-      .json({ success: true, msg: globalMsg, data: { successMsg } });
+    return res.json({
+      success: true,
+      msg: `成功註冊 ${globalSuccessCount} 名學生到 ${course_ids.length} 個課程`,
+      data: successMsg,
+    });
   } catch (e) {
-    console.log(e);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "modifyCourse.js",
+      "register",
+      `註冊學生失敗`,
+      e
+    );
     return res.status(500).json({
       success: false,
-      msg: "伺服器發生問題，無法成功註冊",
+      msg: "很抱歉，伺服器儲存失敗",
     });
   }
 });
@@ -301,27 +331,21 @@ router.post("/unRegister", async (req, res) => {
           continue;
         }
         // 註銷學生
-        foundStudent.courses = foundStudent.courses.filter(
-          (n) => n != course_id
-        );
-        await foundStudent.save();
-        successCount++;
+        if (foundStudent.courses.includes(course_id)) {
+          foundStudent.courses = foundStudent.courses.filter(
+            (n) => n.toString() !== course_id.toString()
+          );
+          await foundStudent.save();
+          successCount++;
+        }
       }
-      await foundCourse.save();
 
       globalSuccessCount += successCount;
 
-      // 記錄課程處理結果
       successMsg[course_id] = {
-        unregisterSuccess: `成功註銷 ${successCount} 位學生從課程 ${foundCourse.courseName}。`,
-        notRegistered:
-          notRegistered.length > 0
-            ? `以下學生未註冊過：${notRegistered.join(", ")}。`
-            : "",
-        invalidUsers:
-          invalidUsers.length > 0
-            ? `以下學生 ID 無效：${invalidUsers.join(", ")}。`
-            : "",
+        successCount,
+        notRegistered,
+        invalidUsers,
       };
     }
 
@@ -331,14 +355,35 @@ router.post("/unRegister", async (req, res) => {
         ? `成功註銷全部學生。`
         : `成功註銷 ${globalSuccessCount} 位學生。`;
 
-    return res
-      .status(200)
-      .json({ success: true, msg: globalMsg, data: { successMsg } });
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      `註銷 ${globalSuccessCount} 名學生從 ${course_ids.length} 個課程`
+    );
+
+    return res.json({
+      success: true,
+      msg: `成功註銷 ${globalSuccessCount} 名學生從 ${course_ids.length} 個課程`,
+      data: successMsg,
+    });
   } catch (e) {
-    console.log(e);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "modifyCourse.js",
+      "unRegister",
+      `註銷學生失敗`,
+      e
+    );
     return res.status(500).json({
       success: false,
-      msg: "伺服器發生問題，無法成功註銷",
+      msg: "很抱歉，伺服器儲存失敗",
     });
   }
 });
@@ -437,13 +482,32 @@ router.patch("/patchCourse", async (req, res) => {
     foundCourse.courseClass = newCourseClass;
     let savedCourse = await foundCourse.save();
 
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      `更新課程 ${foundCourse.courseName}`
+    );
+
     return res.json({
       success: true,
       msg: "課程更新成功",
       data: savedCourse,
     });
   } catch (e) {
-    console.log(e);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "modifyCourse.js",
+      "patchCourse",
+      `更新課程失敗`,
+      e
+    );
     return res.status(500).json({
       success: false,
       msg: "很抱歉，伺服器更新失敗",
@@ -480,9 +544,28 @@ router.delete("/deleteCourse", async (req, res) => {
     // 刪除課程（相關資源清理由 Course 模型的 hook 處理）
     await Course.findByIdAndDelete(course_id);
 
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      `刪除課程 ${courseName}`
+    );
+
     res.json({ success: true, msg: `課程 ${courseName} 已成功刪除` });
   } catch (e) {
-    console.error(e);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "modifyCourse.js",
+      "deleteCourse",
+      `刪除課程失敗`,
+      e
+    );
     res.status(500).json({ success: false, msg: "很抱歉，伺服器刪除課程失敗" });
   }
 });

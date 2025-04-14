@@ -1,6 +1,6 @@
 /**
  * @file videoAccess.js
- * @description 視頻權限權限管理路由，處理視頻權限記錄的增刪改查
+ * @description 影片權限權限管理路由，處理影片權限記錄的增刪改查
  * @author StudyWeb Team
  * @date 2024-03-30
  */
@@ -9,13 +9,14 @@ const router = require("express").Router();
 const VideoAccess = require("../../models").courseVideoAccess;
 const VideoInfo = require("../../models").courseVideoInfo;
 const User = require("../../models").user;
+const { logError, log } = require("../../utils/logger");
 
 /**
  * VideoAccess 資料結構
  * @typedef {Object} VideoAccess
  * @property {string} _id - 記錄ID
  * @property {string} courseID - 課程ID
- * @property {string[]} videoIDs - 視頻ID列表
+ * @property {string[]} videoIDs - 影片ID列表
  * @property {string[]} studentIDs - 學生ID列表
  * @property {Date|null} accessDate - 權限截止日期，null表示無限期
  * @property {string} accessName - 權限記錄名稱
@@ -23,10 +24,10 @@ const User = require("../../models").user;
  */
 
 /**
- * 獲取視頻權限記錄
+ * 獲取影片權限記錄
  * @route GET /
  * @param {string} [access_id] - 可選的權限記錄ID，如果提供則只返回該記錄
- * @returns {Object} 視頻權限記錄列表或單條記錄
+ * @returns {Object} 影片權限記錄列表或單條記錄
  */
 router.get("/", async (req, res) => {
   try {
@@ -71,8 +72,18 @@ router.get("/", async (req, res) => {
         });
       return res.json({ success: true, data: records });
     }
-  } catch (err) {
-    console.error(err);
+  } catch (e) {
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "videoAccess.js",
+      "getAccess",
+      `獲取影片權限記錄失敗`,
+      e
+    );
     return res
       .status(500)
       .json({ success: false, msg: "取得 video access 紀錄失敗" });
@@ -80,10 +91,10 @@ router.get("/", async (req, res) => {
 });
 
 /**
- * 創建新的視頻權限記錄
+ * 創建新的影片權限記錄
  * @route POST /postNewAccess
  * @param {string} accessName - 權限記錄名稱
- * @param {string[]} videoIDs - 視頻ID列表
+ * @param {string[]} videoIDs - 影片ID列表
  * @param {string[]} studentIDs - 學生ID列表
  * @param {Date} [accessDate] - 權限截止日期
  * @param {boolean} [unlimited] - 是否無限期權限，true則忽略accessDate
@@ -155,9 +166,29 @@ router.post("/postNewAccess", async (req, res) => {
     });
 
     const savedAccess = await newAccess.save();
+
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      `創建影片權限記錄 ${accessName}`
+    );
+
     return res.status(201).json({ success: true, data: savedAccess });
-  } catch (err) {
-    console.error(err);
+  } catch (e) {
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "videoAccess.js",
+      "postNewAccess",
+      `創建影片權限記錄失敗`,
+      e
+    );
     return res
       .status(500)
       .json({ success: false, msg: "建立 video access 紀錄失敗" });
@@ -165,11 +196,11 @@ router.post("/postNewAccess", async (req, res) => {
 });
 
 /**
- * 更新視頻權限記錄
+ * 更新影片權限記錄
  * @route PATCH /patchAccess/:id
  * @param {string} id - 權限記錄ID
  * @param {string} [accessName] - 權限記錄名稱
- * @param {string[]} [videoIDs] - 視頻ID列表
+ * @param {string[]} [videoIDs] - 影片ID列表
  * @param {string[]} [studentIDs] - 學生ID列表
  * @param {Date} [accessDate] - 權限截止日期
  * @param {boolean} [unlimited] - 是否無限期權限，true則忽略accessDate
@@ -256,9 +287,29 @@ router.patch("/patchAccess/:id", async (req, res) => {
         .status(404)
         .json({ success: false, msg: "找不到該 video access 紀錄" });
     }
+
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      `更新影片權限記錄 ${recordId}`
+    );
+
     return res.json({ success: true, data: updatedRecord });
-  } catch (err) {
-    console.error(err);
+  } catch (e) {
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "videoAccess.js",
+      "patchAccess",
+      `更新影片權限記錄失敗`,
+      e
+    );
     return res
       .status(500)
       .json({ success: false, msg: "更新 video access 紀錄失敗" });
@@ -266,7 +317,7 @@ router.patch("/patchAccess/:id", async (req, res) => {
 });
 
 /**
- * 刪除視頻權限記錄
+ * 刪除影片權限記錄
  * @route DELETE /deleteAccess/:id
  * @param {string} id - 權限記錄ID
  * @returns {Object} 刪除結果
@@ -286,9 +337,29 @@ router.delete("/deleteAccess/:id", async (req, res) => {
         .status(404)
         .json({ success: false, msg: "找不到該 video access 紀錄" });
     }
+
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      `刪除影片權限記錄 ${recordId}`
+    );
+
     return res.json({ success: true, msg: "video access 紀錄已刪除" });
-  } catch (err) {
-    console.error(err);
+  } catch (e) {
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "videoAccess.js",
+      "deleteAccess",
+      `刪除影片權限記錄失敗`,
+      e
+    );
     return res
       .status(500)
       .json({ success: false, msg: "刪除 video access 紀錄失敗" });

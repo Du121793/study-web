@@ -10,6 +10,7 @@ const router = require("express").Router();
 const Board = require("../models").board;
 const path = require("path");
 const fs = require("fs");
+const { log, logError } = require("../utils/logger");
 
 const multer = require("multer");
 const upload = multer({ storage: multer.memoryStorage() });
@@ -32,7 +33,7 @@ async function processCarouselImage(file) {
     // 讀取 carousel 目錄內所有檔案
     fs.readdir(carouselPath, (err, files) => {
       if (err) {
-        console.error("讀取輪轉圖目錄失敗:", err);
+        logError({}, "modifyResource.js", "processCarouselImage", {}, err);
         return reject(err);
       }
       let maxNumber = 0;
@@ -51,7 +52,7 @@ async function processCarouselImage(file) {
       // 寫入檔案
       fs.writeFile(newPath, file.buffer, (err) => {
         if (err) {
-          console.error("寫入輪轉圖檔案錯誤:", err);
+          logError({}, "modifyResource.js", "processCarouselImage", {}, err);
           return reject(err);
         }
         resolve(newPath);
@@ -77,6 +78,15 @@ router.post("/postNewCarousel", upload.single("image"), async (req, res) => {
     // 處理並儲存輪轉圖
     const savedPath = await processCarouselImage(req.file);
 
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      `新增輪轉圖 ${path.basename(savedPath)}`
+    );
+
     // 回傳存檔路徑，可依實際需求轉成 URL 回傳前端
     return res.json({
       success: true,
@@ -84,7 +94,17 @@ router.post("/postNewCarousel", upload.single("image"), async (req, res) => {
       data: { path: savedPath },
     });
   } catch (e) {
-    console.error(e);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "modifyResource.js",
+      "POST /postNewCarousel",
+      {},
+      e
+    );
     return res
       .status(500)
       .json({ success: false, msg: "伺服器處理新增輪轉圖失敗" });
@@ -102,12 +122,9 @@ router.delete("/deleteCarousel", async (req, res) => {
   try {
     // 從查詢參數中獲取要刪除的輪轉圖編號陣列
     const { numbers } = req.query;
-    if (!Array.isArray(numbers)) {
-      return res.status(400).json({ success: false, msg: "請傳入數字陣列" });
-    }
 
     // 轉換陣列內的每個值為 Number，並建立 Set 以便快速查詢
-    const numbersSet = new Set(numbers.map((n) => Number(n)));
+    const numbersSet = new Set([Number(numbers)]);
 
     // 讀取 carousel 目錄中的所有檔案
     const files = await fs.promises.readdir(carouselPath);
@@ -129,6 +146,15 @@ router.delete("/deleteCarousel", async (req, res) => {
       }
     }
 
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      `刪除輪轉圖 ${numbers.join(", ")}`
+    );
+
     // 回傳刪除結果
     return res.json({
       success: true,
@@ -136,7 +162,17 @@ router.delete("/deleteCarousel", async (req, res) => {
       deletedFiles,
     });
   } catch (e) {
-    console.error(e);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "modifyResource.js",
+      "DELETE /deleteCarousel",
+      req.query,
+      e
+    );
     return res
       .status(500)
       .json({ success: false, msg: "伺服器刪除輪轉圖失敗" });
@@ -154,11 +190,8 @@ router.delete("/deleteCarousel", async (req, res) => {
  */
 router.post("/postNewBoard", async (req, res) => {
   try {
-    // 從 req.body 取得標題、副標題、內容等欄位
     const { title, subTitle, content } = req.body;
-    console.log(subTitle)
 
-    // 建立新 Board，poster 從 req.user 取得
     const newBoard = new Board({
       title,
       subTitle,
@@ -207,14 +240,32 @@ router.post("/postNewBoard", async (req, res) => {
       await newBoard.save();
     }
 
-    // 回傳新增結果
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      `新增公告 ${title}`
+    );
+
     return res.json({
       success: true,
       msg: "公告新增成功",
       data: newBoard,
     });
   } catch (e) {
-    console.error(e);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "modifyResource.js",
+      "POST /postNewBoard",
+      { title, subTitle },
+      e
+    );
     return res
       .status(500)
       .json({ success: false, msg: "伺服器處理公告新增失敗" });
@@ -292,10 +343,29 @@ router.put("/putBoard", async (req, res) => {
     // 儲存更新後的公告
     await board.save();
 
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      `更新公告 ${board_id}`
+    );
+
     // 回傳更新結果
     return res.json({ success: true, msg: "公告更新成功", data: board });
   } catch (e) {
-    console.error(e);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "modifyResource.js",
+      "PUT /putBoard",
+      req.body,
+      e
+    );
     return res
       .status(500)
       .json({ success: false, msg: "伺服器處理公告更新失敗" });
@@ -326,10 +396,29 @@ router.delete("/deleteBoard/:board_id", async (req, res) => {
       fs.rmSync(boardFolder, { recursive: true, force: true });
     }
 
+    log(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      `刪除公告 ${board_id}`
+    );
+
     // 回傳刪除結果
     return res.json({ success: true, msg: "公告已成功刪除" });
   } catch (e) {
-    console.error(e);
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "modifyResource.js",
+      "DELETE /deleteBoard/:board_id",
+      { board_id: req.params.board_id },
+      e
+    );
     return res
       .status(500)
       .json({ success: false, msg: "伺服器處理公告刪除失敗" });

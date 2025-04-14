@@ -6,6 +6,7 @@
   background-color: #fefefe;
   padding: 24px;
   gap: 8px;
+  z-index: 0;
 }
 .remove-users-page .container-line {
   display: flex;

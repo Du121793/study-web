@@ -14,6 +14,7 @@ const checkTeacherAccess =
   require("../../routesMiddleware/accessChecker").teacher;
 const checkQuestionAccess =
   require("../../routesMiddleware/accessChecker").question;
+const { logError, log } = require("../../../utils/logger");
 
 router.use("/modifyQA", modifyQARoute);
 router.use("/QAMethod/:question_id", checkQuestionAccess, QAMethodRoute);
@@ -146,12 +147,19 @@ router.get("/getPublicQAs", checkTeacherAccess, async (req, res) => {
       sortOrder,
       sortType,
     });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      success: false,
-      msg: "發生了不可預期的錯誤",
-    });
+  } catch (e) {
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "index.js",
+      "getPublicQAs",
+      `獲取公開問題列表失敗`,
+      e
+    );
+    return res.status(500).json({ success: false, msg: "伺服器發生問題" });
   }
 });
 
@@ -282,9 +290,19 @@ router.get("/getCourseQAs/:course_id", async (req, res) => {
       sortOrder,
       sortType,
     });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ success: false, msg: "取得資源時發生錯誤" });
+  } catch (e) {
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "index.js",
+      "getCourseQAs",
+      `獲取課程問題列表失敗`,
+      e
+    );
+    return res.status(500).json({ success: false, msg: "伺服器發生問題" });
   }
 });
 
@@ -349,8 +367,18 @@ router.get("/getCourseQAsByTag/:course_id", async (req, res) => {
       total,
       data: paginatedQAs,
     });
-  } catch (error) {
-    console.error(error);
+  } catch (e) {
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "index.js",
+      "getQAsByTag",
+      `獲取標籤問題列表失敗`,
+      e
+    );
     return res.status(500).json({
       success: false,
       msg: "發生了不可預期的錯誤",
@@ -396,12 +424,23 @@ router.get("/getCourseTags/:course_id", async (req, res) => {
       msg: "",
       data: tags,
     });
-  } catch (error) {
-    console.error(error);
+  } catch (e) {
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "index.js",
+      "GET /getCourseTags/:course_id",
+      req.query,
+      e
+    );
     return res.status(500).json({
       success: false,
       msg: "發生了不可預期的錯誤",
     });
   }
 });
+
 module.exports = router;
