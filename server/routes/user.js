@@ -69,7 +69,7 @@ router.get("/registedCourse", async (req, res) => {
     const { course_id, filter } = req.query;
     let page, pageSize;
 
-    // 將 filter 轉成可用物件
+    // 將 filter 轉成物件
     let parsedFilter = {};
     if (filter) {
       try {
@@ -82,62 +82,44 @@ router.get("/registedCourse", async (req, res) => {
       }
     }
 
-    // 可透過 filter 指定要「投影」(顯示) 的欄位
-    const allowedFields = ["courseName", "subject", "grade", "courseClass", "date"];
-    let projection = {};
-
-    // 如果 filter 中有對應到想顯示的欄位，就加到 projection
-    allowedFields.forEach((field) => {
-      if (field in parsedFilter) {
-        projection[field] = 1;
-      }
-    });
-
-    // 取得分頁參數
+    // 取出分頁資訊
     if (parsedFilter.hasOwnProperty("page")) {
-      page = parseInt(parsedFilter.page, 10) || 1;
+      page = parseInt(parsedFilter.page) || 1;
       delete parsedFilter.page;
     }
     if (parsedFilter.hasOwnProperty("pageSize")) {
-      pageSize = parseInt(parsedFilter.pageSize, 10) || 0;
+      pageSize = parseInt(parsedFilter.pageSize) || 0;
       delete parsedFilter.pageSize;
     }
 
-    /**
-     * ============================
-     *   A. 查詢「單一課程」的情況
-     * ============================
-     */
+    // =============== 如果有帶 course_id，表示查詢單一課程 ===============
     if (course_id) {
-      // 權限檢查：若使用者不是 teacher，且 course_id 不在自己的 courses 清單裡
-      // 就返回 404
-      if (!req.user.courses.includes(course_id) && req.user.role !== "teacher") {
-        return res.status(404).json({
-          success: false,
-          msg: "您尚未註冊此課程",
-        });
+      // 權限檢查：若不是老師且課程不在自己的 courses 裡，則回傳 404
+      if (
+        !req.user.courses.includes(course_id) &&
+        req.user.role !== "teacher"
+      ) {
+        return res
+          .status(404)
+          .json({ success: false, msg: "您尚未註冊此課程" });
       }
 
-      // 查詢課程（若有指定 projection 就用，否則回傳整份文件）
-      const foundCourse =
-        Object.keys(projection).length > 0
-          ? await Course.findOne({ _id: course_id }, projection).populate(
-              "teacher",
-              "_id userinfo.username userinfo.pictureUrl userinfo.makePictureAnonymous"
-            )
-          : await Course.findOne({ _id: course_id }).populate(
-              "teacher",
-              "_id userinfo.username userinfo.pictureUrl userinfo.makePictureAnonymous"
-            );
+      // 查詢指定課程，返回所有欄位
+      const foundCourse = await Course.findOne({ _id: course_id }).populate(
+        "teacher",
+        // 必須包含 pictureUrl 和 makePictureAnonymous，
+        // 以保證 userSchema 虛擬欄位 displayPictureUrl 正常運作
+        "_id userinfo.username userinfo.pictureUrl userinfo.makePictureAnonymous"
+      );
 
       if (!foundCourse) {
         return res.status(404).json({ success: false, msg: "找不到該課程" });
       }
 
-      // 計算成員人數（一次 countDocuments）
+      // 計算該課程的成員數
       const memberCount = await User.countDocuments({ courses: course_id });
 
-      // 整理輸出資料
+      // 轉成物件後加上 members 資訊
       const courseData =
         typeof foundCourse.toObject === "function"
           ? foundCourse.toObject()
@@ -147,100 +129,70 @@ router.get("/registedCourse", async (req, res) => {
       return res.json({ success: true, data: courseData });
     }
 
-    /**
-     * ==============================
-     *   B. 查詢「多課程列表」的情況
-     * ==============================
-     */
+    // =============== 如果沒有帶 course_id，則查詢「多筆課程列表」 ===============
     else {
-      // 組合查詢條件：僅限於該用戶已註冊的課程
+      // 建立基礎查詢條件，必須是該用戶已註冊的課程
       const query = { _id: { $in: req.user.courses } };
 
-      // 若有搜索關鍵字 search -> 針對 courseName 或 _id
-      if (parsedFilter.search) {
+      // 處理搜尋條件（如果有 search）
+      if (parsedFilter.hasOwnProperty("search")) {
         const searchTerm = parsedFilter.search;
-        const regex = new RegExp(searchTerm, "i");
-        // 注意 _id 是 ObjectId 型態，若要比對字串則需特別處理
-        // 這裡範例寫法：courseName 用 regex, _id 直接用字串比對
-        query.$or = [{ courseName: regex }, { _id: searchTerm }];
+        const searchRegex = new RegExp(searchTerm, "i");
+        // 同時模糊搜尋 courseName 和 _id（_id 以字串比對）
+        query.$or = [{ courseName: searchRegex }, { _id: searchTerm }];
         delete parsedFilter.search;
       }
 
-      // 其餘欄位 (subject, grade, courseClass, date 等)，如果有帶就放進 query 過濾
-      const filterFields = ["courseName", "subject", "grade", "courseClass", "date"];
+      // 其他過濾條件：對 courseName, subject, grade, courseClass, date 進行模糊搜索
+      const filterFields = [
+        "courseName",
+        "subject",
+        "grade",
+        "courseClass",
+        "date",
+      ];
       filterFields.forEach((field) => {
         if (parsedFilter[field]) {
-          query[field] = parsedFilter[field];
+          query[field] = { $regex: new RegExp(parsedFilter[field], "i") };
         }
       });
 
-      // 計算總筆數（供分頁返回 total）
+      // 先計算符合條件的所有課程總數（用於前端分頁）
       const totalCourses = await Course.countDocuments(query);
 
-      // 分頁處理
-      let skipCount = 0;
-      let limitCount = 0;
+      // 分頁處理（若有提供 pageSize）
+      let skipNumber = 0;
+      let limitNumber = 0;
       if (pageSize) {
-        skipCount = (page ? page - 1 : 0) * pageSize;
-        limitCount = pageSize;
+        skipNumber = ((page || 1) - 1) * pageSize;
+        limitNumber = pageSize;
       }
 
-      // 第一次查詢：一次拿出對應所有課程資料
-      const foundCourses = await Course.find(query, projection)
-        .skip(skipCount)
-        .limit(limitCount)
+      // 查詢課程資料，返回所有欄位
+      const foundCourses = await Course.find(query)
+        .skip(skipNumber)
+        .limit(limitNumber)
         .populate(
           "teacher",
           "_id userinfo.username userinfo.pictureUrl userinfo.makePictureAnonymous"
         );
 
-      // 如果查到 0 筆課程，直接返回
-      if (!foundCourses.length) {
-        const emptyData = [];
-        if (pageSize) {
-          return res.json({
-            success: true,
-            data: emptyData,
-            pagination: {
-              total: totalCourses,
-              page: page || 1,
-              pageSize,
-            },
+      // 為每個課程計算成員數
+      const coursesInfo = await Promise.all(
+        foundCourses.map(async (course) => {
+          const memberCount = await User.countDocuments({
+            courses: course._id,
           });
-        }
-        return res.json({ success: true, data: emptyData });
-      }
+          const courseData =
+            typeof course.toObject === "function"
+              ? course.toObject()
+              : course;
+          courseData.members = memberCount;
+          return courseData;
+        })
+      );
 
-      /**
-       * 第二次查詢：用 aggregation 一次拿到所有課程的 members 數量
-       * （比逐筆 countDocuments 快多了，減少大量 DB 請求）
-       */
-      const courseIds = foundCourses.map((c) => c._id);
-      const membersResult = await User.aggregate([
-        { $match: { courses: { $in: courseIds } } },
-        { $unwind: "$courses" },
-        {
-          $group: {
-            _id: "$courses",
-            count: { $sum: 1 },
-          },
-        },
-      ]);
-      // 整理成  { courseId: count } 格式
-      const memberCountMap = {};
-      membersResult.forEach((item) => {
-        memberCountMap[item._id.toString()] = item.count;
-      });
-
-      // 組合輸出：把 members 數帶到每個課程
-      const coursesInfo = foundCourses.map((course) => {
-        const courseObj =
-          typeof course.toObject === "function" ? course.toObject() : course;
-        courseObj.members = memberCountMap[courseObj._id.toString()] || 0;
-        return courseObj;
-      });
-
-      // 返回結果（帶分頁資訊）
+      // 回傳分頁資訊（若有 pageSize）
       if (pageSize) {
         return res.json({
           success: true,
@@ -253,7 +205,6 @@ router.get("/registedCourse", async (req, res) => {
         });
       }
 
-      // 不用分頁就直接回傳
       return res.json({ success: true, data: coursesInfo });
     }
   } catch (error) {
@@ -268,9 +219,12 @@ router.get("/registedCourse", async (req, res) => {
       req.query,
       error
     );
-    return res.status(500).json({ success: false, msg: "發生了不可預期的錯誤" });
+    return res
+      .status(500)
+      .json({ success: false, msg: "發生了不可預期的錯誤" });
   }
 });
+
 
 
 

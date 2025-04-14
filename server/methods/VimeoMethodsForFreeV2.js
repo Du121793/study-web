@@ -7,6 +7,9 @@
 const { log, logError } = require("../utils/logger");
 require("dotenv").config();
 const { Vimeo } = require("@vimeo/vimeo");
+// 新增導入 config，使用 ../config/vimeoConfig.json
+const config = require("../config/vimeoConfig.json");
+
 const VideoInfo = require("../models").courseVideoInfo;
 
 // 檢查環境變數
@@ -166,6 +169,40 @@ async function uploadVideo(videoInfo, videoIndex) {
     // 步驟 2: 合併描述資訊
     const finalDesc = buildDescription(description, videoIndex);
 
+    // 構建上傳任務的選項物件，僅處理權限相關部分
+    const queryOptions = {
+      upload: {
+        approach: "tus",
+        size: fileSize,
+      },
+      name: title,
+      description: finalDesc,
+      embed: {
+        buttons: {
+          like: false,
+          watchlater: false,
+          share: false,
+          embed: false,
+        },
+        logos: {
+          vimeo: false,
+        },
+        title: {
+          name: "hide",
+          owner: "hide",
+          portrait: "hide",
+        },
+      },
+    };
+
+    // 如果需要設定權限，則必須在 config.videoPrivacy 設定為 "privacy"
+    if (config.videoPrivacy === "privacy") {
+      queryOptions.privacy = {
+        view: "disable",
+        embed: "public",
+      };
+    }
+
     // 步驟 3: 創建影片上傳任務
     const createResp = await vimeoRequest({
       method: "POST",
@@ -173,34 +210,7 @@ async function uploadVideo(videoInfo, videoIndex) {
       headers: {
         "Content-Type": "application/json",
       },
-      query: {
-        upload: {
-          approach: "tus",
-          size: fileSize,
-        },
-        name: title,
-        description: finalDesc,
-        privacy: {
-          view: "disable",
-          embed: "public",
-        },
-        embed: {
-          buttons: {
-            like: false,
-            watchlater: false,
-            share: false,
-            embed: false,
-          },
-          logos: {
-            vimeo: false,
-          },
-          title: {
-            name: "hide",
-            owner: "hide",
-            portrait: "hide",
-          },
-        },
-      },
+      query: queryOptions,
     });
 
     // 驗證上傳連結
@@ -215,6 +225,7 @@ async function uploadVideo(videoInfo, videoIndex) {
       path: `/users/${userId}/projects/${folderId}/videos/${videoId}`,
     });
     console.log(addFolderResp.APILimit);
+
     // 返回上傳結果
     return {
       success: true,

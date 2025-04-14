@@ -155,29 +155,27 @@ export default function UserProfile() {
         </div>
         {hideAvatar === false && (
           <div className="avatar">
-            {userInfo?.userinfo?.pictureUrl && (
+            {userInfo?.userinfo?.displayPictureUrl && (
               <Image
                 alt="user avatar"
                 className="image"
                 loading="lazy"
-                src={userInfo.userinfo.pictureUrl}
+                src={userInfo.userinfo.displayPictureUrl}
                 width={100}
-                height={100}
-                objectFit="cover"></Image>
+                height={100}></Image>
             )}
           </div>
         )}
         {hideAvatar === true && (
           <div className="avatar">
-            {userInfo?.userinfo?.pictureUrl && (
+            {userInfo?.userinfo?.displayPictureUrl && (
               <Image
                 alt="user avatar"
                 className="image"
                 loading="lazy"
                 src={anonymous}
                 width={100}
-                height={100}
-                objectFit="cover"></Image>
+                height={100}></Image>
             )}
           </div>
         )}

@@ -134,10 +134,6 @@ export default function RemoveUsers() {
   // 取消選取所有已選取的成員
   const clearSelectedMemebers = () => {
     setSelectedUserId([])
-    const element = Array.from(document.querySelectorAll('.member-info'))
-    element.map((item) => {
-      item.style.border = '1px solid rgba(0, 0, 0, 0.2)'
-    })
   }
 
   // 搜尋使用者資料

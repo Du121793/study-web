@@ -762,6 +762,40 @@ async function uploadVideo(videoInfo, videoIndex) {
 
     const finalDesc = buildDescription(description, videoIndex);
 
+    // 構建上傳任務的查詢內容，僅處理權限相關部分
+    const uploadQuery = {
+      upload: {
+        approach: "tus",
+        size: fileSize,
+      },
+      name: title,
+      description: finalDesc,
+      embed: {
+        buttons: {
+          like: false,
+          watchlater: false,
+          share: false,
+          embed: false,
+        },
+        logos: {
+          vimeo: false,
+        },
+        title: {
+          name: "hide",
+          owner: "hide",
+          portrait: "hide",
+        },
+      },
+    };
+
+    // 如果需要設定權限 (config.videoPrivacy 為 "privacy") 才加入 privacy 屬性
+    if (config.videoPrivacy === "privacy") {
+      uploadQuery.privacy = {
+        view: "disable",
+        embed: "public",
+      };
+    }
+
     // 步驟 3: 創建影片上傳任務
     const createResp = await vimeoRequest({
       method: "POST",
@@ -769,34 +803,7 @@ async function uploadVideo(videoInfo, videoIndex) {
       headers: {
         "Content-Type": "application/json",
       },
-      query: {
-        upload: {
-          approach: "tus",
-          size: fileSize,
-        },
-        name: title,
-        description: finalDesc,
-        privacy: {
-          view: "disable",
-          embed: "public",
-        },
-        embed: {
-          buttons: {
-            like: false,
-            watchlater: false,
-            share: false,
-            embed: false,
-          },
-          logos: {
-            vimeo: false,
-          },
-          title: {
-            name: "hide",
-            owner: "hide",
-            portrait: "hide",
-          },
-        },
-      },
+      query: uploadQuery,
     });
 
     if (!createResp.data.upload || !createResp.data.upload.upload_link) {

@@ -379,6 +379,7 @@ export default function QaPage() {
                     src={`${getImageUrl}/${item}?token=${userToken}`}
                     onClick={() => {
                       clickZoomImage(`${getImageUrl}/${item}`)
+                      console.log(`${getImageUrl}/${item}?token=${userToken}`)
                     }}
                     alt="course has no image icon"
                     // 若是圖片大於三張則縮小顯示

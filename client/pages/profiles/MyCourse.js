@@ -59,7 +59,7 @@ export default function MyCourse() {
     }
   }, [])
 
-  // 請求所有用戶已註冊課程資訊，若為admin則為全部
+  // 請求所有用戶已註冊課程資訊
   useEffect(() => {
     if (token) {
       setCourseLoading(true)
@@ -118,10 +118,10 @@ export default function MyCourse() {
                       <div className="course-fake-shot">
                         <Image
                           className="shot"
-                          src={item?.teacher?.userinfo?.pictureUrl ? item.teacher.userinfo.pictureUrl : anonymous}
+                          src={item?.teacher?.userinfo?.displayPictureUrl ? item.teacher.userinfo.displayPictureUrl : anonymous}
                           alt="course's teacher avatar"
-                          width={30}
-                          height={30}></Image>
+                          width={100}
+                          height={100}></Image>
                       </div>
                       <div className="course-name">{item.courseName}</div>
                     </div>
@@ -133,7 +133,12 @@ export default function MyCourse() {
                       {item?.teacher?.userinfo?.username}
                     </div>
                     <div className="info-area">
-                      <span>科目: </span>
+                      <span
+                        onClick={() => {
+                          console.log(item)
+                        }}>
+                        科目:{' '}
+                      </span>
                       {item.subject}
                     </div>
                     <div className="info-area">

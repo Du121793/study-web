@@ -1,13 +1,16 @@
 /**
  * @file VimeoMethods.js
  * @description Vimeo 影片管理工具，提供影片上傳、查詢、刪除等功能
- * @author StudyWeb Team
+ * @author
  * @date 2024-03-30
  */
 const { log, logError } = require("../utils/logger");
 require("dotenv").config();
 const { Vimeo } = require("@vimeo/vimeo");
 const VideoInfo = require("../models/").courseVideoInfo;
+
+// 新增引入 config
+const config = require("../config/vimeoConfig.json");
 
 // 檢查環境變數
 const VIMEO_ACCESS_TOKEN = process.env.VIMEO_ACCESS_TOKEN;
@@ -58,7 +61,7 @@ async function findOrCreateFolder(folderName) {
   const searchResp = await vimeoRequest({
     method: "GET",
     path: "/me/projects",
-    query: { per_page: 100 }, // 增加每頁數量以確保能找到所有資料夾
+    query: { per_page: 100 },
   });
 
   // 精確匹配資料夾名稱
@@ -137,10 +140,8 @@ function extractDomains(url) {
   try {
     // 移除 http:// 或 https://
     const domainWithPort = url.replace(/^https?:\/\//, "");
-
     // 分離網域和端口
     const [domain, port] = domainWithPort.split(":");
-
     if (port) {
       // 如果有端口，返回兩種格式
       return [domainWithPort, domain];
@@ -160,10 +161,8 @@ function extractDomains(url) {
  */
 function getAllowedDomains() {
   const domains = new Set(["localhost"]); // 預設允許 localhost
-
   // 從環境變數獲取 URL
-  const urls = [process.env.CLIENT_IP, process.env.SERVER_IP].filter(Boolean); // 過濾掉 undefined 或空值
-
+  const urls = [process.env.CLIENT_IP, process.env.SERVER_IP].filter(Boolean);
   // 處理每個 URL
   urls.forEach((url) => {
     if (url) {
@@ -198,6 +197,41 @@ async function uploadVideo(videoInfo, videoIndex) {
     // 步驟 2: 合併描述資訊
     const finalDesc = buildDescription(description, videoIndex);
 
+    // 構建上傳任務的選項物件
+    const uploadOptions = {
+      upload: {
+        approach: "tus",
+        size: fileSize,
+      },
+      name: title,
+      description: finalDesc,
+      embed: {
+        buttons: {
+          like: false,
+          watchlater: false,
+          share: false,
+          embed: false,
+        },
+        logos: {
+          vimeo: false,
+        },
+        title: {
+          name: "hide",
+          owner: "hide",
+          portrait: "hide",
+        },
+      },
+    };
+
+    // 免費版處理權限：免費版不能更改 Vimeo 的觀看權限
+    // 如果需要設定權限，則必須在 config.videoPrivacy 設定為 "privacy"
+    if (config.videoPrivacy === "privacy") {
+      uploadOptions.privacy = {
+        view: "disable",
+        embed: "public",
+      };
+    }
+
     // 步驟 3: 創建影片上傳任務
     const createResp = await vimeoRequest({
       method: "POST",
@@ -205,34 +239,7 @@ async function uploadVideo(videoInfo, videoIndex) {
       headers: {
         "Content-Type": "application/json",
       },
-      query: {
-        upload: {
-          approach: "tus",
-          size: fileSize,
-        },
-        name: title,
-        description: finalDesc,
-        privacy: {
-          view: "disable",
-          embed: "public",
-        },
-        embed: {
-          buttons: {
-            like: false,
-            watchlater: false,
-            share: false,
-            embed: false,
-          },
-          logos: {
-            vimeo: false,
-          },
-          title: {
-            name: "hide",
-            owner: "hide",
-            portrait: "hide",
-          },
-        },
-      },
+      query: uploadOptions,
     });
 
     // 驗證上傳連結
@@ -247,7 +254,6 @@ async function uploadVideo(videoInfo, videoIndex) {
       path: `/users/${userId}/projects/${folderId}/videos/${videoId}`,
     });
 
-    // 返回上傳結果
     return {
       success: true,
       vimeoUri: createResp.data.uri,
@@ -338,7 +344,6 @@ async function findVideo(videoIndex = {}) {
       matchDescription(video.description || "", videoIndex)
     );
 
-    // 返回查詢結果
     return {
       success: true,
       total: filtered.length,
@@ -346,7 +351,6 @@ async function findVideo(videoIndex = {}) {
       APILimit: lastAPILimit,
     };
   } catch (err) {
-    // 錯誤處理
     let errorObj;
     try {
       errorObj = JSON.parse(err.message);
@@ -425,7 +429,6 @@ async function deleteVideo(videoIndex) {
       lastDeleteAPILimit = deleteResp.APILimit;
     }
 
-    // 返回刪除結果
     return {
       success: true,
       total: filtered.length,
@@ -433,7 +436,6 @@ async function deleteVideo(videoIndex) {
       APILimit: lastDeleteAPILimit,
     };
   } catch (err) {
-    // 錯誤處理
     let errorObj;
     try {
       errorObj = JSON.parse(err.message);

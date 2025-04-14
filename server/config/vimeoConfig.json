@@ -7,5 +7,9 @@
   "folderStructure": {
     "rootFolder": "WebVideos",
     "subFolders": ["Course", "Question"]
-  }
+  },
+  "videoPrivacy": "free",
+
+  "須知1": "免費版設置：免費版不能更改 Vimeo 的觀看權限,如果需要設定權限，則必須設定為 privacy",
+  "須知2": "folderStructure 只有 Free需要設定 cache則相反"
 }

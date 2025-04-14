@@ -58,6 +58,7 @@
   width: 100%;
 }
 .QA-area .container .QA-grid .QA-container {
+  min-height: 80px;
   padding: 24px;
   display: flex;
   justify-content: flex-start;

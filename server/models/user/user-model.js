@@ -51,8 +51,22 @@ userSchema.virtual("userinfo.displayPictureUrl").get(function () {
 });
 
 // 確保虛擬欄位在轉換為 JSON 時被包含
-userSchema.set("toJSON", { virtuals: true });
-userSchema.set("toObject", { virtuals: true });
+const transformFn = function (doc, ret, options) {
+  if (ret.userinfo) {
+    delete ret.userinfo.pictureUrl;
+  }
+  return ret;
+};
+
+userSchema.set("toJSON", {
+  virtuals: true,
+  transform: transformFn,
+});
+
+userSchema.set("toObject", {
+  virtuals: true,
+  transform: transformFn,
+});
 
 userSchema.methods.isStudent = function () {
   return this.role == "student";

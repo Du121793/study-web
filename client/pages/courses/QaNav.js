@@ -352,17 +352,7 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
               />
             )}
           </div>
-          {qaOpen && (
-            <div
-              style={{
-                height: messageStatus ? '20px' : '0',
-                padding: messageStatus ? '24px' : '0',
-                backgroundColor: messageColor,
-              }}
-              className="message">
-              {message}
-            </div>
-          )}
+
           <div className="QA-grid">
             <Masonry
               className="QA-container"
@@ -532,6 +522,7 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
                   }
                 })}
             </Masonry>
+
             <div className="btn-area">
               {(defaultSortType === 'none' || (sortBy && sortBy === 'none')) && (
                 <button
@@ -544,6 +535,19 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
               )}
             </div>
           </div>
+
+          {qaOpen && (
+            <div
+              style={{
+                top: '50%',
+                height: messageStatus ? '20px' : '0',
+                padding: messageStatus ? '24px' : '0',
+                backgroundColor: messageColor,
+              }}
+              className="message">
+              {message}
+            </div>
+          )}
         </div>
       </div>
     </div>

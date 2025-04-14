@@ -219,7 +219,7 @@ export default function VideoNav({ course_id, courseName, user_role }) {
           sortOrder: chooseSortOrder,
         })
         .then((res) => {
-          if (res?.isSuccess) {
+          if (res?.success) {
             setVideos(res.data)
             messageControl('加載成功', true)
           } else {
@@ -371,7 +371,7 @@ export default function VideoNav({ course_id, courseName, user_role }) {
         {videoNavOpen && (
           <div className="meesage-area">
             <div
-              style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
+              style={{ top: '80px', height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
               className="message">
               {message}
             </div>
