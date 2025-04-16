@@ -71,15 +71,14 @@ export default function StudentSelector({ course_id, selectedVideo, setSelectedV
                     onClick={(e) => {
                       clickVideo(e.target, item._id)
                     }}>
-                    <div className="shot">
-                      <Image
-                        className="image"
-                        src={item.thumbnail}
-                        alt="video shot"
-                        quality={100}
-                        width={200}
-                        height={120}></Image>
-                    </div>
+                    <Image
+                      className="image"
+                      src={item.thumbnail}
+                      alt="video shot"
+                      quality={100}
+                      width={100}
+                      height={0}
+                      style={{ height: 'auto' }}></Image>
                     <div className="info">{item.title}</div>
                   </div>
                 )
@@ -91,14 +90,14 @@ export default function StudentSelector({ course_id, selectedVideo, setSelectedV
                     onClick={(e) => {
                       clickVideo(e.target, item._id)
                     }}>
-                    <div className="shot">
-                      <Image
-                        src={item.thumbnail}
-                        alt="video shot"
-                        quality={100}
-                        width={200}
-                        height={120}></Image>
-                    </div>
+                    <Image
+                      className="image"
+                      src={item.thumbnail}
+                      alt="video shot"
+                      quality={100}
+                      width={100}
+                      height={0}
+                      style={{ height: 'auto' }}></Image>
                     <div className="info">{item.title}</div>
                   </div>
                 )

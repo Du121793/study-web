@@ -9,7 +9,7 @@
   align-items: center;
   gap: 16px;
   background-color: #fff; // 讓清單區域白底
-  width: 75%;
+  width: 90%;
   input[type="checkbox"] {
     transform: scale(1.3);
   }
@@ -90,87 +90,53 @@
       background-color: #efefef;
     }
   }
-  .member-area {
-    margin-top: 12px;
-    width: 100%;
-    .title-area {
-      font-size: clamp(16px, 1.2vw, 20px);
-      margin-bottom: -8px;
+  .member-list-area {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    border-radius: 8px;
+    padding: 24px;
+    .inner-line {
       display: flex;
       justify-content: center;
-      width: 100%;
-      #username {
-        margin-left: 50px;
-        width: 120px;
-        text-align: left;
-      }
-      #realname {
-        width: 80px;
-      }
-      #phone-number {
-        width: 120px;
-      }
-      #grade {
-        width: 80px;
-      }
-      #role {
-        width: 80px;
-      }
-      span {
-        pointer-events: none;
-        display: flex;
-        align-items: flex-end;
-      }
-    }
-    li {
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-      margin-top: 12px;
-      width: 97.5%;
-      display: flex;
       align-items: center;
-      justify-content: center;
-      position: relative;
-      padding: 4px 8px;
-      border: 2px solid rgb(0, 0, 0, 0.2);
-      border-radius: 12px;
-      height: 40px;
-      background-color: #fafafa;
-      transition: 0.2s;
-
-      .student-checkbox {
-        width: 16px;
-        height: 16px;
+      width: 100%;
+      border: 2px solid rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+      padding: 8px;
+      gap: 4px;
+      font-size: clamp(16px, 1.2vw, 20px);
+      .user-name {
+        width: 20%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
       }
-      .searched-info {
-        display: flex;
-        pointer-events: none;
-        span {
-          pointer-events: none;
-          display: flex;
-          align-items: flex-end;
-        }
-        #username {
-          margin-left: 24px;
-          width: 120px;
-          text-align: left;
-          font-size: clamp(16px, 1.2vw, 20px);
-        }
-        #realname {
-          width: 80px;
-          font-size: clamp(16px, 1.2vw, 20px);
-        }
-        #phone-number {
-          width: 120px;
-          font-size: clamp(16px, 1.2vw, 20px);
-        }
-        #role {
-          width: 80px;
-          font-size: clamp(16px, 1.2vw, 20px);
-        }
-        #grade {
-          width: 80px;
-          font-size: clamp(16px, 1.2vw, 20px);
-        }
+      .real-name {
+        width: 20%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      .phone {
+        width: 20%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      .grade {
+        width: 10%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      .role {
+        width: 20%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
       }
     }
   }

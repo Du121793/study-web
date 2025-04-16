@@ -50,7 +50,6 @@ passport.serializeUser((user, done) => {
  * @param {Function} done - 回調函數
  */
 passport.deserializeUser(async (serialized, done) => {
-  console.log("Deserialize user...");
   // 檢查是否為字串格式（已存在使用者的 ID）
   if (typeof serialized === "string") {
     try {
@@ -90,6 +89,7 @@ passport.use(
     async (accessToken, refreshToken, profile, done) => {
       // 查找是否已存在使用者
       let foundUser = await User.findOne({ lineID: profile.id }).exec();
+      foundUser = foundUser.toFullJSON();
       if (foundUser) {
         // 若使用者存在，檢查頭像是否需要更新
         if (foundUser.userinfo.pictureUrl !== profile.pictureUrl) {
@@ -100,7 +100,6 @@ passport.use(
             await foundUser.save();
           } catch (error) {
             logError({}, "passport.js", "LineStrategy", { profile }, error);
-            console.error("更新用戶頭像時發生錯誤:", error);
           }
         }
         return done(null, foundUser);

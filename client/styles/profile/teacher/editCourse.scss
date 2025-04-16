@@ -8,11 +8,12 @@
 }
 .edit-course-main {
   position: relative;
+  height: 100%;
   display: flex;
   justify-content: center;
   background-color: #fefefe; // 淡色背景
-  padding: 24px 0;
   .title {
+    margin-top: 24px;
     font-size: clamp(28px, 2vw, 34px);
   }
   .edit-course-function-area {
@@ -144,12 +145,29 @@
       flex-wrap: wrap;
       flex-direction: column;
       align-items: center;
-      width: 80%;
+      width: 95%;
       padding: 24px 0;
       box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
       border-radius: 8px;
       gap: 12px;
       font-size: clamp(16px, 1.2vw, 20px);
+      .search-area {
+        display: flex;
+        align-items: center;
+        width: 90%;
+        justify-content: center;
+        gap: 12px;
+        .content {
+          font-size: clamp(16px, 1.2vw, 20px);
+        }
+        .input {
+          flex: 1;
+          font-size: clamp(16px, 1.2vw, 20px);
+        }
+        button {
+          width: 80px;
+        }
+      }
       .courses-info-area {
         width: 80%;
         display: flex;

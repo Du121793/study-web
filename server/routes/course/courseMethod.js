@@ -35,7 +35,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 async function processThumbnailImage(file, videoId) {
   return new Promise((resolve, reject) => {
     const fileExt = path.extname(file.originalname);
-    const newFilename = videoId + fileExt;
+    const newFilename = videoId + fileExt + ".jpg";
     // 最終檔案存放在 resource/videoIMG/ 下
     const newPath = path.join("resource/videoIMG/", newFilename);
 
@@ -183,7 +183,7 @@ router.get("/videoInfo", async (req, res) => {
         let accessRecord = null;
 
         // 處理私有影片的訪問權限
-        if (plainItem.isPrivate) {
+        if (plainItem.isPrivate && req.user.role === 'student') {
           const records = await VideoAccess.aggregate([
             {
               $match: {
@@ -277,7 +277,7 @@ router.get("/videoUri", async (req, res) => {
 
       if (!access) {
         return res
-          .status(401)
+          .status(403)
           .json({ success: false, msg: "你沒有觀看此影片的權限" });
       }
     }
@@ -399,7 +399,6 @@ router.post(
 
       // 呼叫 VimeoMethods.upload 進行影片上傳
       const uploadUri = await VimeoMethods.upload(req.body, videoIndex);
-      console.log(uploadUri);
       if (!uploadUri.success)
         return res.status(500).json({
           success: false,
@@ -553,7 +552,6 @@ router.patch(
   upload.single("thumbnail"),
   async (req, res) => {
     try {
-      console.log(req.body);
       const { videoID } = req.body;
       if (!videoID)
         return res.status(400).json({ success: false, msg: "缺少 videoID" });

@@ -45,6 +45,14 @@ const userSchema = new Schema({
   },
 });
 
+userSchema.methods.toFullJSON = function () {
+  // 先使用 toObject 取得預設轉換後的物件（包含 virtuals）
+  const obj = this.toObject({ virtuals: true });
+  // 補上原始的 pictureUrl
+  obj.userinfo.pictureUrl = this.userinfo.pictureUrl;
+  return obj;
+};
+
 // 添加虛擬欄位來處理匿名頭像
 userSchema.virtual("userinfo.displayPictureUrl").get(function () {
   return this.userinfo.makePictureAnonymous ? "" : this.userinfo.pictureUrl;

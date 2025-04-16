@@ -28,7 +28,7 @@ const checkAdminAccess = accessChecker.admin;
  */
 router.get("/", (req, res) => {
   try {
-    return res.json({ success: true, data: req.user });
+    return res.json({ success: true, data: req.user.toFullJSON() });
   } catch (e) {
     logError(
       {
@@ -184,9 +184,7 @@ router.get("/registedCourse", async (req, res) => {
             courses: course._id,
           });
           const courseData =
-            typeof course.toObject === "function"
-              ? course.toObject()
-              : course;
+            typeof course.toObject === "function" ? course.toObject() : course;
           courseData.members = memberCount;
           return courseData;
         })
@@ -224,9 +222,6 @@ router.get("/registedCourse", async (req, res) => {
       .json({ success: false, msg: "發生了不可預期的錯誤" });
   }
 });
-
-
-
 
 // =====================
 // 成員管理路由
@@ -355,7 +350,6 @@ router.get("/getMembers", checkTeacherAccess, async (req, res) => {
  */
 router.get("/exportMembers", checkTeacherAccess, async (req, res) => {
   try {
-    console.log(req.query);
     let filter = {};
 
     // 處理選擇的會員過濾

@@ -5,10 +5,11 @@
   align-items: center;
   background-color: #fefefe;
   width: 100%;
-  padding: 24px 0;
+  height: 100%;
   gap: 12px;
 }
 .edit-members-main .title {
+  margin-top: 24px;
   font-size: clamp(28px, 2vw, 34px);
 }
 .edit-members-main .input-area {
@@ -18,6 +19,7 @@
   font-size: clamp(16px, 1.2vw, 20px);
 }
 .edit-members-main .member-selector-area {
+  width: 95%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -41,108 +43,77 @@
 .edit-members-main .member-selector-area .option-area .button:hover {
   background-color: #f0f0f0;
 }
-.edit-members-main .member-selector-area .member-area {
-  margin-top: 12px;
-  width: 100%;
+.edit-members-main .member-selector-area .option-area .active {
+  background-color: #d4d4d4;
+  box-shadow: inset 0px 0px 4px 0.5px rgba(0, 0, 0, 0.3);
 }
-.edit-members-main .member-selector-area .member-area .title-area {
-  margin-bottom: -8px;
+.edit-members-main .member-selector-area .option-area .active:hover {
+  background-color: #c5c5c5;
+  box-shadow: inset 0px 0px 4px 0.5px rgba(0, 0, 0, 0.3);
+}
+.edit-members-main .member-selector-area .option-area .add-member-to-course-btn {
+  background-color: #c1f49d;
+  border: 1px solid rgb(193, 193, 193);
+}
+.edit-members-main .member-selector-area .option-area .add-member-to-course-btn:hover {
+  background-color: #aedb8f;
+}
+.edit-members-main .member-selector-area .option-area .remove-member-to-course-btn {
+  background-color: #f4a8a8;
+  border: 1px solid rgb(193, 193, 193);
+}
+.edit-members-main .member-selector-area .option-area .remove-member-to-course-btn:hover {
+  background-color: #d79595;
+}
+.edit-members-main .member-selector-area .member-list-area {
+  width: 90%;
   display: flex;
-  width: 100%;
-  font-size: clamp(16px, 1.2vw, 20px);
-  word-break: keep-all;
-}
-.edit-members-main .member-selector-area .member-area .title-area #username {
-  margin-left: 50px;
-  width: 120px;
-  text-align: left;
-}
-.edit-members-main .member-selector-area .member-area .title-area #realname {
-  width: 80px;
-}
-.edit-members-main .member-selector-area .member-area .title-area #phone-number {
-  width: 120px;
-}
-.edit-members-main .member-selector-area .member-area .title-area #grade {
-  width: 120px;
-}
-.edit-members-main .member-selector-area .member-area .title-area #role {
-  width: 80px;
-}
-.edit-members-main .member-selector-area .member-area .title-area span {
-  pointer-events: none;
-  display: flex;
-  align-items: flex-end;
-}
-.edit-members-main .member-selector-area .member-area li {
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  margin-top: 12px;
-  width: 97.5%;
-  display: flex;
+  flex-direction: column;
   align-items: center;
-  position: relative;
-  padding: 4px 8px;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 24px;
+}
+.edit-members-main .member-selector-area .member-list-area .inner-line {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
   border: 2px solid rgba(0, 0, 0, 0.2);
-  border-radius: 12px;
-  height: 40px;
-  background-color: #fafafa;
-  transition: 0.2s;
-}
-.edit-members-main .member-selector-area .member-area li input[type=checkbox] {
-  transform: scale(1.2);
-}
-.edit-members-main .member-selector-area .member-area li .student-checkbox {
-  width: 16px;
-  height: 16px;
-}
-.edit-members-main .member-selector-area .member-area li .searched-info {
-  display: flex;
-  pointer-events: none;
-}
-.edit-members-main .member-selector-area .member-area li .searched-info span {
-  pointer-events: none;
-  display: flex;
-  align-items: flex-end;
-}
-.edit-members-main .member-selector-area .member-area li .searched-info #username {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  margin-left: 24px;
-  width: 120px;
-  text-align: left;
+  border-radius: 4px;
+  padding: 8px;
+  gap: 4px;
   font-size: clamp(16px, 1.2vw, 20px);
 }
-.edit-members-main .member-selector-area .member-area li .searched-info #realname {
-  overflow: hidden;
-  white-space: nowrap;
+.edit-members-main .member-selector-area .member-list-area .inner-line .user-name {
+  width: 20%;
   text-overflow: ellipsis;
-  width: 80px;
-  font-size: clamp(16px, 1.2vw, 20px);
-}
-.edit-members-main .member-selector-area .member-area li .searched-info #phone-number {
-  overflow: hidden;
   white-space: nowrap;
-  text-overflow: ellipsis;
-  font-size: clamp(16px, 1.2vw, 20px);
-  width: 120px;
-}
-.edit-members-main .member-selector-area .member-area li .searched-info #role {
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  font-size: clamp(16px, 1.2vw, 20px);
-  width: 80px;
 }
-.edit-members-main .member-selector-area .member-area li .searched-info #grade {
+.edit-members-main .member-selector-area .member-list-area .inner-line .real-name {
+  width: 20%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  font-size: clamp(16px, 1.2vw, 20px);
-  width: 120px;
 }
-.edit-members-main .member-selector-area .member-area .select-active {
-  border: 2px solid rgb(124, 225, 180);
+.edit-members-main .member-selector-area .member-list-area .inner-line .phone {
+  width: 20%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.edit-members-main .member-selector-area .member-list-area .inner-line .grade {
+  width: 10%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.edit-members-main .member-selector-area .member-list-area .inner-line .role {
+  width: 20%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 .edit-members-main .member-selector-area .page-switch {
   display: flex;

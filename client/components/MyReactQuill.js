@@ -12,42 +12,18 @@ const defaultModules = {
   toolbar: [
     // 你可以保留 header 與 font 的選項
     [{ header: [1, 2, 3, 4, 5, 6, false] }, { font: [] }],
-    // 使用自訂的 size 選項（顯示數字及單位）
-    [{ size: ['10px', '12px', '14px', '16px', '18px', '24px'] }],
     [{ color: [] }, { background: [] }],
     ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+    [{ align: [] }],
     [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
     ['link', 'image', 'video'],
-    ['clean']
-  ]
+    ['clean'],
+  ],
 }
 
-const defaultFormats = [
-  'header',
-  'font',
-  'size',
-  'color',
-  'background',
-  'bold',
-  'italic',
-  'underline',
-  'strike',
-  'blockquote',
-  'list',
-  'bullet',
-  'indent',
-  'link',
-  'image',
-  'video'
-]
+const defaultFormats = ['header', 'font', 'size', 'color', 'background', 'bold', 'italic', 'underline', 'strike', 'blockquote', 'list', 'bullet', 'indent', 'link', 'image', 'video', 'align']
 
-const MyReactQuill = ({
-  value,
-  onChange,
-  modules = defaultModules,
-  formats = defaultFormats,
-  ...props
-}) => {
+const MyReactQuill = ({ value, onChange, modules = defaultModules, formats = defaultFormats, ...props }) => {
   return (
     <ReactQuill
       value={value}

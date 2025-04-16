@@ -98,42 +98,19 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
       }, 200)
     }, 2000)
   }
+
   // 全選按鈕
   const selectAllStudent = () => {
-    const boxs = document.querySelectorAll('.student-checkbox')
-    boxs.forEach((checkbox) => {
-      // 判斷是否有單個被選取
-      if (checkbox.checked === false) {
-        // 全部打勾
-        checkbox.click()
-      } else if (isSelectAllCheckbox === false && checkbox.checked === false) {
-        boxs.forEach((checkbox) => {
-          // 全部打勾
-          checkbox.click()
-        })
-        setIsSelectAllCheckbox(true)
-      }
-    })
+    setSelectedStudentId(
+      members.map((item) => {
+        return item._id
+      })
+    )
   }
 
   // 取消全選按鈕
   const clearSearch = () => {
-    const boxs = document.querySelectorAll('.student-checkbox')
-    if (isSelectAllCheckbox) {
-      boxs.forEach((checkbox) => {
-        // 全部打勾
-        checkbox.click()
-      })
-      setIsSelectAllCheckbox(false)
-    } else {
-      // 判斷是否有單個被選取
-      boxs.forEach((checkbox) => {
-        if (checkbox.checked === true) {
-          // 全部打勾
-          checkbox.click()
-        }
-      })
-    }
+    setSelectedStudentId([])
   }
 
   // 搜尋按鈕
@@ -190,6 +167,7 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
       let data = {
         page: page,
         pageSize: pageSize,
+        role: roleInput,
       }
       try {
         adminService.getMembers(token, data).then((res) => {
@@ -213,7 +191,7 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
         alert(e)
       }
     }
-  }, [token, page, pageSize])
+  }, [token, page, pageSize, roleInput])
 
   const test = () => {
     console.log(selectedStudentId)
@@ -291,7 +269,7 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
           <button
             className="g-red-btn"
             onClick={clearSearch}>
-            取消全選
+            取消選取
           </button>
           <button
             className="g-blue-btn"
@@ -304,58 +282,44 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
           </button>
         </div>
       </div>
-      <ul className="member-area">
-        <div className="title-area">
-          <span id="username">暱稱</span>
-          <span id="realname">姓名</span>
-          <span id="phone-number">電話號碼</span>
-          <span id="grade">年級</span>
-          <span id="role">身分組</span>
+      <ul className="member-list-area">
+        <div className="inner-line">
+          <span className="user-name">暱稱</span>
+          <span className="real-name">姓名</span>
+          <span className="phone">電話號碼</span>
+          <span className="grade">年級</span>
+          <span className="role">身分組</span>
         </div>
         {memberloading && <LoadingAnime />}
         {members &&
           members.map((item, index) => (
-            <li
+            <div
               style={{
-                border: selectedStudentId.find((id) => {
-                  return id === item._id
-                })
-                  ? '2px solid rgb(124, 225, 180)'
-                  : '2px solid rgb(0, 0, 0,0.2)',
+                cursor: 'pointer',
+                border: selectedStudentId.find((id) => id === item._id) ? '2px solid rgb(153, 153, 153)' : '2px solid rgba(0, 0, 0, 0.2)',
+                backgroundColor: selectedStudentId.find((id) => id === item._id) ? 'rgb(242, 242, 242)' : 'transparent',
+                boxShadow: selectedStudentId.find((id) => id === item._id) ? '0px 4px 12px rgba(0, 0, 0, 0.15)' : 'none',
               }}
               key={index}
               onClick={(e) => {
-                memberAreaClickEvent(e.target)
-              }}>
+                if (selectedStudentId.find((id) => id === item._id)) {
+                  setSelectedStudentId(selectedStudentId.filter((id_filter) => id_filter !== item._id))
+                } else {
+                  setSelectedStudentId([...selectedStudentId, item._id])
+                }
+              }}
+              className="inner-line">
               {/* 勾選框 */}
-              <input
-                className="student-checkbox"
-                type="checkbox"
-                checked={selectedStudentId.find((id) => {
-                  return id === item._id
-                })}
-                onLoad={() => {
-                  initSelectedId()
-                }}
-                onChange={(e) => {
-                  checkboxClickEvent(e.target)
-                  setSelectedStudentId((prev) => {
-                    return e.target.checked ? [...prev, item._id] : prev.filter((id) => id !== item._id)
-                  })
-                }}
-              />
-              <div className="searched-info">
-                {item.userinfo.username === undefined && <span id="username">無</span>}
-                {item.userinfo.username !== undefined && <span id="username">{item.userinfo.username}</span>}
-                <span id="realname">{item.userinfo.realname}</span>
-                <span id="phone-number">{item.userinfo.phoneNumber}</span>
-                <span id="course-class">{item.userinfo.courseClass}</span>
-                <span id="grade">{item.userinfo.grade}</span>
-                {item.role === 'teacher' && <span id="role">教師</span>}
-                {item.role === 'student' && <span id="role">學生</span>}
-                {item.role === 'admin' && <span id="role">管理員</span>}
-              </div>
-            </li>
+              {item.userinfo.username === undefined && <span className="user-name">無</span>}
+              {item.userinfo.username !== undefined && <span className="user-name">{item.userinfo.username}</span>}
+              <span className="real-name">{item.userinfo.realname}</span>
+              <span className="phone">{item.userinfo.phoneNumber}</span>
+              <span className="course-class">{item.userinfo.courseClass}</span>
+              <span className="grade">{item.userinfo.grade}</span>
+              {item.role === 'teacher' && <span className="role">教師</span>}
+              {item.role === 'student' && <span className="role">學生</span>}
+              {item.role === 'admin' && <span className="role">管理員</span>}
+            </div>
           ))}
       </ul>
 

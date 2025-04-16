@@ -37,8 +37,12 @@ export default function Header({ loginState, user_line_shot }) {
 
   useEffect(() => {
     const user_line_shot_temp = sessionStorage.getItem('user_line_shot')
-    setUserShot(user_line_shot_temp)
+    if (user_line_shot_temp) {
+      setUserShot(user_line_shot_temp)
+    }
   }, [])
+
+  const test = () => {}
 
   // Layout
   return (
@@ -59,7 +63,7 @@ export default function Header({ loginState, user_line_shot }) {
             className="header-middle-nav-area"
             id="newest">
             <div className="line"></div>
-            <span>最新消息</span>
+            <span onClick={test}>最新消息</span>
           </div>
           <div
             className="header-middle-nav-area"
@@ -107,15 +111,17 @@ export default function Header({ loginState, user_line_shot }) {
           {loginState === true && (
             <Link href={ProfilePageURL}>
               <div className="member-img">
-                <Image
-                  loading="lazy"
-                  className="shot"
-                  // 由於userShot在index頁面會來不及加載，因此會改為使用index傳過來的user_line_shot
-                  src={userShot !== null ? userShot : user_line_shot}
-                  alt="user's shot"
-                  width={100}
-                  height={100}
-                />
+                {(user_line_shot || userShot) && (
+                  <Image
+                    loading="lazy"
+                    className="shot"
+                    // 由於userShot在index頁面會來不及加載，因此會改為使用index傳過來的user_line_shot
+                    src={user_line_shot ? user_line_shot : userShot}
+                    alt="user's shot"
+                    width={100}
+                    height={100}
+                  />
+                )}
               </div>
             </Link>
           )}

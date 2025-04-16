@@ -251,46 +251,50 @@
         width: 100%;
         .message-top {
           display: flex;
-          align-items: flex-end;
+          align-items: center;
           gap: 6px;
           .isBest {
             display: flex;
             align-items: center;
             gap: 4px;
             font-weight: bold;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            padding: 1px 8px;
+            border-radius: 12px;
           }
           .time {
             font-size: 14px;
             color: rgb(92, 92, 92);
           }
           .name {
+            height: 100%;
             font-weight: bold;
             font-size: 18px;
           }
           .function-btn-area {
             display: flex;
             align-items: center;
-            gap: 24px;
+            gap: 8px;
 
             .delete-comment {
               cursor: pointer;
               font-weight: bold;
-              color: rgb(34, 34, 34);
+              color: rgb(200, 0, 0);
               transition: 0.2s;
               font-size: 14px;
             }
             .delete-comment:hover {
-              color: rgb(148, 0, 0);
+              color: rgb(179, 0, 0);
             }
             .set-best-comment-btn {
               cursor: pointer;
               font-weight: bold;
-              color: rgb(34, 34, 34);
+              color: rgb(222, 70, 0);
               transition: 0.2s;
               font-size: 14px;
             }
             .set-best-comment-btn:hover {
-              color: rgb(222, 70, 0);
+              color: rgb(203, 65, 1);
             }
           }
         }

@@ -4,11 +4,12 @@
   flex-direction: column;
   align-items: center;
   background-color: #fefefe;
-  padding: 24px;
+  height: 100%;
   gap: 8px;
   z-index: 0;
 }
 .remove-users-page .container-line {
+  margin-top: 24px;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -68,7 +69,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  width: 80%;
+  width: 90%;
 }
 .remove-users-page .user-list-title .container {
   display: flex;
@@ -82,28 +83,46 @@
 .remove-users-page .user-list-title .container .username {
   width: 80px;
   margin-left: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .remove-users-page .user-list-title .container .grade {
   pointer-events: none;
   width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .remove-users-page .user-list-title .container .realname {
-  width: 70px;
+  width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .remove-users-page .user-list-title .container .phone {
   width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .remove-users-page .user-list-title .container .userid {
   width: 30%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .remove-users-page .user-list-title .container .role {
   width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .remove-users-page .user-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  width: 80%;
+  width: 90%;
   font-size: clamp(16px, 1.2vw, 20px);
 }
 .remove-users-page .user-list .container {
@@ -120,24 +139,37 @@
   margin-left: 6px;
 }
 .remove-users-page .user-list .container .grade {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   pointer-events: none;
   width: 70px;
 }
 .remove-users-page .user-list .container .realname {
   pointer-events: none;
-  width: 70px;
+  width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .remove-users-page .user-list .container .phone {
   pointer-events: none;
   width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .remove-users-page .user-list .container .userid {
   pointer-events: none;
   width: 30%;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .remove-users-page .user-list .container .role {
   pointer-events: none;
   width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }/*# sourceMappingURL=removeUsers.css.map */

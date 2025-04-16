@@ -27,22 +27,19 @@
       gap: 24px;
       .video-card {
         cursor: pointer;
-        border: 2px solid rgb(0, 0, 0, 0.2);
+        border: 2px solid rgb(0, 0, 0, 0.4);
         border-radius: 8px;
         overflow: hidden;
         transition: 0.2s;
         .image {
           pointer-events: none;
           user-select: none;
-        }
-        .shot {
-          height: 120px;
-          width: 200px;
-          overflow: hidden;
-          pointer-events: none;
-          user-select: none;
+          width: 100%;  
         }
         .info {
+          width: 204px;
+          display: flex;
+          flex-wrap: wrap;
           padding: 8px;
           font-weight: bold;
           pointer-events: none;

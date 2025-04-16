@@ -12,18 +12,11 @@ const USER_URL = `${serverIp}/user`
 
 // 登出函式
 const signOut = () => {
-  if (sessionStorage.getItem('user_lineID')) {
-    sessionStorage.removeItem('user_lineID')
-  }
-  if (sessionStorage.getItem('user_role')) {
-    sessionStorage.removeItem('user_role')
-  }
-  if (sessionStorage.getItem('user_id')) {
-    sessionStorage.removeItem('user_id')
-  }
-  if (sessionStorage.getItem('user_role')) {
-    sessionStorage.removeItem('user_role')
-  }
+  sessionStorage.removeItem('user_lineID')
+  sessionStorage.removeItem('user_role')
+  sessionStorage.removeItem('user_id')
+  sessionStorage.removeItem('user_role')
+  sessionStorage.removeItem('user_name')
   localStorage.removeItem('token')
   window.location.replace('/')
 }
@@ -38,11 +31,11 @@ const adminService = {
       })
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      if (e?.response?.data) {
+      if (e.response?.data) {
         return e.response.data
       } else {
         return e
@@ -63,11 +56,11 @@ const adminService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      if (e?.response?.data) {
+      if (e.response?.data) {
         return e.response.data
       } else {
         return e
@@ -87,30 +80,47 @@ const adminService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      return e
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
 
+  // grade是物件 存放{grade}
   async findJoinedSubject(token, grade) {
-    // grade是物件 存放{grade}
-    const authHeader = token ? { Authorization: token } : {}
-    const response = await axios.get(USER_URL + '/findJoinedSubject', {
-      headers: authHeader,
-      params: grade,
-    })
-    if (response.status === 401) {
-      signOut()
-      return
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.get(USER_URL + '/findJoinedSubject', {
+        headers: authHeader,
+        params: grade,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (e) {
+      if (e.response?.status === 401) {
+        signOut()
+        return
+      }
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
-    return response.data
   },
 
   // 獲得課程內的成員
-  /* const data = {
+  async getMembers(token, data) {
+    /* const data = {
         realname,
         phoneNumber,
         gradeInput,
@@ -120,20 +130,32 @@ const adminService = {
         pageSize,
         withoutCourses: null,
     }*/
-  async getMembers(token, data) {
-    const authHeader = token ? { Authorization: token } : {}
-    const response = await axios.get(USER_URL + '/getMembers', {
-      headers: authHeader,
-      params: data,
-    })
-    if (response.status === 401) {
-      signOut()
-      return
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.get(USER_URL + '/getMembers', {
+        headers: authHeader,
+        params: data,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (e) {
+      if (e.response?.status === 401) {
+        signOut()
+        return
+      }
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
-    return response.data
   },
 
-  /* const data = {
+  async exportMembers(token, data) {
+    /* const data = {
         realname: nameInput,
         phoneNumber: phoneInput,
         gradeInput: gradeInput,
@@ -142,42 +164,62 @@ const adminService = {
         page: page,
         pageSize: pageSize,
     }*/
-  async exportMembers(token, data) {
-    console.log(data)
-    const authHeader = token ? { Authorization: token } : {}
-    const response = await axios
-      .get(USER_URL + '/exportMembers', {
-        headers: authHeader,
-        params: data,
-        responseType: 'blob',
-      })
-      .then((response) => {
-        const now = new Date()
-        const year = now.getFullYear()
-        const month = String(now.getMonth() + 1).padStart(2, '0') // 月份從 0 開始所以要 +1
-        const day = String(now.getDate()).padStart(2, '0')
-        const hour = String(now.getHours()).padStart(2, '0')
-        const minute = String(now.getMinutes()).padStart(2, '0')
-        const formattedTime = `${year}/${month}/${day}_${hour}-${minute}`
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios
+        .get(USER_URL + '/exportMembers', {
+          headers: authHeader,
+          params: data,
+          responseType: 'blob',
+        })
+        .then((response) => {
+          const now = new Date()
+          const year = now.getFullYear()
+          const month = String(now.getMonth() + 1).padStart(2, '0') // 月份從 0 開始所以要 +1
+          const day = String(now.getDate()).padStart(2, '0')
+          const hour = String(now.getHours()).padStart(2, '0')
+          const minute = String(now.getMinutes()).padStart(2, '0')
+          const formattedTime = `${year}/${month}/${day}_${hour}-${minute}`
 
-        const url = window.URL.createObjectURL(new Blob([response.data]))
-        const link = document.createElement('a')
-        link.href = url
-        // 設定下載檔名
-        link.setAttribute('download', `${formattedTime}_members.csv`)
-        // Date+time_members.csv
-        document.body.appendChild(link)
-        link.click()
-        // 釋放記憶體
-        window.URL.revokeObjectURL(url)
+          const url = window.URL.createObjectURL(new Blob([response.data]))
+          const link = document.createElement('a')
+          link.href = url
+          // 設定下載檔名
+          link.setAttribute('download', `${formattedTime}_members.csv`)
+          // Date+time_members.csv
+          document.body.appendChild(link)
+          link.click()
+          // 釋放記憶體
+          window.URL.revokeObjectURL(url)
+          return
+        })
+        .catch((e) => {
+          if (e.response?.status === 401) {
+            signOut()
+            return
+          }
+          if (e.response?.data) {
+            return e.response.data
+          } else {
+            return e
+          }
+        })
+    } catch (e) {
+      if (e.response?.status === 401) {
+        signOut()
         return
-      })
-      .catch((error) => {
-        console.error(error)
-      })
+      }
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
+    }
   },
 
-  /*
+  // 獲得課程
+  async getCourses(token, data) {
+    /*
   const data = {
     courseName: courseNameInput,
     grade: gradeInput,
@@ -187,101 +229,132 @@ const adminService = {
     pageSize,
   }
   */
-
-  // 獲得課程
-  async getCourses(token, data) {
     /* filter需要是物件
      { courseName, subject, grade, courseClass, members, _id, page, pageSize}*/
-    const authHeader = token ? { Authorization: token } : {}
-    const response = await axios.get(API_URL + '/course/getCourses', {
-      headers: authHeader,
-      params: data,
-    })
-    if (response.status === 401) {
-      signOut()
-      return
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.get(API_URL + '/course/getCourses', {
+        headers: authHeader,
+        params: data,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (e) {
+      if (e.response?.status === 401) {
+        signOut()
+        return
+      }
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
-    return response.data
   },
 
   // 獲得課程資訊清單
   async getCoursesInfoList(token, filter) {
-    const authHeader = token ? { Authorization: token } : {}
-    const response = await axios.get(COURSE_URL + '/findJoinedSubject', {
-      headers: authHeader,
-      params: filter,
-    })
-    if (response.status === 401) {
-      signOut()
-      return
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.get(COURSE_URL + '/findJoinedSubject', {
+        headers: authHeader,
+        params: filter,
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (e) {
+      if (e.response?.status === 401) {
+        signOut()
+        return
+      }
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
-    return response.data
   },
 
   // 刪除課程
   async deleteCourse(token, courseId) {
-    console.log(courseId)
-    const authHeader = token ? { Authorization: token } : {}
-    const response = await axios.delete(COURSE_URL + '/deleteCourse', {
-      headers: authHeader,
-      data: { course_id: courseId },
-    })
-    if (response.status === 401) {
-      signOut()
-      return
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.delete(COURSE_URL + '/deleteCourse', {
+        headers: authHeader,
+        data: { course_id: courseId },
+      })
+      if (response.status === 401) {
+        signOut()
+        return
+      }
+      return response.data
+    } catch (e) {
+      if (e.response?.status === 401) {
+        signOut()
+        return
+      }
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
-    return response.data
   },
 
   // 預註冊
   async preRegisterUser(token, users) {
-    console.log(users)
     // users 是一個陣列 裝著物件 [{{userinfo} , role},...]
     const authHeader = token ? { Authorization: token } : {}
     try {
       const response = await axios.post(USER_URL + '/preRegisterUser', users, {
         headers: authHeader,
       })
-
-      console.log(response)
       return response.data
-
-      if (response?.status === 401) {
+    } catch (e) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-    } catch (e) {
-      return e
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
 
   // 刪除成員
   async deleteMembers(token, userIds) {
     try {
-      console.log(userIds)
       // 設定 Authorization 標頭，若 token 存在則加入
       const authHeader = token ? { Authorization: token } : {}
-
       const response = await axios.delete(USER_URL + '/deleteMember', {
         headers: authHeader,
         data: userIds,
       })
-
       return response.data
-    } catch (error) {
-      if (response?.status === 401) {
+    } catch (e) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      console.error(error)
-      throw error
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
 
   // 刪除影片
   async deleteVideo(token, videoId, courseID) {
     try {
-      // 設定 Authorization 標頭，若 token 存在則加入
       const authHeader = token ? { Authorization: token } : {}
       console.log(BASE_COURSE_URL + `/${courseID}/deleteVideo`)
       const response = await axios.delete(BASE_COURSE_URL + `/${courseID}/deleteVideo`, {
@@ -290,12 +363,16 @@ const adminService = {
       })
 
       return response.data
-    } catch (error) {
-      if (response?.status === 401) {
+    } catch (e) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      console.error(error)
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
 
@@ -309,12 +386,16 @@ const adminService = {
       })
 
       return response.data
-    } catch (err) {
-      if (response?.status === 401) {
+    } catch (e) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      console.error(err.response.data)
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
 
@@ -327,12 +408,16 @@ const adminService = {
       })
 
       return response.data
-    } catch (err) {
-      if (response?.status === 401) {
+    } catch (e) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      console.error(err?.response?.data)
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
 
@@ -347,13 +432,16 @@ const adminService = {
       })
 
       return response.data
-    } catch (err) {
-      if (response?.status === 401) {
+    } catch (e) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      console.log(err.response)
-      console.error(err.response.data)
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
 
@@ -368,12 +456,16 @@ const adminService = {
       })
 
       return response.data
-    } catch (err) {
-      if (response?.status === 401) {
+    } catch (e) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      console.error(err.response.data)
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
 
@@ -389,12 +481,16 @@ const adminService = {
       })
 
       return response.data
-    } catch (err) {
-      if (response?.status === 401) {
+    } catch (e) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      console.error(err.response.data)
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
 
@@ -409,12 +505,16 @@ const adminService = {
       })
 
       return response.data
-    } catch (err) {
-      if (response?.status === 401) {
+    } catch (e) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      console.error(err.response.data)
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
 
@@ -431,12 +531,16 @@ const adminService = {
       })
 
       return response.data
-    } catch (err) {
-      if (response?.status === 401) {
+    } catch (e) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      console.error(err.response.data)
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
 
@@ -450,12 +554,16 @@ const adminService = {
       })
 
       return response.data
-    } catch (err) {
-      if (response?.status === 401) {
+    } catch (e) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      console.error(err.response.data)
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
 
@@ -468,17 +576,22 @@ const adminService = {
       })
 
       return response.data
-    } catch (err) {
-      if (response?.status === 401) {
+    } catch (e) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      console.error(err)
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
 
   // 編輯影片
-  /* 
+  async editVideoInfo(token, courseID, data) {
+    /* 
   data={
     videoID = videoID
     thumbnail = null
@@ -487,26 +600,29 @@ const adminService = {
     isPrivate = true || false
   }
  */
-  async editVideoInfo(token, courseID, data) {
     try {
-      // 設定 Authorization 標頭，若 token 存在則加入
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.patch(BASE_COURSE_URL + `/${courseID}/patchVideo`, data, {
         headers: authHeader,
       })
 
       return response.data
-    } catch (error) {
-      if (response?.status === 401) {
+    } catch (e) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      console.error(error)
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
 
   // 編輯QA
-  /* 
+  async editQAInfo(token, data, courseID) {
+    /* 
   data =  {
         question_id,
         course_ids,
@@ -518,7 +634,6 @@ const adminService = {
         replied,
       } = req.body;
   */
-  async editQAInfo(token, data, courseID) {
     try {
       // 設定 Authorization 標頭，若 token 存在則加入
       const authHeader = token ? { Authorization: token } : {}
@@ -527,16 +642,21 @@ const adminService = {
       })
 
       return response.data
-    } catch (error) {
-      if (response?.status === 401) {
+    } catch (e) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      console.error(error)
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
-  //  {title, content}
+
   async postCarousels(token, data) {
+    //  {title, content}
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.post(API_URL + `/modifyResource/postNewCarousel`, data, {
@@ -545,18 +665,18 @@ const adminService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      if (e?.response?.data) {
+      if (e.response?.data) {
         return e.response.data
       } else {
         return e
       }
     }
   },
-  // { numbers: [1, 3, 5] }
+  // 刪除輪播圖
   async deleteCarousels(token, data) {
     console.log(data)
     try {
@@ -580,7 +700,9 @@ const adminService = {
     }
   },
 
-  /* 
+  // 新增公告
+  async postBoard(token, data) {
+    /* 
   {
     title,
     content,
@@ -588,7 +710,6 @@ const adminService = {
     image: [],
   }
   */
-  async postBoard(token, data) {
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.post(API_URL + `/modifyResource/postNewBoard`, data, {
@@ -609,7 +730,31 @@ const adminService = {
     }
   },
 
+  // 刪除公告
+  async deleteBoard(token, board_id) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.delete(API_URL + `/modifyResource/deleteBoard/${board_id}`, {
+        headers: authHeader,
+      })
+      console.log(response)
+      return response?.data
+    } catch (e) {
+      if (e.response?.status === 401) {
+        signOut()
+        return
+      }
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
+    }
+  },
+
+  // 編輯公告
   async putBoard(token, data) {
+    console.log(data)
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.put(API_URL + `/modifyResource/putBoard`, data, {
@@ -618,25 +763,21 @@ const adminService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      if (e?.response?.data) {
-        if (e?.response?.data) {
-          return e.response.data
-        } else {
-          return e
-        }
+      if (e.response?.data) {
+        return e.response.data
       } else {
         return e
       }
     }
   },
 
-  // data = {videos : [{title,description,length(可選),recordDate(可選),isPrivate}]}
+  // 推送新增舊video
   async batchCreate(token, data, course_id) {
-    console.log(data)
+    // data = {videos : [{title,description,length(可選),recordDate(可選),isPrivate}]}
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.post(API_URL + `/course/${course_id}/vimeoMigrate/batchCreate`, data, {
@@ -645,11 +786,11 @@ const adminService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      if (e?.response?.data) {
+      if (e.response?.data) {
         return e.response.data
       } else {
         return e
@@ -657,10 +798,9 @@ const adminService = {
     }
   },
 
-  // data = {videoIds}
   async updateUrls(token, data, course_id) {
+    // data = {videoIds}
     try {
-      console.log(data)
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.patch(API_URL + `/course/${course_id}/vimeoMigrate/updateUrls`, data, {
         headers: authHeader,
@@ -668,11 +808,11 @@ const adminService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      if (e?.response?.data) {
+      if (e.response?.data) {
         return e.response.data
       } else {
         return e
@@ -689,12 +829,12 @@ const adminService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      if (e?.response?.data) {
-        return e?.response?.data
+      if (e.response?.data) {
+        return e.response.data
       } else {
         return e
       }
@@ -715,34 +855,34 @@ const adminService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      if (e?.response?.data) {
-        return e?.response?.data
+      if (e.response?.data) {
+        return e.response.data
       } else {
         return e
       }
     }
   },
 
-  /**
-   * 修改問題
-   * @route PATCH /patchQuestion
-   * @param {string} question_id - 問題ID
-   * @param {string[]} [course_ids] - 課程ID陣列
-   * @param {boolean} [isPublic] - 是否公開，不傳則保留原有資料
-   * @param {string} [description] - 問題描述，不傳則保留原有資料
-   * @param {string[]} [resourceCategories] - 資源類別標籤，不傳則保留原有資料
-   * @param {string[]} [hints] - 提示標籤，不傳則保留原有資料
-   * @param {number[]} [rmIMG] - 要刪除的圖片索引陣列
-   * @param {boolean} [replied] - 是否已回覆，不傳則保留原有資料
-   * @param {Object[]} [image] - 上傳的新圖片檔案
-   * @param {string[]} [folders] - 預上傳的資料夾位置
-   * @returns {Object} 更新後的問題ID
-   */
   async patchQaToFolders(token, data) {
+    /**
+     * 修改問題
+     * @route PATCH /patchQuestion
+     * @param {string} question_id - 問題ID
+     * @param {string[]} [course_ids] - 課程ID陣列
+     * @param {boolean} [isPublic] - 是否公開，不傳則保留原有資料
+     * @param {string} [description] - 問題描述，不傳則保留原有資料
+     * @param {string[]} [resourceCategories] - 資源類別標籤，不傳則保留原有資料
+     * @param {string[]} [hints] - 提示標籤，不傳則保留原有資料
+     * @param {number[]} [rmIMG] - 要刪除的圖片索引陣列
+     * @param {boolean} [replied] - 是否已回覆，不傳則保留原有資料
+     * @param {Object[]} [image] - 上傳的新圖片檔案
+     * @param {string[]} [folders] - 預上傳的資料夾位置
+     * @returns {Object} 更新後的問題ID
+     */
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.patch(QA_URL + `/patchQuestion`, data, {
@@ -750,22 +890,26 @@ const adminService = {
       })
 
       return response.data
-    } catch (err) {
-      if (response?.status === 401) {
+    } catch (e) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      console.error(err.response.data)
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
 
-  /**
-   * 刪除資料夾
-   * @route DELETE /deleteFolder
-   * @param {string} folder_id - 要刪除的資料夾ID
-   * @returns {Object} 刪除結果
-   */
   async deleteFolder(token, data) {
+    /**
+     * 刪除資料夾
+     * @route DELETE /deleteFolder
+     * @param {string} folder_id - 要刪除的資料夾ID
+     * @returns {Object} 刪除結果
+     */
     console.log(token)
     try {
       const authHeader = token ? { Authorization: token } : {}
@@ -775,25 +919,29 @@ const adminService = {
       })
 
       return response.data
-    } catch (err) {
-      if (response?.status === 401) {
+    } catch (e) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      console.error(err.response.data)
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
 
-  /**
-   * 修改用戶資料
-   * @route PATCH /updateProfile
-   * @param {string} username - 可選，用戶暱稱
-   * @param {string} realname - 可選，真實姓名（僅限教師以上）
-   * @param {string} phoneNumber - 可選，電話號碼（僅限教師以上）
-   * @param {boolean} makeAnonymous - 可選，是否將圖片設為匿名
-   * @returns {Object} 更新結果
-   */
   async patchUserInfo(token, data) {
+    /**
+     * 修改用戶資料
+     * @route PATCH /updateProfile
+     * @param {string} username - 可選，用戶暱稱
+     * @param {string} realname - 可選，真實姓名（僅限教師以上）
+     * @param {string} phoneNumber - 可選，電話號碼（僅限教師以上）
+     * @param {boolean} makeAnonymous - 可選，是否將圖片設為匿名
+     * @returns {Object} 更新結果
+     */
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.patch(API_URL + `/user/updateProfile`, data, {
@@ -801,28 +949,32 @@ const adminService = {
       })
 
       return response.data
-    } catch (err) {
-      if (response?.status === 401) {
+    } catch (e) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      console.error(err.response.data)
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
 
-  /**
-   * 修改單一會員資料
-   * @route PATCH /patchMembers
-   * @param {Array} memberId - 要修改的會員ID陣列
-   * @param {Object} updateData - 要更新的資料
-   * @param {string} updateData.username - 可選，用戶暱稱
-   * @param {string} updateData.realname - 可選，真實姓名
-   * @param {string} updateData.phoneNumber - 可選，電話號碼
-   * @param {string} updateData.grade - 可選，年級
-   * @param {string} updateData.role - 可選，角色
-   * @returns {Object} 更新結果統計
-   */
   async patchUsersInfo(token, data) {
+    /**
+     * 修改單一會員資料
+     * @route PATCH /patchMembers
+     * @param {Array} memberId - 要修改的會員ID陣列
+     * @param {Object} updateData - 要更新的資料
+     * @param {string} updateData.username - 可選，用戶暱稱
+     * @param {string} updateData.realname - 可選，真實姓名
+     * @param {string} updateData.phoneNumber - 可選，電話號碼
+     * @param {string} updateData.grade - 可選，年級
+     * @param {string} updateData.role - 可選，角色
+     * @returns {Object} 更新結果統計
+     */
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.patch(API_URL + `/user/patchMember`, data, {
@@ -830,19 +982,23 @@ const adminService = {
       })
 
       return response.data
-    } catch (err) {
-      if (response?.status === 401) {
+    } catch (e) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      return err?.response?.data
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
 
-  /*
+  async changeRole(token, data) {
+    /*
   role
   */
-  async changeRole(token, data) {
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.post(API_URL + `/user/changeRole`, data, {
@@ -850,12 +1006,16 @@ const adminService = {
       })
 
       return response.data
-    } catch (err) {
-      if (response?.status === 401) {
+    } catch (e) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      console.error(err.response.data)
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
 }

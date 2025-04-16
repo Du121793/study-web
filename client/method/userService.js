@@ -10,18 +10,11 @@ const QA_URL = `${serverIp}/course/question`
 
 // 登出函式
 const signOut = () => {
-  if (sessionStorage.getItem('user_lineID')) {
-    sessionStorage.removeItem('user_lineID')
-  }
-  if (sessionStorage.getItem('user_role')) {
-    sessionStorage.removeItem('user_role')
-  }
-  if (sessionStorage.getItem('user_id')) {
-    sessionStorage.removeItem('user_id')
-  }
-  if (sessionStorage.getItem('user_role')) {
-    sessionStorage.removeItem('user_role')
-  }
+  sessionStorage.removeItem('user_lineID')
+  sessionStorage.removeItem('user_role')
+  sessionStorage.removeItem('user_id')
+  sessionStorage.removeItem('user_role')
+  sessionStorage.removeItem('user_name')
   localStorage.removeItem('token')
   window.location.replace('/')
 }
@@ -32,14 +25,17 @@ const userService = {
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.get(USER_URL, { headers: authHeader })
-
       return response.data
-    } catch (error) {
-      if (response?.status === 401) {
+    } catch (e) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      console.log(error)
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
 
@@ -82,11 +78,15 @@ const userService = {
       // 回傳 API 回應的完整資料 (包含查詢結果與分頁資訊)
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      console.error(e)
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
     }
   },
 
@@ -105,22 +105,20 @@ const userService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      if (e?.response?.data) {
-        console.log(e.response.data)
+      if (e.response?.data) {
+        return e.response.data
       } else {
-        console.log(e)
+        return e
       }
     }
   },
 
   // 獲得影片連結，用於播放器頁面
   async getVideoLink(token, course_id, video_id) {
-    console.log(course_id)
-    console.log(video_id)
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.get(COURSE_URL + `/${course_id}/videoUri`, {
@@ -130,15 +128,14 @@ const userService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-
-      if (e?.response?.data) {
-        console.log(e.response.data)
+      if (e.response?.data) {
+        return e.response.data
       } else {
-        console.log(e)
+        return e
       }
     }
   },
@@ -157,14 +154,14 @@ const userService = {
       }
       return response
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      if (e?.response?.data) {
-        return response
+      if (e.response?.data) {
+        return e.response.data
       } else {
-        return response
+        return e
       }
     }
   },
@@ -178,15 +175,14 @@ const userService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-
-      if (e?.response?.data) {
-        console.log(e.response.data)
+      if (e.response?.data) {
+        return e.response.data
       } else {
-        console.log(e)
+        return e
       }
     }
   },
@@ -201,15 +197,14 @@ const userService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-
-      if (e?.response?.data) {
-        console.log(e.response.data)
+      if (e.response?.data) {
+        return e.response.data
       } else {
-        console.log(e)
+        return e
       }
     }
   },
@@ -225,16 +220,15 @@ const userService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      if (e?.response?.data) {
-        console.log(e.response.data)
+      if (e.response?.data) {
+        return e.response.data
       } else {
-        console.log(e)
+        return e
       }
-      return e
     }
   },
 
@@ -254,23 +248,21 @@ const userService = {
       })
 
       return response.data
-    } catch (err) {
-      if (response?.status === 401) {
+    } catch (e) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-
-      if (e?.response?.data) {
-        console.log(e.response.data)
+      if (e.response?.data) {
+        return e.response.data
       } else {
-        console.log(e)
+        return e
       }
     }
   },
 
   // 獲得QA問題的留言區
   async getQaComment(token, qa_id, data) {
-    console.log(data)
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.get(QA_URL + `/QAMethod/${qa_id}/getComment`, {
@@ -280,15 +272,14 @@ const userService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-
-      if (e?.response?.data) {
-        console.log(e.response.data)
+      if (e.response?.data) {
+        return e.response.data
       } else {
-        console.log(e)
+        return e
       }
     }
   },
@@ -301,15 +292,14 @@ const userService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-
-      if (e?.response?.data) {
-        console.log(e.response.data)
+      if (e.response?.data) {
+        return e.response.data
       } else {
-        console.log(e)
+        return e
       }
     }
   },
@@ -324,15 +314,14 @@ const userService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-
-      if (e?.response?.data) {
-        console.log(e.response.data)
+      if (e.response?.data) {
+        return e.response.data
       } else {
-        console.log(e)
+        return e
       }
     }
   },
@@ -351,14 +340,14 @@ const userService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      if (e?.response?.data) {
-        console.log(e.response.data)
+      if (e.response?.data) {
+        return e.response.data
       } else {
-        console.log(e)
+        return e
       }
     }
   },
@@ -373,17 +362,15 @@ const userService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-
-      if (e?.response?.data) {
-        console.log(e.response.data)
+      if (e.response?.data) {
+        return e.response.data
       } else {
-        console.log(e)
+        return e
       }
-      return e
     }
   },
 
@@ -396,17 +383,15 @@ const userService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-
-      if (e?.response?.data) {
-        console.log(e.response.data)
+      if (e.response?.data) {
+        return e.response.data
       } else {
-        console.log(e)
+        return e
       }
-      return e
     }
   },
 
@@ -417,17 +402,15 @@ const userService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-
-      if (e?.response?.data) {
-        console.log(e.response.data)
+      if (e.response?.data) {
+        return e.response.data
       } else {
-        console.log(e)
+        return e
       }
-      return e
     }
   },
 
@@ -452,14 +435,14 @@ const userService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-      if (e?.response?.data) {
-        console.log(e.response.data)
+      if (e.response?.data) {
+        return e.response.data
       } else {
-        console.log(e)
+        return e
       }
     }
   },
@@ -476,15 +459,14 @@ const userService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-
-      if (e?.response?.data) {
-        console.log(e.response.data)
+      if (e.response?.data) {
+        return e.response.data
       } else {
-        console.log(e)
+        return e
       }
     }
   },
@@ -506,15 +488,14 @@ const userService = {
 
       return response.data
     } catch (e) {
-      if (response?.status === 401) {
+      if (e.response?.status === 401) {
         signOut()
         return
       }
-
-      if (e?.response?.data) {
-        console.log(e.response.data)
+      if (e.response?.data) {
+        return e.response.data
       } else {
-        console.log(e)
+        return e
       }
     }
   },

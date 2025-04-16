@@ -6,7 +6,7 @@ import userService from '../../method/userService'
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 const serverIp = process.env.NEXT_PUBLIC_SERVER_IP
 
-export default function Board({ boardhasChange }) {
+export default function Board({ editHasChange }) {
   const [boards, setBoards] = useState([])
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(5)
@@ -36,7 +36,7 @@ export default function Board({ boardhasChange }) {
         console.log(res)
       }
     })
-  }, [boardhasChange, pageSize])
+  }, [editHasChange, pageSize])
 
   return (
     <div className="board-main">

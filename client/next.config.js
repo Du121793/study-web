@@ -1,39 +1,78 @@
 /** @type {import('next').NextConfig} */
-const serverUrl = new URL(process.env.NEXT_PUBLIC_SERVER_IP); // "http://35.212.172.120:8080"
-const clientUrl = new URL(process.env.NEXT_PUBLIC_CLIENT_IP); // "http://35.212.172.120:3000"
-
 const nextConfig = {
   reactStrictMode: true,
   images: {
+    unoptimized: true,
     remotePatterns: [
-      // 允許來自環境變數指定的伺服器 (例如: http://35.212.172.120:8080/resource/**)
+      // 測試用：允許所有協議與域名 (僅用於測試階段，正式環境請根據需求收窄)
       {
-        protocol: serverUrl.protocol.replace(":", ""), // 會變成 "http"
-        hostname: serverUrl.hostname, // "35.212.172.120"
-        port: serverUrl.port, // "8080"
-        pathname: "/resource/**",
-      },
-      // 允許來自 profile.line-scdn.net（假設使用 HTTPS）
-      {
-        protocol: "https",
-        hostname: "profile.line-scdn.net",
-        pathname: "/**",
-      },
-      // 允許來自 client (例如: http://35.212.172.120:3000 或 localhost)
-      {
-        protocol: clientUrl.protocol.replace(":", ""), // 例如 "http"
-        hostname: clientUrl.hostname, // 例如 "35.212.172.120" 或 "localhost"
-        port: clientUrl.port, // 例如 "3000"
-        pathname: "/**",
+        protocol: 'https',
+        hostname: '**',
+        port: '',
+        pathname: '/**',
       },
       {
-        protocol: "http",  // localhost 一般使用 HTTP
-        hostname: "localhost",
-        port: "8080",      // 請將 port 改為字串
-        pathname: "/**",
+        protocol: 'http',
+        hostname: '**',
+        port: '',
+        pathname: '/**',
+      },
+      // 僅允許 www.du1217.club 的 HTTPS 圖片
+      {
+        protocol: 'https',
+        hostname: 'www.du1217.club',
+        port: '',
+        pathname: '/**',
+      },
+      // API 路徑
+      {
+        protocol: 'https',
+        hostname: 'www.du1217.club',
+        port: '',
+        pathname: '/api/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.du1217.club',
+        port: '',
+        pathname: '/api/resource/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.du1217.club',
+        port: '',
+        pathname: '/api/resource/videoIMG/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.du1217.club',
+        port: '',
+        pathname: '/api/resource/public/carousel/**',
+      },
+      // LINE 圖片
+      {
+        protocol: 'https',
+        hostname: 'profile.line-scdn.net',
+        pathname: '/**',
+      },
+      // 開發環境（HTTP）
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '3000',
+        pathname: '/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '8080',
+        pathname: '/**',
       },
     ],
+    // 使用自訂 loader 強制 HTTPS 並補上副檔名
+    // loader: 'custom',
+    // loaderFile: './customImageLoader.js'
   },
-};
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig

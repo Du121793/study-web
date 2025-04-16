@@ -438,7 +438,6 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
                                     loading="lazy"
                                     style={{ height: 'auto' }}
                                     alt="qa-image"
-                                    onClick={() => clickZoomImage(`${doc.image[0]}`)}
                                   />
                                 )}
                               </div>
@@ -502,6 +501,15 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
                             }}>
                             刪除
                           </button>
+                        )}
+                        {item.image && item.image.length > 0 && (
+                          <Image
+                            className="qa-image"
+                            src={`${item.image[0]}?token=${userToken}`}
+                            width={300}
+                            height={0}
+                            alt='qa image pre view'
+                            style={{ height: 'auto' }}></Image>
                         )}
                         <div className="content">
                           <div

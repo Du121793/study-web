@@ -9,7 +9,7 @@
   align-items: center;
   gap: 16px;
   background-color: #fff;
-  width: 75%;
+  width: 90%;
 }
 .member-select-area input[type=checkbox] {
   transform: scale(1.3);
@@ -91,86 +91,53 @@
 .member-select-area .btns .search-option-btn:hover {
   background-color: #efefef;
 }
-.member-select-area .member-area {
-  margin-top: 12px;
-  width: 100%;
-}
-.member-select-area .member-area .title-area {
-  font-size: clamp(16px, 1.2vw, 20px);
-  margin-bottom: -8px;
+.member-select-area .member-list-area {
+  width: 90%;
   display: flex;
-  justify-content: center;
-  width: 100%;
-}
-.member-select-area .member-area .title-area #username {
-  margin-left: 50px;
-  width: 120px;
-  text-align: left;
-}
-.member-select-area .member-area .title-area #realname {
-  width: 80px;
-}
-.member-select-area .member-area .title-area #phone-number {
-  width: 120px;
-}
-.member-select-area .member-area .title-area #grade {
-  width: 80px;
-}
-.member-select-area .member-area .title-area #role {
-  width: 80px;
-}
-.member-select-area .member-area .title-area span {
-  pointer-events: none;
-  display: flex;
-  align-items: flex-end;
-}
-.member-select-area .member-area li {
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  margin-top: 12px;
-  width: 97.5%;
-  display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 24px;
+}
+.member-select-area .member-list-area .inner-line {
+  display: flex;
   justify-content: center;
-  position: relative;
-  padding: 4px 8px;
+  align-items: center;
+  width: 100%;
   border: 2px solid rgba(0, 0, 0, 0.2);
-  border-radius: 12px;
-  height: 40px;
-  background-color: #fafafa;
-  transition: 0.2s;
-}
-.member-select-area .member-area li .student-checkbox {
-  width: 16px;
-  height: 16px;
-}
-.member-select-area .member-area li .searched-info {
-  display: flex;
-  pointer-events: none;
-}
-.member-select-area .member-area li .searched-info span {
-  pointer-events: none;
-  display: flex;
-  align-items: flex-end;
-}
-.member-select-area .member-area li .searched-info #username {
-  margin-left: 24px;
-  width: 120px;
-  text-align: left;
+  border-radius: 4px;
+  padding: 8px;
+  gap: 4px;
   font-size: clamp(16px, 1.2vw, 20px);
 }
-.member-select-area .member-area li .searched-info #realname {
-  width: 80px;
-  font-size: clamp(16px, 1.2vw, 20px);
+.member-select-area .member-list-area .inner-line .user-name {
+  width: 20%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
-.member-select-area .member-area li .searched-info #phone-number {
-  width: 120px;
-  font-size: clamp(16px, 1.2vw, 20px);
+.member-select-area .member-list-area .inner-line .real-name {
+  width: 20%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
-.member-select-area .member-area li .searched-info #role {
-  width: 80px;
-  font-size: clamp(16px, 1.2vw, 20px);
+.member-select-area .member-list-area .inner-line .phone {
+  width: 20%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
-.member-select-area .member-area li .searched-info #grade {
-  width: 80px;
-  font-size: clamp(16px, 1.2vw, 20px);
+.member-select-area .member-list-area .inner-line .grade {
+  width: 10%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.member-select-area .member-list-area .inner-line .role {
+  width: 20%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }/*# sourceMappingURL=memberSelector.css.map */

@@ -24,9 +24,11 @@ export default function Index() {
   const [uploadBoardUIHeight, setUploadBoardUIHeight] = useState(0)
   const [bannerHasChange, setBannerHasChange] = useState(false)
   const [boardhasChange, setBoardHasChange] = useState(false)
+  const [editHasChange, setEditHasChange] = useState(false)
   // 用於開關UI時覆蓋所有內部元素
   const [visibility, setVisibility] = useState('visible')
 
+  // session 設定
   useEffect(() => {
     if (token) {
       userService
@@ -39,8 +41,9 @@ export default function Index() {
             sessionStorage.setItem('user_lineID', res.data.lineID)
             sessionStorage.setItem('user_id', res.data._id)
             sessionStorage.setItem('user_line_shot', res.data.userinfo.pictureUrl)
-            setUserShot(res.data.userinfo.pictureUrl)
             sessionStorage.setItem('user_role', res.data.role)
+            sessionStorage.setItem('user_name', res.data.userinfo.username)
+            setUserShot(res.data.userinfo.pictureUrl)
           }
           setUserRole(res.data.role)
           setLogined(true)
@@ -65,6 +68,8 @@ export default function Index() {
         )}
         {showUploadBoardUI && (
           <UploadBoard
+            editHasChange={editHasChange}
+            setEditHasChange={setEditHasChange}
             visibility={visibility}
             setVisibility={setVisibility}
             setShowUploadBoardUI={setShowUploadBoardUI}
@@ -99,7 +104,7 @@ export default function Index() {
           </div>
         )}
       </div>
-      <Board boardHasChange={boardhasChange}></Board>
+      <Board editHasChange={editHasChange}></Board>
       <div className="footer-area">
         <Footer></Footer>
       </div>

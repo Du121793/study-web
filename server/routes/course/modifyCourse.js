@@ -51,7 +51,6 @@ router.use("/videoAccess", accessChecker.teacher, videoAccessRoute);
 router.post("/createNewCourse", async (req, res) => {
   try {
     const { courseName, subject, grade, courseClass, teacherId } = req.body;
-    console.log(teacherId)
     // 驗證必要參數
     if (!(courseName && subject && grade && courseClass))
       return res.status(400).json({ success: false, msg: "資料提供不完整" });
@@ -74,7 +73,7 @@ router.post("/createNewCourse", async (req, res) => {
 
     // 其他類型則使用自己的ID
     teacherToAssign = req.user._id;
-    
+
     // 如果是管理員且有指定教師
     if (req.user.role === "admin" && teacherId) {
       // 檢查指定的教師是否存在且具有適當的角色

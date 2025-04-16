@@ -30,7 +30,7 @@ export default function UserProfile() {
   const [username, setUsername] = useState('')
   const [realname, setRealname] = useState(false)
   const [phoneNumber, setPhoneNumber] = useState(false)
-  const [hideAvatar, setHideAvatar] = useState(false)
+  const [hideAvatar, setHideAvatar] = useState(userInfo?.makePictureAnonymous)
 
   // 控制訊息外觀與隱藏計時
   const messageControl = (info, isSuccess) => {
@@ -50,7 +50,10 @@ export default function UserProfile() {
     }, 2000)
   }
 
-  const test = () => {}
+  const test = () => {
+    console.log(hideAvatar)
+    console.log(userInfo)
+  }
 
   const changeUserRole = (role) => {
     console.log(role)
@@ -146,7 +149,9 @@ export default function UserProfile() {
         <div className="hide-avatar">
           <input
             className="checkbox"
+            checked={hideAvatar}
             onChange={(e) => {
+              console.log(e.target.checked)
               setHideAvatar(e.target.checked)
             }}
             type="checkbox"
@@ -155,28 +160,26 @@ export default function UserProfile() {
         </div>
         {hideAvatar === false && (
           <div className="avatar">
-            {userInfo?.userinfo?.displayPictureUrl && (
+            {userInfo?.userinfo && (
               <Image
                 alt="user avatar"
                 className="image"
                 loading="lazy"
-                src={userInfo.userinfo.displayPictureUrl}
+                src={userInfo.userinfo.pictureUrl}
                 width={100}
-                height={100}></Image>
+                height={0}></Image>
             )}
           </div>
         )}
         {hideAvatar === true && (
           <div className="avatar">
-            {userInfo?.userinfo?.displayPictureUrl && (
-              <Image
-                alt="user avatar"
-                className="image"
-                loading="lazy"
-                src={anonymous}
-                width={100}
-                height={100}></Image>
-            )}
+            <Image
+              alt="user avatar"
+              className="image"
+              loading="lazy"
+              src={anonymous}
+              width={100}
+              height={0}></Image>
           </div>
         )}
         {/* 右側資訊條 */}
@@ -271,7 +274,7 @@ export default function UserProfile() {
               onClick={() => {
                 setEditState(true)
               }}>
-              編輯
+              編輯資訊
             </button>
             <button
               className="g-blue-btn"

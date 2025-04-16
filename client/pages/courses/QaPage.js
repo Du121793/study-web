@@ -27,11 +27,12 @@ import dbArrowRight from '../../public/profile/doubleArrowRight.png'
 import ArrowLeft from '../../public/profile/leftArrow.png'
 import ArrowRight from '../../public/profile/rightArrow.png'
 
-// 用於請求後端圖片的路由
-const getImageUrl = 'http://localhost:8080/resource/questionIMG'
-
 // env
+const server_url = process.env.NEXT_PUBLIC_SERVER_IP
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
+
+// 用於請求後端圖片的路由
+const getImageUrl = `${server_url}/resource/questionIMG`
 // --------------------------------------------------------------------------
 export default function QaPage() {
   const token = useUserToken()
@@ -215,6 +216,24 @@ export default function QaPage() {
       adminService.setCommentBest(token, data, qa_id).then((res) => {
         if (res.success) {
           setCommentHasChange(!commentHasChange)
+          messageControl('修改成功', true)
+        } else {
+          messageControl('發生錯誤', false)
+        }
+      })
+    }
+  }
+
+  const setCommentUnbest = (commentId) => {
+    let data = {
+      commentID: commentId,
+      isBest: false,
+    }
+    if (commentId) {
+      adminService.setCommentBest(token, data, qa_id).then((res) => {
+        if (res.success) {
+          setCommentHasChange(!commentHasChange)
+          messageControl('修改成功', true)
         } else {
           messageControl('發生錯誤', false)
         }
@@ -376,10 +395,10 @@ export default function QaPage() {
                     crossOrigin="anonymous"
                     className="image-video"
                     loading="lazy"
+                    unoptimized={true}
                     src={`${getImageUrl}/${item}?token=${userToken}`}
                     onClick={() => {
                       clickZoomImage(`${getImageUrl}/${item}`)
-                      console.log(`${getImageUrl}/${item}?token=${userToken}`)
                     }}
                     alt="course has no image icon"
                     // 若是圖片大於三張則縮小顯示
@@ -476,14 +495,26 @@ export default function QaPage() {
                         width={12}
                         height={12}
                         alt="user shot"></Image>
-                      <div className="content">置頂</div>
+                      <div
+                        className="content"
+                        style={{ color: '#46A3FF' }}>
+                        置頂
+                      </div>
                     </div>
                   )}
                   <div className="function-btn-area">
+                    {(userRole === 'teacher' || userRole === 'admin') && item?.isBest === true && (
+                      <div
+                        onClick={() => {
+                          setCommentUnbest(item._id)
+                        }}
+                        className="set-best-comment-btn">
+                        取消置頂
+                      </div>
+                    )}
                     {(userRole === 'teacher' || userRole === 'admin') && item?.isBest !== true && (
                       <div
                         onClick={() => {
-                          console.log(item)
                           setCommentBest(item._id)
                         }}
                         className="set-best-comment-btn">

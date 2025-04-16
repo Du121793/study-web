@@ -4,10 +4,11 @@
   flex-direction: column;
   align-items: center;
   background-color: #fefefe;
-  padding: 24px;
+  height: 100%;
   gap: 8px;
 }
 .preRegister-main .header {
+  margin-top: 24px;
   width: 100%;
   display: flex;
   justify-content: center;

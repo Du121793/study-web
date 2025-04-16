@@ -9,12 +9,11 @@ import logo from '../../public/videoPlay/logo2.png'
 // method
 import { useUserToken } from '../../method/useUserToken'
 import userService from '../../method/userService'
-
+import Footer from '../../components/global/Footer'
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
 export default function Player() {
-  const baseUrl = `${clientIp}/`
   const token = useUserToken()
   // 路由初始化
   const router = useRouter()
@@ -40,31 +39,70 @@ export default function Player() {
       setIsAlignCenter('center')
       setVideoListIsOpen(false)
       setVideoListWidth(0)
-      setVideoListMarginRight('-300px')
-      setPlayerHeight(700)
+      setVideoListMarginRight('-500px')
+      setPlayerHeight('70%')
     } else if (e === 'open-button') {
       setIsAlignCenter('flex-start')
       setVideoListIsOpen(true)
-      setVideoListWidth(300)
+      setVideoListWidth(500)
       setVideoListMarginRight('0')
-      setPlayerHeight(600)
+      setPlayerHeight('60%')
     }
   }
 
   function formatTime(seconds) {
-    // 計算小時
-    const h = Math.floor(seconds / 3600)
-    // 計算剩餘分鐘數
-    const m = Math.floor((seconds % 3600) / 60)
-    // 剩下的秒數
-    const s = seconds % 60
+    const hour = Math.floor(seconds / 3600)
+    const min = Math.floor((seconds % 3600) / 60)
+    const sec = seconds % 60
 
-    // 使用 padStart 確保不足兩位的數字前面補零
-    const hours = h.toString().padStart(2, '0')
-    const minutes = m.toString().padStart(2, '0')
-    const secs = s.toString().padStart(2, '0')
+    if (hour > 0) {
+      // 當有小時時，分鐘和秒都補0
+      const hourStr = hour.toString()
+      const minStr = min < 10 ? `0${min}` : min.toString()
+      const secStr = sec < 10 ? `0${sec}` : sec.toString()
+      return `${hourStr}:${minStr}:${secStr}`
+    } else if (min > 0) {
+      // 當只有分鐘（無小時），分鐘不用補0，秒補0
+      const minStr = min.toString()
+      const secStr = sec < 10 ? `0${sec}` : sec.toString()
+      return `${minStr}:${secStr}`
+    } else {
+      // 當小時和分鐘皆為0，固定輸出0作為分鐘，秒補0
+      const secStr = sec < 10 ? `0${sec}` : sec.toString()
+      return `0:${secStr}`
+    }
+  }
 
-    return `${hours}:${minutes}:${secs}`
+  function timeAgo(isoDate) {
+    const past = new Date(isoDate)
+    const now = new Date()
+    const diffMs = now - past
+
+    const seconds = Math.floor(diffMs / 1000)
+    if (seconds < 60) {
+      return `${seconds}秒前`
+    }
+
+    const minutes = diffMs / (1000 * 60)
+    if (minutes < 60) {
+      return `${Math.floor(minutes)}分鐘前`
+    }
+
+    const hours = diffMs / (1000 * 60 * 60)
+    if (hours < 24) {
+      return `${Math.floor(hours)}小時前`
+    }
+
+    const days = diffMs / (1000 * 60 * 60 * 24)
+    if (days < 7) {
+      return `${Math.floor(days)}天前`
+    } else if (days < 30) {
+      return `${Math.floor(days / 7)}周前`
+    } else if (days < 365) {
+      return `${Math.floor(days / 30)}個月前`
+    } else {
+      return `${Math.floor(days / 365)}年前`
+    }
   }
 
   // 解析query的JSON
@@ -82,7 +120,6 @@ export default function Player() {
   useEffect(() => {
     if (token && course_id && video_id) {
       userService.getVideoLink(token, course_id, video_id).then((res) => {
-        console.log(res)
         setVideoUrl(res.data.embedLink)
       })
     }
@@ -95,6 +132,7 @@ export default function Player() {
           sortOrder: 'asc',
         })
         .then((res) => {
+          console.log(res)
           setVideosList(res.data)
         })
     }
@@ -108,7 +146,7 @@ export default function Player() {
   }, [])
 
   const test = () => {
-    console.log(VideosList)
+    console.log(formatTime(10))
   }
 
   return (
@@ -142,7 +180,7 @@ export default function Player() {
         {/* 左側影片播放器 */}
         <div className="player">
           <iframe
-            style={{ height: `${playerHeight}px` }}
+            style={{ height: `${playerHeight}` }}
             id="iframe"
             src={videoUrl}
             title="Video Player"
@@ -189,28 +227,26 @@ export default function Player() {
           }}>
           {/* 開關按鈕 */}
           <div
-            className="title"
-            style={{ opacity: !videoListIsOpen ? 0 : 1 }}>
-            影片列表
-            <div
-              id="close-button"
-              className="hidden-info-btn"
-              onClick={(e) => {
-                listSwitch(e.target.id)
-              }}>
-              X
-            </div>
+            id="close-button"
+            className="hidden-info-btn"
+            onClick={(e) => {
+              listSwitch(e.target.id)
+            }}>
+            隱藏列表
           </div>
           <ul
             className="videos-area"
             style={{ opacity: !videoListIsOpen ? 0 : 1 }}>
             {VideosList &&
               VideosList.map((item, index) => {
-                if (item._id === video_id && item.access.isAccess === true) {
+                if (item.access && item.access.isAccess === true) {
                   return (
                     <Link
-                      className="video active"
+                      className={`video ${item._id === video_id ? 'active' : ''}`}
                       key={index}
+                      onClick={() => {
+                        console.log(item)
+                      }}
                       href={{
                         pathname: `${clientIp}/videoPlay/Player`,
                         query: {
@@ -220,25 +256,21 @@ export default function Player() {
                           info: JSON.stringify({ description: item.description, title: item.title, time: item.recordDate }),
                         },
                       }}>
-                      {item.title}
-                      <div className="content">{formatTime(item.length)}</div>
-                    </Link>
-                  )
-                } else {
-                  return (
-                    <Link
-                      className="video"
-                      key={index}
-                      href={{
-                        pathname: `${clientIp}/videoPlay/Player`,
-                        query: {
-                          course_name: course_name,
-                          video_id: item._id,
-                          course_id: course_id,
-                          info: JSON.stringify({ description: item.description, title: item.title, time: item.recordDate }),
-                        },
-                      }}>
-                      {item.title}
+                      <div className="image-area">
+                        {item?.thumbnail && (
+                          <Image
+                            className="pre-view-image"
+                            src={item.thumbnail}
+                            width={180}
+                            height={0}
+                            alt="video image"></Image>
+                        )}
+                        <div className="video-time">{formatTime(item.length)}</div>
+                      </div>
+                      <div className="info">
+                        <div className="video-title">{item.title}</div>
+                        <div className="video-time">{timeAgo(item.date)}</div>
+                      </div>
                     </Link>
                   )
                 }
@@ -246,6 +278,7 @@ export default function Player() {
           </ul>
         </div>
       </div>
+      <Footer></Footer>
     </div>
   )
 }

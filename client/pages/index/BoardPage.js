@@ -1,18 +1,24 @@
+// 庫
 import { useRouter } from 'next/router'
+import { useEffect, useState, useRef } from 'react'
+import Link from 'next/link'
+// globel component
 import Header from '../../components/global/Header'
-import { useEffect, useState } from 'react'
+import Footer from '../../components/global/Footer'
+// method
 import userService from '../../method/userService'
 import { useUserToken } from '../../method/useUserToken'
-import Link from 'next/link'
-import Footer from '../../components/global/Footer'
+import adminService from '../../method/adminService'
+// child component
 import UploadBoard from '../components/UploadBoard'
+// env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
 export default function BoardPage() {
   const token = useUserToken()
   const router = useRouter()
   const { board_id } = router.query
-  const loginState = true
+  const [loginState, setLoginState] = useState(false)
   const [showUploadBoardUI, setShowUploadBoardUI] = useState(false)
   const [uploadBoardUIHeight, setUploadBoardUIHeight] = useState(0)
   const [whichMethod, setWhichMethod] = useState('edit')
@@ -25,6 +31,58 @@ export default function BoardPage() {
   const [boardInfo, setBoardInfo] = useState(null)
   // 編輯公告
   const [editBoard, setEditBoard] = useState(false)
+  // 二次確認刪除
+  const [dbcheckDelete, setDbcheckDelete] = useState(false)
+  // loading anime
+  const [loading, setLoading] = useState(false)
+  // 控制訊息
+  const [message, setMessage] = useState('無訊息')
+  const [messageStatus, setMessageStatus] = useState(false)
+  const [messageColor, setMessageColor] = useState('')
+  // 綁定timeout，用於重計
+  const messageTimer = useRef(null)
+  const resetTimer = useRef(null)
+
+  const test = () => {
+    console.log(boardInfo)
+  }
+
+  // 控制訊息
+  const messageControl = (info, isSuccess) => {
+    setMessage(info)
+    setMessageStatus(true)
+    if (isSuccess) {
+      setMessageColor('rgba(195, 240, 178, 0.8)')
+    } else {
+      setMessageColor('rgba(240, 178, 178, 0.8)')
+    }
+
+    // 清除之前的 timer
+    if (messageTimer.current) clearTimeout(messageTimer.current)
+    if (resetTimer.current) clearTimeout(resetTimer.current)
+
+    messageTimer.current = setTimeout(() => {
+      setMessageStatus(false)
+      resetTimer.current = setTimeout(() => {
+        setMessage('無訊息')
+        setMessageColor('')
+      }, 200)
+    }, 2000)
+  }
+
+  // 刪除公告
+  const deletBoard = () => {
+    setLoading(true)
+    adminService.deleteBoard(token, boardInfo._id).then((res) => {
+      if (res?.success) {
+        setLoading(false)
+        window.location.href = `${clientIp}`
+      } else {
+        setLoading(false)
+        messageControl('發生錯誤，刪除失敗', false)
+      }
+    })
+  }
 
   // get Board info by id
   useEffect(() => {
@@ -44,14 +102,31 @@ export default function BoardPage() {
     if (sessionStorage.getItem('user_role')) {
       const role = sessionStorage.getItem('user_role')
       setUserRole(role)
+      if (role) {
+        setLoginState(true)
+      }
     }
   }, [])
 
   return (
     <div className="board-page-main">
+      <div className="messaege-area">
+        <div
+          style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
+          className="message">
+          {message}
+        </div>
+      </div>
+
+      {loading && (
+        <div className="loading-main">
+          <div className="loader"></div>
+        </div>
+      )}
       <Header loginState={loginState} />
       {showUploadBoardUI && (
         <UploadBoard
+          boardInfo={boardInfo}
           visibility={visibility}
           setVisibility={setVisibility}
           setShowUploadBoardUI={setShowUploadBoardUI}
@@ -82,7 +157,33 @@ export default function BoardPage() {
             }}>
             編輯公告
           </div>
-          <div className="g-red-btn">刪除公告</div>
+          {!dbcheckDelete && (
+            <div
+              className="g-red-btn"
+              onClick={() => {
+                setDbcheckDelete(true)
+              }}>
+              刪除公告
+            </div>
+          )}
+          {dbcheckDelete && (
+            <div
+              className="g-green-btn"
+              onClick={() => {
+                deletBoard()
+              }}>
+              確定刪除
+            </div>
+          )}
+          {dbcheckDelete && (
+            <div
+              className="g-red-btn"
+              onClick={() => {
+                setDbcheckDelete(false)
+              }}>
+              取消
+            </div>
+          )}
         </div>
       ) : (
         <div className="g-btn-area">
@@ -98,18 +199,32 @@ export default function BoardPage() {
         <div className="announcement">
           <div className="announcement-header">
             <div className="info">
-              <div className="title">{boardInfo.title}</div>
-              <div className="subTitle">{boardInfo.subTitle}</div>
+              <div
+                className="title"
+                style={{ whiteSpace: 'pre-wrap' }}
+                onClick={() => {
+                  test()
+                }}>
+                {boardInfo.title}
+              </div>
+              <div
+                className="subTitle"
+                style={{ whiteSpace: 'pre-wrap' }}>
+                {boardInfo.subTitle}
+              </div>
             </div>
           </div>
           <div
             className="announcement-body"
+            style={{ whiteSpace: 'pre-wrap' }}
             // 根據 content 的順序渲染所有元素（文字、圖片等）
             dangerouslySetInnerHTML={{ __html: boardInfo.content }}
           />
-          <div className="announcement-footer">
-            Posted by {boardInfo.poster.username} on {new Date(boardInfo.date).toLocaleString()}
-          </div>
+          {boardInfo.poster && (
+            <div className="announcement-footer">
+              Posted by {boardInfo.poster.username} on {new Date(boardInfo.date).toLocaleString()}
+            </div>
+          )}
         </div>
       )}
       <div className="footer-area">

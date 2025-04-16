@@ -20,6 +20,12 @@ const hpp = require("hpp");
 const jwt = require("jsonwebtoken");
 const { log, logError } = require("./utils/logger");
 
+// 載入 access 設定（可依需求儲存設定，以下內容來源於 accessConfig.json）
+const accessConfig = require("./config/accessConfig.json");
+
+// 取得第二個ip作為req.ip
+app.set("trust proxy", 2);
+
 // =====================
 // 載入配置和路由
 // =====================
@@ -157,25 +163,27 @@ const tokenCheck = (req, res, next) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    // 檢查 IP 是否匹配
-    const tokenPayload = jwt.decode(req.headers.authorization.split(" ")[1]);
-    if (tokenPayload.ip !== req.ip) {
-      logError(
-        {},
-        "index.js",
-        "tokenCheck",
-        {
-          path: req.path,
-          reason: "IP 不匹配",
-          tokenIp: tokenPayload.ip,
-          requestIp: req.ip,
-        },
-        new Error("IP 不匹配")
-      );
-      return res.status(401).json({
-        message: "IP 不匹配，請重新登入",
-        code: "IP_MISMATCH",
-      });
+    // 檢查 IP 是否匹配（若 accessConfig 設定綁定 IP）
+    if (accessConfig.token.bindIP) {
+      const tokenPayload = jwt.decode(req.headers.authorization.split(" ")[1]);
+      if (tokenPayload.ip !== req.ip) {
+        logError(
+          {},
+          "index.js",
+          "tokenCheck",
+          {
+            path: req.path,
+            reason: "IP 不匹配",
+            tokenIp: tokenPayload.ip,
+            requestIp: req.ip,
+          },
+          {}
+        );
+        return res.status(401).json({
+          message: "IP 不匹配，請重新登入",
+          code: "IP_MISMATCH",
+        });
+      }
     }
 
     req.user = user;

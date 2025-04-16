@@ -152,7 +152,7 @@ router.delete("/deleteCarousel", async (req, res) => {
         userId: req.user._id,
         userName: req.user.userinfo.realname,
       },
-      `刪除輪轉圖 ${numbers.join(", ")}`
+      `刪除輪轉圖 ${numbers}`
     );
 
     // 回傳刪除結果
@@ -276,71 +276,166 @@ router.post("/postNewBoard", async (req, res) => {
  * PUT /putBoard
  * 更新公告內容，包括標題、副標題和內容
  * @route PUT /putBoard
- * @param {string} req.body.board_id - 要更新的公告 ID
- * @param {string} [req.body.title] - 新的公告標題
- * @param {string} [req.body.subTitle] - 新的公告副標題
- * @param {string} [req.body.content] - 新的公告內容，可包含 base64 格式的圖片
+ * @param {string} req.body.board_id - 要更新的公告 ID（必填）
+ * @param {string} req.body.title - 新的公告標題（必填）
+ * @param {string} req.body.subTitle - 新的公告副標題（必填）
+ * @param {string} req.body.content - 新的公告內容，可包含 base64 圖片（必填）
  * @returns {Object} 包含成功狀態、訊息和更新後的公告資料的 JSON 響應
  */
 router.put("/putBoard", async (req, res) => {
   try {
-    // 從請求體中獲取公告ID和更新內容
     const { board_id, title, subTitle, content } = req.body;
 
-    // 查找要更新的公告
+    // 1. 必填欄位檢查
+    if (!board_id || !title || !subTitle || !content) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "缺少必要欄位，無法更新公告" });
+    }
+
+    // 2. 查詢公告
     let board = await Board.findById(board_id);
     if (!board) {
       return res.status(404).json({ success: false, msg: "找不到該公告" });
     }
 
-    // 更新基本資料
-    if (title !== undefined) board.title = title;
-    if (subTitle !== undefined) board.subTitle = subTitle;
-    if (content !== undefined) board.content = content;
+    // 3. 更新基本文字資料
+    board.title = title;
+    board.subTitle = subTitle;
+    // 先把 content 留著，待會處理完圖片後，最後再賦值回去
+    let originalContent = content;
 
-    // 計算該公告的圖片資料夾路徑
+    // 4. 準備公告的圖片資料夾
     const boardFolder = path.join(boardPath, board._id.toString());
-
-    // 清空原有圖片資料夾
-    if (fs.existsSync(boardFolder)) {
-      fs.rmSync(boardFolder, { recursive: true, force: true });
-    }
-    fs.mkdirSync(boardFolder, { recursive: true });
-
-    // 處理新的 base64 圖片
-    const imageRegex = /<img[^>]+src="data:image\/([^;]+);base64,([^"]+)"/g;
-    let match;
-    let newContent = content;
-    let imageCount = 0;
-
-    // 處理內容中的每張 base64 圖片
-    while ((match = imageRegex.exec(content)) !== null) {
-      const [fullMatch, imageType, base64Data] = match;
-
-      // 將 base64 轉換為 buffer
-      const imageBuffer = Buffer.from(base64Data, "base64");
-
-      // 建立新的檔名
-      const newNumber = imageCount + 1;
-      const newFilename = `image-${newNumber}.${imageType}`;
-      const newFilePath = path.join(boardFolder, newFilename);
-
-      // 寫入檔案
-      fs.writeFileSync(newFilePath, imageBuffer);
-
-      // 更新 content 中的圖片路徑
-      const relativePath = `/resource/public/board/${board._id}/${newFilename}`;
-      newContent = newContent.replace(fullMatch, `<img src="${relativePath}"`);
-
-      imageCount++;
+    if (!fs.existsSync(boardFolder)) {
+      fs.mkdirSync(boardFolder, { recursive: true });
     }
 
-    // 更新 Board 文件的 content
-    if (imageCount > 0) {
-      board.content = newContent;
+    // 讀出「舊」圖片清單
+    const oldFiles = fs.readdirSync(boardFolder);
+    const oldImages = new Set(oldFiles);
+
+    // 找出已存在的最大 image 編號，避免覆蓋舊圖
+    let maxImageIndex = 0;
+    for (const file of oldFiles) {
+      const match = file.match(/^image-(\d+)\.(.+)$/); 
+      if (match) {
+        const idx = parseInt(match[1], 10);
+        if (!isNaN(idx) && idx > maxImageIndex) {
+          maxImageIndex = idx;
+        }
+      }
+    }
+    let nextImageIndex = maxImageIndex + 1;
+
+    // 5. 以正規表達式找出所有 <img ...> 標籤
+    const imageTagRegex = /<img[^>]*>/gi;
+    let newContentSegments = [];
+    let lastIndex = 0;
+    let keepImages = new Set(); // 需要保留的舊檔名或新檔名
+
+    let imgMatch;
+    while ((imgMatch = imageTagRegex.exec(originalContent)) !== null) {
+      const entireTag = imgMatch[0];
+      const startIndex = imgMatch.index;
+      const endIndex = imageTagRegex.lastIndex;
+
+      // 先把前一段（非 <img> 的部分）加入
+      newContentSegments.push(originalContent.substring(lastIndex, startIndex));
+
+      // 再進一步找 <img> 裡的 src
+      const srcAttrRegex = /\bsrc\s*=\s*(["'])(.*?)\1/i;
+      const srcMatch = entireTag.match(srcAttrRegex);
+
+      if (!srcMatch) {
+        // 如果 <img> 沒 src，乾脆移除
+        lastIndex = endIndex;
+        continue;
+      }
+
+      let srcValue = srcMatch[2]; // 原始的 src
+      let newImgTag = entireTag;  // 預設保留整個 <img>，若有需求再改
+
+      // -- 檢查是否 base64 --
+      const base64Regex = /^data:image\/([^;]+);base64,(.+)$/;
+      const base64Match = srcValue.match(base64Regex);
+
+      if (base64Match) {
+        // base64 圖片 => 轉檔並另存新名稱
+        const imageType = base64Match[1];  
+        const base64Data = base64Match[2];  
+        const imageBuffer = Buffer.from(base64Data, "base64");
+
+        const newFilename = `image-${nextImageIndex}.${imageType}`;
+        nextImageIndex++;
+
+        const newFilePath = path.join(boardFolder, newFilename);
+        fs.writeFileSync(newFilePath, imageBuffer);
+
+        // 更新 <img> 的 src
+        const newSrc = `/resource/public/board/${board._id}/${newFilename}`;
+        newImgTag = newImgTag.replace(srcAttrRegex, `src="${newSrc}"`);
+
+        keepImages.add(newFilename);
+
+      } else {
+        // 非 base64 => 檢查是否屬於當前公告的本地圖片
+        // 有些環境可能會傳來 domain 或 /api，需去除前綴，只比對後半部
+        // 先嘗試找出 "/resource/public/board/<board_id>/" 之後的子字串
+        // 例如 "https://xxx.com/api/resource/public/board/6418e8a76c529f4/image-1.png"
+        // 最後我們只關心 "/resource/public/board/6418e8a76c529f4/image-1.png" 之後的部分
+
+        const pathIndex = srcValue.indexOf(`/resource/public/board/${board._id}/`);
+        if (pathIndex !== -1) {
+          // 取得真正的檔名（含子資料夾路徑或檔名）
+          const realPath = srcValue.substring(pathIndex); 
+          // realPath 形如：/resource/public/board/<board_id>/image-1.png
+
+          // 取出最後的檔名
+          // "/resource/public/board/6418e8a76c529f4/image-1.png" => "image-1.png"
+          const fileName = realPath.replace(`/resource/public/board/${board._id}/`, "");
+
+          // 檢查此檔名在舊檔案中是否存在
+          if (oldImages.has(fileName)) {
+            // 存在 => 保留
+            keepImages.add(fileName);
+
+            // 也確保 <img> src 統一成沒有多餘 domain /api 的版本
+            const pureSrc = `/resource/public/board/${board._id}/${fileName}`;
+            newImgTag = newImgTag.replace(srcAttrRegex, `src="${pureSrc}"`);
+          } else {
+            // 舊檔中找不到 => 移除此 <img>
+            newImgTag = "";
+          }
+        } else {
+          // 不在同一路徑 => 移除
+          newImgTag = "";
+        }
+      }
+
+      // 放入新的 <img>（或空字串）
+      newContentSegments.push(newImgTag);
+      lastIndex = endIndex;
     }
 
-    // 儲存更新後的公告
+    // 處理最後一段（最後一個 <img> 之後）
+    newContentSegments.push(originalContent.substring(lastIndex));
+    const newContent = newContentSegments.join("");
+
+    // 6. 刪除未被引用的舊圖片
+    for (const oldFile of oldImages) {
+      if (!keepImages.has(oldFile)) {
+        try {
+          fs.unlinkSync(path.join(boardFolder, oldFile));
+        } catch (err) {
+          // 可自行記錄錯誤
+          console.error("刪除舊檔案時發生錯誤：", err);
+        }
+      }
+    }
+
+    // 7. 更新 content 並儲存
+    board.content = newContent;
     await board.save();
 
     log(
@@ -352,7 +447,6 @@ router.put("/putBoard", async (req, res) => {
       `更新公告 ${board_id}`
     );
 
-    // 回傳更新結果
     return res.json({ success: true, msg: "公告更新成功", data: board });
   } catch (e) {
     logError(
@@ -383,7 +477,6 @@ router.delete("/deleteBoard/:board_id", async (req, res) => {
   try {
     // 從路徑參數中獲取公告ID
     const { board_id } = req.params;
-
     // 查找並刪除公告
     const board = await Board.findByIdAndDelete(board_id);
     if (!board) {

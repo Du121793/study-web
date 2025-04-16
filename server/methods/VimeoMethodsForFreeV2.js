@@ -158,7 +158,7 @@ async function uploadVideo(videoInfo, videoIndex) {
   const { title, fileSize, description = "", type } = videoInfo;
   try {
     // 驗證檔案大小
-    console.log(fileSize);
+    // console.log(fileSize);
     if (!fileSize || isNaN(fileSize)) {
       throw new Error("fileSize錯誤");
     }
@@ -224,7 +224,7 @@ async function uploadVideo(videoInfo, videoIndex) {
       method: "PUT",
       path: `/users/${userId}/projects/${folderId}/videos/${videoId}`,
     });
-    console.log(addFolderResp.APILimit);
+    // console.log(addFolderResp.APILimit);
 
     // 返回上傳結果
     return {
@@ -352,7 +352,7 @@ async function findVideo(videoIndex = {}) {
     const filtered = allVideos.filter((video) =>
       matchDescription(video.description || "", videoIndex)
     );
-    console.log(lastAPILimit);
+    // console.log(lastAPILimit);
 
     // 返回查詢結果
     return {

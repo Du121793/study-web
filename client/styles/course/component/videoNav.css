@@ -158,19 +158,21 @@
 }
 #video-nav .video-area .video-card .bottom-container {
   flex: 1;
-  height: 40%;
   background-color: #fff;
   display: flex;
   align-items: center;
+  padding: 4px;
 }
 #video-nav .video-area .video-card .bottom-container .info {
+  min-height: 110px;
+  max-height: 110px;
   color: black;
   width: 100%;
   background-color: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
 }
 #video-nav .video-area .video-card .bottom-container .info .time {
   width: 95%;
@@ -186,8 +188,11 @@
   display: flex;
 }
 #video-nav .video-area .video-card .bottom-container .info .title {
+  height: 48px;
   display: -webkit-box;
   -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-clamp: 2;
   -webkit-line-clamp: 2; /* 限制最多顯示 3 行，超過則省略 */
   text-overflow: ellipsis;
   width: 95%;
@@ -213,4 +218,10 @@
 }
 #video-nav .video-area .video-card .bottom-container .info .bottom-area .container .access-time {
   color: rgba(0, 0, 0, 0.6);
+}
+#video-nav .video-area .video-card .bottom-container .info .bottom-area .container .light {
+  color: rgb(236, 89, 89);
+}
+#video-nav .video-area .video-card .bottom-container .info .bottom-area .container .box {
+  opacity: 0;
 }/*# sourceMappingURL=videoNav.css.map */

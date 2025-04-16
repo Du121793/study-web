@@ -13,7 +13,7 @@ const VideoInfo = require("../models/").courseVideoInfo;
 const QAmessage = require("../models/").QAmessage;
 const vimeoSchedule = require("../models").vimeoSchedule;
 const VimeoMethods = require("../methods").vimeoMethods;
-const { logError } = require("../utils/logger");
+const { log, logError } = require("../utils/logger");
 
 // 讀取config
 const scheduleConfig = require("../config/scheduleConfig.json");
@@ -74,7 +74,7 @@ async function processExpiredVideos() {
         });
         await newSchedule.save();
         await VideoInfo.findByIdAndDelete(doc._id);
-        console.log(`將 VideoInfo_id: ${doc._id} 轉移到待刪除影片`);
+        log({}, `將 VideoInfo_id: ${doc._id} 轉移到待刪除影片`);
       } catch (err) {
         logError(
           {},
@@ -85,8 +85,6 @@ async function processExpiredVideos() {
         );
       }
     }
-  } else {
-    console.log("VideoInfo 無過期資料，跳過處理");
   }
 
   // 步驟 2: 處理 QAmessage 過期記錄
@@ -115,7 +113,7 @@ async function processExpiredVideos() {
         });
         await newSchedule.save();
         await QAmessage.findByIdAndDelete(doc._id);
-        console.log(`將 QAmessage_id: ${doc._id} 轉移到待刪除影片`);
+        log({}, `將 QAmessage_id: ${doc._id} 轉移到待刪除影片`);
       } catch (err) {
         logError(
           {},
@@ -126,8 +124,6 @@ async function processExpiredVideos() {
         );
       }
     }
-  } else {
-    console.log("QAmessage 無過期資料，跳過處理");
   }
 }
 
@@ -167,12 +163,6 @@ async function processGetSchedule() {
 
     // 處理 API 回應失敗的情況
     if (!findResp.success || findResp.total === 0) {
-      console.log(
-        `GET 排程失敗：method: ${schedule.method}, videoIndex: ${JSON.stringify(
-          Object.fromEntries(schedule.videoIndex)
-        )}`
-      );
-
       // 檢查是否因 API 限制而失败
       const shouldCountAsFail = !(
         (findResp.APILimit && findResp.APILimit.remaining === 0) || // API 限制
@@ -183,15 +173,10 @@ async function processGetSchedule() {
         schedule.failedCount = (schedule.failedCount || 0) + 1;
         if (schedule.failedCount >= scheduleConfig.getSchedule.maxFailCount) {
           await vimeoSchedule.findByIdAndDelete(schedule._id);
-          console.log(
-            `GET 排程：失敗次數達到上限，已刪除 _id: ${schedule._id}`
-          );
+          log({}, `GET 排程：失敗次數達到上限，已刪除 _id: ${schedule._id}`);
         } else {
           await schedule.save();
-          console.log(`GET 排程：failedCount 更新為 ${schedule.failedCount}`);
         }
-      } else {
-        console.log("GET 排程：因 API 限制或有效響應而不計入失敗次數");
       }
 
       return { success: false, processed: 0, APILimit: findResp.APILimit };
@@ -226,7 +211,7 @@ async function processGetSchedule() {
           });
         }
         await vimeoSchedule.findByIdAndDelete(schedule._id);
-        console.log(`GET 排程：成功處理並刪除 _id: ${schedule._id}`);
+        log({}, `GET 排程：成功處理並刪除 _id: ${schedule._id}`);
       }
     }
 
@@ -237,11 +222,7 @@ async function processGetSchedule() {
         APILimit.remaining <
         APILimit.limit * scheduleConfig.getSchedule.apiLimitThreshold
       ) {
-        console.log(
-          `GET 排程：剩餘點數低於總額的 ${
-            scheduleConfig.getSchedule.apiLimitThreshold * 100
-          }%，結束本輪處理`
-        );
+        // `GET 排程：剩餘點數低於總額的${scheduleConfig.getSchedule.apiLimitThreshold * 100}%，結束本輪處理`
         break;
       }
     }
@@ -283,14 +264,6 @@ async function processDeleteSchedule() {
       (deleteResp.data && deleteResp.success === false) ||
       deleteResp.total === 0
     ) {
-      console.log(
-        `DELETE 排程失敗：method: ${
-          schedule.method
-        }, videoIndex: ${JSON.stringify(
-          Object.fromEntries(schedule.videoIndex)
-        )}`
-      );
-
       // 檢查是否 API 限制而失败
       const shouldCountAsFail = !(
         (deleteResp.APILimit && deleteResp.APILimit.remaining === 0) || // API 限制
@@ -303,24 +276,17 @@ async function processDeleteSchedule() {
           schedule.failedCount >= scheduleConfig.deleteSchedule.maxFailCount
         ) {
           await vimeoSchedule.findByIdAndDelete(schedule._id);
-          console.log(
-            `DELETE 排程：失敗次數達到上限，已刪除 _id: ${schedule._id}`
-          );
+          log({}, `DELETE 排程：失敗次數達到上限，已刪除 _id: ${schedule._id}`);
         } else {
           await schedule.save();
-          console.log(
-            `DELETE 排程：failedCount 更新為 ${schedule.failedCount}`
-          );
         }
-      } else {
-        console.log("DELETE 排程：因 API 限制或有效響應而不計入失敗次數");
       }
 
       return { success: false, processed: 0, APILimit: deleteResp.APILimit };
     }
     if (deleteResp.data && deleteResp.success === true) {
       await vimeoSchedule.findByIdAndDelete(schedule._id);
-      console.log(`DELETE 排程：成功處理並刪除 _id: ${schedule._id}`);
+      log({}, `DELETE 排程：成功處理並刪除 _id: ${schedule._id}`);
     }
     if (deleteResp.APILimit) {
       APILimit = deleteResp.APILimit;
@@ -328,11 +294,6 @@ async function processDeleteSchedule() {
         APILimit.remaining <
         APILimit.limit * scheduleConfig.deleteSchedule.apiLimitThreshold
       ) {
-        console.log(
-          `DELETE 排程：剩餘點數低於總額的 ${
-            scheduleConfig.deleteSchedule.apiLimitThreshold * 100
-          }%，結束本輪處理`
-        );
         break;
       }
     }
@@ -346,10 +307,10 @@ async function processDeleteSchedule() {
 cron.schedule(
   scheduleConfig.expiredVideos.cronTime,
   async () => {
-    console.log("開始執行過期影片清理排程...");
+    log({}, `開始執行過期影片清理排程...`);
     try {
       await processExpiredVideos();
-      console.log("過期影片清理排程執行完畢");
+      log({}, "過期影片清理排程執行完畢");
     } catch (err) {
       logError({}, "cleanUpDataBase.js", "processExpiredVideos", {}, err);
     }
@@ -364,9 +325,9 @@ cron.schedule(
     try {
       const result = await processGetSchedule();
       if (result.success && result.processed > 0) {
-        console.log("GET 排程執行結果:", result);
+        log({}, `GET 排程執行結果:${result}`);
       } else if (!result.success) {
-        console.log("GET 排程因 API 回傳失敗而跳過本輪處理");
+        // console.log("GET 排程因 API 回傳失敗而跳過本輪處理");
       }
     } catch (err) {
       logError({}, "cleanUpDataBase.js", "processGetSchedule", {}, err);
@@ -396,9 +357,9 @@ cron.schedule(
     try {
       const result = await processDeleteSchedule();
       if (result.success && result.processed > 0) {
-        console.log("DELETE 排程執行結果:", result);
+        log({}, `DELETE 排程執行結果:${result}`);
       } else if (!result.success) {
-        console.log("DELETE 排程因 API 回傳失敗而跳過本輪處理");
+        // console.log("DELETE 排程因 API 回傳失敗而跳過本輪處理");
       }
     } catch (err) {
       logError({}, "cleanUpDataBase.js", "processDeleteSchedule", {}, err);

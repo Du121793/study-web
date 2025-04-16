@@ -3,6 +3,7 @@
   flex-direction: column;
   max-width: 100vw;
   overflow-x: hidden;
+  background-color: #fff;
   .header {
     height: 60px;
     width: 100%;
@@ -56,11 +57,13 @@
     // 播放器
     .player {
       width: 100%;
+      height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
 
       iframe {
+        height: 80%;
         transition: 0.3s;
         background-color: black;
         width: 100%;
@@ -68,6 +71,7 @@
       }
 
       .video-info {
+        flex: 1;
         width: 100%;
         padding: 16px 0 16px 0;
         display: flex;
@@ -76,6 +80,7 @@
         gap: 16px;
         background-color: #fff;
         transition: 0.2s;
+        border-right: 1px solid rgba(0, 0, 0, 0.2);
         .title {
           justify-content: center;
           width: 80%;
@@ -137,41 +142,31 @@
 
     // 右側列表
     .video-info-list {
+      position: fixed;
+      top: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      border-top: 1px solid rgba(0, 0, 0, 0.2);
-      background-color: #f6f6f6;
+      background-color: #ffffff;
       transition: 0.3s;
 
       // 讓列表跟著捲動時固定在畫面頂端 60px (header 高度)
       position: sticky;
       top: 60px;
       right: 0;
-      .title {
+      .hidden-info-btn {
         display: flex;
-        justify-content: center;
         align-items: center;
-        text-align: center;
-        font-weight: bold;
-        width: 100%;
-        gap: 12px;
+        justify-content: center;
+        overflow: hidden;
+        cursor: pointer;
         font-size: 20px;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-        padding: 8px 0;
-        .hidden-info-btn {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          font-size: 18px;
-          transition: 0.2s;
-          width: 24px;
-          border-radius: 64px;
-        }
-        .hidden-info-btn:hover {
-          background-color: #c8c8c8;
-        }
+        transition: 0.2s;
+        width: 100%;
+        height: 64px;
+      }
+      .hidden-info-btn:hover {
+        background-color: #dedede;
       }
 
       .videos-area {
@@ -179,29 +174,56 @@
         flex-direction: column;
         width: 100%;
         .video {
-          justify-content: center;
-          align-items: center;
           display: flex;
+          align-items: center;
+          justify-content: center;
           color: black;
           width: 100%;
-          height: 64px;
-          border-bottom: 1px solid rgba(0, 0, 0, 0.2);
           transition: 0.2s;
-          gap: 24px;
-          .content{
-            color: #555555;
+          gap: 16px;
+          border-bottom: 1px solid #e7e7e7;
+          .image-area {
+            position: relative;
+            margin: 12px 0 12px 12px;
+            .pre-view-image {
+              height: auto;
+              border-radius: 8px;
+              overflow: hidden;
+            }
+            .video-time {
+              position: absolute;
+              bottom: 12px;
+              right: 8px;
+              color: white;
+              background-color: rgba(0, 0, 0, 0.8);
+              padding: 2px 4px;
+              border-radius: 4px;
+            }
+          }
+          .info {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            flex: 1;
+            .video-title {
+              display: -webkit-box;
+              overflow: hidden;
+              line-clamp: 2;
+              -webkit-line-clamp: 2;
+              -webkit-box-orient: vertical;
+            }
+            .video-time {
+              font-size: 14px;
+              color: #a5a5a5;
+            }
           }
         }
-        .video:hover {
+        .active {
           background-color: #e7e7e7;
         }
-        .active {
-          background-color: #ccc;
-          box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        .active:hover {
-          background-color: #ccc;
-          box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        .video:hover {
+          background-color: #d7d7d7;
         }
       }
     }

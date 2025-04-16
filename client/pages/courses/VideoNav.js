@@ -41,6 +41,8 @@ export default function VideoNav({ course_id, courseName, user_role }) {
   // 影片
   const [videos, setVideos] = useState([])
 
+  //loading
+  const [deleteLoading, setDeleteLoading] = useState(false)
   // 請求影片資訊的參數
   const [chooseType, setChooseType] = useState('')
   const [videosShowPage, setVideosShowPage] = useState(1)
@@ -68,9 +70,6 @@ export default function VideoNav({ course_id, courseName, user_role }) {
   const [messageColor, setMessageColor] = useState('')
 
   const test = () => {
-    videos.map((item) => {
-      console.log(item.thumbnail)
-    })
     console.log(videos)
   }
 
@@ -179,9 +178,11 @@ export default function VideoNav({ course_id, courseName, user_role }) {
     const deleteBtn = document.querySelectorAll('.delete-video-btn')
     const from = Array.from(deleteBtn)
     if (e.innerText === '在點擊一次確認刪除') {
+      setDeleteLoading(true)
       adminService.deleteVideo(token, item._id, course_id).then((res) => {
         getCourseVideos(false)
         messageControl('移除成功', true)
+        setDeleteLoading(false)
       })
     } else {
       from.map((item) => {
@@ -379,11 +380,22 @@ export default function VideoNav({ course_id, courseName, user_role }) {
         )}
         {/* 影片顯示區 */}
         <div className="video-area-container">
+          {deleteLoading && (
+            <div className="loading-main">
+              <div className="loader"></div>
+            </div>
+          )}
           <div className="video-area">
             {videos &&
               videos.map((item) => (
                 <Link
                   key={item._id}
+                  style={{ cursor: item.access.isAccess ? 'pointer' : 'not-Allowed' }}
+                  onClick={(e) => {
+                    if (!item.access.isAccess) {
+                      e.preventDefault()
+                    }
+                  }}
                   href={{
                     pathname: `${clientIp}/videoPlay/Player`,
                     query: {
@@ -440,17 +452,17 @@ export default function VideoNav({ course_id, courseName, user_role }) {
                           <div>{item.date.split(/[-T:.]/)[2]}</div>
                         </div>
                         <div className="clock">
-                          {item.date.split(/[-T:.]/)[3] >= 0 && item.date.split(/[-T:.]/)[3] && <div>{Number(item.date.split(/[-T:.]/)[3]) + 8}點</div>}
-                          <div>{item.date.split(/[-T:.]/)[4]}分</div>
+                          <div>{item.date.split(/[-T:.]/)[3]}:</div>
+                          <div>{item.date.split(/[-T:.]/)[4]}</div>
                         </div>
                         {item.isPrivate === true && (
                           <div className="isPublic">
-                            <div className="content unprivate">未公開影片</div>
+                            <div className="content unprivate">未公開</div>
                           </div>
                         )}
                         {item.isPrivate === false && (
                           <div className="isPublic">
-                            <div className="content private">公開影片</div>
+                            <div className="content private">公開</div>
                           </div>
                         )}
                       </div>
@@ -470,7 +482,15 @@ export default function VideoNav({ course_id, courseName, user_role }) {
                               編輯
                             </div>
                           )}
-                          {item.access.accessDate === null ? <div className="access-time">無期限</div> : <div className="access-time">影片授權時間至{item.access.accessDate}</div>}
+                          <div className={`access-time ${item.access.accessDate === null && !item.access.isAccess && 'light'}`}>
+                            {item.access.accessDate === null && !item.access.isAccess && '無權限'}
+                            {item.access.accessDate === null && item.access.isAccess && item.isPrivate === true && '無限期'}
+                            {item.access.accessDate !== null &&
+                              item.access.isAccess &&
+                              `影片授權時間至${item.date.split(/[-T:.]/)[0]}/${item.date.split(/[-T:.]/)[1]}/${item.date.split(/[-T:.]/)[2]}
+                              ${item.date.split(/[-T:.]/)[3]}:${item.date.split(/[-T:.]/)[4]}:}`}
+                            {item.isPrivate === false && <div className="box">1</div>}
+                          </div>
                         </div>
                       </div>
                     </div>

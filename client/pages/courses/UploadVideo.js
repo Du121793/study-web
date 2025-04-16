@@ -1,5 +1,6 @@
 // 組件庫
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
+import Image from 'next/image'
 // TSU
 import { Upload } from 'tus-js-client'
 // method
@@ -18,14 +19,26 @@ export default function UploadVideoFc({ setshowUploadVideoUI, showUploadVideoUI,
   const [videoFile, setVideoFile] = useState(null)
   const [thumbFile, setThumbFile] = useState(null)
   const [recordDate, setRecordDate] = useState(null)
-
+  // req
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [type, setType] = useState('MainClass')
   const [duration, setDuration] = useState(0)
   const [fileSize, setFileSize] = useState(0)
+  // pre view
+  const [preViewVideoImage, setPreViewVideoImage] = useState(null)
+  // const [autoExtractFrame, setAutoExtractFrame] = useState('')
   // ui控制
   const uiRef = useRef(null)
+
+  const test = () => {
+    console.log(preViewVideoImage)
+  }
+
+  const getVideoPreviewImage = async (file) => {
+    const blobUrl = URL.createObjectURL(await autoExtractFrame(file))
+    setPreViewVideoImage(blobUrl)
+  }
 
   const strictClickCloseUI = useStrictClickHandler(() => {
     setUploadVideoUIInnerOpacity(0)
@@ -442,47 +455,70 @@ export default function UploadVideoFc({ setshowUploadVideoUI, showUploadVideoUI,
             onClick={(e) => {
               e.stopPropagation()
             }}>
-            <div className="section title-section">
-              <label className="label">影片檔案上傳</label>
-              <button
-                className="g-blue-btn"
-                onClick={() => {
-                  fileInput.current.click()
-                }}>
-                選擇檔案
-              </button>
-              {fileInput.current?.value.length > 0 && <div className="content">{fileInput.current.value}</div>}
-              <input
-                style={{ display: 'none' }}
-                ref={fileInput}
-                type="file"
-                accept="video/*"
-                multiple
-                onChange={handleVideoSelect}
-                className="input"
-              />
-            </div>
+            <div className="top-section">
+              {/* 左邊按鈕區域 */}
+              <div className="btn-area">
+                <label
+                  className="label"
+                  onClick={test}>
+                  影片檔案上傳
+                </label>
+                <button
+                  className="g-blue-btn"
+                  onClick={() => {
+                    fileInput.current.click()
+                  }}>
+                  選擇檔案
+                </button>
+                {fileInput.current?.value.length > 0 && <div className="content">{fileInput.current.value}</div>}
+                <input
+                  style={{ display: 'none' }}
+                  ref={fileInput}
+                  type="file"
+                  accept="video/*"
+                  multiple
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      handleVideoSelect(e)
+                      getVideoPreviewImage(e.target.files[0])
+                    }
+                  }}
+                  className="input"
+                />
 
-            <div className="section title-section">
-              <label className="label">影片縮圖上傳 (可選)</label>
-              <button
-                className="g-blue-btn"
+                <div className="section title-section">
+                  <input
+                    style={{ display: 'none' }}
+                    ref={fileAvatarInput}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      if (e.target.value) handleThumbSelect(e)
+                    }}
+                    className="input"
+                  />
+                </div>
+              </div>
+              {/* 預覽圖片 */}
+              <div
+                className="preview-image"
                 onClick={() => {
                   fileAvatarInput.current.click()
                 }}>
-                選擇檔案
-              </button>
-              {fileAvatarInput.current?.value.length > 0 && <div className="content">{fileAvatarInput.current.value}</div>}
-              <input
-                style={{ display: 'none' }}
-                ref={fileAvatarInput}
-                type="file"
-                accept="image/*"
-                onChange={handleThumbSelect}
-                className="input"
-              />
+                <div className="hint">預覽圖片區域</div>
+                {preViewVideoImage && preViewVideoImage.length > 0 && (
+                  <Image
+                    src={preViewVideoImage}
+                    className="image-pre-view"
+                    width={0}
+                    height={0}
+                    alt="video image pre view"
+                  />
+                )}
+              </div>
             </div>
 
+            {/* 輸入區域 */}
             <div className="section">
               <label className="label">錄影日期 (可選)</label>
               <input

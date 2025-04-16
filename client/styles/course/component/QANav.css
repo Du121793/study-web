@@ -198,6 +198,10 @@
   margin-bottom: 12px;
   transition: 0.2s;
 }
+.QA-area .container .QA-grid .QA-container .qa-info-area .qa-image {
+  width: 100%;
+  border-radius: 8px;
+}
 .QA-area .container .QA-grid .QA-container .qa-info-area .content {
   font-size: clamp(16px, 1.2vw, 18px);
   display: flex;

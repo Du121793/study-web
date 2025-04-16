@@ -152,13 +152,6 @@ export default function EditMembers() {
       })
   }
 
-  // 使成員區域點擊整片區域都能選取到
-  const memberAreaClickEvent = (e) => {
-    if (e.firstChild) {
-      e.firstChild.click()
-    }
-  }
-
   // 按下打勾變色
   const checkboxClickEvent = (e) => {
     if (e.parentNode.style.border === '2px solid rgb(124, 225, 180)') {
@@ -269,6 +262,7 @@ export default function EditMembers() {
           })
         } else {
           messageControl('請選擇課程', false)
+          setMembers([])
         }
         break
       case 'ousideMemberPage':
@@ -297,6 +291,7 @@ export default function EditMembers() {
           })
         } else {
           messageControl('請選擇課程', false)
+          setMembers([])
         }
         break
       default:
@@ -414,7 +409,7 @@ export default function EditMembers() {
       <div className="member-selector-area">
         <div className="option-area">
           <div
-            className="button show-all-members-btn"
+            className={`button show-course-members-btn ${method.name === 'ousideMemberPage' ? 'active' : null}`}
             onClick={() => {
               setMethod({
                 name: 'ousideMemberPage',
@@ -424,7 +419,7 @@ export default function EditMembers() {
             顯示課程以外成員
           </div>
           <div
-            className="button show-all-members-btn"
+            className={`button show-course-members-btn ${method.name === 'allMemberPage' ? 'active' : null}`}
             onClick={() => {
               setMethod({
                 name: 'allMemberPage',
@@ -434,7 +429,7 @@ export default function EditMembers() {
             顯示所有成員
           </div>
           <div
-            className="button show-course-members-btn"
+            className={`button show-course-members-btn ${method.name === 'courseMemberPage' ? 'active' : null}`}
             onClick={() => {
               setMethod({
                 name: 'courseMemberPage',
@@ -488,51 +483,44 @@ export default function EditMembers() {
           </div>
         )}
 
-        <ul className="member-area">
-          <div className="title-area">
-            <span id="username">暱稱</span>
-            <span id="realname">姓名</span>
-            <span id="phone-number">電話號碼</span>
-            <span id="grade">年級</span>
-            <span id="role">身分組</span>
+        <div className="member-list-area">
+          <div className="inner-line">
+            <span className="user-name">暱稱</span>
+            <span className="real-name">姓名</span>
+            <span className="phone">電話號碼</span>
+            <span className="grade">年級</span>
+            <span className="role">身分組</span>
           </div>
           {members &&
             members.map((item, index) => (
               <li
-                style={{
-                  border: selectedStudentId.find((id) => id === item._id) ? '2px solid rgb(124, 225, 180)' : '2px solid rgba(0, 0, 0, 0.2)',
-                }}
                 key={index}
-                className="select-area"
-                onClick={(e) => {
-                  memberAreaClickEvent(e.target)
+                className="inner-line"
+                style={{
+                  cursor: 'pointer',
+                  border: selectedStudentId.find((id) => id === item._id) ? '2px solid rgb(153, 153, 153)' : '2px solid rgba(0, 0, 0, 0.2)',
+                  backgroundColor: selectedStudentId.find((id) => id === item._id) ? 'rgb(242, 242, 242)' : 'transparent',
+                  boxShadow: selectedStudentId.find((id) => id === item._id) ? '0px 4px 12px rgba(0, 0, 0, 0.15)' : 'none',
+                }}
+                onClick={() => {
+                  if (selectedStudentId.find((id) => id === item._id)) {
+                    setSelectedStudentId(selectedStudentId.filter((id_filter) => id_filter !== item._id))
+                  } else {
+                    setSelectedStudentId([...selectedStudentId, item._id])
+                  }
                 }}>
-                {/* 勾選框 */}
-                <input
-                  className="student-checkbox"
-                  type="checkbox"
-                  checked={!!(selectedStudentId && selectedStudentId.find((id) => id === item._id))}
-                  onChange={(e) => {
-                    checkboxClickEvent(e.target)
-                    setSelectedStudentId((prev) => {
-                      return e.target.checked ? [...prev, item._id] : prev.filter((id) => id !== item._id)
-                    })
-                  }}
-                />
-                <div className="searched-info">
-                  {item.userinfo.username === undefined && <span id="username">無</span>}
-                  {item.userinfo.username !== undefined && <span id="username">{item.userinfo.username}</span>}
-                  <span id="realname">{item.userinfo.realname}</span>
-                  <span id="phone-number">{item.userinfo.phoneNumber}</span>
-                  <span id="course-class">{item.userinfo.courseClass}</span>
-                  <span id="grade">{item.userinfo.grade}</span>
-                  {item.role === 'teacher' && <span id="role">教師</span>}
-                  {item.role === 'student' && <span id="role">學生</span>}
-                  {item.role === 'admin' && <span id="role">管理員</span>}
-                </div>
+                {item.userinfo.username === undefined && <span className="user-name">無</span>}
+                {item.userinfo.username !== undefined && <span className="user-name">{item.userinfo.username}</span>}
+                <span className="real-name">{item.userinfo.realname}</span>
+                <span className="phone">{item.userinfo.phoneNumber}</span>
+                <span className="course-class">{item.userinfo.courseClass}</span>
+                <span className="grade">{item.userinfo.grade}</span>
+                {item.role === 'teacher' && <span className="role">教師</span>}
+                {item.role === 'student' && <span className="role">學生</span>}
+                {item.role === 'admin' && <span className="role">管理員</span>}
               </li>
             ))}
-        </ul>
+        </div>
         <div className="page-switch">
           <Image
             alt="switch back to first page icon"

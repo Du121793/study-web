@@ -96,7 +96,7 @@ router.get("/board", async (req, res) => {
       .sort({ date: -1 })
       .skip(skip)
       .limit(pageSize)
-      .populate("poster", "userinfo.username userinfo.pictureUrl role")
+      .populate("poster", "userinfo.username userinfo.pictureUrl role userinfo.makePictureAnonymous")
       .exec();
 
     // 轉換發布者資料格式，提取需要的資訊
@@ -106,7 +106,7 @@ router.get("/board", async (req, res) => {
       if (boardObj.poster) {
         boardObj.poster = {
           username: boardObj.poster.userinfo?.username || "",
-          pictureUrl: boardObj.poster.userinfo?.pictureUrl || "",
+          displayPictureUrl: boardObj.poster.userinfo?.displayPictureUrl || "",
           role: boardObj.poster.role,
         };
       }
@@ -153,7 +153,7 @@ router.get("/board/:board_id", async (req, res) => {
     // 查詢指定ID的公告
     // 同時關聯查詢發布者的資訊（用戶名、頭像和角色）
     const board = await Board.findById(req.params.board_id)
-      .populate("poster", "userinfo.username userinfo.pictureUrl role")
+      .populate("poster", "userinfo.username userinfo.pictureUrl role userinfo.makePictureAnonymous")
       .exec();
 
     // 如果找不到公告，回傳404錯誤
@@ -169,7 +169,7 @@ router.get("/board/:board_id", async (req, res) => {
     if (boardData.poster) {
       boardData.poster = {
         username: boardData.poster.userinfo?.username || "",
-        pictureUrl: boardData.poster.userinfo?.pictureUrl || "",
+        displayPictureUrl: boardData.poster.userinfo?.displayPictureUrl || "",
         role: boardData.poster.role,
       };
     }

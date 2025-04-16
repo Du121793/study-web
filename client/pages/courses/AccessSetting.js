@@ -16,7 +16,7 @@ import AccessVideoList from './component/AccessVideoList'
 // public
 import editIcon from '../../public/global/edit.png'
 import removeIcon from '../../public/global/delete.png'
-
+import Header from '../../components/global/Header'
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
@@ -62,17 +62,8 @@ export default function AccessSetting() {
   const [editAccessDate, setEditAccessDate] = useState('')
   const [editisInfiniite, setEditIsInfiniite] = useState(false)
   const [editIsPrivate, setEditIsPrivate] = useState(true)
-
-  // 獲得該課程的成員資料
-  useEffect(() => {
-    if (token && course_id) {
-      adminService.getAccessAllInfo(token, course_id).then((res) => {
-        if (res.success === true) {
-          setAccessInfo(res.data)
-        }
-      })
-    }
-  }, [token, course_id, editStatus])
+  // header login state
+  const [loginState, setLoginState] = useState(false)
 
   const test = () => {
     console.log(accessInfo)
@@ -172,8 +163,21 @@ export default function AccessSetting() {
     }, 2000)
   }
 
+  // 獲得該課程的成員資料
+  useEffect(() => {
+    if (token && course_id) {
+      setLoginState(true)
+      adminService.getAccessAllInfo(token, course_id).then((res) => {
+        if (res.success === true) {
+          setAccessInfo(res.data)
+        }
+      })
+    }
+  }, [token, course_id, editStatus])
+
   return (
     <div className="access-setting-main">
+      <Header loginState={loginState}></Header>
       <div className="components">
         {showStudentSelector && (
           <StudentSelector
@@ -249,7 +253,7 @@ export default function AccessSetting() {
               <div className="content">學生:</div>
               <div className="content">{selectedStudent.length}，</div>
               <div
-                className="button"
+                className="g-blue-btn"
                 onClick={() => {
                   setShowStudentSelector(true)
                 }}>
@@ -261,7 +265,7 @@ export default function AccessSetting() {
               <div className="content">影片:</div>
               <div className="content">{selectedVideo.length}，</div>
               <div
-                className="button"
+                className="g-blue-btn"
                 onClick={() => {
                   setShowVideoSelector(true)
                 }}>
@@ -301,7 +305,7 @@ export default function AccessSetting() {
               {!isPrivate && <div className="hint">若關閉此設定，設定公開的影片會維持公開，但他將不會套用此權杖</div>}
             </div>
             <div
-              className="submit-btn"
+                className="g-green-btn"
               onClick={submitNewAccess}>
               新增
             </div>

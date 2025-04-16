@@ -261,7 +261,7 @@ async function createProject(userId, name, parentFolderUri = null) {
  * @returns {Object|null} 解析結果
  */
 function parseVideoIndex(videoIndex) {
-  console.log("解析 videoIndex:", videoIndex);
+  // console.log("解析 videoIndex:", videoIndex);
 
   const upperIndex = {};
   for (const [k, v] of Object.entries(videoIndex)) {
@@ -294,7 +294,7 @@ function parseVideoIndex(videoIndex) {
  * @returns {Promise<Object>} 移動後的資料夾
  */
 async function moveFolder(userId, folderId, newParentUri) {
-  console.log(`移動資料夾 ${folderId} 到 ${newParentUri}`);
+  // console.log(`移動資料夾 ${folderId} 到 ${newParentUri}`);
 
   const maxRetries = 3;
   let lastError = null;
@@ -307,15 +307,15 @@ async function moveFolder(userId, folderId, newParentUri) {
         path: `/users/${userId}/projects/${folderId}`,
       });
 
-      console.log("移動前資料夾狀態:", {
-        name: beforeCheck.data.name,
-        uri: beforeCheck.data.uri,
-        parent: beforeCheck.data.parent_folder?.uri,
-      });
+      // console.log("移動前資料夾狀態:", {
+      //   name: beforeCheck.data.name,
+      //   uri: beforeCheck.data.uri,
+      //   parent: beforeCheck.data.parent_folder?.uri,
+      // });
 
       // 如果已經在正確位置，直接返回
       if (beforeCheck.data.parent_folder?.uri === newParentUri) {
-        console.log("資料夾已在正確位置");
+        // console.log("資料夾已在正確位置");
         return beforeCheck.data;
       }
 
@@ -341,12 +341,12 @@ async function moveFolder(userId, folderId, newParentUri) {
         path: `/users/${userId}/projects/${folderId}`,
       });
 
-      console.log("移動後資料夾狀態:", {
-        name: afterCheck.data.name,
-        uri: afterCheck.data.uri,
-        parent: afterCheck.data.parent_folder?.uri,
-        raw: JSON.stringify(afterCheck.data, null, 2),
-      });
+      // console.log("移動後資料夾狀態:", {
+      //   name: afterCheck.data.name,
+      //   uri: afterCheck.data.uri,
+      //   parent: afterCheck.data.parent_folder?.uri,
+      //   raw: JSON.stringify(afterCheck.data, null, 2),
+      // });
 
       // 檢查移動是否成功
       if (!afterCheck.data.parent_folder) {
@@ -361,7 +361,7 @@ async function moveFolder(userId, folderId, newParentUri) {
         );
       }
 
-      console.log("資料夾移動成功並驗證通過");
+      // console.log("資料夾移動成功並驗證通過");
       return afterCheck.data;
     } catch (err) {
       lastError = err;
@@ -408,7 +408,7 @@ async function findOrCreateFolder(projectsList, userId, folderName, parentUri) {
  * 根據路徑查找資料夾
  */
 async function findFolderByPath(path) {
-  console.log(`根據路徑查找資料夾: ${path}`);
+  // console.log(`根據路徑查找資料夾: ${path}`);
 
   // 分割路徑
   const parts = path.split("/").filter(Boolean);
@@ -423,7 +423,7 @@ async function findFolderByPath(path) {
     currentFolder = findProjectByNameAndParent(projectsList, part, parentUri);
 
     if (!currentFolder) {
-      console.log(`在路徑 ${path} 中找不到資料夾 ${part}`);
+      // console.log(`在路徑 ${path} 中找不到資料夾 ${part}`);
       return null;
     }
   }
@@ -1033,7 +1033,7 @@ async function deleteEmptyFolder(userId, folderId) {
             current[section].ids = current[section].ids.filter((item) => {
               const shouldKeep = item.path !== folderId;
               if (!shouldKeep) {
-                console.log(`刪除緩存: ${section} - ${item.id}`);
+                // console.log(`刪除緩存: ${section} - ${item.id}`);
               }
               return shouldKeep;
             });

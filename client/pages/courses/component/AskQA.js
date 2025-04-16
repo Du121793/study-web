@@ -28,7 +28,8 @@ export default function AskNav({ showAskQA, setShowAskQA, qaHasUpload, setQaHasU
   // ref
   const fileInputRef = useRef(null)
   const innerEleHeight = useRef(null)
-
+  // loading
+  const [postLoading, setpostLoading] = useState(false)
   // ask 區塊 - 同樣使用 ref 與 state 控制展開/收合
   const [qaAsk, setQaAsk] = useState(false)
   const askContentRef = useRef(null)
@@ -187,26 +188,15 @@ export default function AskNav({ showAskQA, setShowAskQA, qaHasUpload, setQaHasU
       formData.append('hints[]', item)
     })
     initInput()
+    setpostLoading(true)
     userService.createNewQuestion(token, formData).then((res) => {
       if (res.success) {
+        setpostLoading(false)
         messageControl('新增成功', true)
         setQaHasUpload(!qaHasUpload)
         initInput()
       }
     })
-  }
-
-  // 切換ask的展示收回狀態
-  const toggleAsk = () => {
-    if (!qaAsk) {
-      if (askContentRef.current) {
-        setAskContentHeight(askContentRef.current.scrollHeight)
-      }
-      setQaAsk(true)
-    } else {
-      setAskContentHeight(0)
-      setQaAsk(false)
-    }
   }
 
   // 替換input按鈕
@@ -259,6 +249,11 @@ export default function AskNav({ showAskQA, setShowAskQA, qaHasUpload, setQaHasU
         }}
         className="ask-form"
         ref={innerEleHeight}>
+        {postLoading && (
+          <div className="loading-main">
+            <div className="loader"></div>
+          </div>
+        )}
         <div className="upload-img-area shadow">
           <button
             onClick={handleButtonClick}

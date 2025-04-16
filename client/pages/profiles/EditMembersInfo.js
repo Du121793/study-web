@@ -286,6 +286,7 @@ export default function EditMembersInfo() {
         </div>
       </div>
       <div className="member-list-area g-shadow">
+        
         <div className="inner-line">
           <div className="user-name">暱稱</div>
           <div className="real-name">姓名</div>
@@ -294,6 +295,7 @@ export default function EditMembersInfo() {
           <div className="role">身分組</div>
           <div className="id">ID</div>
         </div>
+
         {members &&
           members.length > 0 &&
           members.map((item, idx) => {
@@ -376,6 +378,7 @@ export default function EditMembersInfo() {
               )
             }
           })}
+
         <div className="page-switch">
           <Image
             alt="switch back to first page icon"

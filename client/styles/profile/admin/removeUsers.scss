@@ -4,10 +4,11 @@
   flex-direction: column;
   align-items: center;
   background-color: #fefefe; // 淡色背景
-  padding: 24px;
+  height: 100%;
   gap: 8px;
   z-index: 0;
   .container-line {
+    margin-top: 24px;
     display: flex;
     align-items: center;
     gap: 4px;
@@ -67,7 +68,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    width: 80%;
+    width: 90%;
     .container {
       display: flex;
       align-items: center;
@@ -79,22 +80,40 @@
       .username {
         width: 80px;
         margin-left: 6px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       .grade {
         pointer-events: none;
         width: 70px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       .realname {
-        width: 70px;
+        width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       .phone {
         width: 140px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       .userid {
         width: 30%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       .role {
         width: 70px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
   }
@@ -102,7 +121,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    width: 80%;
+    width: 90%;
     font-size: clamp(16px, 1.2vw, 20px);
     .container {
       cursor: pointer;
@@ -117,26 +136,39 @@
         margin-left: 6px;
       }
       .grade {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
         pointer-events: none;
         width: 70px;
       }
       .realname {
         pointer-events: none;
-        width: 70px;
+        width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       .phone {
         pointer-events: none;
         width: 140px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       .userid {
         pointer-events: none;
         width: 30%;
         overflow: hidden;
         text-overflow: ellipsis;
+        white-space: nowrap;
       }
       .role {
         pointer-events: none;
         width: 70px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
   }

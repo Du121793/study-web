@@ -4,9 +4,10 @@
   flex-direction: column;
   align-items: center;
   background-color: #fefefe; // 淡色背景
-  padding: 24px;
+  height: 100%;
   gap: 8px;
   .header {
+    margin-top: 24px;
     width: 100%;
     display: flex;
     justify-content: center;

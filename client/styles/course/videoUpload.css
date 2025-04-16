@@ -32,6 +32,44 @@
   font-size: 32px;
   text-align: center;
 }
+.upload-vidoe-main .top-section {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  min-height: 200px;
+}
+.upload-vidoe-main .top-section .btn-area {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 20%;
+  height: 100%;
+}
+.upload-vidoe-main .top-section .preview-image {
+  overflow: hidden;
+  position: relative;
+  background-color: #fff;
+  width: 40%;
+  border: 1px dashed rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.2s;
+  cursor: pointer;
+}
+.upload-vidoe-main .top-section .preview-image .hint {
+  position: absolute;
+  color: rgba(0, 0, 0, 0.6);
+}
+.upload-vidoe-main .top-section .preview-image .image-pre-view {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+.upload-vidoe-main .top-section .preview-image:hover {
+  background-color: #dbdbdb;
+}
 .upload-vidoe-main .section {
   display: flex;
   flex-direction: column;

@@ -94,7 +94,9 @@ const question = async (req, res, next) => {
     }
 
     // 查詢問題是否存在
-    let foundQuestion = await QA.findOne({ _id: question_id }).exec();
+    let foundQuestion = await QA.findOne({ _id: question_id })
+  .populate("poster", "userinfo.username userinfo.pictureUrl userinfo.makePictureAnonymous")
+  .exec();
     if (!foundQuestion)
       return res.status(400).json({ success: false, msg: "無法找到問題" });
 

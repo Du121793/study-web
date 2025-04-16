@@ -125,7 +125,7 @@ router.get("/getComment", async (req, res) => {
     const messages = await QAmessage.find({
       pointTo: req.question._id,
     })
-      .populate("poster", "role userinfo.username userinfo.pictureUrl")
+      .populate("poster", "role userinfo.username userinfo.pictureUrl userinfo.makePictureAnonymous")
       .sort({ isBest: -1, date: sortOrder }) // 先按 isBest 降序，再按日期排序
       .skip(skip)
       .limit(pageSize);
@@ -149,8 +149,8 @@ router.get("/getComment", async (req, res) => {
         ? {
             role: msg.poster.role,
             username: msg.poster.userinfo ? msg.poster.userinfo.username : "",
-            pictureUrl: msg.poster.userinfo
-              ? msg.poster.userinfo.pictureUrl
+            displayPictureUrl: msg.poster.userinfo
+              ? msg.poster.userinfo.displayPictureUrl
               : "",
           }
         : null;
@@ -160,7 +160,7 @@ router.get("/getComment", async (req, res) => {
         poster = {
           role: "匿名角色",
           username: "匿名",
-          pictureUrl: "",
+          displayPictureUrl: "",
         };
       }
 

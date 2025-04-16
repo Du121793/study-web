@@ -22,6 +22,10 @@ import LoadingAnime from '../../components/global/LoadingAnime'
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
 export default function EditCourse() {
+  // session
+  const [user_id, setUser_id] = useState('')
+  const [user_name, setUser_name] = useState('')
+  //
   const [courseLoading, setCourseLoading] = useState(false)
   const token = useUserToken()
   const [editStatusIndex, setEditStatusIndex] = useState(null)
@@ -54,7 +58,8 @@ export default function EditCourse() {
   const [courses, setCourses] = useState([])
   // 是否要在新增課程時也將選擇的成員加入課程
   const [addThenRegister, setAddThenRegister] = useState(false)
-
+  // search info
+  const [searchInput, setSearchInput] = useState('')
   // 控制訊息
   const [message, setMessage] = useState('無訊息')
   const [messageStatus, setMessageStatus] = useState(false)
@@ -123,18 +128,20 @@ export default function EditCourse() {
 
   // 搜尋課程功能
   const searchCourse = () => {
-    const data = {
-      grade: gradeInput,
-      subject: subjectInput,
-      courseClass: classInput,
-      page: page,
-      pageSize: pageSize,
-    }
+    const data = { courseName: searchInput, page: page, pageSize: pageSize }
     adminService.getCourses(token, data).then((res) => {
+      console.log(res)
       setTeachers()
-
       setCoursesInfo(res.data)
     })
+  }
+
+  const initAddInfo = () => {
+    // 清空新增課程用的欄位
+    setGradeInput('')
+    setSubjectInput('')
+    setClassInput('')
+    setSeletedTeacher('')
   }
 
   // 1. 新增課程
@@ -239,7 +246,7 @@ export default function EditCourse() {
   }
 
   const test = () => {
-    console.log(teachers)
+    console.log(userinfo)
   }
 
   // 獲取課程資料，老師資訊
@@ -275,6 +282,17 @@ export default function EditCourse() {
       })
     }
   }, [token, page])
+
+  useEffect(() => {
+    const name = sessionStorage.getItem('user_name')
+    const id = sessionStorage.getItem('user_id')
+    if (name) {
+      setUser_name(name)
+    }
+    if (id) {
+      setUser_id(id)
+    }
+  })
 
   // 當年級、科目、班級更改時也會更改課名
   useEffect(() => {
@@ -360,7 +378,7 @@ export default function EditCourse() {
             onChange={(e) => {
               setSeletedTeacher(e.target.value)
             }}>
-            <option value="">請選擇</option>
+            <option value={user_id}>{user_name}</option>
             {teachers &&
               teachers.length > 0 &&
               teachers.map((item, idx) => (
@@ -384,14 +402,16 @@ export default function EditCourse() {
             }}
           />
           <div
-            className="g-blue-btn"
-            onClick={searchCourse}>
-            搜尋
-          </div>
-          <div
             className="g-green-btn"
             onClick={addNewCourse}>
             新增
+          </div>
+          <div
+            className="g-red-btn"
+            onClick={() => {
+              initAddInfo()
+            }}>
+            清空
           </div>
         </div>
         {/* 是否要在新增課程時也將選擇的成員加入課程 */}
@@ -406,7 +426,41 @@ export default function EditCourse() {
             />
           </div>
         </div>
+
         <div className="courses-info-list">
+          <form
+            className="search-area"
+            onSubmit={(e) => {
+              e.preventDefault()
+              searchCourse()
+            }}>
+            <div className="content">搜尋</div>
+            <input
+              className="input"
+              type="text"
+              placeholder="輸入課名"
+              value={searchInput}
+              onChange={(e) => {
+                setSearchInput(e.target.value)
+              }}
+            />
+            <button
+              className="g-blue-btn"
+              type="submit"
+              onClick={() => {
+                searchCourse()
+              }}>
+              搜尋
+            </button>
+            <button
+              className="g-red-btn"
+              type="button"
+              onClick={() => {
+                setSearchInput('')
+              }}>
+              清空
+            </button>
+          </form>
           {/* list title */}
           <div
             className="courses-info-area"
@@ -632,6 +686,7 @@ export default function EditCourse() {
               }}></Image>
           </div>
         </div>
+
         {addThenRegister && (
           <MemberSelector
             selectedStudentId={selectedStudentId}

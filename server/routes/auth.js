@@ -14,7 +14,7 @@ require("../config/passport");
 const User = require("../models").user;
 const jwt = require("jsonwebtoken");
 const { user } = require("../models");
-const tokenConfig = require("../config/tokenConfig.json");
+const accessConfig = require("../config/accessConfig.json");
 const { log, logError } = require("../utils/logger");
 
 const dotenv = require("dotenv");
@@ -57,12 +57,12 @@ router.get(
       };
 
       // 如果需要綁定 IP，則加入 IP 資訊
-      if (tokenConfig.token.bindIP) {
+      if (accessConfig.token.bindIP) {
         tokenObject.ip = req.ip;
       }
 
       const token = jwt.sign(tokenObject, process.env.PASSPORT_SECRET, {
-        expiresIn: tokenConfig.token.expiration.accessToken,
+        expiresIn: accessConfig.token.expiration.accessToken,
       });
 
       // 導回前端的某個頁面，帶上正式 JWT
@@ -81,7 +81,7 @@ router.get(
     };
 
     // 如果需要綁定 IP，則加入 IP 資訊
-    if (tokenConfig.token.bindIP) {
+    if (accessConfig.token.bindIP) {
       partialUserPayload.ip = req.ip;
     }
 
@@ -89,7 +89,7 @@ router.get(
       partialUserPayload,
       process.env.PASSPORT_SECRET,
       {
-        expiresIn: tokenConfig.token.expiration.tempToken,
+        expiresIn: accessConfig.token.expiration.tempToken,
       }
     );
 
@@ -127,7 +127,7 @@ router.post("/completeRegistration", async (req, res) => {
       decoded = jwt.verify(tempToken, process.env.PASSPORT_SECRET);
 
       // 檢查 IP 綁定
-      if (tokenConfig.token.bindIP && decoded.ip !== req.ip) {
+      if (accessConfig.token.bindIP && decoded.ip !== req.ip) {
         return res.status(400).json({ msg: "IP 位址不匹配，請重新登入" });
       }
     } catch (err) {
@@ -189,12 +189,12 @@ router.post("/completeRegistration", async (req, res) => {
       const tokenObject = { userID: existingUser._id };
 
       // 如果需要綁定 IP，則加入 IP 資訊
-      if (tokenConfig.token.bindIP) {
+      if (accessConfig.token.bindIP) {
         tokenObject.ip = req.ip;
       }
 
       const finalToken = jwt.sign(tokenObject, process.env.PASSPORT_SECRET, {
-        expiresIn: tokenConfig.token.expiration.accessToken,
+        expiresIn: accessConfig.token.expiration.accessToken,
       });
 
       return res.status(200).json({
