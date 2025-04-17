@@ -145,4 +145,4 @@ server/resource/public/board/**
 server/resource/public/carousel/**
 server/resource/questionIMG/**
 server/resource/videoIMG/**
-methods/**
+server/methods/*/*.json

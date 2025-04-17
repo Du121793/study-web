@@ -419,7 +419,7 @@ export default function VideoNav({ course_id, courseName, user_role }) {
                       x
                     </div>
                     {/* 影片縮圖 */}
-                    {item.thumbnail.length > 0 || item.thumbnail !== '' ? (
+                    {item?.thumbnail && (item?.thumbnail?.length > 0 || item?.thumbnail !== '') ? (
                       <Image
                         src={item.thumbnail}
                         className="videos-shot"

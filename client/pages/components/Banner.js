@@ -13,22 +13,32 @@ export default function Banner({ bannerHasChange }) {
   const [currentIndex, setCurrentIndex] = useState(1)
   // 控制是否開啟 CSS transition（在跳轉時關閉，以達到無縫效果）
   const [transitionEnabled, setTransitionEnabled] = useState(true)
+  // 紀錄圖片
+  const [slides, setSlides] = useState([])
+  const [slideCount, setSlideCount] = useState([])
   const autoSlideRef = useRef(null)
   // 節流鎖
   const lockRef = useRef(false)
 
   // 利用克隆方法：當原始陣列不為空時，在前面加上最後一張，在後面加上第一張
   const getSlides = () => {
-    if (carousel.length === 0) return []
+    setSlideCount(carousel.length)
+    if (carousel.length === 0) {
+      setSlides([])
+      return
+    }
     const slides = []
-    slides.push(carousel[carousel.length - 1]) // 克隆最後一張放最前面
+    slides.push(carousel[carousel?.length - 1]) // 克隆最後一張放最前面
     slides.push(...carousel)
     slides.push(carousel[0]) // 克隆第一張放最後面
-    return slides
+    setSlides(slides)
   }
 
-  const slides = getSlides()
-  const slideCount = carousel.length // 真實圖片數量
+  useEffect(() => {
+    if (carousel) {
+      getSlides()
+    }
+  }, [carousel])
 
   const nextSlide = () => {
     if (lockRef.current) return
@@ -99,7 +109,7 @@ export default function Banner({ bannerHasChange }) {
     if (typeof document === 'undefined') return
 
     const startInterval = () => {
-      if (carousel.length > 0 && !document.hidden) {
+      if (carousel && carousel.length > 0 && !document.hidden) {
         autoSlideRef.current = setInterval(() => {
           nextSlide()
         }, 5000)
@@ -168,12 +178,14 @@ export default function Banner({ bannerHasChange }) {
         {/* 底部指示器 */}
         <div className="indicator-bar">
           <div className="indicator">
-            {carousel.map((_, idx) => (
-              <div
-                key={idx}
-                className={`indicator-dot ${getRealIndex() === idx ? 'active' : ''}`}
-                onClick={() => handleIndicatorClick(idx)}></div>
-            ))}
+            {carousel &&
+              carousel.length > 0 &&
+              carousel.map((_, idx) => (
+                <div
+                  key={idx}
+                  className={`indicator-dot ${getRealIndex() === idx ? 'active' : ''}`}
+                  onClick={() => handleIndicatorClick(idx)}></div>
+              ))}
           </div>
         </div>
       </div>

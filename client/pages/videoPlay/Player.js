@@ -40,13 +40,13 @@ export default function Player() {
       setVideoListIsOpen(false)
       setVideoListWidth(0)
       setVideoListMarginRight('-500px')
-      setPlayerHeight('70%')
+      setPlayerHeight('1100px')
     } else if (e === 'open-button') {
       setIsAlignCenter('flex-start')
       setVideoListIsOpen(true)
       setVideoListWidth(500)
       setVideoListMarginRight('0')
-      setPlayerHeight('60%')
+      setPlayerHeight('900px')
     }
   }
 

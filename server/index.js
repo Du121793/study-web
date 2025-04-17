@@ -153,12 +153,10 @@ const tokenCheck = (req, res, next) => {
       return next(err);
     }
     if (!user) {
-      logError(
-        {},
-        "index.js",
-        "tokenCheck",
-        { path: req.path, reason: "未授權" },
-      );
+      logError({}, "index.js", "tokenCheck", {
+        path: req.path,
+        reason: "未授權",
+      });
       return res.status(401).json({ message: "Unauthorized" });
     }
 

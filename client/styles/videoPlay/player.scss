@@ -57,13 +57,12 @@
     // 播放器
     .player {
       width: 100%;
-      height: 100vh;
+      height: 1100px; 
       display: flex;
       flex-direction: column;
       align-items: center;
 
       iframe {
-        height: 80%;
         transition: 0.3s;
         background-color: black;
         width: 100%;
@@ -71,7 +70,6 @@
       }
 
       .video-info {
-        flex: 1;
         width: 100%;
         padding: 16px 0 16px 0;
         display: flex;
