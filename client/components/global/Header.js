@@ -4,19 +4,24 @@ import Link from 'next/link'
 // public
 import lineIcon from '../../public/imgs/line.png'
 import logo from '../../public/imgs/logo.jpg'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
-export default function Header({ loginState, user_line_shot }) {
+export default function Header({ callBoardMoveToBoardFunction, loginState, user_line_shot }) {
   // env
   const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
   const serverIp = process.env.NEXT_PUBLIC_SERVER_IP
+  const officialLine = 'https://line.me/R/ti/p/@910fvcei'
+  const GoogleLocation = 'https://maps.app.goo.gl/KzkExpAGoPxBggUL6'
   // 路由參數
   const loginURL = `${serverIp}/auth/line`
   const HomePageURL = clientIp
   const ProfilePageURL = `${clientIp}/profiles/Profile`
 
+  const [loginStatus, setLoginStatus] = useState(false)
   const [userShot, setUserShot] = useState(null)
 
+  const profileLinkRef = useRef(null)
+  const LoginLinkRef = useRef(null)
   // 登出 刪除token
   const signOut = () => {
     if (sessionStorage.getItem('user_lineID')) {
@@ -40,6 +45,9 @@ export default function Header({ loginState, user_line_shot }) {
     if (user_line_shot_temp) {
       setUserShot(user_line_shot_temp)
     }
+    if (sessionStorage.getItem('user_role')) {
+      setLoginStatus(true)
+    }
   }, [])
 
   const test = () => {}
@@ -61,34 +69,49 @@ export default function Header({ loginState, user_line_shot }) {
         <div className="header-middle">
           <div
             className="header-middle-nav-area"
-            id="newest">
+            id="newest"
+            onClick={() => {
+              callBoardMoveToBoardFunction()
+            }}>
             <div className="line"></div>
-            <span onClick={test}>最新消息</span>
+            <span>最新消息</span>
           </div>
+          <Link
+            ref={profileLinkRef}
+            style={{ display: 'none' }}
+            href={ProfilePageURL}></Link>
+          <Link
+            ref={LoginLinkRef}
+            style={{ display: 'none' }}
+            href={loginURL}></Link>
           <div
             className="header-middle-nav-area"
-            id="course-info">
+            id="course-info"
+            onClick={() => {
+              const isLogin = localStorage.getItem('token')
+              if (isLogin) {
+                profileLinkRef.current.click()
+              } else {
+                LoginLinkRef.current.click()
+              }
+            }}>
             <div className="line"></div>
-            <span>課程資訊</span>
+            <span>我的課程</span>
           </div>
-          <div
-            className="header-middle-nav-area"
-            id="rank">
-            <div className="line"></div>
-            <span>高手榜單</span>
-          </div>
-          <div
+          <Link
+            href={GoogleLocation}
             className="header-middle-nav-area"
             id="recommend-link">
             <div className="line"></div>
-            <span>推薦連結</span>
-          </div>
-          <div
+            <span>地圖位置</span>
+          </Link>
+          <Link
             className="header-middle-nav-area"
-            id="about">
+            id="about"
+            href={officialLine}>
             <div className="line"></div>
-            <span>關於我們</span>
-          </div>
+            <span>聯絡我們</span>
+          </Link>
           {/* Not logined show line login's Link */}
           {!loginState && (
             <Link

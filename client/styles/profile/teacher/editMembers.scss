@@ -64,6 +64,55 @@
         background-color: #d79595;
       }
     }
+    .search-form {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      width: 95%;
+      gap: 8px;
+      .username-input {
+        word-break: keep-all;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        input {
+          width: 120px;
+        }
+      }
+      .realname-input {
+        word-break: keep-all;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        input {
+          width: 100px;
+        }
+      }
+      .phoneNumber-input {
+        word-break: keep-all;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        input {
+          width: 120px;
+        }
+      }
+      .grade-input {
+        word-break: keep-all;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        input {
+          width: 120px;
+        }
+      }
+      .role-input {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+    }
     .member-list-area {
       width: 90%;
       display: flex;

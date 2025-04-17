@@ -229,7 +229,10 @@ export default function UploadVideoFc({ setshowUploadVideoUI, showUploadVideoUI,
           const { uploadLink, videoId } = data
           startTusUpload(uploadLink, videoId, file, uploadId)
         } catch (err) {
-          console.error(err)
+          console.log(err)
+          if (err.error.status === 520) {
+            messageControl(err.error.response.data.msg, false)
+          }
           // 更新對應項目為「建立連結失敗」
           setUploads((prev) => prev.map((u) => (u.id === uploadId ? { ...u, message: '建立連結失敗', progress: 0 } : u)))
           // 3秒後自動從列表移除該項目
@@ -245,7 +248,10 @@ export default function UploadVideoFc({ setshowUploadVideoUI, showUploadVideoUI,
         const { uploadLink, videoId } = data
         startTusUpload(uploadLink, videoId, file, uploadId)
       } catch (err) {
-        console.error(err)
+        console.log(err)
+        if (err?.error?.status === 520) {
+          messageControl(err.error.response.data.msg, false)
+        }
         setUploads((prev) => prev.map((u) => (u.id === uploadId ? { ...u, message: '建立連結失敗', progress: 0 } : u)))
       }
     })

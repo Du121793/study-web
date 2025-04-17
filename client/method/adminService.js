@@ -120,16 +120,23 @@ const adminService = {
 
   // 獲得課程內的成員
   async getMembers(token, data) {
-    /* const data = {
-        realname,
-        phoneNumber,
-        gradeInput,
-        role,
-        courses,
-        page,
-        pageSize,
-        withoutCourses: null,
-    }*/
+    /**
+     * 獲取會員列表
+     * @route GET /getMembers
+     * @param {string} username - 用戶名稱過濾
+     * @param {string} realname - 真實姓名過濾
+     * @param {string} phoneNumber - 電話號碼過濾
+     * @param {string} _id - 用戶ID過濾
+     * @param {string} role - 角色過濾
+     * @param {string} courses - 課程過濾
+     * @param {string} withoutCourses - 排除特定課程的使用者
+     * @param {string} grade - 年級過濾
+     * @param {number} page - 頁碼
+     * @param {number} pageSize - 每頁筆數
+     * @param {string} sortBy - 排序欄位
+     * @param {string} sortOrder - 排序方向
+     * @returns {Object} 會員列表及分頁資訊
+     */
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.get(USER_URL + '/getMembers', {
@@ -154,6 +161,7 @@ const adminService = {
     }
   },
 
+  // 將選擇的成員匯出成csv
   async exportMembers(token, data) {
     /* const data = {
         realname: nameInput,
@@ -165,6 +173,7 @@ const adminService = {
         pageSize: pageSize,
     }*/
     try {
+      console.log(data)
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios
         .get(USER_URL + '/exportMembers', {

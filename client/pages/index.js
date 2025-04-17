@@ -1,5 +1,5 @@
 // 組件庫
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 // 子組件
 import Header from '../components/global/Header'
@@ -27,7 +27,8 @@ export default function Index() {
   const [editHasChange, setEditHasChange] = useState(false)
   // 用於開關UI時覆蓋所有內部元素
   const [visibility, setVisibility] = useState('visible')
-
+  // 移動到最新消息function
+  const moveToBoardRef = useRef(null)
   // session 設定
   useEffect(() => {
     if (token) {
@@ -51,6 +52,10 @@ export default function Index() {
         .catch((err) => console.error('Error:', err))
     }
   }, [token])
+
+  const callBoardMoveToBoardFunction = () => {
+    if (moveToBoardRef.current) moveToBoardRef.current.doSomething()
+  }
 
   const test = () => {}
 
@@ -78,6 +83,7 @@ export default function Index() {
           />
         )}
         <Header
+          callBoardMoveToBoardFunction={callBoardMoveToBoardFunction}
           loginState={isLogined}
           user_line_shot={userShot}></Header>
         <Banner bannerHasChange={bannerHasChange}></Banner>
@@ -104,7 +110,9 @@ export default function Index() {
           </div>
         )}
       </div>
-      <Board editHasChange={editHasChange}></Board>
+      <Board
+        moveToBoardRef={moveToBoardRef}
+        editHasChange={editHasChange}></Board>
       <div className="footer-area">
         <Footer></Footer>
       </div>

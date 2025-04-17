@@ -33,6 +33,7 @@ export default function EditMembers() {
   // allMemberPage
   // courseMemberPage
   // ousideMemberPage
+  // search
   const [method, setMethod] = useState({
     name: 'allMemberPage',
     page: 1,
@@ -53,6 +54,12 @@ export default function EditMembers() {
   const [loading, setLoading] = useState(false)
   // rander lock
   const [randerLock, setRanderLock] = useState(0)
+  // 搜尋用 payload
+  const [usernameInput, setUsernameInput] = useState('')
+  const [realnameInput, setRealnameInput] = useState('')
+  const [phoneNumberInput, setPhoneNumberInput] = useState('')
+  const [gradeInput, setGradeInput] = useState('')
+  const [role, setRole] = useState('')
 
   // 控制訊息
   const messageControl = (info, isSuccess) => {
@@ -94,15 +101,24 @@ export default function EditMembers() {
     setSelectedStudentId([])
   }
 
+  // 反選功能
+  const unSelectAll = () => {
+    const member_ids = members.map((item) => {
+      return item._id
+    })
+    const thisPageMember = selectedStudentId.filter((item) => member_ids.includes(item))
+    const different = selectedStudentId.filter((item) => !thisPageMember.includes(item))
+    setSelectedStudentId(different)
+  }
+
   // 全選功能
   const selectAll = () => {
-    console.log(members)
-    console.log(selectedStudentId)
-    let idTemp = []
-    members.forEach((item) => {
-      idTemp.push(item._id)
+    const member_ids = members.map((item) => {
+      return item._id
     })
-    setSelectedStudentId([...selectedStudentId, ...idTemp])
+    let arrayTemp = Array.from(new Set([...member_ids, ...selectedStudentId]))
+    setSelectedStudentId(arrayTemp)
+    console.log(selectedStudentId)
   }
 
   // 按下"加入到課程"的函式，將選擇的人加入到指定課程
@@ -196,19 +212,114 @@ export default function EditMembers() {
     return page
   }
 
+  const searchMembers = () => {
+    let data = {
+      username: usernameInput,
+      realname: realnameInput,
+      phoneNumber: phoneNumberInput,
+      gradeInput: gradeInput,
+      role: role,
+    }
+    adminService.getMembers(token, data).then((res) => {
+      console.log(res)
+      if (res?.success) {
+        setMethod({ name: 'search', page: 1 })
+        setMembers(res.data)
+      }
+    })
+  }
+
   // 導出成csv
   const exportCSV = (by) => {
     if (by === 'search') {
-      setExportRequested(true)
-      setPageSize(Infinity)
+      switch (method.name) {
+        case 'allMemberPage':
+          if (method.name === 'allMemberPage') {
+            let data = {
+              page: 1,
+              pageSize: Infinity,
+            }
+            adminService.getMembers(token, data).then((res) => {
+              let exportData = {
+                selected_members: [
+                  res.data.map((item) => {
+                    return item._id
+                  }),
+                ],
+              }
+              adminService.exportMembers(token, exportData)
+            })
+          }
+        case 'courseMemberPage':
+          if (method.name === 'courseMemberPage') {
+            let data = {
+              page: 1,
+              pageSize: Infinity,
+              courses: courseId,
+            }
+            adminService.getMembers(token, data).then((res) => {
+              let exportData = {
+                selected_members: [
+                  res.data.map((item) => {
+                    return item._id
+                  }),
+                ],
+              }
+              adminService.exportMembers(token, exportData)
+            })
+          }
+        case 'ousideMemberPage':
+          if (method.name === 'ousideMemberPage') {
+            let data = {
+              page: 1,
+              pageSize: Infinity,
+              withoutCourses: courseId,
+            }
+            adminService.getMembers(token, data).then((res) => {
+              let exportData = {
+                selected_members: [
+                  res.data.map((item) => {
+                    return item._id
+                  }),
+                ],
+              }
+              adminService.exportMembers(token, exportData)
+            })
+          }
+        case 'search':
+          if (method.name === 'search') {
+            let data = {
+              username: usernameInput,
+              realname: realnameInput,
+              phoneNumber: phoneNumberInput,
+              gradeInput: gradeInput,
+              role: role,
+              page: 1,
+              pageSize: Infinity,
+            }
+            adminService.getMembers(token, data).then((res) => {
+              if (res?.success) {
+                let exportData = {
+                  selected_members: [
+                    res.data.map((item) => {
+                      return item._id
+                    }),
+                  ],
+                }
+                adminService.exportMembers(token, exportData)
+              }
+            })
+          }
+      }
     }
     if (by === 'selected' && selectedStudentId.length) {
+      console.log('將選取的成員匯出csv檔案')
       let data = {
         page: page,
         pageSize: pageSize,
         selected_members: [selectedStudentId],
       }
-      adminService.exportMembers(token, data).then((res) => {})
+      adminService.exportMembers(token, data)
     }
   }
 
@@ -334,39 +445,7 @@ export default function EditMembers() {
     setUserRole(user_role)
   }, [])
 
-  // pageSize來控制，將搜尋到的成員匯出csv檔案
-  useEffect(() => {
-    // 如果totalPage=1，代表顯示成員數<=10，直接下載
-    if (totalPage === 1) {
-      if (pageSize === Infinity && !isExporting.current) {
-        isExporting.current = true
-        const data = {
-          selected_members: members.map((item) => item._id),
-        }
-        adminService.exportMembers(token, data).then(() => {
-          setPageSize(10)
-          isExporting.current = false
-        })
-      }
-    }
-    if (totalPage !== 1 && pageSize === Infinity) {
-      let tempMembers = members
-      if (!isExporting.current) {
-        isExporting.current = true
-        const data = {
-          selected_members: members !== tempMembers ? members : null,
-        }
-        adminService.exportMembers(token, data).then(() => {
-          isExporting.current = false
-          setPageSize(10)
-        })
-      }
-    }
-  }, [pageSize, token])
-
-  const test = () => {
-    console.log(selectedStudentId)
-  }
+  const test = () => {}
 
   return (
     <div className="edit-members-main">
@@ -408,6 +487,7 @@ export default function EditMembers() {
       </div>
       <div className="member-selector-area">
         <div className="option-area">
+          {/* 顯示課程以外成員 */}
           <div
             className={`button show-course-members-btn ${method.name === 'ousideMemberPage' ? 'active' : null}`}
             onClick={() => {
@@ -418,6 +498,7 @@ export default function EditMembers() {
             }}>
             顯示課程以外成員
           </div>
+          {/* 顯示所有成員 */}
           <div
             className={`button show-course-members-btn ${method.name === 'allMemberPage' ? 'active' : null}`}
             onClick={() => {
@@ -428,6 +509,7 @@ export default function EditMembers() {
             }}>
             顯示所有成員
           </div>
+          {/* 顯示該課程成員 */}
           <div
             className={`button show-course-members-btn ${method.name === 'courseMemberPage' ? 'active' : null}`}
             onClick={() => {
@@ -438,43 +520,41 @@ export default function EditMembers() {
             }}>
             顯示該課程成員
           </div>
-          {showMembersState === 'all' && (
-            <div
-              className="button add-member-to-course-btn"
-              onClick={registerMemberToCourse}>
-              加入到課程
-            </div>
-          )}
-          {showMembersState === 'course members' && (
-            <div
-              className="button remove-member-to-course-btn"
-              onClick={removeRegisterCourse}>
-              移除出課程
-            </div>
-          )}
+        </div>
+        <div className="option-area">
+          <div
+            className="g-blue-btn"
+            onClick={registerMemberToCourse}>
+            加入到課程
+          </div>
+          <div
+            className="g-red-btn"
+            onClick={removeRegisterCourse}>
+            移除出課程
+          </div>
 
           <div
-            className="button select-all-btn"
+            className="g-black-btn"
             onClick={selectAll}>
             全選
           </div>
           <div
-            className="button unselect-all-btn"
-            onClick={initSelector}>
+            className="g-black-btn"
+            onClick={unSelectAll}>
             反選
           </div>
         </div>
         {userRole && userRole === 'admin' && (
           <div className="option-area">
             <div
-              className="button"
+              className="g-blue-btn"
               onClick={() => {
                 exportCSV('search')
               }}>
               將搜尋到的成員匯出csv檔案
             </div>
             <div
-              className="button"
+              className="g-blue-btn"
               onClick={() => {
                 exportCSV('selected')
               }}>
@@ -482,6 +562,69 @@ export default function EditMembers() {
             </div>
           </div>
         )}
+
+        <form
+          className="search-form"
+          onSubmit={(e) => {
+            console.log(123)
+            e.preventDefault()
+            searchMembers()
+          }}>
+          <div className="username-input">
+            <div className="content">暱稱</div>
+            <input
+              type="text"
+              onChange={(e) => {
+                setUsernameInput(e.target.value)
+              }}
+            />
+          </div>
+          <div className="realname-input">
+            <div className="content">姓名</div>
+            <input
+              type="text"
+              onChange={(e) => {
+                setUsernameInput(e.target.value)
+              }}
+            />
+          </div>
+          <div className="phoneNumber-input">
+            <div className="content">電話號碼</div>
+            <input
+              type="text"
+              onChange={(e) => {
+                setPhoneNumberInput(e.target.value)
+              }}
+            />
+          </div>
+          <div className="grade-input">
+            <div className="content">年級</div>
+            <input
+              type="text"
+              onChange={(e) => {
+                setGradeInput(e.target.value)
+              }}
+            />
+          </div>
+          <div className="role-input">
+            <div className="content">身分組</div>
+            <select
+              className=""
+              onChange={(e) => {
+                setRole(e.target.value)
+              }}>
+              <option value="">全部</option>
+              <option value="teacher">教師</option>
+              <option value="student">學生</option>
+              <option value="admin">管理員</option>
+            </select>
+          </div>
+          <button
+            className="g-blue-btn"
+            type="submit">
+            搜尋
+          </button>
+        </form>
 
         <div className="member-list-area">
           <div className="inner-line">
@@ -521,6 +664,7 @@ export default function EditMembers() {
               </li>
             ))}
         </div>
+
         <div className="page-switch">
           <Image
             alt="switch back to first page icon"

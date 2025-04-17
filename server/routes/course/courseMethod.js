@@ -400,7 +400,7 @@ router.post(
       // 呼叫 VimeoMethods.upload 進行影片上傳
       const uploadUri = await VimeoMethods.upload(req.body, videoIndex);
       if (!uploadUri.success)
-        return res.status(500).json({
+        return res.status(520).json({
           success: false,
           msg: "目前請求繁忙請稍等一分鐘後再進行請求",
         });

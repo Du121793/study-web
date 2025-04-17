@@ -8,12 +8,33 @@
   text-align: center;
   gap: 12px;
 }
-.footer-main .imgs {
+.footer-main .info-area {
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  gap: 24px;
+  align-items: center;
+  gap: 12px;
   width: 100%;
   z-index: 1;
+}
+.footer-main .info-area .images {
+  display: flex;
+  gap: 12px;
+}
+.footer-main .info-area .info {
+  display: flex;
+  gap: 4px;
+}
+.footer-main .info-area .info .content {
+  display: flex;
+  align-items: center;
+}
+.footer-main .info-area .info .content .link {
+  transition: 0.2s;
+  color: black;
+}
+.footer-main .info-area .info .content .link:hover {
+  color: rgb(54, 54, 54);
 }
 .footer-main .footer-content p {
   color: #000000;

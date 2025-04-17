@@ -22,7 +22,7 @@ export default function Player() {
   const [parsedInfo, setParsedInfo] = useState({})
   // 控制右側列表開關
   const [videoListIsOpen, setVideoListIsOpen] = useState(false)
-  const [playerHeight, setPlayerHeight] = useState(700)
+  const [playerHeight, setPlayerHeight] = useState('900px')
   const [videoListWidth, setVideoListWidth] = useState(0)
   const [videoListMarginRight, setVideoListMarginRight] = useState('#fff')
   // 播放器需要的影片url

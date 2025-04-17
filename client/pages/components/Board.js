@@ -1,17 +1,24 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import titleIcon from '../../public/index/board/boardTitle.svg'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useImperativeHandle } from 'react'
 import userService from '../../method/userService'
+
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 const serverIp = process.env.NEXT_PUBLIC_SERVER_IP
 
-export default function Board({ editHasChange }) {
+export default function Board({ editHasChange, moveToBoardRef }) {
   const [boards, setBoards] = useState([])
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(5)
   const [totalPage, setTotalPage] = useState(0)
   const boardEle = useRef(null)
+
+  useImperativeHandle(moveToBoardRef, () => ({
+    doSomething: () => {
+      moveToBoardEle()
+    },
+  }))
 
   const moveToBoardEle = () => {
     if (boardEle) {

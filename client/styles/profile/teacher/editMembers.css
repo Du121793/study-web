@@ -65,6 +65,55 @@
 .edit-members-main .member-selector-area .option-area .remove-member-to-course-btn:hover {
   background-color: #d79595;
 }
+.edit-members-main .member-selector-area .search-form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  width: 95%;
+  gap: 8px;
+}
+.edit-members-main .member-selector-area .search-form .username-input {
+  word-break: keep-all;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.edit-members-main .member-selector-area .search-form .username-input input {
+  width: 120px;
+}
+.edit-members-main .member-selector-area .search-form .realname-input {
+  word-break: keep-all;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.edit-members-main .member-selector-area .search-form .realname-input input {
+  width: 100px;
+}
+.edit-members-main .member-selector-area .search-form .phoneNumber-input {
+  word-break: keep-all;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.edit-members-main .member-selector-area .search-form .phoneNumber-input input {
+  width: 120px;
+}
+.edit-members-main .member-selector-area .search-form .grade-input {
+  word-break: keep-all;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.edit-members-main .member-selector-area .search-form .grade-input input {
+  width: 120px;
+}
+.edit-members-main .member-selector-area .search-form .role-input {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
 .edit-members-main .member-selector-area .member-list-area {
   width: 90%;
   display: flex;
