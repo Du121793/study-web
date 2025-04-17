@@ -158,7 +158,6 @@ const tokenCheck = (req, res, next) => {
         "index.js",
         "tokenCheck",
         { path: req.path, reason: "未授權" },
-        info
       );
       return res.status(401).json({ message: "Unauthorized" });
     }

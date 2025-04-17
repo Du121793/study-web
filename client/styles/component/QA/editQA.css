@@ -61,7 +61,7 @@
   border: 2px solid rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   padding: 8px;
-  min-width: 80%;
+  width: 80%;
 }
 .edit-QA-main .form-area .themes .content {
   display: flex;
@@ -69,6 +69,8 @@
   color: rgba(0, 0, 0, 0.6);
 }
 .edit-QA-main .form-area .themes .theme {
+  position: relative;
+  cursor: pointer;
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
@@ -77,6 +79,11 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   background-color: #4f4f4f;
   color: white;
+  display: flex;
+  transition: 0.2s;
+}
+.edit-QA-main .form-area .themes .theme:hover {
+  padding: 4px 10px;
 }
 .edit-QA-main .form-area .hints-area {
   display: flex;
@@ -102,6 +109,8 @@
   color: rgba(0, 0, 0, 0.6);
 }
 .edit-QA-main .form-area .hints .hint {
+  cursor: pointer;
+  transition: 0.2s;
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
@@ -110,6 +119,9 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   background-color: #cacaca;
   color: rgb(0, 0, 0);
+}
+.edit-QA-main .form-area .hints .hint:hover {
+  padding: 4px 10px;
 }
 .edit-QA-main .form-area .image-area {
   display: flex;

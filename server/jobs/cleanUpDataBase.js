@@ -165,7 +165,7 @@ async function processGetSchedule() {
     if (!findResp.success || findResp.total === 0) {
       // 檢查是否因 API 限制而失败
       const shouldCountAsFail = !(
-        (findResp.APILimit && findResp.APILimit.remaining === 0) || // API 限制
+        (findResp.APILimit && findResp.APILimit.remaining <= 10) || // API 限制
         (findResp.total !== undefined && findResp.total > 0)
       );
 
@@ -266,7 +266,7 @@ async function processDeleteSchedule() {
     ) {
       // 檢查是否 API 限制而失败
       const shouldCountAsFail = !(
-        (deleteResp.APILimit && deleteResp.APILimit.remaining === 0) || // API 限制
+        (deleteResp.APILimit && deleteResp.APILimit.remaining <= 10) || // API 限制
         (deleteResp.total !== undefined && deleteResp.total > 0)
       );
 
@@ -325,7 +325,7 @@ cron.schedule(
     try {
       const result = await processGetSchedule();
       if (result.success && result.processed > 0) {
-        log({}, `GET 排程執行結果:${result}`);
+        log({}, `GET 排程執行結果:${result.success},處理了${result.processed}個檔案`);
       } else if (!result.success) {
         // console.log("GET 排程因 API 回傳失敗而跳過本輪處理");
       }
@@ -357,7 +357,7 @@ cron.schedule(
     try {
       const result = await processDeleteSchedule();
       if (result.success && result.processed > 0) {
-        log({}, `DELETE 排程執行結果:${result}`);
+        log({}, `DELETE 排程執行結果:${result.success},處理了${result.processed}個檔案`);
       } else if (!result.success) {
         // console.log("DELETE 排程因 API 回傳失敗而跳過本輪處理");
       }

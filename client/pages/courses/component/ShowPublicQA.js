@@ -462,6 +462,9 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, showP
                 onMouseOut={(e) => {
                   e.target.style.backgroundColor = 'rgb(255, 255, 255)'
                 }}
+                onClick={() => {
+                  page_body.style.overflow = 'auto'
+                }}
                 key={index}>
                 {removeingQA && (
                   <div

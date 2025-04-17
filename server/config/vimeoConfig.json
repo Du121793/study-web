@@ -1,8 +1,13 @@
 {
-  "version": "VimeoMethodsForFree",
+  "version": "VimeoMethodsForFreeV2",
   "cache": {
     "expireTime": "3d",
     "projectsCacheTime": "3d"
+  },
+  "cacheV2": {
+    "days": 1,    
+    "hour": 0,  
+    "minute": 0    
   },
   "folderStructure": {
     "rootFolder": "WebVideos",

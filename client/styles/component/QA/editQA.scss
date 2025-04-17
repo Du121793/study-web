@@ -20,7 +20,7 @@
     flex-direction: column;
     align-items: center;
     gap: 12px;
-    transition: .2s;
+    transition: 0.2s;
     .add-icon {
       cursor: pointer;
       padding: 4px;
@@ -45,7 +45,7 @@
       flex-wrap: wrap;
     }
 
-    .title-content{
+    .title-content {
       user-select: none;
       margin-bottom: -4px;
       width: 80%;
@@ -59,19 +59,26 @@
       border: 2px solid rgba(0, 0, 0, 0.2);
       border-radius: 4px;
       padding: 8px;
-      min-width: 80%;
+      width: 80%;
       .content {
         display: flex;
         align-items: center;
         color: rgba(0, 0, 0, 0.6);
       }
       .theme {
+        position: relative;
+        cursor: pointer;
         user-select: none;
         padding: 4px 6px;
         border-radius: 4px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         background-color: #4f4f4f;
         color: white;
+        display: flex;
+        transition: 0.2s;
+      }
+      .theme:hover {
+        padding: 4px 10px;
       }
     }
     .hints-area {
@@ -95,12 +102,17 @@
         color: rgba(0, 0, 0, 0.6);
       }
       .hint {
+        cursor: pointer;
+        transition: .2s;
         user-select: none;
         padding: 4px 6px;
         border-radius: 4px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         background-color: #cacaca;
         color: rgb(0, 0, 0);
+      }
+      .hint:hover {
+        padding: 4px 10px;
       }
     }
     .image-area {

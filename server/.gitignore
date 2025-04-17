@@ -1,0 +1,6 @@
+.env
+resource/public/board/**
+resource/public/carousel/**
+resource/questionIMG/**
+resource/videoIMG/**
+methods/**

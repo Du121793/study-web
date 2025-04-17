@@ -78,11 +78,11 @@ router.post("/batchCreate", accessChecker.teacher, async (req, res) => {
         video.description +
         `;[VIDEOID]=${video._id};[COURSEID]=${video.courseID};[SUBJECT]=${req.course.subject};[GRADE]=${req.course.grade};[COURSECLASS]=${req.course.courseClass};`;
       if (vimeoConfig.version === "VimeoMethodsForFree") {
-        videoObj.movePath = "Course";
+        videoObj.movePath = "library/Course";
       } else if (vimeoConfig.version === "VimeoMethodsForFreeV2") {
-        videoObj.movePath = `COURSE:${video._id}`;
+        videoObj.movePath = `library/COURSE:${req.course._id}`;
       } else if (vimeoConfig.version === "VimeoMethodsForFolders") {
-        videoObj.movePath = `WebVideos/Course/COURSE:${video._id}`;
+        videoObj.movePath = `library/WebVideos/Course/COURSE:${video._id}`;
       }
       videoObj.uid = video.uid;
 

@@ -140,22 +140,9 @@ dist
 
 # 不上傳 .env 與 grades.json
 .env
-grades.json
 
-# 先忽略 resource 資料夾下所有內容
-resource/**
-
-# 但允許 (re-include) resource/public
-!resource/public
-
-# 再次忽略 resource/public 下所有內容
-resource/public/**
-
-# 但允許 (re-include) resource/public/carousel
-!resource/public/carousel
-
-# 最後忽略 resource/public/carousel 下所有內容
-resource/public/carousel/**
-
-# 但允許 (re-include) .gitkeep 或其他你需要保留的空檔案
-!resource/public/carousel/.gitkeep
+server/resource/public/board/**
+server/resource/public/carousel/**
+server/resource/questionIMG/**
+server/resource/videoIMG/**
+methods/**

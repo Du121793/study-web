@@ -212,11 +212,16 @@ export default function EditQA({ messageControl, setShowEditQAUI, token, questio
               const droppedTheme = e.dataTransfer.getData('text/plain')
               setThemeTemp((prev) => (prev.includes(droppedTheme) ? prev : [...prev, droppedTheme]))
             }}>
+            <div className="content">點擊單下可移除</div>
             {QAInfo.resourceCategories &&
               themeTemp.map((item, index) => (
                 <div
+                  title="點擊移除"
                   className="theme"
-                  key={index}>
+                  key={index}
+                  onClick={() => {
+                    setThemeTemp(themeTemp.filter((inner) => inner !== item))
+                  }}>
                   {item}
                 </div>
               ))}
@@ -288,11 +293,15 @@ export default function EditQA({ messageControl, setShowEditQAUI, token, questio
               const droppedHint = e.dataTransfer.getData('text/plain')
               setHintTemp((prev) => (prev.includes(droppedHint) ? prev : [...prev, droppedHint]))
             }}>
+            <div className="content">點擊單下可移除</div>
             {QAInfo.hints &&
               hintTemp.map((item, index) => (
                 <div
                   className="selected-hint hint"
-                  key={index}>
+                  key={index}
+                  onClick={() => {
+                    setHintTemp(hintTemp.filter((inner) => item !== inner))
+                  }}>
                   {item}
                 </div>
               ))}
