@@ -33,6 +33,7 @@ const upload = multer({ storage: multer.memoryStorage() });
  * @returns {Promise<string>} 寫入檔案的路徑
  */
 async function processThumbnailImage(file, videoId) {
+  file.buffer = await imageCompresser.compressImageBuffer(file.buffer)
   return new Promise((resolve, reject) => {
     const fileExt = path.extname(file.originalname);
     const newFilename = videoId + fileExt + ".jpg";
@@ -41,7 +42,7 @@ async function processThumbnailImage(file, videoId) {
 
     // 直接寫入 buffer 到指定路徑
     fs.writeFile(newPath, file.buffer, (err) => {
-      if (err) {
+      if (err) {x
         console.error("寫入圖片檔案錯誤:", err);
         return reject(err);
       }

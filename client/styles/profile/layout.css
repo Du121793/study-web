@@ -3,13 +3,18 @@ html {
 }
 
 .profile-main {
-  min-width: 1005px;
   height: 100vh;
   position: relative;
   display: flex;
   flex-direction: column;
 }
+.profile-main .top {
+  position: relative;
+  z-index: 3;
+}
 .profile-main .bottom {
+  z-index: 2;
+  position: relative;
   flex: 1;
   display: flex;
 }
@@ -20,13 +25,13 @@ html {
   left: 0;
   height: 100%;
 }
+@media (max-width: 860px) {
+  .profile-main .bottom .left-item {
+    position: absolute;
+  }
+}
 .profile-main .bottom .right-item {
   flex: 1;
   z-index: 0;
   pointer-events: all;
-}
-
-.index-main {
-  min-width: 1005px;
-  width: 100%;
 }/*# sourceMappingURL=layout.css.map */

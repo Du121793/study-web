@@ -364,7 +364,8 @@ export default function QaPage() {
       )}
       {/* header */}
       <Header loginState={isLogined} />
-      {/* 標題 */}
+
+      {/* 標題 title區域*/}
       <div className="qa-header">
         <button
           className="back-btn"
@@ -377,7 +378,7 @@ export default function QaPage() {
           className="title"
           onClick={test}>
           {courseName}
-          <div className="hint">{course_id}</div>
+          <div className="hint">{qa_id}</div>
         </div>
       </div>
 
@@ -431,7 +432,7 @@ export default function QaPage() {
               onClick={() => {
                 setShowPublicQASetting(true)
               }}>
-              公開提問
+              上傳至公共問題區
             </button>
             <div className="content submit">已回覆</div>
             <input

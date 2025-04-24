@@ -67,9 +67,9 @@
           flex-direction: column;
           align-items: center;
           border: 1px solid #bebebe;
-          border-radius: 2px;
+          border-radius: 8px;
           gap: 18px;
-          background-color: rgb(235, 235, 235);
+          background-color: rgb(231, 231, 231);
           .QA-tag {
             display: flex;
             .content {
@@ -178,7 +178,7 @@
             }
           }
           .qa-info:hover {
-            background-color: #f6f6f6;
+            background-color: #dfefff;
           }
         }
         .qa-info-area {
@@ -254,6 +254,36 @@
         justify-content: center;
         .g-black-btn {
           margin-bottom: 24px;
+        }
+      }
+    }
+  }
+  @media (max-width: 860px) {
+    width: 90vw;
+    .container {
+      width: 100%;
+      .QA-header {
+        width: 90%;
+        padding: 8px;
+        flex-direction: column;
+        gap: 4px;
+        .sort-by-area {
+          .sort-title {
+            margin: 0;
+          }
+        }
+      }
+      .QA-grid {
+        width: 100%;
+        .QA-container {
+          width: 100%;
+          align-items: center;
+          justify-content: center;
+          padding: 0;
+          .my-masonry-grid_column {
+            flex-direction: column;
+            padding: 0 30px;
+          }
         }
       }
     }

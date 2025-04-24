@@ -194,19 +194,21 @@ export default function BoardPage() {
           </Link>
         </div>
       )}
+      {boardInfo && (
+        <div
+          className="main-title-area"
+          style={{ whiteSpace: 'pre-wrap' }}
+          onClick={() => {
+            test()
+          }}>
+          <div className="content">{boardInfo.title}</div>
+        </div>
+      )}
       {/* board info area */}
       {boardInfo && (
         <div className="announcement">
           <div className="announcement-header">
             <div className="info">
-              <div
-                className="title"
-                style={{ whiteSpace: 'pre-wrap' }}
-                onClick={() => {
-                  test()
-                }}>
-                {boardInfo.title}
-              </div>
               <div
                 className="subTitle"
                 style={{ whiteSpace: 'pre-wrap' }}>

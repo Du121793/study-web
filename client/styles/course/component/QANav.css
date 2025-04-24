@@ -71,9 +71,9 @@
   flex-direction: column;
   align-items: center;
   border: 1px solid #bebebe;
-  border-radius: 2px;
+  border-radius: 8px;
   gap: 18px;
-  background-color: rgb(235, 235, 235);
+  background-color: rgb(231, 231, 231);
 }
 .QA-area .container .QA-grid .QA-container .QA-list .QA-tag {
   display: flex;
@@ -183,7 +183,7 @@
   margin-top: -6px;
 }
 .QA-area .container .QA-grid .QA-container .QA-list .qa-info:hover {
-  background-color: #f6f6f6;
+  background-color: #dfefff;
 }
 .QA-area .container .QA-grid .QA-container .qa-info-area {
   color: black;
@@ -257,4 +257,34 @@
 }
 .QA-area .container .QA-grid .btn-area .g-black-btn {
   margin-bottom: 24px;
+}
+@media (max-width: 860px) {
+  .QA-area {
+    width: 90vw;
+  }
+  .QA-area .container {
+    width: 100%;
+  }
+  .QA-area .container .QA-header {
+    width: 90%;
+    padding: 8px;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .QA-area .container .QA-header .sort-by-area .sort-title {
+    margin: 0;
+  }
+  .QA-area .container .QA-grid {
+    width: 100%;
+  }
+  .QA-area .container .QA-grid .QA-container {
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  .QA-area .container .QA-grid .QA-container .my-masonry-grid_column {
+    flex-direction: column;
+    padding: 0 30px;
+  }
 }/*# sourceMappingURL=QANav.css.map */

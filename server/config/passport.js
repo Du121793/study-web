@@ -89,8 +89,8 @@ passport.use(
     async (accessToken, refreshToken, profile, done) => {
       // 查找是否已存在使用者
       let foundUser = await User.findOne({ lineID: profile.id }).exec();
-      foundUser = foundUser.toFullJSON();
       if (foundUser) {
+        foundUser = foundUser.toFullJSON();
         // 若使用者存在，檢查頭像是否需要更新
         if (foundUser.userinfo.pictureUrl !== profile.pictureUrl) {
           try {

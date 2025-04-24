@@ -391,7 +391,7 @@ export default function EditCourse() {
           </select>
         </div>
 
-        <div className="input-area">
+        <div className="input-area course-name">
           <div className="course-name-title">課名:</div>
           <input
             type="text"
@@ -401,23 +401,25 @@ export default function EditCourse() {
               setCourseNameInput(e.target.value)
             }}
           />
-          <div
-            className="g-green-btn"
-            onClick={addNewCourse}>
-            新增
-          </div>
-          <div
-            className="g-red-btn"
-            onClick={() => {
-              initAddInfo()
-            }}>
-            清空
+          <div className="btn-area">
+            <div
+              className="g-green-btn"
+              onClick={addNewCourse}>
+              新增
+            </div>
+            <div
+              className="g-red-btn"
+              onClick={() => {
+                initAddInfo()
+              }}>
+              清空
+            </div>
           </div>
         </div>
         {/* 是否要在新增課程時也將選擇的成員加入課程 */}
         <div className="checkbox-area">
           <div className="hint">
-            是否要在新增課程時也將選擇的成員加入課程
+            是否要在新增課程時也將勾選的成員加入課程
             <input
               onChange={(e) => {
                 setAddThenRegister(e.target.checked)
@@ -499,34 +501,36 @@ export default function EditCourse() {
                 {/* 若true，則將內部元素改為input，用於編輯 */}
                 {index === editStatusIndex ? (
                   <>
-                    <input
-                      className="course-name-input"
-                      defaultValue={item.courseName}
-                      onChange={(e) => {
-                        setEditCourseName(e.target.value)
-                      }}
-                    />
-                    <input
-                      className="course-grade-input"
-                      defaultValue={item.grade}
-                      onChange={(e) => {
-                        setEditGrade(e.target.value)
-                      }}
-                    />
-                    <input
-                      className="course-subject-input"
-                      defaultValue={item.subject}
-                      onChange={(e) => {
-                        setEditSubject(e.target.value)
-                      }}
-                    />
-                    <input
-                      className="course-class-input"
-                      defaultValue={item.courseClass}
-                      onChange={(e) => {
-                        setEditClass(e.target.value)
-                      }}
-                    />
+                    <div className="info-line">
+                      <input
+                        className="course-name-input"
+                        defaultValue={item.courseName}
+                        onChange={(e) => {
+                          setEditCourseName(e.target.value)
+                        }}
+                      />
+                      <input
+                        className="course-grade-input"
+                        defaultValue={item.grade}
+                        onChange={(e) => {
+                          setEditGrade(e.target.value)
+                        }}
+                      />
+                      <input
+                        className="course-subject-input"
+                        defaultValue={item.subject}
+                        onChange={(e) => {
+                          setEditSubject(e.target.value)
+                        }}
+                      />
+                      <input
+                        className="course-class-input"
+                        defaultValue={item.courseClass}
+                        onChange={(e) => {
+                          setEditClass(e.target.value)
+                        }}
+                      />
+                    </div>
                     <div className="image-area">
                       <Image
                         src={complateIcon}
@@ -569,11 +573,13 @@ export default function EditCourse() {
                   </>
                 ) : (
                   <>
-                    <div className="count">{index + 1}</div>
-                    <div className="course-name">{item.courseName}</div>
-                    <div className="course-grade">{item.grade}</div>
-                    <div className="course-subject">{item.subject}</div>
-                    <div className="course-class">{item.courseClass}</div>
+                    <div className="info-line">
+                      <div className="count">{index + 1}</div>
+                      <div className="course-name">{item.courseName}</div>
+                      <div className="course-grade">{item.grade}</div>
+                      <div className="course-subject">{item.subject}</div>
+                      <div className="course-class">{item.courseClass}</div>
+                    </div>
                     <div className="image-area">
                       <Image
                         src={editIcon}

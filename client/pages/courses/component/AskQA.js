@@ -15,6 +15,7 @@ import leftArrow from '../../../public/course/leftArrow.png'
 // nav組件
 import VideoNav from '../VideoNav'
 import QaNav from '../QaNav'
+import adminService from '../../../method/adminService'
 
 export default function AskNav({ showAskQA, setShowAskQA, qaHasUpload, setQaHasUpload, course_id, courseName, user_role }) {
   // 控制內部滾輪
@@ -58,6 +59,12 @@ export default function AskNav({ showAskQA, setShowAskQA, qaHasUpload, setQaHasU
 
   // 用於預覽圖片
   const [previewUrl, setPreviewUrl] = useState([])
+
+  // 現有主題與標籤
+  const [searchTheme, setSearchTheme] = useState([])
+  const [showSearchTheme, setShowSearchTheme] = useState(false)
+  const [searchHint, setSearchHint] = useState([])
+  const [showSearchhHint, setShowSearchHint] = useState(false)
 
   // 控制訊息
   const messageControl = (info, isSuccess) => {
@@ -110,19 +117,31 @@ export default function AskNav({ showAskQA, setShowAskQA, qaHasUpload, setQaHasU
   }
 
   // ask，新增主題功能
-  const addNewTheme = () => {
+  const addNewTheme = (themeName = null) => {
     if (themeInput.length > 19) return
-    if (
-      theme.find((item) => {
-        return item === themeInput
-      }) ||
-      themeInput === ''
-    ) {
-      console.log('這個標籤已經有了')
-    } else {
-      setTheme(theme, theme.push(themeInput))
+
+    if (themeName) {
+      if (theme.find((item) => item === themeName)) {
+        messageControl('這個主題已經有了', false)
+        return
+      }
+      setTheme(theme, theme.push(themeName))
       setRerander(!rerander)
+      return
     }
+
+    if (themeInput.trim() === '') {
+      messageControl('主題不能為空', false)
+      return
+    }
+
+    if (theme.find((item) => item === themeInput)) {
+      messageControl('這個主題已經有了', false)
+      return
+    }
+
+    setTheme(theme, theme.push(themeInput))
+    setRerander(!rerander)
   }
 
   // ask，移除標籤功能
@@ -145,19 +164,28 @@ export default function AskNav({ showAskQA, setShowAskQA, qaHasUpload, setQaHasU
   }
 
   // ask，新增標籤功能
-  const addNewHint = () => {
+  const addNewHint = (hintName) => {
     if (hintInput.length > 19) return
-    if (
-      hints.find((item) => {
-        return item === hintInput
-      }) ||
-      hintInput === ''
-    ) {
-      console.log('這個標籤已經有了')
-    } else {
-      setHints(hints, hints.push(hintInput))
+    if (hintName) {
+      if (hints.find((item) => item === hintName)) {
+        messageControl('這個標籤已經有了')
+        return
+      }
+      setHints(hints, hints.push(hintName))
       setRerander(!rerander)
+      return
     }
+
+    if (hintInput.trim() === '') {
+      messageControl('標籤不能為空', false)
+      return
+    }
+    if (hints.find((item) => item === hintInput)) {
+      messageControl('這個標籤已經有了')
+      return
+    }
+    setHints(hints, hints.push(hintInput))
+    setRerander(!rerander)
   }
 
   const initInput = () => {
@@ -215,7 +243,16 @@ export default function AskNav({ showAskQA, setShowAskQA, qaHasUpload, setQaHasU
     page_body.style.overflow = 'auto'
   }
 
-  const test = () => {}
+  useEffect(() => {
+    if (token) {
+      adminService.getCourseQAsByTag(token, course_id).then((res) => {
+        if (res?.success) {
+          setSearchTheme(res.data.resourceCategories)
+          setSearchHint(res.data.hints)
+        }
+      })
+    }
+  }, [token])
 
   // 控制頁面scroll狀態
   useEffect(() => {
@@ -292,7 +329,7 @@ export default function AskNav({ showAskQA, setShowAskQA, qaHasUpload, setQaHasU
                     className="preview-images"
                     src={item}
                     alt="user chose image"
-                    width={300}
+                    width={0}
                     height={0}
                     style={{ height: 'auto' }}></Image>
                 </div>
@@ -301,7 +338,25 @@ export default function AskNav({ showAskQA, setShowAskQA, qaHasUpload, setQaHasU
           )}
         </div>
         <div className="qa-info-area">
-          {/* 輸入主題 */}
+          {/* 現有主題 */}
+          {showSearchTheme && (
+            <div className="view-card-area">
+              {searchTheme &&
+                searchTheme.length > 0 &&
+                searchTheme.map((item, idx) => (
+                  <div
+                    className="card"
+                    key={idx}
+                    onClick={() => {
+                      addNewTheme(item)
+                    }}
+                    style={{ cursor: 'pointer' }}>
+                    {item}
+                  </div>
+                ))}
+            </div>
+          )}
+          {/* 主題input */}
           <div className="sortType-input-area">
             <span className="title">主題:</span>
             <input
@@ -313,23 +368,33 @@ export default function AskNav({ showAskQA, setShowAskQA, qaHasUpload, setQaHasU
             />
             <button
               className="g-green-btn"
-              onClick={addNewTheme}>
+              onClick={() => {
+                addNewTheme()
+              }}>
               <div
                 className=""
                 onClick={initScrollHeight}>
                 新增
               </div>
             </button>
+            <button
+              className="g-blue-btn"
+              onClick={() => {
+                setShowSearchTheme(true)
+                console.log(searchTheme)
+              }}>
+              顯示現有主題
+            </button>
           </div>
           {/* 顯示主題 */}
-          <div className="themes-area">
+          <div className="view-card-area">
             {theme.map((item, index) => (
               <div
-                className="theme"
+                className="card"
                 key={index}>
                 {item}
                 <span
-                  className="delete-theme"
+                  className="delete-btn"
                   onClick={() => {
                     removeTheme(item)
                   }}>
@@ -338,7 +403,24 @@ export default function AskNav({ showAskQA, setShowAskQA, qaHasUpload, setQaHasU
               </div>
             ))}
           </div>
-          {/* 輸入標籤 */}
+          {/* 現有標籤 */}
+          {showSearchhHint && (
+            <div className="view-card-area">
+              {searchHint.length > 0 &&
+                searchHint.map((item, idx) => (
+                  <div
+                    className="card"
+                    key={idx}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => {
+                      addNewHint(item)
+                    }}>
+                    {item}
+                  </div>
+                ))}
+            </div>
+          )}
+          {/* 標籤input */}
           <div className="sortType-input-area">
             <span className="title">標籤:</span>
             <input
@@ -350,24 +432,34 @@ export default function AskNav({ showAskQA, setShowAskQA, qaHasUpload, setQaHasU
             />
             <button
               className="g-green-btn"
-              onClick={addNewHint}>
+              onClick={() => {
+                addNewHint()
+              }}>
               <div
                 className="content"
                 onClick={initScrollHeight}>
                 新增
               </div>
             </button>
+
+            <button
+              className="g-blue-btn"
+              onClick={() => {
+                setShowSearchHint(true)
+              }}>
+              顯示現有標籤
+            </button>
           </div>
           {/* 顯示標籤 */}
-          <div className="hints-area">
+          <div className="view-card-area">
             {hints &&
               hints.map((item, index) => (
                 <div
-                  className="hint"
+                  className="card"
                   key={index}>
                   {item}
                   <span
-                    className="delete-hint"
+                    className="delete-btn"
                     onClick={() => {
                       removeHint(item)
                     }}>
@@ -404,6 +496,11 @@ export default function AskNav({ showAskQA, setShowAskQA, qaHasUpload, setQaHasU
               onClick={createNewQA}
               className="g-green-btn">
               送出
+            </button>
+            <button
+              onClick={closeUI}
+              className="g-red-btn">
+              關閉介面
             </button>
           </div>
         </div>

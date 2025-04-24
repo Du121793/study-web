@@ -103,22 +103,27 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      width: 23%;
-      max-width: 240px;
-      max-height: 280px;
       background-color: #b7b7b7;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
       border-radius: 4px;
       transition: 0.2s;
       .top-container {
-        height: 60%;
-        padding: 4px;
+        width: 100%;
         background-color: #fff;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
         border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+        @media (min-width: 901px) {
+          min-height: 140px;
+          max-height: 140px;
+        }
         .videos-shot {
           width: 100%;
           height: 100%;
           object-fit: cover;
+          display: block;
         }
         .delete-video-btn {
           z-index: 9;
@@ -193,6 +198,7 @@
             width: 95%;
             .container {
               width: 100%;
+              overflow: auto;
               display: flex;
               flex-direction: row;
               gap: 12px;

@@ -244,15 +244,13 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
             />
           </div>
           {/* 身分組 */}
-          <div className="search-inputs">
-            身分組:
+          <div className="role-inputs">
+            <div className="content">身分組:</div>
             <select
               onChange={(e) => {
                 setRoleInput(e.target.value)
                 console.log(e.target.value)
-              }}
-              name=""
-              id="">
+              }}>
               <option value="">全部</option>
               <option value="teacher">教師</option>
               <option value="student">學生</option>

@@ -151,6 +151,8 @@ async function processGetSchedule() {
     .sort({ date: 1 });
   let APILimit = {};
 
+  let processCount = 0;
+
   // 依序處理每個排程
   for (const schedule of schedules) {
     // 檢查 videoIndex 是否有效
@@ -177,9 +179,10 @@ async function processGetSchedule() {
         } else {
           await schedule.save();
         }
+        continue;
       }
 
-      return { success: false, processed: 0, APILimit: findResp.APILimit };
+      return { success: false, processed: processCount, APILimit: findResp.APILimit };
     }
 
     // 處理成功找到影片的情況
@@ -211,6 +214,7 @@ async function processGetSchedule() {
           });
         }
         await vimeoSchedule.findByIdAndDelete(schedule._id);
+        processCount++;
         log({}, `GET 排程：成功處理並刪除 _id: ${schedule._id}`);
       }
     }
@@ -227,7 +231,7 @@ async function processGetSchedule() {
       }
     }
   }
-  return { success: true, processed: schedules.length, APILimit };
+  return { success: true, processed: processCount, APILimit };
 }
 
 /**
@@ -251,6 +255,8 @@ async function processDeleteSchedule() {
     .find({ method: "delete" })
     .sort({ date: 1 });
   let APILimit = {};
+
+  let processCount = 0;
 
   for (const schedule of schedules) {
     if (!schedule.videoIndex || schedule.videoIndex.size === 0) continue;
@@ -280,12 +286,13 @@ async function processDeleteSchedule() {
         } else {
           await schedule.save();
         }
+        continue;
       }
-
-      return { success: false, processed: 0, APILimit: deleteResp.APILimit };
+      return { success: false, processed: processCount, APILimit: deleteResp.APILimit };
     }
     if (deleteResp.data && deleteResp.success === true) {
       await vimeoSchedule.findByIdAndDelete(schedule._id);
+      processCount++;
       log({}, `DELETE 排程：成功處理並刪除 _id: ${schedule._id}`);
     }
     if (deleteResp.APILimit) {
@@ -298,7 +305,7 @@ async function processDeleteSchedule() {
       }
     }
   }
-  return { success: true, processed: schedules.length, APILimit };
+  return { success: true, processed: processCount, APILimit };
 }
 
 /** 排程設定 */

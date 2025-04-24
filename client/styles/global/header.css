@@ -1,37 +1,59 @@
 .header-container {
   display: flex;
-  width: 100%;
-  background-color: #ffffff;
+  align-items: center;
+  background-color: #fff;
   border-bottom: 1px solid #ccc;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
 }
 .header-container .logo-container {
   display: flex;
   align-items: center;
 }
 .header-container .logo-container .logo-img {
-  box-shadow: 0px 0px 6px 1px rgb(167, 167, 167);
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
-  width: 80px;
-  height: 80px;
-  border-radius: 48px;
-  border: 1px solid rgba(0, 0, 0, 0.532);
+  height: auto;
+}
+.header-container .setting-btn {
+  display: flex;
+  align-items: center;
+  width: 0;
+  height: 100px;
+  overflow: hidden;
+  position: sticky;
+  transition: 0.2s;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+.header-container .setting-btn .menu-icon {
+  padding-right: 8px;
+  margin: 0 24px;
+  width: 48px;
+  height: auto;
+  z-index: 10;
+}
+@media (max-width: 860px) {
+  .header-container .setting-btn {
+    display: flex;
+    width: auto;
+  }
+}
+.header-container .setting-btn:hover {
+  background-color: rgba(0, 0, 0, 0.2);
 }
 .header-container .header-main {
-  background-color: #ffffff;
   margin: 0 auto;
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: center;
+  gap: 72px;
   height: 100px;
-  width: 90vw;
-}
-@media (max-width: 770px) {
-  .header-container .header-main .header-middle {
-    width: 0px;
-  }
+  overflow: hidden;
 }
 .header-container .header-main .header-middle {
   display: flex;
@@ -42,6 +64,7 @@
   height: 100%;
 }
 .header-container .header-main .header-middle .header-middle-nav-area {
+  word-break: keep-all;
   position: relative;
   font-size: 18px;
   font-weight: bold;
@@ -66,48 +89,15 @@
 .header-container .header-main .header-middle .header-middle-nav-area:hover::after {
   width: 60%;
 }
-.header-container .header-main .header-middle .login-area {
-  display: flex;
-  align-items: center;
-  position: absolute;
-  overflow: hidden;
-  background-color: #3acd00;
-  transition: 0.3s;
-  width: 76px;
-  height: 60px;
-  border-radius: 12px;
-  right: 0;
-}
-.header-container .header-main .header-middle .login-area .login-content {
-  position: absolute;
-  left: 12px;
-  font-size: 18px;
-  color: white;
-  font-weight: bolds;
-}
-.header-container .header-main .header-middle .login-area .line-login-icon-area {
-  position: absolute;
-  background-color: #3acd00;
-  right: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 76px;
-  height: 60px;
-}
-.header-container .header-main .header-middle .login-area .line-login-icon-area .icon {
-  width: 40px;
-  height: 40px;
-  border: 2px solid white;
-  border-radius: 12px;
-}
-.header-container .header-main .header-middle .login-area:hover {
-  width: 170px;
-}
 .header-container .header-main .header-right {
   display: flex;
   align-items: center;
+  overflow: hidden;
+  position: relative;
   gap: 18px;
+  min-width: 170px;
+  padding: 0 4px;
+  height: 100%;
 }
 .header-container .header-main .header-right .btn-area {
   -webkit-user-select: none;
@@ -168,4 +158,118 @@
 .header-container .header-main .header-right .sign-out-area .sign-out-btn {
   cursor: pointer;
   font-weight: bold;
+}
+.header-container .header-main .header-right .login-area {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  left: 0;
+  top: 0;
+  width: 69px;
+  height: 60%;
+  background-color: #3acd00;
+  transition: 0.3s;
+  border-radius: 12px;
+  gap: 8px;
+}
+.header-container .header-main .header-right .login-area .login-content {
+  width: 70px;
+  left: 12px;
+  font-size: 18px;
+  color: white;
+  word-break: keep-all;
+  font-weight: bold;
+}
+.header-container .header-main .header-right .login-area .line-login-icon-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #3acd00;
+  padding: 0 12px;
+}
+.header-container .header-main .header-right .login-area .line-login-icon-area .icon {
+  width: 40px;
+  height: 40px;
+  border: 2px solid white;
+  border-radius: 12px;
+}
+.header-container .header-main .header-right .login-area:hover {
+  width: 170px;
+}
+.header-container .header-main .option-list {
+  opacity: 1;
+  pointer-events: all;
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  transition: 0.2s;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  gap: 32px;
+}
+.header-container .header-main .option-list .close-menu-btn-area {
+  height: 100px;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  transition: 0.2s;
+  background-color: #505050;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+}
+.header-container .header-main .option-list .close-menu-btn-area .menu-icon {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  width: 48px;
+  padding: 0 24px;
+  height: auto;
+}
+.header-container .header-main .option-list .content {
+  cursor: pointer;
+  margin: 0 24px;
+  font-size: 24px;
+  color: rgb(255, 255, 255);
+  word-break: keep-all;
+}
+.header-container .header-main .option-list .avatar {
+  cursor: pointer;
+  width: 81px;
+  border-radius: 64px;
+  height: auto;
+}
+.header-container .header-main .option-list .login-btn {
+  padding: 2px 8px;
+  border-radius: 8px;
+  background-color: #16fa62;
+  color: rgb(248, 248, 248);
+  font-weight: bold;
+}
+.header-container .header-main .option-list .login-out {
+  padding: 2px 8px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  color: rgb(252, 103, 103);
+}
+@media (max-width: 860px) {
+  .header-container .header-main {
+    gap: 4px;
+  }
+  .header-container .header-main .header-middle {
+    pointer-events: none;
+    width: 0;
+    opacity: 0;
+  }
+  .header-container .header-main .header-right {
+    display: none;
+    width: 0;
+  }
+  .header-container .header-main .option-list {
+    opacity: 1;
+    pointer-events: all;
+  }
 }/*# sourceMappingURL=header.css.map */

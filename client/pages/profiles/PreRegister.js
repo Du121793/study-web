@@ -307,7 +307,7 @@ export default function PreRegister() {
 
           <div className="copy-area">
             {inputRows.map((row, index) => (
-              <div key={index}>
+              <div key={index} className='input-area'>
                 <div className="form-title">姓名:</div>
                 <input
                   className="input name-input"

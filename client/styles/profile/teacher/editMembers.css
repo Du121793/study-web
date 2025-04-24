@@ -199,4 +199,37 @@
 .edit-members-main .member-selector-area .page-switch .active {
   font-weight: bold;
   color: rgb(0, 0, 0);
+}
+@media (max-width: 860px) {
+  .edit-members-main .member-selector-area {
+    width: 80vw;
+  }
+  .edit-members-main .member-selector-area .search-form {
+    flex-direction: column;
+    width: 100%;
+  }
+  .edit-members-main .member-selector-area .search-form div {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .edit-members-main .member-selector-area .search-form div .content {
+    width: 100%;
+  }
+  .edit-members-main .member-selector-area .search-form div input[type=text] {
+    width: 100%;
+  }
+  .edit-members-main .member-selector-area .search-form .role-input {
+    margin-top: 12px;
+    flex-direction: row;
+    align-items: center;
+    width: 80%;
+  }
+  .edit-members-main .member-selector-area .search-form .role-input .content {
+    flex: 0;
+    word-break: keep-all;
+  }
+  .edit-members-main .member-selector-area .search-form .role-input select {
+    flex: 1;
+    padding: 4px 8px;
+  }
 }/*# sourceMappingURL=editMembers.css.map */

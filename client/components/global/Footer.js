@@ -19,24 +19,27 @@ export default function Footer() {
         <div className="images">
           <Link href={faceBookUrl}>
             <Image
+              className="icon"
               src={facebook}
               alt="facebook icon"
-              width={48}
-              height={48}></Image>
+              width={36}
+              height={36}></Image>
           </Link>
           <Link href={lineUrl}>
             <Image
+              className="icon"
               src={line}
               alt="line icon"
-              width={48}
-              height={48}></Image>
+              width={36}
+              height={36}></Image>
           </Link>
           <Link href={address}>
             <Image
+              className="icon"
               src={googleMap}
               alt="google map icon"
-              width={48}
-              height={48}></Image>
+              width={36}
+              height={36}></Image>
           </Link>
         </div>
 

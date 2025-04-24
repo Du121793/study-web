@@ -113,16 +113,20 @@
       .course-name-input {
         width: 20%;
       }
-      .button {
-        cursor: pointer;
-        transition: 0.2s;
-        padding: 5px 6px;
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        background-color: #ffffff;
-        border-radius: 4px;
-      }
-      .button:hover {
-        background-color: #dedede;
+      .btn-area {
+        display: flex;
+        gap: 6px;
+        .button {
+          cursor: pointer;
+          transition: 0.2s;
+          padding: 5px 6px;
+          border: 1px solid rgba(0, 0, 0, 0.2);
+          background-color: #ffffff;
+          border-radius: 4px;
+        }
+        .button:hover {
+          background-color: #dedede;
+        }
       }
     }
     .checkbox-area {
@@ -180,69 +184,74 @@
         input[type="checkbox"] {
           transform: scale(1.4);
         }
-        .count {
-          font-weight: bold;
-          width: 32px;
-          font-size: clamp(16px, 1.2vw, 20px);
-        }
-        .course-name {
-          font-size: clamp(16px, 1.2vw, 20px);
+        .info-line {
+          width: 100%;
           display: flex;
           align-items: center;
-          height: 100%;
-          width: 200px;
-          border-left: 1px solid rgba(0, 0, 0, 0.2);
-          padding-left: 4px;
-        }
-        .course-grade {
-          display: flex;
-          align-items: center;
-          height: 100%;
-          width: 128px;
-          border-left: 1px solid rgba(0, 0, 0, 0.2);
-          padding-left: 4px;
-          font-size: clamp(16px, 1.2vw, 20px);
-        }
-        .course-subject {
-          display: flex;
-          align-items: center;
-          height: 100%;
-          width: 128px;
-          border-left: 1px solid rgba(0, 0, 0, 0.2);
-          padding-left: 4px;
-          font-size: clamp(16px, 1.2vw, 20px);
-        }
-        .course-class {
-          display: flex;
-          align-items: center;
-          height: 100%;
-          width: 128px;
-          border-left: 1px solid rgba(0, 0, 0, 0.2);
-          padding-left: 4px;
-          font-size: clamp(16px, 1.2vw, 20px);
-        }
-        .course-name-input {
-          width: 32%;
-          border-left: 1px solid rgba(0, 0, 0, 0.2);
-          font-size: clamp(16px, 1.2vw, 20px);
-        }
-        .course-grade-input {
-          width: 15%;
-          border-left: 1px solid rgba(0, 0, 0, 0.2);
-          font-size: clamp(16px, 1.2vw, 20px);
-          margin-left: 4px;
-        }
-        .course-subject-input {
-          width: 15%;
-          border-left: 1px solid rgba(0, 0, 0, 0.2);
-          font-size: clamp(16px, 1.2vw, 20px);
-          margin-left: 4px;
-        }
-        .course-class-input {
-          width: 15%;
-          border-left: 1px solid rgba(0, 0, 0, 0.2);
-          font-size: clamp(16px, 1.2vw, 20px);
-          margin-left: 4px;
+          .count {
+            font-weight: bold;
+            width: 32px;
+            font-size: clamp(16px, 1.2vw, 20px);
+          }
+          .course-name {
+            font-size: clamp(16px, 1.2vw, 20px);
+            display: flex;
+            align-items: center;
+            height: 100%;
+            width: 200px;
+            border-left: 1px solid rgba(0, 0, 0, 0.2);
+            padding-left: 4px;
+          }
+          .course-grade {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            width: 128px;
+            border-left: 1px solid rgba(0, 0, 0, 0.2);
+            padding-left: 4px;
+            font-size: clamp(16px, 1.2vw, 20px);
+          }
+          .course-subject {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            width: 128px;
+            border-left: 1px solid rgba(0, 0, 0, 0.2);
+            padding-left: 4px;
+            font-size: clamp(16px, 1.2vw, 20px);
+          }
+          .course-class {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            width: 128px;
+            border-left: 1px solid rgba(0, 0, 0, 0.2);
+            padding-left: 4px;
+            font-size: clamp(16px, 1.2vw, 20px);
+          }
+          .course-name-input {
+            width: 32%;
+            border-left: 1px solid rgba(0, 0, 0, 0.2);
+            font-size: clamp(16px, 1.2vw, 20px);
+          }
+          .course-grade-input {
+            width: 15%;
+            border-left: 1px solid rgba(0, 0, 0, 0.2);
+            font-size: clamp(16px, 1.2vw, 20px);
+            margin-left: 4px;
+          }
+          .course-subject-input {
+            width: 15%;
+            border-left: 1px solid rgba(0, 0, 0, 0.2);
+            font-size: clamp(16px, 1.2vw, 20px);
+            margin-left: 4px;
+          }
+          .course-class-input {
+            width: 15%;
+            border-left: 1px solid rgba(0, 0, 0, 0.2);
+            font-size: clamp(16px, 1.2vw, 20px);
+            margin-left: 4px;
+          }
         }
         .image-area {
           display: flex;
@@ -291,6 +300,64 @@
         .image {
           opacity: 0;
           pointer-events: none;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 860px) {
+    width: 100vw;
+    .edit-course-function-area {
+      .input-area {
+        flex-direction: column;
+        width: 80vw;
+        select{
+          min-width: 85%;
+          padding: 8px 6px;
+        }
+        .grade-input {
+          width: 80%;
+        }
+        .subject-input {
+          width: 80%;
+        }
+        .class-input {
+          width: 80%;
+        }
+        .course-name-input {
+          width: 80%;
+        }
+      }
+    }
+    .checkbox-area {
+      width: 60%;
+      .hint {
+        input {
+          margin-left: 8px;
+        }
+        input[type="checkbox"] {
+          transform: scale(1.6);
+        }
+      }
+    }
+    .courses-info-list {
+      width: 90%;
+      .search-area {
+        flex-direction: column;
+      }
+      .courses-info-area {
+        word-break: keep-all;
+      }
+      .courses-info-area {
+        flex-direction: column;
+      }
+      #title-area {
+        flex-direction: row;
+        gap: 4px;
+        justify-items: center;
+        overflow: hidden;
+        .image-area {
+          width: 0;
         }
       }
     }

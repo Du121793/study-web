@@ -30,6 +30,8 @@ export default function UploadVideoFc({ setshowUploadVideoUI, showUploadVideoUI,
   // const [autoExtractFrame, setAutoExtractFrame] = useState('')
   // ui控制
   const uiRef = useRef(null)
+  // 控制頁面scroll狀態
+  const [page_body, setPage_body] = useState([])
 
   const test = () => {
     console.log(preViewVideoImage)
@@ -42,51 +44,9 @@ export default function UploadVideoFc({ setshowUploadVideoUI, showUploadVideoUI,
 
   const strictClickCloseUI = useStrictClickHandler(() => {
     setUploadVideoUIInnerOpacity(0)
+    page_body.style.overflow = 'auto'
     setshowUploadVideoUI(false)
   })
-
-  useEffect(() => {
-    setVideoFiles([])
-    setVideoFile(null)
-    setThumbFile(null)
-    setRecordDate(null)
-    setTitle('')
-    setDescription('')
-    setType('MainClass')
-    setDuration(0)
-    setFileSize(0)
-    setIsPublic(false)
-    if (fileInput?.current) {
-      fileInput.current.value = ''
-    }
-    if (fileAvatarInput?.current) {
-      fileAvatarInput.current.value = ''
-    }
-  }, [isShowVideoUpload, fileInput, fileAvatarInput])
-
-  // ★ 第一次載入：從 sessionStorage 讀取先前的上傳狀態
-  useEffect(() => {
-    const storedUploads = JSON.parse(sessionStorage.getItem('uploadProgress')) || []
-    setUploads(storedUploads)
-  }, [])
-
-  // ★ 每當 uploads 改變，就存回 sessionStorage
-  useEffect(() => {
-    sessionStorage.setItem('uploadProgress', JSON.stringify(uploads))
-  }, [uploads])
-
-  const initValues = () => {
-    setVideoFiles([])
-    setVideoFile(null)
-    setThumbFile(null)
-    setRecordDate(null)
-    setTitle('')
-    setDescription('')
-    setType('MainClass')
-    setDuration(0)
-    setFileSize(0)
-    setIsPublic(false)
-  }
 
   // STEP 1: 選擇影片 (可支援多檔)
   const handleVideoSelect = (e) => {
@@ -112,7 +72,9 @@ export default function UploadVideoFc({ setshowUploadVideoUI, showUploadVideoUI,
   // STEP 2: 若用戶有選擇自訂縮圖
   const handleThumbSelect = (e) => {
     const file = e.target.files?.[0]
+    const url = URL.createObjectURL(e.target.files[0])
     if (!file) return
+    setPreViewVideoImage(url)
     setThumbFile(file)
   }
 
@@ -162,17 +124,6 @@ export default function UploadVideoFc({ setshowUploadVideoUI, showUploadVideoUI,
     } else {
       console.error('請先輸入標題')
       return false
-    }
-  }
-
-  // 關閉上傳影片組件
-  const closeVideoUploadOnclick = () => {
-    if (isShowVideoUpload) {
-      let videoUpload = document.querySelector('.upload-vidoe-main')
-      let background = document.querySelector('.background')
-      if (videoUpload) videoUpload.style.height = '0'
-      if (background) background.style.display = 'none'
-      setIsShowVideoUpload(false)
     }
   }
 
@@ -229,7 +180,6 @@ export default function UploadVideoFc({ setshowUploadVideoUI, showUploadVideoUI,
           const { uploadLink, videoId } = data
           startTusUpload(uploadLink, videoId, file, uploadId)
         } catch (err) {
-          console.log(err)
           if (err.error.status === 520) {
             messageControl(err.error.response.data.msg, false)
           }
@@ -448,6 +398,48 @@ export default function UploadVideoFc({ setshowUploadVideoUI, showUploadVideoUI,
     )
   }
 
+  // 初始化欄位
+  useEffect(() => {
+    if (fileInput?.current) {
+      fileInput.current.value = ''
+    }
+    if (fileAvatarInput?.current) {
+      fileAvatarInput.current.value = ''
+    }
+  }, [isShowVideoUpload, fileInput, fileAvatarInput])
+
+  // 第一次載入從 sessionStorage 讀取先前的上傳狀態
+  useEffect(() => {
+    setVideoFiles([])
+    setVideoFile(null)
+    setThumbFile(null)
+    setRecordDate(null)
+    setTitle('')
+    setDescription('')
+    setType('MainClass')
+    setDuration(0)
+    setFileSize(0)
+    setIsPublic(false)
+    setPreViewVideoImage(null)
+    const storedUploads = JSON.parse(sessionStorage.getItem('uploadProgress')) || []
+    setUploads(storedUploads)
+  }, [])
+
+  // 每當 uploads 改變，就存回 sessionStorage
+  useEffect(() => {
+    sessionStorage.setItem('uploadProgress', JSON.stringify(uploads))
+  }, [uploads])
+
+  // 控制頁面scroll狀態
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      setPage_body(document.querySelector('body'))
+    }
+    if (page_body && page_body.style) {
+      page_body.style.overflow = 'hidden'
+    }
+  }, [page_body])
+
   return (
     <div>
       {/* 上傳視窗 */}
@@ -497,7 +489,7 @@ export default function UploadVideoFc({ setshowUploadVideoUI, showUploadVideoUI,
                     style={{ display: 'none' }}
                     ref={fileAvatarInput}
                     type="file"
-                    accept="image/*"
+                    accept=".png, .jpg, .jpeg"
                     onChange={(e) => {
                       if (e.target.value) handleThumbSelect(e)
                     }}
@@ -604,6 +596,11 @@ export default function UploadVideoFc({ setshowUploadVideoUI, showUploadVideoUI,
                 className="g-blue-btn">
                 建立上傳連結並上傳
               </button>
+              <div
+                className="g-red-btn"
+                {...strictClickCloseUI}>
+                關閉介面
+              </div>
             </div>
           </div>
         </div>

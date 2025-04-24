@@ -1,5 +1,5 @@
 // 組件庫
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -40,7 +40,39 @@ export default function ShowPublicQA({ token, setShowPublicQASetting, question_i
 
   //選擇資料夾用於新增QA
   const [selectedFolders, setSelectedFolders] = useState([])
+  // 控制訊息
+  const [message, setMessage] = useState('無訊息')
+  const [messageStatus, setMessageStatus] = useState(false)
+  const [messageColor, setMessageColor] = useState('')
+  // 綁定timeout，用於重計
+  const messageTimer = useRef(null)
+  const resetTimer = useRef(null)
 
+  const initSelectedFolder = () => {
+    setSelectedFolders([])
+  }
+  // 控制訊息
+  const messageControl = (info, isSuccess) => {
+    setMessage(info)
+    setMessageStatus(true)
+    if (isSuccess) {
+      setMessageColor('rgba(195, 240, 178, 0.8)')
+    } else {
+      setMessageColor('rgba(240, 178, 178, 0.8)')
+    }
+
+    // 清除之前的 timer
+    if (messageTimer.current) clearTimeout(messageTimer.current)
+    if (resetTimer.current) clearTimeout(resetTimer.current)
+
+    messageTimer.current = setTimeout(() => {
+      setMessageStatus(false)
+      resetTimer.current = setTimeout(() => {
+        setMessage('無訊息')
+        setMessageColor('')
+      }, 200)
+    }, 2000)
+  }
   // 將QA新增到選擇到的folder
   const pushQAtoFolder = () => {
     /**
@@ -62,23 +94,31 @@ export default function ShowPublicQA({ token, setShowPublicQASetting, question_i
     selectedFolders.forEach((item) => {
       folder_ids.push(item._id)
     })
-    userService.getQaInfo(token, question_id).then((res) => {
-      if (res?.success) {
-        res.data.folders.forEach((item) => {
-          folder_ids.push(item)
-        })
-        let data = {
-          question_id: question_id,
-          course_ids: res.data.courses,
-          folders: folder_ids,
-          isPublic: true,
-        }
-        adminService.patchQaToFolders(token, data).then((response) => {
-          console.log(response)
-        })
-      }
-    })
+
     if (folder_ids.length > 0) {
+      userService.getQaInfo(token, question_id).then((res) => {
+        if (res?.success) {
+          res.data.folders.forEach((item) => {
+            folder_ids.push(item)
+          })
+          let data = {
+            question_id: question_id,
+            course_ids: res.data.courses,
+            folders: folder_ids,
+            isPublic: true,
+          }
+          adminService.patchQaToFolders(token, data).then((response) => {
+            if (response?.success) {
+              messageControl('新增成功', true)
+              initSelectedFolder()
+            } else {
+              messageControl('新增失敗', false)
+            }
+          })
+        }
+      })
+    } else {
+      messageControl('請選擇要加入的資料夾', false)
     }
   }
 
@@ -193,6 +233,13 @@ export default function ShowPublicQA({ token, setShowPublicQASetting, question_i
   return (
     <div className="show-more-public-main">
       <div className="qa-info-area">
+        <div className="meesage-area">
+          <div
+            style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
+            className="message">
+            {message}
+          </div>
+        </div>
         <div className="btn-area">
           {/* 新增資料夾 */}
           {userRole === 'admin' && (
@@ -296,7 +343,8 @@ export default function ShowPublicQA({ token, setShowPublicQASetting, question_i
         </div>
         {/* 資料夾顯示區 */}
         <div className="folder-area">
-          {rootFolder && nowFolder === rootFolder?._id && (
+          {/* 不顯示root */}
+          {/* {rootFolder && nowFolder === rootFolder?._id && (
             <div className="folder-btn">
               <div className="inner-content">
                 <Image
@@ -321,7 +369,7 @@ export default function ShowPublicQA({ token, setShowPublicQASetting, question_i
                 </div>
               </div>
             </div>
-          )}
+          )} */}
           {ChildFolders.length > 0 &&
             ChildFolders.map((item, index) => (
               <div

@@ -172,4 +172,26 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+@media (max-width: 860px) {
+  .remove-users-page {
+    padding-top: 72px;
+    width: 100vw;
+  }
+  .remove-users-page .remove-user-header {
+    flex-direction: column;
+  }
+  .remove-users-page .remove-user-header .top-info-input {
+    display: flex;
+    width: 80%;
+  }
+  .remove-users-page .remove-user-header .top-info-input .title {
+    width: 18%;
+    word-break: keep-all;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .remove-users-page .remove-user-header .top-info-input input {
+    flex: 1;
+  }
 }/*# sourceMappingURL=removeUsers.css.map */

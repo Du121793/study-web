@@ -2,12 +2,17 @@ html {
   background-color: #f0f0f0;
 }
 .profile-main {
-  min-width: 1005px;
   height: 100vh;
   position: relative;
   display: flex;
   flex-direction: column;
+  .top{
+    position: relative;
+    z-index: 3;
+  }
   .bottom {
+    z-index: 2;
+    position: relative;
     flex: 1;
     display: flex;
     .left-item {
@@ -16,6 +21,9 @@ html {
       top: 0;
       left: 0;
       height: 100%;
+      @media (max-width: 860px) {
+        position: absolute;
+      }
     }
     .right-item {
       flex: 1;
@@ -23,8 +31,4 @@ html {
       pointer-events: all;
     }
   }
-}
-.index-main {
-  min-width: 1005px;
-  width: 100%;
 }

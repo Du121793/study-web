@@ -83,8 +83,8 @@ export default function Course() {
         <div className="header-title-area">
           <div className="course-title">
             {courseName}
-            <div className="hint">{courseId}</div>
           </div>
+          <div className="hint">{courseId}</div>
           <Link
             className="back-to-course-btn"
             href={backToMyCoursePageUrl}>

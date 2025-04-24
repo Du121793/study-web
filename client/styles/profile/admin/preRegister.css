@@ -116,7 +116,31 @@
   top: 12px;
   display: flex;
   justify-content: center;
+  padding-bottom: 24px;
 }
 .preRegister-main .form-submit .submit {
   padding: 6px 64px;
+}
+@media (max-width: 860px) {
+  .preRegister-main {
+    width: 100vw;
+  }
+  .preRegister-main .form .form-line .form-selects {
+    flex-wrap: wrap;
+  }
+  .preRegister-main .form .form-line .copy-area {
+    align-items: center;
+    gap: 64px;
+  }
+  .preRegister-main .form .form-line .copy-area .input-area {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0;
+  }
+  .preRegister-main .form .form-line .copy-area .input-area input {
+    width: 100%;
+  }
 }/*# sourceMappingURL=preRegister.css.map */

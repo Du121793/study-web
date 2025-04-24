@@ -108,25 +108,32 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  width: 23%;
-  max-width: 240px;
-  max-height: 280px;
   background-color: #b7b7b7;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   transition: 0.2s;
 }
 #video-nav .video-area .video-card .top-container {
-  height: 60%;
-  padding: 4px;
+  width: 100%;
   background-color: #fff;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
   border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+@media (min-width: 901px) {
+  #video-nav .video-area .video-card .top-container {
+    min-height: 140px;
+    max-height: 140px;
+  }
 }
 #video-nav .video-area .video-card .top-container .videos-shot {
   width: 100%;
   height: 100%;
   -o-object-fit: cover;
      object-fit: cover;
+  display: block;
 }
 #video-nav .video-area .video-card .top-container .delete-video-btn {
   z-index: 9;
@@ -203,6 +210,7 @@
 }
 #video-nav .video-area .video-card .bottom-container .info .bottom-area .container {
   width: 100%;
+  overflow: auto;
   display: flex;
   flex-direction: row;
   gap: 12px;

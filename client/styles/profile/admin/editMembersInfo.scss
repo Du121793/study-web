@@ -101,6 +101,44 @@
       }
       .id {
         flex: 1;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+    }
+  }
+  @media (max-width: 860px) {
+    width: 100vw;
+    padding-top: 64px;
+    .search-area {
+      .input-area {
+        flex-direction: column;
+        align-items: center;
+        width: 80%;
+        .realName {
+          width: 100%;
+          input{
+            width: 100%;
+          }
+        }
+        .phone {
+          width: 100%;
+          input{
+            width: 100%;
+          }
+        }
+        .grade {
+          width: 100%;
+          input{
+            width: 100%;
+          }
+        }
+        .id {
+          width: 100%;
+          input{
+            width: 100%;
+          }
+        }
       }
     }
   }

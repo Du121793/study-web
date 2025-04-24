@@ -10,8 +10,8 @@
   top: 0;
 }
 .list-main .show-list-btn-area .show-list-btn {
+  padding: 24px;
   transition: 0.2s;
-  padding: 8px;
   z-index: 2;
 }
 .list-main .show-list-btn-area .show-list-btn:hover {
@@ -25,6 +25,11 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+@media (max-width: 860px) {
+  .list-main .list-info-area {
+    width: 100vw;
+  }
 }
 .list-main .list-info-area .close-list-btn-area {
   display: flex;

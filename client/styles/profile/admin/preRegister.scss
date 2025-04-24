@@ -116,8 +116,34 @@
     top: 12px;
     display: flex;
     justify-content: center;
+    padding-bottom: 24px;
     .submit {
       padding: 6px 64px;
+    }
+  }
+  @media (max-width: 860px) {
+    width: 100vw;
+    .form {
+      .form-line {
+        .form-selects {
+          flex-wrap: wrap;
+        }
+        .copy-area {
+          align-items: center;
+          gap: 64px;
+          .input-area {
+            width: 80%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 0;
+            input {
+              width: 100%;
+            }
+          }
+        }
+      }
     }
   }
 }

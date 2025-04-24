@@ -10,8 +10,12 @@
   width: 100%;
   background-color: #282828;
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
+}
+.video-player-main .header .g-black-btn {
+  position: absolute;
+  left: 24px;
 }
 .video-player-main .header .logos {
   border-radius: 4px;
@@ -173,12 +177,16 @@
 }
 .video-player-main .player-area .video-info-list .videos-area .video .image-area {
   position: relative;
+  display: flex;
+  justify-content: center;
+  width: 180px;
+  height: 100px;
   margin: 12px 0 12px 12px;
 }
 .video-player-main .player-area .video-info-list .videos-area .video .image-area .pre-view-image {
-  height: auto;
+  width: auto;
+  height: 100%;
   border-radius: 8px;
-  overflow: hidden;
 }
 .video-player-main .player-area .video-info-list .videos-area .video .image-area .video-time {
   position: absolute;

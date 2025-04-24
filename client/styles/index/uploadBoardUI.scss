@@ -19,6 +19,7 @@
     background-color: #fff;
     border-radius: 8px;
     padding: 24px;
+    margin: 24px;
     max-height: 90vh;
     .input-container {
       display: flex;
@@ -26,7 +27,7 @@
       align-items: flex-start;
       width: 100%;
       input {
-        width: 100%;
+        width: 90%;
       }
     }
     .title {
@@ -37,9 +38,13 @@
       display: flex;
       flex-direction: column;
       align-items: flex-start;
+      margin-bottom: 48px;
       .quill {
         height: 480px;
         margin-bottom: 32px;
+        @media (max-width: 860px) {
+          height: 240px;
+        }
       }
       .content {
         font-size: 18px;

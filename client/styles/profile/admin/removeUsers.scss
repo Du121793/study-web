@@ -172,4 +172,24 @@
       }
     }
   }
+  @media (max-width: 860px) {
+    padding-top: 72px;
+    width: 100vw;
+    .remove-user-header {
+      flex-direction: column;
+      .top-info-input {
+        display: flex;
+        width: 80%;
+        .title {
+          width: 18%;
+          word-break: keep-all;
+          display: flex;
+          justify-content: flex-end;
+        }
+        input {
+          flex: 1;
+        }
+      }
+    }
+  }
 }

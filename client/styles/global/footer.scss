@@ -7,6 +7,7 @@
   flex-direction: column;
   text-align: center;
   gap: 12px;
+  overflow: hidden;
   .info-area {
     display: flex;
     flex-direction: column;
@@ -17,10 +18,12 @@
     z-index: 1;
     .images {
       display: flex;
-      gap: 12px;
+      gap: 20px;
     }
     .info {
       display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
       gap: 4px;
       .content {
         display: flex;

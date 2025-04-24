@@ -286,7 +286,6 @@ export default function EditMembersInfo() {
         </div>
       </div>
       <div className="member-list-area g-shadow">
-        
         <div className="inner-line">
           <div className="user-name">暱稱</div>
           <div className="real-name">姓名</div>
@@ -333,6 +332,7 @@ export default function EditMembersInfo() {
                       setGradeInput(e.target.value)
                     }}></input>
                   <select
+                    className="role-select"
                     defaultValue={item.role}
                     onChange={(e) => {
                       setRoleInput(e.target.value)

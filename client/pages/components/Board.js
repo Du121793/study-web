@@ -73,10 +73,12 @@ export default function Board({ editHasChange, moveToBoardRef }) {
                   key={index}
                   href={{ pathname: `${clientIp}/index/BoardPage`, query: data }}>
                   <div className="categories">
-                    <div className="background"></div>
-                    <div className="content">{item.title}</div>
+                    <div className="content">
+                      <div className="background"></div>
+                      <div className="text">{item.subTitle}</div>
+                    </div>
                   </div>
-                  <div className="info">{item.subTitle}</div>
+                  <div className="info">{item.title}</div>
                 </Link>
               )
             })}

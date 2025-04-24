@@ -29,6 +29,11 @@ export default function Index() {
   const [visibility, setVisibility] = useState('visible')
   // 移動到最新消息function
   const moveToBoardRef = useRef(null)
+
+  const callBoardMoveToBoardFunction = () => {
+    if (moveToBoardRef.current) moveToBoardRef.current.doSomething()
+  }
+
   // session 設定
   useEffect(() => {
     if (token) {
@@ -53,15 +58,16 @@ export default function Index() {
     }
   }, [token])
 
-  const callBoardMoveToBoardFunction = () => {
-    if (moveToBoardRef.current) moveToBoardRef.current.doSomething()
-  }
-
+  useEffect(() => {
+    if (sessionStorage.getItem('homePageScrollToNews') === '1') {
+      callBoardMoveToBoardFunction()
+      sessionStorage.setItem('homePageScrollToNews', 0)
+    }
+  }, [])
   const test = () => {}
 
   return (
     <div className="index-main">
-      <Head></Head>
       <div className="RWD">
         {showCarouselEdit && (
           <UploadCarousel
@@ -85,10 +91,11 @@ export default function Index() {
         <Header
           callBoardMoveToBoardFunction={callBoardMoveToBoardFunction}
           loginState={isLogined}
-          user_line_shot={userShot}></Header>
+          user_line_shot={userShot}
+          inIndex={true}></Header>
         <Banner bannerHasChange={bannerHasChange}></Banner>
         {userRole && userRole === 'admin' && (
-          <div className="g-btn-area">
+          <div className="btn-area">
             <div
               className="g-blue-btn"
               onClick={() => {

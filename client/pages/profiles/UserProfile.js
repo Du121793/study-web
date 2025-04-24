@@ -166,7 +166,7 @@ export default function UserProfile() {
                 className="image"
                 loading="lazy"
                 src={userInfo.userinfo.pictureUrl}
-                width={100}
+                width={0}
                 height={0}></Image>
             )}
           </div>

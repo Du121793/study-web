@@ -212,7 +212,12 @@ export default function EditMembers() {
     return page
   }
 
+  /* 搜尋功能 */
   const searchMembers = () => {
+    if (usernameInput === '' && realnameInput === '' && phoneNumberInput === '' && gradeInput === '') {
+      messageControl('請輸入搜尋條件', false)
+      return
+    }
     let data = {
       username: usernameInput,
       realname: realnameInput,
@@ -221,10 +226,10 @@ export default function EditMembers() {
       role: role,
     }
     adminService.getMembers(token, data).then((res) => {
-      console.log(res)
       if (res?.success) {
-        setMethod({ name: 'search', page: 1 })
-        setMembers(res.data)
+        const memberIds = new Set(members.map((m) => m._id))
+        const common = res.data.filter((item) => memberIds.has(item._id))
+        setMembers(common)
       }
     })
   }

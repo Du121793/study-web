@@ -1,5 +1,5 @@
 // 組件庫
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -49,8 +49,17 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, showP
   const [sortType, setSortType] = useState('resourceCategories')
   const [QAsInfo, setQAsInfo] = useState([])
 
+  // 控制訊息
+  const [message, setMessage] = useState('無訊息')
+  const [messageStatus, setMessageStatus] = useState(false)
+  const [messageColor, setMessageColor] = useState('')
+  // 綁定timeout，用於重計
+  const messageTimer = useRef(null)
+  const resetTimer = useRef(null)
   // 刪除QA
   const [removeingQA, setRemoveingQA] = useState(false)
+  //loading
+  const [loading, setLoading] = useState(false)
 
   // 移除QA
   const removeQA = (QAInfo) => {
@@ -80,6 +89,29 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, showP
         console.log(res)
       }
     })
+  }
+
+  // 控制訊息
+  const messageControl = (info, isSuccess) => {
+    setMessage(info)
+    setMessageStatus(true)
+    if (isSuccess) {
+      setMessageColor('rgba(195, 240, 178, 0.8)')
+    } else {
+      setMessageColor('rgba(240, 178, 178, 0.8)')
+    }
+
+    // 清除之前的 timer
+    if (messageTimer.current) clearTimeout(messageTimer.current)
+    if (resetTimer.current) clearTimeout(resetTimer.current)
+
+    messageTimer.current = setTimeout(() => {
+      setMessageStatus(false)
+      resetTimer.current = setTimeout(() => {
+        setMessage('無訊息')
+        setMessageColor('')
+      }, 200)
+    }, 2000)
   }
 
   // 移除資料夾
@@ -133,25 +165,6 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, showP
     }
   }
 
-  // 從指定id的folderId找到該id內的所有問題
-  const getQAById = (folder_id) => {
-    if (folder_id) {
-      let data = {
-        folder_id: folder_id,
-        page: page,
-        pageSize: pageSize,
-        sortBy: 'none',
-        sortOrder: sortOrder,
-        sortType: sortType,
-      }
-      userService.getFolderQuestions(token, data).then((res) => {
-        setQAsInfo(res.data)
-      })
-    } else {
-      console.log('沒有id')
-    }
-  }
-
   // 留下點擊的路徑與之前的路徑
   const initShortcut = (folder) => {
     setNowFolder(folder._id)
@@ -184,6 +197,10 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, showP
         setQaHasUpload(!qaHasUpload)
       }
     })
+  }
+
+  const test = () => {
+    console.log(QAsInfo)
   }
 
   // session setting
@@ -219,6 +236,7 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, showP
   // get root
   useEffect(() => {
     if (token) {
+      setLoading(true)
       userService.getRootFolder(token).then((res) => {
         if (!res?.success) return
         setRootFolder(res.data.find((item) => item?.name === 'root'))
@@ -232,6 +250,7 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, showP
           userService.getChildFolders(token, data).then((res) => {
             if (res?.success) {
               setChildFolders(res.data)
+              setLoading(false)
             }
           })
         }
@@ -242,6 +261,7 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, showP
   // get folder's qa
   useEffect(() => {
     if (nowFolder) {
+      setLoading(true)
       let data = {
         folder_id: nowFolder,
         page: page,
@@ -250,20 +270,42 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, showP
         sortType: 'none',
         sortOrder: sortOrder,
       }
-      userService.getFolderQuestions(token, data).then((res) => {
-        if (res?.success) {
-          console.log(res.data)
-          setQAsInfo(res.data)
-        }
-      })
-    } else {
-      console.log('沒有id')
+
+      userService
+        .getFolderQuestions(token, data)
+        .then((res) => {
+          setTimeout(() => {
+            if (!res) {
+              setLoading(false)
+              messageControl('回應超時，請稍後在試', false)
+            }
+          }, 3000)
+          if (res?.success) {
+            setQAsInfo(res.data)
+            setLoading(false)
+          }
+        })
+        .catch((err) => {
+          console(err)
+        })
     }
   }, [nowFolder])
 
   return (
     <div className="show-more-public-main">
       <div className="qa-info-area">
+        {loading && (
+          <div className="loading-main">
+            <div className="loader"></div>
+          </div>
+        )}
+        <div className="meesage-area">
+          <div
+            style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
+            className="message">
+            {message}
+          </div>
+        </div>
         <div className="btn-area">
           {/* 新增資料夾、刪除資料夾 按鈕 */}
           {userRole === 'admin' && (
@@ -423,23 +465,6 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, showP
         {/* 問題排序依據 */}
         <div className="sort-setting-area">
           <div
-            className="content"
-            defaultValue={'resourceCategories'}
-            onChange={(e) => {
-              setSortType(e.target.value)
-            }}>
-            問題排序依據
-          </div>
-          <select>
-            <option value="resourceCategories">主題</option>
-            <option value="hints">標籤</option>
-          </select>
-          <div className="space"></div>
-          <select>
-            <option value="asc">升序</option>
-            <option value="desc">降序</option>
-          </select>
-          <div
             className="g-red-btn"
             onClick={() => {
               setRemoveingQA(!removeingQA)
@@ -457,40 +482,70 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, showP
                 href={`${client_URL}/courses/QaPage?qa_id=${item._id}&courseName=${course_name}&course_id=${course_id}`}
                 className="card"
                 onMouseOver={(e) => {
-                  e.target.style.backgroundColor = ' #efefef'
+                  if (e.target.className === 'card') e.target.style.backgroundColor = ' #efefef'
                 }}
                 onMouseOut={(e) => {
-                  e.target.style.backgroundColor = 'rgb(255, 255, 255)'
+                  if (e.target.className === 'card') e.target.style.backgroundColor = 'rgb(255, 255, 255)'
                 }}
-                onClick={() => {
-                  page_body.style.overflow = 'auto'
+                onClick={(e) => {
+                  if (e.target.className === 'card') page_body.style.overflow = 'auto'
                 }}
                 key={index}>
-                {removeingQA && (
-                  <div
-                    className="g-light-red-btn"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      if (e.target.innerText === '刪除') {
-                        e.target.innerText = '確定刪除'
-                        return
+                <div className="label">
+                  {item.hints &&
+                    item.hints.length > 0 &&
+                    item.hints.map((hint, idx) => {
+                      if (idx < 3) {
+                        return (
+                          <div
+                            className="hint"
+                            key={idx}>
+                            {hint}
+                          </div>
+                        )
                       }
-                      if (e.target.innerText === '確定刪除') removeQA(item)
-                    }}>
-                    刪除
-                  </div>
-                )}
-                <div className="content">課程描述</div>
-                <div
-                  className="g-white-btn"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    e.preventDefault()
-                    pushQAtoCourse(item)
-                  }}>
-                  加進此課程
+                    })}
+                  {item.resourceCategories &&
+                    item.resourceCategories.length > 0 &&
+                    item.resourceCategories.map((resourceCategories, idx) => {
+                      if (idx < 3) {
+                        return (
+                          <div
+                            className="resourceCategories"
+                            key={idx}>
+                            {resourceCategories}
+                          </div>
+                        )
+                      }
+                    })}
                 </div>
+                <div className="button-area">
+                  {removeingQA && (
+                    <div
+                      className="g-light-red-btn"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        if (e.target.innerText === '刪除') {
+                          e.target.innerText = '確定刪除'
+                          return
+                        }
+                        if (e.target.innerText === '確定刪除') removeQA(item)
+                      }}>
+                      刪除
+                    </div>
+                  )}
+                  <div
+                    className="g-blue-btn"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      e.preventDefault()
+                      pushQAtoCourse(item)
+                    }}>
+                    加進此課程
+                  </div>
+                </div>
+                <div className="content">問題描述</div>
                 <div className="description-area">{item.description}</div>
               </Link>
             ))}

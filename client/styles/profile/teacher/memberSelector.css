@@ -53,6 +53,9 @@
 .member-select-area .classification .search-inputs .input-grade {
   width: 60px;
 }
+.member-select-area .classification .search-inputs .role-inputs {
+  display: flex;
+}
 .member-select-area .classification .search-inputs select {
   outline: none;
   padding: 4px 6px;
@@ -140,4 +143,42 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+}
+@media (max-width: 860px) {
+  .member-select-area {
+    width: 70vw;
+  }
+  .member-select-area .classification {
+    flex-direction: column;
+  }
+  .member-select-area .classification .search-inputs {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .member-select-area .classification .search-inputs div {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .member-select-area .classification .search-inputs div .input-name {
+    width: 80%;
+  }
+  .member-select-area .classification .search-inputs div .input-phone {
+    width: 80%;
+  }
+  .member-select-area .classification .search-inputs div .input-grade {
+    width: 80%;
+  }
+  .member-select-area .classification .search-inputs .role-inputs {
+    display: flex;
+    width: 85%;
+  }
+  .member-select-area .classification .search-inputs .role-inputs select {
+    width: 100%;
+  }
+  .member-select-area .classification .btns {
+    flex-direction: column;
+    gap: 4px;
+  }
 }/*# sourceMappingURL=memberSelector.css.map */

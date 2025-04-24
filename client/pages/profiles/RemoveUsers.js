@@ -179,7 +179,7 @@ export default function RemoveUsers() {
       {/* 搜尋選項: 姓名，電話，年級*/}
       <div className="remove-user-header">
         {/* 輸入姓名 */}
-        <div>
+        <div className='top-info-input'>
           <div className="title">真實姓名:</div>
           <input
             onChange={(e) => {
@@ -191,7 +191,7 @@ export default function RemoveUsers() {
           />
         </div>
         {/* 輸入電話 */}
-        <div>
+        <div className='top-info-input'>
           <div className="title">電話:</div>
           <input
             onChange={(e) => {
@@ -203,7 +203,7 @@ export default function RemoveUsers() {
           />
         </div>
         {/* 輸入年級 */}
-        <div>
+        <div className='top-info-input'>
           <div className="title">年級 :</div>
           <input
             onChange={(e) => {

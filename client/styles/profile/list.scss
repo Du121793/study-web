@@ -8,8 +8,8 @@
     left: 0;
     top: 0;
     .show-list-btn {
+      padding: 24px;
       transition: 0.2s;
-      padding: 8px;
       z-index: 2;
     }
     .show-list-btn:hover {
@@ -24,6 +24,9 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    @media (max-width: 860px) {
+      width: 100vw;
+    }
     .close-list-btn-area {
       display: flex;
       justify-content: center;

@@ -6,6 +6,7 @@ import Link from 'next/link'
 // public
 import arrow from '../../public/videoPlay/arrow.png'
 import logo from '../../public/videoPlay/logo2.png'
+import noThumbnailImg from '../../public/global/no-image-available-icon.jpg'
 // method
 import { useUserToken } from '../../method/useUserToken'
 import userService from '../../method/userService'
@@ -22,7 +23,7 @@ export default function Player() {
   const [parsedInfo, setParsedInfo] = useState({})
   // 控制右側列表開關
   const [videoListIsOpen, setVideoListIsOpen] = useState(false)
-  const [playerHeight, setPlayerHeight] = useState('900px')
+  const [playerHeight, setPlayerHeight] = useState('70%')
   const [videoListWidth, setVideoListWidth] = useState(0)
   const [videoListMarginRight, setVideoListMarginRight] = useState('#fff')
   // 播放器需要的影片url
@@ -40,34 +41,35 @@ export default function Player() {
       setVideoListIsOpen(false)
       setVideoListWidth(0)
       setVideoListMarginRight('-500px')
-      setPlayerHeight('1100px')
+      setPlayerHeight('80%')
     } else if (e === 'open-button') {
       setIsAlignCenter('flex-start')
       setVideoListIsOpen(true)
       setVideoListWidth(500)
       setVideoListMarginRight('0')
-      setPlayerHeight('900px')
+      setPlayerHeight('70%')
     }
   }
 
   function formatTime(seconds) {
-    const hour = Math.floor(seconds / 3600)
-    const min = Math.floor((seconds % 3600) / 60)
-    const sec = seconds % 60
+    // 先取整，抹去任何小数部分
+    const total = Math.floor(seconds)
+
+    const hour = Math.floor(total / 3600)
+    const min = Math.floor((total % 3600) / 60)
+    const sec = total % 60
 
     if (hour > 0) {
-      // 當有小時時，分鐘和秒都補0
       const hourStr = hour.toString()
       const minStr = min < 10 ? `0${min}` : min.toString()
       const secStr = sec < 10 ? `0${sec}` : sec.toString()
       return `${hourStr}:${minStr}:${secStr}`
     } else if (min > 0) {
-      // 當只有分鐘（無小時），分鐘不用補0，秒補0
       const minStr = min.toString()
       const secStr = sec < 10 ? `0${sec}` : sec.toString()
       return `${minStr}:${secStr}`
     } else {
-      // 當小時和分鐘皆為0，固定輸出0作為分鐘，秒補0
+      // 小时和分钟皆为 0
       const secStr = sec < 10 ? `0${sec}` : sec.toString()
       return `0:${secStr}`
     }
@@ -153,7 +155,7 @@ export default function Player() {
     <div className="video-player-main">
       <div className="header">
         <div
-          className="back-to-course-btn"
+          className="g-black-btn"
           onClick={() => {
             window.location = `${clientIp}/courses/Course?courseName=${course_name}&courseId=${course_id}`
           }}>
@@ -257,14 +259,13 @@ export default function Player() {
                         },
                       }}>
                       <div className="image-area">
-                        {item?.thumbnail && (
-                          <Image
-                            className="pre-view-image"
-                            src={item.thumbnail}
-                            width={180}
-                            height={0}
-                            alt="video image"></Image>
-                        )}
+                        <Image
+                          className="pre-view-image"
+                          src={item.thumbnail !== '' ? item.thumbnail : noThumbnailImg}
+                          width={0}
+                          height={0}
+                          objectFit="contain"
+                          alt="video image"></Image>
                         <div className="video-time">{formatTime(item.length)}</div>
                       </div>
                       <div className="info">

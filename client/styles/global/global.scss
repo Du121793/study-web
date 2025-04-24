@@ -407,6 +407,7 @@ import ArrowRight from '../../public/profile/rightArrow.png'
   user-select: none;
 }
 
+// message control
 /*
 // 控制訊息
 const [message, setMessage] = useState('無訊息')
@@ -439,9 +440,31 @@ const messageControl = (info, isSuccess) => {
   }, 2000)
 }
 
-  <div
-        style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
-        className="message">
-        {message}
-      </div>
+  <div style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
+    className="message">
+    {message}
+  </div>
+  <div className='meesage-area'>
+    <div style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
+      className="message">
+      {message}
+    </div>
+  </div>
+  
+*/
+
+// 控制頁面scroll狀態
+/*
+// 控制頁面scroll狀態
+const [page_body, setPage_body] = useState([])
+
+// 控制頁面scroll狀態
+useEffect(() => {
+  if (typeof document !== 'undefined') {
+    setPage_body(document.querySelector('body'))
+  }
+  if (page_body && page_body.style) {
+    page_body.style.overflow = 'hidden'
+  }
+}, [page_body])
 */

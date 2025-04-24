@@ -1,8 +1,42 @@
 .index-main {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.index-main .RWD {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  z-index: 3;
+}
+.index-main .RWD .header-container {
+  position: relative;
+  z-index: 1;
+}
+.index-main .RWD .banner-main {
+  position: relative;
+  z-index: 0;
+}
+.index-main .RWD .btn-area {
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 12px 0;
+}
+.index-main .board-main {
+  position: relative;
+  z-index: 1;
+  width: 100%;
 }
 .index-main .footer-area {
+  width: 100%;
   position: absolute;
   bottom: -104px;
-  width: 100%;
+  z-index: 2;
 }/*# sourceMappingURL=index.css.map */

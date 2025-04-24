@@ -50,6 +50,9 @@
       .input-grade {
         width: 60px;
       }
+      .role-inputs {
+        display: flex;
+      }
       select {
         outline: none;
         padding: 4px 6px;
@@ -137,6 +140,42 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
+      }
+    }
+  }
+  @media (max-width: 860px) {
+    width: 70vw;
+    .classification {
+      flex-direction: column;
+      .search-inputs {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        div {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          .input-name {
+            width: 80%;
+          }
+          .input-phone {
+            width: 80%;
+          }
+          .input-grade {
+            width: 80%;
+          }
+        }
+        .role-inputs {
+          display: flex;
+          width: 85%;
+          select{
+            width: 100%;
+          }
+        }
+      }
+      .btns{
+        flex-direction: column;
+        gap: 4px;
       }
     }
   }

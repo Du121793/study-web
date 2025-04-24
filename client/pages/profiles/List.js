@@ -19,8 +19,8 @@ export default function List({ switchState, setSwitchState }) {
   const token = useUserToken()
   // session控制來選擇顯示那些功能
   const [userRole, setUserRole] = useState(null)
-  // 選單寬度切換，用於開關
-  const [listWidth, setListWidth] = useState(320)
+  // 選單寬度切換，用於開關，320px
+  const [listWidth, setListWidth] = useState(0)
   const listRef = useRef(null)
   // 切換高亮
   const [activeSwitch, setActiveSwitch] = useState(['public', 'myCourse'])
@@ -32,6 +32,58 @@ export default function List({ switchState, setSwitchState }) {
   const teacherRef = useRef(null)
   const adminRef = useRef(null)
 
+  /* 監聽全局寬度變化 */
+  const isClient = typeof window === 'object'
+  const [windowsWidth, setWindowsWidth] = useState(0)
+  useEffect(() => {
+    if (!isClient) return false
+
+    const handleResize = () => {
+      setWindowsWidth(window.innerWidth)
+    }
+
+    window.addEventListener('resize', handleResize)
+    // 先觸發一次，保證初始值正確
+    handleResize()
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [isClient])
+
+  /* 當畫面切換成手機畫面會收起選單，當畫面切換為電腦畫面會顯示選單 */
+  const [phoneLock, setPhoneLock] = useState(false)
+  const [PClock, setPCLock] = useState(false)
+  /* 手機畫面處理 */
+  useEffect(() => {
+    // 當已在手機畫面，再次移動寬度不會造成選單自行收起
+    if (phoneLock === true) {
+      return
+    } else if (windowsWidth <= 860 && windowsWidth !== 0) {
+      // 當寬度在手機畫面將選單隱藏，只執行一次，除非回到電腦畫面
+      setListWidth(0)
+      setPhoneLock(true)
+      setPCLock(false)
+    }
+  }, [windowsWidth])
+  /* 電腦畫面處理 */
+  useEffect(() => {
+    if (PClock === true) {
+      return
+    } else if (windowsWidth >= 860 && listRef) {
+      // 當寬度在電腦畫面顯示選單
+      setListWidth(320)
+      setPCLock(true)
+      setPhoneLock(false)
+    }
+  }, [windowsWidth, listRef])
+
+  /* 關閉選單欄 */
+  const closeList = () => {
+    setListWidth(0)
+  }
+
+  /* session */
   useEffect(() => {
     if (!sessionStorage.getItem('user_role') || !sessionStorage.getItem('user_id')) {
       userService.getUserInfo(token).then((res) => {
@@ -46,14 +98,8 @@ export default function List({ switchState, setSwitchState }) {
     }
   })
 
-  useEffect(() => {
-    if (listRef) {
-      setListWidth(listRef.current.scrollWidth)
-      setTimeout(() => {
-        setListWidth(listRef.current.scrollWidth)
-      }, 30)
-    }
-  }, [listRef])
+  /* 獲取選單ref拿到寬高 */
+  useEffect(() => {}, [listRef])
 
   useEffect(() => {
     if (publicRef) {
@@ -87,7 +133,7 @@ export default function List({ switchState, setSwitchState }) {
         <div
           className="close-list-btn-area"
           onClick={() => {
-            setListWidth(0)
+            closeList()
           }}>
           <Image
             alt="close list buttn"
@@ -151,6 +197,7 @@ export default function List({ switchState, setSwitchState }) {
                       if (switchState === 'myCourse') return
                       setSwitchState('myCourse')
                       setActiveSwitch(['public', 'myCourse'])
+                      if (window.innerWidth <= 860) closeList()
                     }}>
                     我的課程
                   </div>
@@ -164,6 +211,7 @@ export default function List({ switchState, setSwitchState }) {
                       if (switchState === 'profile') return
                       setSwitchState('profile')
                       setActiveSwitch(['public', 'profile'])
+                      if (window.innerWidth <= 860) closeList()
                     }}>
                     個人資訊
                   </div>
@@ -217,6 +265,7 @@ export default function List({ switchState, setSwitchState }) {
               </div>
               <div className="options">
                 <div className="item-area">
+                  {/* 編輯課程資訊 */}
                   <div
                     className="item"
                     style={{ color: activeSwitch[1] === 'editCourse' ? 'purple' : null }}
@@ -224,11 +273,13 @@ export default function List({ switchState, setSwitchState }) {
                       if (switchState === 'editCourse') return
                       setSwitchState('editCourse')
                       setActiveSwitch(['teacher', 'editCourse'])
+                      if (window.innerWidth <= 860) closeList()
                     }}>
                     編輯課程資訊
                   </div>
                 </div>
                 <div className="item-area">
+                  {/* 編輯課程成員 */}
                   <div
                     className="item"
                     style={{ color: activeSwitch[1] === 'editCourseMember' ? 'purple' : null }}
@@ -236,6 +287,7 @@ export default function List({ switchState, setSwitchState }) {
                       if (switchState === 'editCourseMember') return
                       setSwitchState('editCourseMember')
                       setActiveSwitch(['teacher', 'editCourseMember'])
+                      if (window.innerWidth <= 860) closeList()
                     }}>
                     編輯課程成員
                   </div>
@@ -289,6 +341,7 @@ export default function List({ switchState, setSwitchState }) {
               </div>
               <div className="options">
                 <div className="item-area">
+                  {/* 修改成員資訊 */}
                   <div
                     className="item"
                     style={{ color: activeSwitch[1] === 'editMemberInfo' ? 'purple' : null }}
@@ -296,11 +349,13 @@ export default function List({ switchState, setSwitchState }) {
                       if (switchState === 'editMemberInfo') return
                       setSwitchState('editMemberInfo')
                       setActiveSwitch(['admin', 'editMemberInfo'])
+                      if (window.innerWidth <= 860) closeList()
                     }}>
                     修改成員資訊
                   </div>
                 </div>
                 <div className="item-area">
+                  {/* 預註冊成員 */}
                   <div
                     className="item"
                     style={{ color: activeSwitch[1] === 'preRegisterMember' ? 'purple' : null }}
@@ -308,11 +363,13 @@ export default function List({ switchState, setSwitchState }) {
                       if (switchState === 'preRegisterMember') return
                       setSwitchState('preRegisterMember')
                       setActiveSwitch(['admin', 'preRegisterMember'])
+                      if (window.innerWidth <= 860) closeList()
                     }}>
                     預註冊成員
                   </div>
                 </div>
                 <div className="item-area">
+                  {/* 刪除成員 */}
                   <div
                     className="item"
                     style={{ color: activeSwitch[1] === 'deletMember' ? 'purple' : null }}
@@ -320,6 +377,7 @@ export default function List({ switchState, setSwitchState }) {
                       if (switchState === 'deletMember') return
                       setSwitchState('deletMember')
                       setActiveSwitch(['admin', 'deletMember'])
+                      if (window.innerWidth <= 860) closeList()
                     }}>
                     刪除成員
                   </div>

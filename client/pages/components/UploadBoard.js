@@ -188,18 +188,24 @@ export default function UploadBoard({ boardInfo, setEditHasChange, editHasChange
           className="g-btn-area"
           style={{ visibility: visibility }}>
           {whichMethod === 'edit' ? (
-            <div
-              className="g-blue-btn submit"
-              style={{ visibility: visibility }}
-              onClick={editBoard}>
-              編輯公告
+            <div className="btn-area">
+              <div
+                className="g-blue-btn submit"
+                style={{ visibility: visibility }}
+                onClick={editBoard}>
+                編輯公告
+              </div>
+              <div className="g-red-btn" {...strictClickCloseUI}>關閉介面</div>
             </div>
           ) : (
-            <div
-              className="g-blue-btn submit"
-              style={{ visibility: visibility }}
-              onClick={uploadBoard}>
-              上傳公告
+            <div className="btn-area">
+              <div
+                className="g-blue-btn submit"
+                style={{ visibility: visibility }}
+                onClick={uploadBoard}>
+                上傳公告
+              </div>
+              <div className="g-red-btn" {...strictClickCloseUI}>關閉介面</div>
             </div>
           )}
         </div>

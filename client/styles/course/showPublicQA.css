@@ -15,11 +15,11 @@
   font-size: clamp(16px, 1.2vw, 24px);
 }
 .show-more-public-main .qa-info-area {
-  overflow: auto;
   width: 80%;
   max-height: 90%;
   display: flex;
   flex-direction: column;
+  position: relative;
   overflow: auto;
   background-color: rgb(255, 255, 255);
   z-index: 999;
@@ -27,6 +27,12 @@
   gap: 12px;
   padding: 24px;
   transition: 0.2s;
+}
+.show-more-public-main .qa-info-area .loading-main {
+  width: 90%;
+  position: absolute;
+  display: flex;
+  justify-content: center;
 }
 .show-more-public-main .qa-info-area .top-left-btn-area {
   display: flex;
@@ -172,13 +178,38 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 4px;
   padding: 12px;
   cursor: pointer;
   width: 230px;
   border: 1px solid rgba(0, 0, 0, 0.211);
   border-radius: 4px;
   transition: 0.2s;
+}
+.show-more-public-main .qa-info-area .qa-card-area .card .label {
+  display: flex;
+  gap: 4px;
+}
+.show-more-public-main .qa-info-area .qa-card-area .card .label .hint {
+  padding: 2px 8px;
+  border: 1px solid #b9cdf9;
+  background-color: #b9cdf9;
+  border-radius: 4px;
+}
+.show-more-public-main .qa-info-area .qa-card-area .card .label .resourceCategories {
+  padding: 2px 8px;
+  border: 1px solid #f6b594;
+  background-color: #f6b594;
+  border-radius: 4px;
+}
+.show-more-public-main .qa-info-area .qa-card-area .card .button-area {
+  display: flex;
+  gap: 4px;
+}
+.show-more-public-main .qa-info-area .qa-card-area .card .content {
+  justify-content: flex-start;
+  display: flex;
+  width: 90%;
 }
 .show-more-public-main .qa-info-area .qa-card-area .card .into-qa-btn {
   display: flex;
@@ -195,4 +226,21 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 8px;
   background-color: #ffffff;
+}
+@media (max-width: 860px) {
+  .show-more-public-main {
+    width: 100%;
+  }
+  .show-more-public-main .qa-info-area {
+    width: 80%;
+  }
+  .show-more-public-main .qa-info-area .btn-area .top-left-btn-area {
+    flex-direction: column;
+  }
+  .show-more-public-main .qa-info-area .btn-area .g-blue-btn {
+    height: 34px;
+  }
+  .show-more-public-main .qa-info-area .btn-area .g-red-btn {
+    height: 34px;
+  }
 }/*# sourceMappingURL=showPublicQA.css.map */

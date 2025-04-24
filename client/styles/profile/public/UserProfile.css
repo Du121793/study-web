@@ -8,6 +8,11 @@
   border-bottom-right-radius: 12px;
   height: 100%;
 }
+@media (max-width: 860px) {
+  .user-profile {
+    width: 100vw;
+  }
+}
 .user-profile .title {
   margin-top: 24px;
   display: flex;
@@ -20,6 +25,14 @@
   justify-content: center;
   padding: 0 128px;
   gap: 8px;
+}
+@media (max-width: 860px) {
+  .user-profile .top-section {
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+  }
 }
 .user-profile .top-section .hide-avatar {
   display: flex;
@@ -76,6 +89,13 @@
   flex-wrap: wrap;
   gap: 32px;
 }
+@media (max-width: 860px) {
+  .user-profile .top-section .info-bar {
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+}
 .user-profile .top-section .info-bar .content {
   font-size: clamp(16px, 1.2vw, 20px);
   padding: 8px 24px;
@@ -84,11 +104,24 @@
   align-items: center;
   gap: 8px;
 }
+@media (max-width: 860px) {
+  .user-profile .top-section .info-bar .content {
+    width: 100%;
+  }
+}
 .user-profile .bottom-section {
   display: flex;
   justify-content: center;
   padding: 0 64px;
   /* 右側區塊 (綠色框) */
+}
+@media (max-width: 860px) {
+  .user-profile .bottom-section {
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    width: 100%;
+  }
 }
 .user-profile .bottom-section .left-panel {
   display: flex;
@@ -105,17 +138,39 @@
   word-break: keep-all;
   gap: 8px;
 }
+@media (max-width: 860px) {
+  .user-profile .bottom-section .left-panel .content-area {
+    flex-direction: column;
+    gap: 4px;
+  }
+  .user-profile .bottom-section .left-panel .content-area .content {
+    width: 80%;
+  }
+}
+.user-profile .bottom-section .left-panel .content-area .content {
+  font-weight: bold;
+}
 .user-profile .bottom-section .left-panel .content-area input {
   width: 320px;
 }
 .user-profile .bottom-section .left-panel .content-area .content-info {
   min-width: 450px;
-  padding: 0 8px;
+  padding: 4px 8px;
   height: 32px;
   box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
   gap: 8px;
+}
+@media (max-width: 860px) {
+  .user-profile .bottom-section .left-panel .content-area .content-info {
+    min-width: 0px;
+    width: 80%;
+    padding: 4px;
+  }
 }
 .user-profile .bottom-section .left-panel .content-area .hint {
   color: rgba(0, 0, 0, 0.4);

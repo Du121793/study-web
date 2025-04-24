@@ -32,15 +32,13 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
   const [qaHeight, setQaHeight] = useState(0)
   const [containerHeight, setContainerHeight] = useState(0)
 
-  // 控制訊息
+  /* 控制訊息*/
   const [message, setMessage] = useState('無訊息')
   const [messageStatus, setMessageStatus] = useState(false)
   const [messageColor, setMessageColor] = useState('')
-
-  // 其他狀態
+  /* 其他狀態*/
   const [imageIsZoom, setImageIsZoom] = useState(false)
   const [zoomImage, setZoomImage] = useState()
-  const breakpointColumnsObj = { default: 4 }
   const [sortBy, setSortBy] = useState('resourceCategories')
   const [timeSort, setTimeSort] = useState('desc')
   const [publicQAInfo, setPublicQAInfo] = useState({})
@@ -48,17 +46,24 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
   const [showPublicQA, setShowPublicQA] = useState(false)
   const [selectBy, setSelectBy] = useState(null)
   const [doubleCheck, setDoubleCheck] = useState(false)
-
-  // get參數
+  /* Masonry */
+  const breakpointColumnsObj = { default: 4 }
+  /* get參數 */
   const [pageSize, setPageSize] = useState(8)
   const [page, setPage] = useState(1)
-
-  // 刪除qa
+  /* 刪除qa*/
   const [removeingQA, setRemoveingQA] = useState(false)
-
-  // 提問區
+  /* 提問區*/
   const [showAskQA, setShowAskQA] = useState(false)
   const [askQAHeight, setAskQAHeight] = useState(0)
+  /* 全局寬度*/
+  const [windowsWidth, setWindowsWidth] = useState(0)
+  const isClient = typeof window === 'object'
+  const headerRef = useRef(null)
+  const navInnerRef = useRef(null)
+
+  /* 排序依據*/
+  const sortTypeRef = useRef(null)
 
   const changeSort = (sortBy, timeSort) => {
     const data = {
@@ -173,30 +178,52 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
     })
   }
 
+  // 當全局寬度有變動的話，計算nav內部元素的高度來相加並加上40
+  useEffect(() => {
+    if (!isClient) return false
+    const container = navInnerRef?.current
+    if (!container) return
+    if (headerRef && navInnerRef) {
+      const innerWidth = navInnerRef?.current?.clientWidth
+      const headerWidth = headerRef?.current?.clientWidth
+      const innerHeight = navInnerRef?.current?.clientHeight
+      const headerHeight = headerRef?.current?.clientHeight
+      setQaHeight(innerHeight + headerHeight + 40)
+      console.log(innerWidth)
+    }
+  }, [windowsWidth])
+
+  // 監聽全局寬度變化
+  useEffect(() => {
+    if (!isClient) return false
+
+    const handleResize = () => {
+      setWindowsWidth(window.innerWidth)
+    }
+
+    window.addEventListener('resize', handleResize)
+    // 先觸發一次，保證初始值正確
+    handleResize()
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [isClient])
+
   // 取得 localStorage 中的 token
   useEffect(() => {
-    setTimeout(() => {
-      if (typeof window !== 'undefined') {
-        const localToken = window.localStorage.getItem('token')
-        if (localToken) {
-          setUserToken(localToken.split(' ')[1])
-        }
-        const localSortType = window.localStorage.getItem('qa_sort_by')
-        if (localToken) {
-          setDefaultSortType(localSortType)
-        }
-        const localSortBy = window.localStorage.getItem('qa_time_sort_by')
-        if (localToken) {
-          setDefaultSortBy(localSortBy)
-        }
-      }
-    }, 100)
+    const localSortType = window.localStorage.getItem('qa_sort_by')
+    if (localSortType) setDefaultSortType(localSortType)
+    const localToken = window.localStorage.getItem('token')
+    if (localToken) setUserToken(localToken.split(' ')[1])
+    const localSortBy = window.localStorage.getItem('qa_time_sort_by')
+    if (localSortBy) setDefaultSortBy(localSortBy)
   }, [])
 
   // 渲染頁面時取得 QA 資料
   useEffect(() => {
     if (token) {
-      const localStorageSortBy = localStorage.getItem('qa_sort_by')
+      const localStorageSortBy = sortTypeRef.current.value
       const localStorageTimeSortBy = localStorage.getItem('qa_time_sort_by')
 
       const data = {
@@ -263,7 +290,9 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
         <div
           className="container"
           ref={containerRef}>
-          <div className="QA-header">
+          <div
+            className="QA-header"
+            ref={headerRef}>
             <div className="sort-by-area">
               <span
                 className="sort-title"
@@ -272,6 +301,7 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
               </span>
               <select
                 className="select"
+                ref={sortTypeRef}
                 defaultValue={defaultSortType !== '' ? defaultSortType : sortBy}
                 onChange={(e) => {
                   setSortBy(e.target.value)
@@ -353,10 +383,12 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
             )}
           </div>
 
-          <div className="QA-grid">
+          <div
+            className="QA-grid"
+            ref={navInnerRef}>
             <Masonry
               className="QA-container"
-              breakpointCols={breakpointColumnsObj}
+              breakpointCols={windowsWidth <= 1040 ? '1%' : breakpointColumnsObj}
               columnClassName="my-masonry-grid_column">
               {(defaultSortType !== 'none' || (sortBy && sortBy !== 'none')) &&
                 courseQas.map((item, index) => {
@@ -508,7 +540,7 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
                             src={`${item.image[0]}?token=${userToken}`}
                             width={300}
                             height={0}
-                            alt='qa image pre view'
+                            alt="qa image pre view"
                             style={{ height: 'auto' }}></Image>
                         )}
                         <div className="content">

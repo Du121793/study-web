@@ -23,6 +23,8 @@ const serverIp = process.env.NEXT_PUBLIC_SERVER_IP
 
 export default function VideoNav({ course_id, courseName, user_role }) {
   const token = useUserToken()
+  // 控制頁面scroll狀態
+  const [page_body, setPage_body] = useState([])
   // nav 高度- 使用 ref 與 state 控制展開/收合
   const [videoNavOpen, setVideoNavOpen] = useState(false)
   const videoContentRef = useRef(null)
@@ -62,12 +64,30 @@ export default function VideoNav({ course_id, courseName, user_role }) {
 
   // 控制移除影片的小圖案高度
   const [videoDeleteBtnHeight, setVideoDeleteBtnHeight] = useState('0px')
-
+  // 子元素有變更，用來更新video內容
   const [hasChange, setHasChange] = useState(false)
-
+  // 控制訊息
   const [message, setMessage] = useState('無訊息')
   const [messageStatus, setMessageStatus] = useState(false)
   const [messageColor, setMessageColor] = useState('')
+  // 全局寬度
+  const [windowsWidth, setWindowsWidth] = useState(0)
+  const inputRef = useRef(null)
+  const videoRef = useRef(null)
+  const loadMoreRef = useRef(null)
+  const [navTotalHeight, setNavTotalHeight] = useState(0)
+  const isClient = typeof window === 'object'
+  // 影片區域動態變更內容寬度
+  const [videoCardWidth, setVideoCardWidth] = useState(0)
+
+  /* 用來將top-container內的圖片切成父元素寬高 */
+  const topContainerRef = useRef(null)
+  const [cardImageWidth, setCardImageWidth] = useState(0)
+  const [cardImageHeight, setCardImageHeight] = useState(0)
+  useEffect(() => {
+    setCardImageWidth(topContainerRef?.current?.clientWidth)
+    setCardImageHeight(topContainerRef?.current?.scrollHeight)
+  }, [windowsWidth])
 
   const test = () => {
     console.log(videos)
@@ -197,13 +217,41 @@ export default function VideoNav({ course_id, courseName, user_role }) {
   // 當第一次渲染打開nav
   useEffect(() => {
     if (!lock) {
-      if (videoContentRef.current) {
-        setVideoContentHeight(videoContentRef.current.scrollHeight)
+      if (inputRef && videoRef && loadMoreRef) {
+        setVideoCardWidth(videoRef.current.clientWidth / 5)
+        setVideoContentHeight(inputRef.current.scrollHeight + videoRef.current.scrollHeight + loadMoreRef?.current?.scrollHeight + 40)
       }
+
       setVideoNavOpen(true)
       setLock(true)
     }
   }, [lock])
+
+  // 當全局寬度有變動的話，計算nav內部元素的高度來相加並加上40
+  useEffect(() => {
+    if (!isClient) return false
+    if (inputRef && videoRef && loadMoreRef) {
+      setVideoCardWidth(videoRef.current.clientWidth / 5)
+      setVideoContentHeight(inputRef?.current?.scrollHeight + videoRef?.current?.scrollHeight + loadMoreRef?.current?.scrollHeight + 40)
+    }
+  }, [windowsWidth])
+
+  // 監聽全局寬度變化
+  useEffect(() => {
+    if (!isClient) return false
+
+    const handleResize = () => {
+      setWindowsWidth(window.innerWidth)
+    }
+
+    window.addEventListener('resize', handleResize)
+    // 先觸發一次，保證初始值正確
+    handleResize()
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [isClient])
 
   // 若是任何一個有改變，重新發一次影片請求
   // 問題:會跑兩次
@@ -231,10 +279,20 @@ export default function VideoNav({ course_id, courseName, user_role }) {
   }, [token, course_id, chooseType, chooseSortOrder, uploadSuccess, videosShowPage, videosPageSize, hasChange])
 
   useEffect(() => {
-    if (videoNavOpen && videoContentRef.current) {
-      setVideoContentHeight(videoContentRef.current.scrollHeight)
+    if (videoNavOpen && inputRef && videoRef && loadMoreRef) {
+      setVideoContentHeight(inputRef?.current?.scrollHeight + videoRef?.current?.scrollHeight + loadMoreRef?.current?.scrollHeight + 100)
     }
   }, [videos, videoNavOpen])
+
+  // 控制頁面scroll狀態
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      setPage_body(document.querySelector('body'))
+    }
+    if (page_body && page_body.style) {
+      page_body.style.overflow = 'auto'
+    }
+  }, [page_body])
 
   return (
     <div
@@ -304,7 +362,9 @@ export default function VideoNav({ course_id, courseName, user_role }) {
           transition: 'height 0.3s ease',
         }}>
         {/* 頂部 */}
-        <div className="update-video-area">
+        <div
+          className="update-video-area"
+          ref={inputRef}>
           {/* 上傳影片 */}
           {user_role && (user_role === 'teacher' || user_role === 'admin') && (
             <div
@@ -369,6 +429,7 @@ export default function VideoNav({ course_id, courseName, user_role }) {
           </div>
         </div>
 
+        {/* message */}
         {videoNavOpen && (
           <div className="meesage-area">
             <div
@@ -378,19 +439,25 @@ export default function VideoNav({ course_id, courseName, user_role }) {
             </div>
           </div>
         )}
+
         {/* 影片顯示區 */}
-        <div className="video-area-container">
+        <div
+          className="video-area-container"
+          ref={videoRef}>
+          {/* 刪除按鈕 */}
           {deleteLoading && (
             <div className="loading-main">
               <div className="loader"></div>
             </div>
           )}
+
           <div className="video-area">
             {videos &&
               videos.map((item) => (
                 <Link
                   key={item._id}
-                  style={{ cursor: item.access.isAccess ? 'pointer' : 'not-Allowed' }}
+                  style={{ cursor: item.access.isAccess ? 'pointer' : 'not-Allowed', width: videoCardWidth }}
+                  className="video-card"
                   onClick={(e) => {
                     if (!item.access.isAccess) {
                       e.preventDefault()
@@ -404,9 +471,10 @@ export default function VideoNav({ course_id, courseName, user_role }) {
                       course_id: course_id,
                       info: JSON.stringify({ description: item.description, title: item.title, time: item.date }),
                     },
-                  }}
-                  className="video-card">
-                  <div className="top-container">
+                  }}>
+                  <div
+                    className="top-container"
+                    ref={topContainerRef}>
                     {/* 刪除按鈕 */}
                     <div
                       className="delete-video-btn"
@@ -425,8 +493,8 @@ export default function VideoNav({ course_id, courseName, user_role }) {
                         className="videos-shot"
                         loading="lazy"
                         alt={item.title}
-                        width={142}
-                        height={142}
+                        width={0}
+                        height={0}
                       />
                     ) : (
                       <Image
@@ -434,8 +502,8 @@ export default function VideoNav({ course_id, courseName, user_role }) {
                         className="videos-shot"
                         loading="lazy"
                         alt={'no videos shot icon'}
-                        width={100}
-                        height={100}
+                        width={0}
+                        height={0}
                       />
                     )}
                     {/* 影片長度 */}
@@ -468,7 +536,9 @@ export default function VideoNav({ course_id, courseName, user_role }) {
                       </div>
 
                       <div className="title">{item.title}</div>
-                      <div className="bottom-area">
+                      <div
+                        className="bottom-area"
+                        ref={loadMoreRef}>
                         <div className="container">
                           {user_role === 'admin' && (
                             <div
