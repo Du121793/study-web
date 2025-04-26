@@ -260,7 +260,7 @@
 }
 @media (max-width: 860px) {
   .QA-area {
-    width: 90vw;
+    width: 100%;
   }
   .QA-area .container {
     width: 100%;

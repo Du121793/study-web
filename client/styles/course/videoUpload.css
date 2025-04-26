@@ -27,7 +27,8 @@
   gap: 12px;
   overflow: auto;
   max-width: 80%;
-  max-height: 90%;
+  max-height: 80%;
+  margin: 0;
 }
 .upload-vidoe-main .title {
   font-size: 32px;

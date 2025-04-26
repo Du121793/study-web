@@ -195,7 +195,11 @@ export default function UploadBoard({ boardInfo, setEditHasChange, editHasChange
                 onClick={editBoard}>
                 編輯公告
               </div>
-              <div className="g-red-btn" {...strictClickCloseUI}>關閉介面</div>
+              <div
+                className="g-red-btn"
+                {...strictClickCloseUI}>
+                關閉介面
+              </div>
             </div>
           ) : (
             <div className="btn-area">
@@ -205,7 +209,11 @@ export default function UploadBoard({ boardInfo, setEditHasChange, editHasChange
                 onClick={uploadBoard}>
                 上傳公告
               </div>
-              <div className="g-red-btn" {...strictClickCloseUI}>關閉介面</div>
+              <div
+                className="g-red-btn"
+                {...strictClickCloseUI}>
+                關閉介面
+              </div>
             </div>
           )}
         </div>

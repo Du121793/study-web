@@ -1,6 +1,6 @@
 .footer-main {
   width: 100%;
-  background-color: #e5e5e5;
+  background-color: #ffffff;
   border-top: 1px solid rgba(0, 0, 0, 0.2);
   padding: 12px 0;
   display: flex;
@@ -8,6 +8,8 @@
   text-align: center;
   gap: 12px;
   overflow: hidden;
+  background-color: rgb(29, 29, 29);
+  color: white;
 }
 .footer-main .info-area {
   display: flex;
@@ -34,12 +36,11 @@
 }
 .footer-main .info-area .info .content .link {
   transition: 0.2s;
-  color: black;
+  color: white;
 }
 .footer-main .info-area .info .content .link:hover {
   color: rgb(54, 54, 54);
 }
 .footer-main .footer-content p {
-  color: #000000;
   font-size: 14px;
 }/*# sourceMappingURL=footer.css.map */

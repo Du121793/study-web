@@ -1,6 +1,6 @@
 .footer-main {
   width: 100%;
-  background-color: #e5e5e5;
+  background-color: #ffffff;
   border-top: 1px solid rgba(0, 0, 0, 0.2);
   padding: 12px 0;
   display: flex;
@@ -8,6 +8,8 @@
   text-align: center;
   gap: 12px;
   overflow: hidden;
+  background-color: rgb(29, 29, 29);
+  color: white;
   .info-area {
     display: flex;
     flex-direction: column;
@@ -30,7 +32,7 @@
         align-items: center;
         .link {
           transition: 0.2s;
-          color: black;
+          color: white;
         }
         .link:hover {
           color: rgb(54, 54, 54);
@@ -40,7 +42,6 @@
   }
   .footer-content {
     p {
-      color: #000000;
       font-size: 14px;
     }
   }

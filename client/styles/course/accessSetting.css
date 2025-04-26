@@ -1,13 +1,38 @@
 .access-setting-main {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  gap: 8px;
   width: 100%;
+}
+.access-setting-main .btn-area {
+  width: 90%;
+  display: flex;
+}
+.access-setting-main .btn-area .back-btn {
+  cursor: pointer;
+  color: rgb(0, 0, 0);
+  background-color: #313131;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 8px 12px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  transition: 0.2s;
+  font-size: 18px;
+  transition: 0.2s;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+.access-setting-main .btn-area .back-btn:hover {
+  background-color: #e6e6e6;
+  color: rgb(42, 42, 42);
 }
 .access-setting-main .main-container {
   background-color: #fff;
   display: flex;
   flex-direction: column;
-  margin: 64px;
+  width: 90%;
   padding: 24px;
   border-radius: 12px;
   border: 1px solid rgba(0, 0, 0, 0.2);
@@ -31,19 +56,6 @@
   display: flex;
   align-items: center;
   gap: 24px;
-}
-.access-setting-main .main-container .header .back-btn {
-  cursor: pointer;
-  color: rgb(0, 0, 0);
-  background-color: #bebebe;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 8px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  transition: 0.2s;
-  font-size: 18px;
-  font-weight: bold;
 }
 .access-setting-main .main-container .header .back-btn:hover {
   background-color: #ffffff;
@@ -83,13 +95,11 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  max-width: 242px;
 }
 .access-setting-main .main-container .add-area .studen-area {
   font-weight: bold;
   display: flex;
   align-items: center;
-  max-width: 200px;
   gap: 4px;
 }
 .access-setting-main .main-container .add-area .studen-area .button {
@@ -107,7 +117,6 @@
   font-weight: bold;
   display: flex;
   align-items: center;
-  max-width: 200px;
   gap: 4px;
 }
 .access-setting-main .main-container .add-area .video-area .button {
@@ -126,11 +135,18 @@
   align-items: center;
   gap: 4px;
 }
+.access-setting-main .main-container .add-area .dateSetting-area .title {
+  font-weight: bold;
+}
+.access-setting-main .main-container .add-area .dateSetting-area .infinity-option-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .access-setting-main .main-container .add-area .dateSetting-area .video-record-date {
   width: 210px;
 }
 .access-setting-main .main-container .add-area .content {
-  font-weight: bold;
   font-size: 18px;
 }
 .access-setting-main .main-container .add-area .submit-btn {
@@ -290,4 +306,52 @@
   display: flex;
   align-items: center;
   gap: 4px;
+}
+@media (max-width: 860px) {
+  .access-setting-main .main-container {
+    width: 80%;
+    flex-direction: column;
+    align-items: center;
+  }
+  .access-setting-main .main-container .header {
+    flex-direction: column;
+    gap: 4px;
+  }
+  .access-setting-main .main-container .add-area {
+    width: 95%;
+  }
+  .access-setting-main .main-container .add-area .name-area {
+    width: 100%;
+  }
+  .access-setting-main .main-container .add-area .name-area input {
+    flex: 1;
+  }
+  .access-setting-main .main-container .add-area .studen-area {
+    width: 100%;
+  }
+  .access-setting-main .main-container .add-area .studen-area .content {
+    flex: 1;
+  }
+  .access-setting-main .main-container .add-area .video-area {
+    width: 100%;
+  }
+  .access-setting-main .main-container .add-area .video-area .content {
+    flex: 1;
+  }
+  .access-setting-main .main-container .add-area .dateSetting-area {
+    width: 100%;
+    flex-direction: column;
+  }
+  .access-setting-main .main-container .add-area .dateSetting-area .title {
+    font-size: 24px;
+  }
+  .access-setting-main .main-container .add-area .is-private {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .access-setting-main .main-container .add-area .g-green-btn {
+    margin: 0 auto;
+  }
 }/*# sourceMappingURL=accessSetting.css.map */

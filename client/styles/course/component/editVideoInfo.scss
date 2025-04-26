@@ -17,12 +17,13 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    overflow: auto;
     gap: 24px;
     padding: 24px 64px;
     border-radius: 8px;
     .title {
-        font-size: 26px;
-        font-weight: bold;
+      font-size: 26px;
+      font-weight: bold;
     }
     .title-area {
       display: flex;
@@ -40,6 +41,15 @@
       }
       .file-input:hover {
         background-color: #ececec;
+      }
+    }
+    .pre-view-image-area {
+      width: 80%;
+      height: 180px;
+      .image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
       }
     }
     .description-area {
@@ -64,15 +74,8 @@
       gap: 12px;
     }
     .submit-area {
-      .submit-btn {
-        cursor: pointer;
-        padding: 4px 6px;
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        transition: 0.2s;
-      }
-      :hover {
-        background-color: #f1f1f1;
-      }
+      display: flex;
+      gap: 8px;
     }
   }
 }

@@ -280,7 +280,7 @@ export default function RemoveUsers() {
                 style={{ border: selectedUserId.find((id) => item._id === id) ? '2px solid rgb(113, 231, 63)' : '2px solid rgba(0, 0, 0, 0.2)' }}>
                 <div className="username">{!item.userinfo.username ? '無' : item.userinfo.username}</div>
                 <div className="realname">{item.userinfo.realname}</div>
-                <div className="grade">{item.userinfo.grade}</div>
+                <div className="grade">{item.role === 'student' ? item.userinfo.grade : null}</div>
                 <div className="phone">{item.userinfo.phoneNumber}</div>
                 <div className="userid">{item._id}</div>
                 {item.role === 'admin' && <div className="role">管理員</div>}

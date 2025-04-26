@@ -359,7 +359,7 @@ export default function EditMembersInfo() {
                   <div className="user-name">{item.userinfo.username}</div>
                   <div className="real-name">{item.userinfo.realname}</div>
                   <div className="phone">{item.userinfo.phoneNumber}</div>
-                  <div className="grade">{item.userinfo.grade}</div>
+                  <div className="grade">{item.role === 'student' ? item.userinfo.grade : null}</div>
                   <div className="role">{item.role === 'admin' ? '管理員' : item.role === 'teacher' ? '教師' : '學生'}</div>
                   <div className="id">{item._id}</div>
                   <div

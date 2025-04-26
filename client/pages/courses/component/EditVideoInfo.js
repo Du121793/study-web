@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import adminService from '../../../method/adminService'
 import Image from 'next/image'
+import { useStrictClickHandler } from '../../../method/userful'
 
 export default function EditVideoInfo({ video_info, getCourseVideos, messageControl, setShowEditVideoInfo, token, video_id, course_id }) {
   // 請求參數
@@ -10,6 +11,10 @@ export default function EditVideoInfo({ video_info, getCourseVideos, messageCont
   const [isPrivate, setIsPrivate] = useState(video_info?.isPrivate)
   // 預覽圖片
   const [preViewImage, setPreViewImage] = useState('')
+
+  const strictClickCloseUI = useStrictClickHandler(() => {
+    setShowEditVideoInfo(false)
+  })
 
   const submitEdit = () => {
     if (title === null) {
@@ -51,9 +56,7 @@ export default function EditVideoInfo({ video_info, getCourseVideos, messageCont
   return (
     <div
       className="edit-video-main"
-      onClick={() => {
-        setShowEditVideoInfo(false)
-      }}>
+      {...strictClickCloseUI}>
       <div
         className="form-area"
         onClick={(e) => {
@@ -80,20 +83,22 @@ export default function EditVideoInfo({ video_info, getCourseVideos, messageCont
           <input
             type="file"
             className="file-input"
-            accept="image/*"
+            accept=".jpg, .jpeg, .png"
             onChange={(e) => {
+              const url = URL.createObjectURL(e.target.files[0])
               setThumbnail(e.target.files[0])
+              setPreViewImage(url)
             }}
           />
         </div>
-        {preViewImage && preViewImage !== '' && (
+        {preViewImage && (
           <div className="pre-view-image-area">
             <Image
               alt="pre view image"
+              className="image"
               src={preViewImage}
-              width={300}
-              height={0}
-              style={{ height: 'auto' }}></Image>
+              width={0}
+              height={0}></Image>
           </div>
         )}
 
@@ -134,9 +139,14 @@ export default function EditVideoInfo({ video_info, getCourseVideos, messageCont
         </div>
         <div className="submit-area">
           <div
-            className="submit-btn"
+            className="g-blue-btn"
             onClick={submitEdit}>
             送出
+          </div>
+          <div
+            className="g-red-btn"
+            {...strictClickCloseUI}>
+            關閉介面
           </div>
         </div>
       </div>

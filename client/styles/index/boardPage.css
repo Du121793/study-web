@@ -12,13 +12,21 @@
   justify-content: center;
   font-size: 36px;
   font-weight: bold;
+  align-items: flex-end;
   margin: 0 0 12px 0;
+  gap: 16px;
 }
 .board-page-main .main-title-area .content {
   padding: 2px 20px;
   border-radius: 4px;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+.board-page-main .main-title-area .subTitle {
+  border-radius: 4px;
+  height: 100%;
+  font-size: 24px;
+  color: #999;
 }
 .board-page-main .announcement {
   flex: 1;
@@ -31,40 +39,9 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+  position: relative;
   gap: 24px;
-}
-.board-page-main .announcement-header {
-  display: flex;
-  align-items: center;
-}
-.board-page-main .announcement-header .poster {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  overflow: hidden;
-  margin-right: 15px;
-}
-.board-page-main .announcement-header .poster img {
-  width: 100%;
-  height: 100%;
-  -o-object-fit: cover;
-     object-fit: cover;
-}
-.board-page-main .announcement-header .info {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.board-page-main .announcement-header .info .title {
-  font-size: 35px;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-.board-page-main .announcement-header .subTitle {
-  font-size: 24px;
-  color: #777;
 }
 .board-page-main .announcement .announcement-body {
   margin: 0 auto;
@@ -112,6 +89,11 @@
   border-left: 5px solid #ccc;
   font-style: italic;
 }
+.board-page-main .announcement .announcement-footer {
+  position: absolute;
+  right: 8px;
+  bottom: 4px;
+}
 .board-page-main .announcement-body {
   font-size: 1rem;
   color: #333;
@@ -136,4 +118,17 @@
   position: absolute;
   bottom: -166px;
   width: 100%;
+}
+@media (max-width: 860px) {
+  .board-page-main {
+    width: 100vw;
+  }
+  .board-page-main .g-btn-area {
+    flex-wrap: wrap;
+  }
+  .board-page-main .announcement {
+    width: 90%;
+    padding: 12px 0;
+    margin-bottom: 60px;
+  }
 }/*# sourceMappingURL=boardPage.css.map */

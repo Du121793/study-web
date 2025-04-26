@@ -7,39 +7,49 @@
   .qa-header {
     display: flex;
     align-items: center;
-    .title {
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    .left {
+      height: 100%;
       display: flex;
-      justify-content: center;
-      font-size: 28px;
-      padding: 6px 16px 6px 16px;
-      background-color: #fff;
-      position: relative;
-      align-items: flex-end;
-      .hint {
-        display: flex;
-        align-items: center;
-        position: absolute;
-        left: calc(100% + 24px);
-        font-size: 14px;
-        color: rgba(0, 0, 0, 0.2);
-      }
-    }
-    .back-btn {
+      align-items: center;
       position: absolute;
       left: 0;
-      padding: 6px 12px;
-      height: 36px;
-      border: none;
-      background-color: #333;
-      color: #fff;
-      cursor: pointer;
-      transition: 0.3s;
-      font-size: clamp(16px, 1.1vw, 20px);
+      .back-btn {
+        padding: 6px 12px;
+        height: 36px;
+        border: none;
+        background-color: #333;
+        color: #fff;
+        cursor: pointer;
+        transition: 0.3s;
+        font-size: clamp(16px, 1.1vw, 20px);
+      }
+      .back-btn:hover {
+        background-color: #545454;
+      }
     }
-    .back-btn:hover {
-      background-color: #545454;
+    .right {
+      height: 100%;
+      display: flex;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      position: relative;
+      .content {
+        padding: 6px 16px 6px 16px;
+        background-color: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        font-size: 28px;
+        border-radius: 8px;
+      }
+      .hint {
+        position: absolute;
+        right: -240%;
+        padding: 10px 0;
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.4);
+      }
     }
   }
   .btn-area {
@@ -231,8 +241,6 @@
       display: flex;
       gap: 16px;
       border-bottom: 1px solid rgba(0, 0, 0, 0.5);
-      @media screen and (max-width) {
-      }
       .user-shot-area {
         display: flex;
         .user-shot {
@@ -312,6 +320,64 @@
             border-radius: 6px;
           }
           margin-bottom: 12px;
+        }
+      }
+    }
+  }
+  @media (max-width: 860px) {
+    width: 100vw;
+    .header-container {
+      width: 100%;
+    }
+    .qa-header {
+      .left {
+      }
+      .right {
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        bottom: -10px;
+        .hint {
+          padding: 2px 0;
+          position: relative;
+          left: 0;
+        }
+      }
+    }
+    .qa-info-area {
+      width: 80%;
+      flex-wrap: wrap;
+      .edit-qa-function-area {
+        width: 100%;
+        flex-wrap: wrap;
+        .description {
+          flex-wrap: wrap;
+        }
+      }
+    }
+    .msg-board {
+      width: 80%;
+      flex-wrap: wrap;
+    }
+    .qaPage-container {
+      width: 80%;
+      .comment-area {
+        width: 100%;
+        gap: 8px;
+        .message-info {
+          margin: 0;
+          width: 80%;
+          word-break: keep-all;
+          flex-wrap: wrap;
+          .message-top {
+            flex-direction: column;
+          }
+          .message-bottom {
+            flex-wrap: wrap;
+            .file-preview {
+              max-width: 100%;
+            }
+          }
         }
       }
     }

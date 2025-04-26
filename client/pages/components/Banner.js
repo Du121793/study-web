@@ -4,6 +4,9 @@ import Image from 'next/image'
 // method
 import { useUserToken } from '../../method/useUserToken'
 import userService from '../../method/userService'
+// public
+import blackRightArrow from '../../public/arrow/right_arrow_black.png'
+import blackleftArrow from '../../public/arrow/left_arrow_black.png'
 
 export default function Banner({ bannerHasChange }) {
   const token = useUserToken()
@@ -144,9 +147,14 @@ export default function Banner({ bannerHasChange }) {
       <div className="banner">
         {/* 左箭頭 */}
         <div
-          className="arrow left-arrow"
+          className="left-arrow-area"
           onClick={prevSlide}>
-          &#10094;
+          <Image
+            className="arrow"
+            src={blackleftArrow}
+            width={32}
+            height={32}
+            alt="banner left arrow icon"></Image>
         </div>
         {/* 輪播圖 */}
         <div
@@ -171,9 +179,14 @@ export default function Banner({ bannerHasChange }) {
         </div>
         {/* 右箭頭 */}
         <div
-          className="arrow right-arrow"
+          className="right-arror-area"
           onClick={nextSlide}>
-          &#10095;
+          <Image
+            className="arrow"
+            src={blackRightArrow}
+            width={32}
+            height={32}
+            alt="banner right arrow icon"></Image>
         </div>
         {/* 底部指示器 */}
         <div className="indicator-bar">

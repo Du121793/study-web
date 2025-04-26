@@ -8,6 +8,7 @@ import lineIcon from '../../public/imgs/line.png'
 import logoC from '../../public/imgs/logo3.png'
 import menu from '../../public/imgs/home/homeIcon1.png'
 import whiteMenu from '../../public/imgs/home/homeIcon2.png'
+import closeIcon from '../../public/close/close_white.png'
 
 export default function Header({ callBoardMoveToBoardFunction, loginState, user_line_shot, inIndex = false }) {
   const router = useRouter()
@@ -27,7 +28,7 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
   const LoginLinkRef = useRef(null)
   // list切換
   const openMenuBtnRef = useRef(null)
-  const [listWidth, setListWidht] = useState('0')
+  const [listWidth, setListWidht] = useState(0)
   const closeArea = useRef(null)
 
   // RWD:開關左邊選項清單，手機畫面
@@ -76,21 +77,6 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
   // Layout
   return (
     <div className="header-container">
-      {/* 菜單按鈕 */}
-      {inIndex && (
-        <div
-          className="setting-btn"
-          ref={openMenuBtnRef}
-          onClick={openList}>
-          <Image
-            src={menu}
-            className="menu-icon"
-            alt="menu button"
-            width={0}
-            height={0}></Image>
-        </div>
-      )}
-
       <div className="header-main">
         {/* 菜單清單 */}
         <div
@@ -104,7 +90,7 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
               closeList()
             }}>
             <Image
-              src={whiteMenu}
+              src={closeIcon}
               className="menu-icon"
               alt="menu button"
               onClick={(e) => {
@@ -163,12 +149,14 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
           </div>
           <Link
             className="content"
-            href={GoogleLocation}>
+            href={GoogleLocation}
+            target="_blank">
             地圖位置
           </Link>
           <Link
             className="content"
-            href={officialLine}>
+            href={officialLine}
+            target="_blank">
             聯絡我們
           </Link>
           {loginState && (
@@ -180,15 +168,15 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
           )}
         </div>
         {/* header's logo */}
-        <Link
-          className="logo-container"
-          href={HomePageURL}>
-          <Image
-            className="logo-img"
-            alt="logo,s image"
-            src={logoC}
-            width={200}></Image>
-        </Link>
+        <div className="logo-container">
+          <Link href={HomePageURL}>
+            <Image
+              className="logo-img"
+              alt="logo,s image"
+              src={logoC}
+              width={200}></Image>
+          </Link>
+        </div>
         <div className="header-middle">
           <div
             className="header-middle-nav-area"
@@ -229,14 +217,16 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
           <Link
             href={GoogleLocation}
             className="header-middle-nav-area"
-            id="recommend-link">
+            id="recommend-link"
+            target="_blank">
             <div className="line"></div>
             <span>地圖位置</span>
           </Link>
           <Link
             className="header-middle-nav-area"
             id="about"
-            href={officialLine}>
+            href={officialLine}
+            target="_blank">
             <div className="line"></div>
             <span>聯絡我們</span>
           </Link>
@@ -285,6 +275,23 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
             </Link>
           )}
         </div>
+        {/* 菜單按鈕 */}
+        {inIndex && (
+          <div
+            className="setting-btn"
+            ref={openMenuBtnRef}
+            style={{ pointerEvents: listWidth === 0 ? 'all' : 'none' }}
+            onClick={(e) => {
+              openList()
+            }}>
+            <Image
+              src={menu}
+              className="menu-icon"
+              alt="menu button"
+              width={0}
+              height={0}></Image>
+          </div>
+        )}
       </div>
     </div>
   )

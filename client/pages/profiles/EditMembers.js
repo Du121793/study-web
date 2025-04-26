@@ -214,10 +214,6 @@ export default function EditMembers() {
 
   /* 搜尋功能 */
   const searchMembers = () => {
-    if (usernameInput === '' && realnameInput === '' && phoneNumberInput === '' && gradeInput === '') {
-      messageControl('請輸入搜尋條件', false)
-      return
-    }
     let data = {
       username: usernameInput,
       realname: realnameInput,
@@ -492,17 +488,6 @@ export default function EditMembers() {
       </div>
       <div className="member-selector-area">
         <div className="option-area">
-          {/* 顯示課程以外成員 */}
-          <div
-            className={`button show-course-members-btn ${method.name === 'ousideMemberPage' ? 'active' : null}`}
-            onClick={() => {
-              setMethod({
-                name: 'ousideMemberPage',
-                page: 1,
-              })
-            }}>
-            顯示課程以外成員
-          </div>
           {/* 顯示所有成員 */}
           <div
             className={`button show-course-members-btn ${method.name === 'allMemberPage' ? 'active' : null}`}
@@ -513,6 +498,17 @@ export default function EditMembers() {
               })
             }}>
             顯示所有成員
+          </div>
+          {/* 顯示課程以外成員 */}
+          <div
+            className={`button show-course-members-btn ${method.name === 'ousideMemberPage' ? 'active' : null}`}
+            onClick={() => {
+              setMethod({
+                name: 'ousideMemberPage',
+                page: 1,
+              })
+            }}>
+            顯示課程以外成員
           </div>
           {/* 顯示該課程成員 */}
           <div
@@ -662,7 +658,7 @@ export default function EditMembers() {
                 <span className="real-name">{item.userinfo.realname}</span>
                 <span className="phone">{item.userinfo.phoneNumber}</span>
                 <span className="course-class">{item.userinfo.courseClass}</span>
-                <span className="grade">{item.userinfo.grade}</span>
+                <span className="grade">{item.role === 'student' ? item.userinfo.grade : null}</span>
                 {item.role === 'teacher' && <span className="role">教師</span>}
                 {item.role === 'student' && <span className="role">學生</span>}
                 {item.role === 'admin' && <span className="role">管理員</span>}

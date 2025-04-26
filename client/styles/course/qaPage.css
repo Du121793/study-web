@@ -8,29 +8,18 @@
 .qaPage-main .qa-header {
   display: flex;
   align-items: center;
-}
-.qaPage-main .qa-header .title {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  display: flex;
   justify-content: center;
-  font-size: 28px;
-  padding: 6px 16px 6px 16px;
-  background-color: #fff;
   position: relative;
-  align-items: flex-end;
+  width: 100%;
 }
-.qaPage-main .qa-header .title .hint {
+.qaPage-main .qa-header .left {
+  height: 100%;
   display: flex;
   align-items: center;
   position: absolute;
-  left: calc(100% + 24px);
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.2);
-}
-.qaPage-main .qa-header .back-btn {
-  position: absolute;
   left: 0;
+}
+.qaPage-main .qa-header .left .back-btn {
   padding: 6px 12px;
   height: 36px;
   border: none;
@@ -40,8 +29,29 @@
   transition: 0.3s;
   font-size: clamp(16px, 1.1vw, 20px);
 }
-.qaPage-main .qa-header .back-btn:hover {
+.qaPage-main .qa-header .left .back-btn:hover {
   background-color: #545454;
+}
+.qaPage-main .qa-header .right {
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  position: relative;
+}
+.qaPage-main .qa-header .right .content {
+  padding: 6px 16px 6px 16px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-size: 28px;
+  border-radius: 8px;
+}
+.qaPage-main .qa-header .right .hint {
+  position: absolute;
+  right: -240%;
+  padding: 10px 0;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.4);
 }
 .qaPage-main .btn-area {
   display: flex;
@@ -318,4 +328,60 @@
   max-width: 420px;
   max-height: 340px;
   border-radius: 6px;
+}
+@media (max-width: 860px) {
+  .qaPage-main {
+    width: 100vw;
+  }
+  .qaPage-main .header-container {
+    width: 100%;
+  }
+  .qaPage-main .qa-header .right {
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    bottom: -10px;
+  }
+  .qaPage-main .qa-header .right .hint {
+    padding: 2px 0;
+    position: relative;
+    left: 0;
+  }
+  .qaPage-main .qa-info-area {
+    width: 80%;
+    flex-wrap: wrap;
+  }
+  .qaPage-main .qa-info-area .edit-qa-function-area {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .qaPage-main .qa-info-area .edit-qa-function-area .description {
+    flex-wrap: wrap;
+  }
+  .qaPage-main .msg-board {
+    width: 80%;
+    flex-wrap: wrap;
+  }
+  .qaPage-main .qaPage-container {
+    width: 80%;
+  }
+  .qaPage-main .qaPage-container .comment-area {
+    width: 100%;
+    gap: 8px;
+  }
+  .qaPage-main .qaPage-container .comment-area .message-info {
+    margin: 0;
+    width: 80%;
+    word-break: keep-all;
+    flex-wrap: wrap;
+  }
+  .qaPage-main .qaPage-container .comment-area .message-info .message-top {
+    flex-direction: column;
+  }
+  .qaPage-main .qaPage-container .comment-area .message-info .message-bottom {
+    flex-wrap: wrap;
+  }
+  .qaPage-main .qaPage-container .comment-area .message-info .message-bottom .file-preview {
+    max-width: 100%;
+  }
 }/*# sourceMappingURL=qaPage.css.map */

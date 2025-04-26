@@ -1,7 +1,7 @@
 // MyReactQuill.js
 import React from 'react'
-import ReactQuill, { Quill } from 'react-quill'
-import 'react-quill/dist/quill.snow.css'
+import ReactQuill, { Quill } from 'react-quill-new'
+import 'react-quill-new/dist/quill.snow.css'
 
 // 註冊自訂的 size 格式，並定義允許的數值（以 px 為單位）
 const Size = Quill.import('formats/size')

@@ -216,20 +216,22 @@ export default function AccessSetting() {
             setEditStatus={setEditStatus}></AccessVideoList>
         )}
       </div>
+      <div className="btn-area">
+        <Link
+          href={{ pathname: `${clientIp}/courses/Course`, query: { courseName: course_name, courseId: course_id } }}
+          className="back-btn">
+          返回課程
+        </Link>
+      </div>
       <div className="main-container">
         <div className="header">
-          <Link
-            href={{ pathname: `${clientIp}/courses/Course`, query: { courseName: course_name, courseId: course_id } }}
-            className="back-btn">
-            返回課程
-          </Link>
           <div
             className="title"
             onClick={test}>
             變更影片權限功能
           </div>
           <div
-            className="btn"
+            className="g-blue-btn"
             onClick={() => {
               setIsClickAdd(!isClickAdd)
             }}>
@@ -250,8 +252,7 @@ export default function AccessSetting() {
               />
             </div>
             <div className="studen-area">
-              <div className="content">學生:</div>
-              <div className="content">{selectedStudent.length}，</div>
+              <div className="content">學生人數 {selectedStudent.length} 。</div>
               <div
                 className="g-blue-btn"
                 onClick={() => {
@@ -259,11 +260,9 @@ export default function AccessSetting() {
                 }}>
                 選擇學生
               </div>
-              ，
             </div>
             <div className="video-area">
-              <div className="content">影片:</div>
-              <div className="content">{selectedVideo.length}，</div>
+              <div className="content">影片數量 {selectedVideo.length} 。</div>
               <div
                 className="g-blue-btn"
                 onClick={() => {
@@ -271,18 +270,20 @@ export default function AccessSetting() {
                 }}>
                 選擇影片
               </div>
-              ，
             </div>
             <div className="dateSetting-area">
-              <div className="content">結束日期:</div>
-              無期限
-              <input
-                type="checkbox"
-                onChange={(e) => {
-                  setIsInfiniite(e.target.checked)
-                  setOverDate(null)
-                }}
-              />
+              <div className="content title">結束日期設定</div>
+              <div className="infinity-option-area">
+                <div className="content">無期限</div>
+                <input
+                  type="checkbox"
+                  onChange={(e) => {
+                    setIsInfiniite(e.target.checked)
+                    setOverDate(null)
+                  }}
+                />
+              </div>
+
               {!isInfiniite && (
                 <input
                   type="datetime-local"
@@ -305,7 +306,7 @@ export default function AccessSetting() {
               {!isPrivate && <div className="hint">若關閉此設定，設定公開的影片會維持公開，但他將不會套用此權杖</div>}
             </div>
             <div
-                className="g-green-btn"
+              className="g-green-btn"
               onClick={submitNewAccess}>
               新增
             </div>

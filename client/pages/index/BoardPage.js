@@ -202,20 +202,12 @@ export default function BoardPage() {
             test()
           }}>
           <div className="content">{boardInfo.title}</div>
+          <div className="subTitle">{boardInfo.subTitle}</div>
         </div>
       )}
       {/* board info area */}
       {boardInfo && (
         <div className="announcement">
-          <div className="announcement-header">
-            <div className="info">
-              <div
-                className="subTitle"
-                style={{ whiteSpace: 'pre-wrap' }}>
-                {boardInfo.subTitle}
-              </div>
-            </div>
-          </div>
           <div
             className="announcement-body"
             style={{ whiteSpace: 'pre-wrap' }}

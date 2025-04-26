@@ -32,48 +32,47 @@
       display: flex;
       align-items: center;
       position: relative;
-      justify-content: space-between;
-      .hint {
+      padding: 12px 0;
+      .left {
         display: flex;
         align-items: flex-end;
-        color: #959393;
+        .course-title {
+          padding: 8px 14px 8px 14px;
+          font-size: 28px;
+          background-color: #fafafa;
+          border-radius: 12px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          z-index: 2;
+          font-weight: bold;
+          position: relative;
+          display: flex;
+          align-items: flex-end;
+        }
+        .hint {
+          display: flex;
+          align-items: flex-end;
+          color: #959393;
+          height: 35px;
+          left: 100px;
+          padding: 8px;
+        }
+      }
+      .right {
         position: absolute;
-        height: 35px;
-        left: 100px;
-      }
-      .back-to-course-btn {
-        color: black;
-        background-color: #fafafa;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        padding: 8px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        transition: 0.2s;
-      }
-      .back-to-course-btn:hover {
-        background-color: #ececec;
-      }
-    }
-    .course-title {
-      padding: 8px 14px 8px 14px;
-      margin: 12px 0 12px 0;
-      font-size: 28px;
-      background-color: #fafafa;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      z-index: 2;
-      font-weight: bold;
-      position: relative;
-      display: flex;
-      align-items: flex-end;
-      .hint {
-        display: flex;
-        align-items: center;
-        position: absolute;
-        left: calc(100% + 24px);
-        font-size: 14px;
-        color: rgba(0, 0, 0, 0.2);
+        right: 0;
+        .back-to-course-btn {
+          color: black;
+          background-color: #fafafa;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          padding: 8px;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          transition: 0.2s;
+        }
+        .back-to-course-btn:hover {
+          background-color: #ececec;
+        }
       }
     }
     .nav {
@@ -112,19 +111,39 @@
   @media (max-width: 920px) {
     width: 100vw;
     .container {
-      width: 90%;
-      gap: 8px;
+      width: 100%;
+      gap: 12px;
+      margin-bottom: 128px;
       .header-title-area {
         position: relative;
         flex-wrap: wrap;
-        height: 100%;
-        gap: 12px;
-        .hint {
-          position: relative;
-          left: 0;
-          display: flex;
-          justify-content: center;
-          align-items: center;
+        width: 90%;
+        gap: 0;
+        .left {
+          flex-direction: column;
+          align-items: flex-start;
+          .course-title {
+          }
+          .hint {
+            padding: 0;
+          }
+        }
+        .right{
+          top: 18px;
+        }
+      }
+      #video-nav {
+        border-radius: 0;
+        margin: 0;
+        #video-header {
+          border-radius: 0;
+        }
+      }
+      #qa-nav {
+        border-radius: 0;
+        margin: 0;
+        .header {
+          border-radius: 0;
         }
       }
       .nav {
@@ -133,26 +152,17 @@
           width: 100%;
           .update-video-area {
             width: 100%;
-            flex-wrap: wrap;
             overflow: hidden;
           }
           .video-area-container {
             width: 100%;
             .video-area {
-              width: 100%;
+              min-width: 100%;
               flex-direction: column;
               align-items: center;
               .video-card {
-                min-width: 90%;
-                min-height: 340px;
-                .top-container {
-                  @media (max-width: 900px) {
-                    min-height: none;
-                  }
-                }
-                .bottom-container {
-                  flex: 1;
-                }
+                display: flex;
+                flex-direction: row;
               }
             }
           }

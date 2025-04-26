@@ -221,4 +221,13 @@
 }
 .edit-QA-main .form-area .btns-area .cancel:hover {
   background-color: #febebe;
+}
+@media (max-width: 860px) {
+  .edit-QA-main {
+    width: 100vw;
+  }
+  .edit-QA-main .form-area {
+    width: 90%;
+    padding: 12px;
+  }
 }/*# sourceMappingURL=editQA.css.map */

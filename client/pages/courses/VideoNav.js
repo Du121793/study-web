@@ -56,7 +56,8 @@ export default function VideoNav({ course_id, courseName, user_role }) {
   const [uploadSuccess, setUploadSuccess] = useState(false) // 用於上傳完成更新影片區域
   const [uploadError, setUploadError] = useState(false) // 存取是否上傳發生錯誤
 
-  // 開關編輯影片介面
+  // 開關編輯影片介面與按鈕
+  const [showEditVideoBtn, setShowEditVideoBtn] = useState(false)
   const [editShowVideoInfo, setShowEditVideoInfo] = useState(false)
   const [choseEditVideo, setChoseEditVideo] = useState({})
   // 編輯影片參數
@@ -365,10 +366,10 @@ export default function VideoNav({ course_id, courseName, user_role }) {
         <div
           className="update-video-area"
           ref={inputRef}>
-          {/* 上傳影片 */}
+          {/* 上傳影片btn */}
           {user_role && (user_role === 'teacher' || user_role === 'admin') && (
             <div
-              className="g-blue-btn"
+              className="g-blue-btn upload-btn"
               onClick={() => {
                 setshowUploadVideoUI(true)
                 setTimeout(() => {
@@ -403,6 +404,16 @@ export default function VideoNav({ course_id, courseName, user_role }) {
               搬遷舊有Vimeo影片
             </div>
           )}
+          {/* 編輯影片 button */}
+          {user_role && (user_role === 'teacher' || user_role === 'admin') && (
+            <div
+              className="g-blue-btn"
+              onClick={() => {
+                setShowEditVideoBtn(!showEditVideoBtn)
+              }}>
+              編輯影片
+            </div>
+          )}
           {/* 編輯權限 button */}
           {user_role && (user_role === 'teacher' || user_role === 'admin') && (
             <Link
@@ -412,7 +423,11 @@ export default function VideoNav({ course_id, courseName, user_role }) {
             </Link>
           )}
           {/* 排序根據 */}
-          <span onClick={test}>排序根據</span>
+          <div
+            className="content"
+            onClick={test}>
+            排序根據
+          </div>
           <div className="select">
             <select onChange={(e) => switchSortBy(e.target.value)}>
               <option value="">上傳時間</option>
@@ -472,9 +487,20 @@ export default function VideoNav({ course_id, courseName, user_role }) {
                       info: JSON.stringify({ description: item.description, title: item.title, time: item.date }),
                     },
                   }}>
-                  <div
-                    className="top-container"
-                    ref={topContainerRef}>
+                  {showEditVideoBtn && (
+                    <div
+                      className="edit-btn"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setShowEditVideoInfo(true)
+                        setVideo_id(item._id)
+                        setChoseEditVideo(item)
+                      }}>
+                      編輯
+                    </div>
+                  )}
+
+                  <div className="top-container">
                     {/* 刪除按鈕 */}
                     <div
                       className="delete-video-btn"
@@ -513,6 +539,7 @@ export default function VideoNav({ course_id, courseName, user_role }) {
                   <div className="bottom-container">
                     {/* 影片詳情 */}
                     <div className="info">
+                      <div className="title">{item.title}</div>
                       <div className="time">
                         <div className="day">
                           <div>{item.date.split(/[-T:.]/)[0]}/</div>
@@ -535,23 +562,10 @@ export default function VideoNav({ course_id, courseName, user_role }) {
                         )}
                       </div>
 
-                      <div className="title">{item.title}</div>
                       <div
                         className="bottom-area"
                         ref={loadMoreRef}>
                         <div className="container">
-                          {user_role === 'admin' && (
-                            <div
-                              className="edit-btn"
-                              onClick={(e) => {
-                                e.preventDefault()
-                                setShowEditVideoInfo(true)
-                                setVideo_id(item._id)
-                                setChoseEditVideo(item)
-                              }}>
-                              編輯
-                            </div>
-                          )}
                           <div className={`access-time ${item.access.accessDate === null && !item.access.isAccess && 'light'}`}>
                             {item.access.accessDate === null && !item.access.isAccess && '無權限'}
                             {item.access.accessDate === null && item.access.isAccess && item.isPrivate === true && '無限期'}

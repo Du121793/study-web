@@ -21,6 +21,9 @@
   overflow: hidden;
   height: 60vw;
   max-height: 60vh;
+  background-color: rgba(255, 255, 255, 0.3);
+  padding-bottom: 32px;
+  padding-top: 32px;
   /* 底部指示器容器 */
   /* 指示器內容 */
 }
@@ -32,34 +35,59 @@
   position: relative;
   min-width: 100%;
   height: 100%;
-  background-color: #f0f0f0;
 }
-.index-main .banner-main .banner .arrow {
+.index-main .banner-main .banner .left-arrow-area {
+  cursor: pointer;
+  transition: 0.2s;
   position: absolute;
   display: flex;
   align-items: center;
-  top: 50%;
+  left: 0px;
+  top: 0;
   height: 100%;
-  transform: translateY(-50%);
-  font-size: 2rem;
-  color: #fff;
-  background-color: rgba(0, 0, 0, 0.1);
+  padding: 0 64px;
+  z-index: 3;
+}
+@media (max-width: 860px) {
+  .index-main .banner-main .banner .left-arrow-area {
+    padding: 0 12px;
+  }
+}
+.index-main .banner-main .banner .right-arror-area {
   cursor: pointer;
+  transition: 0.2s;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  right: 0px;
+  top: 0;
+  height: 100%;
+  padding: 0 64px;
+  z-index: 3;
+}
+@media (max-width: 860px) {
+  .index-main .banner-main .banner .right-arror-area {
+    padding: 0 12px;
+  }
+}
+.index-main .banner-main .banner .right-arror-area:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+.index-main .banner-main .banner .left-arrow-area:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+.index-main .banner-main .banner .arrow {
+  color: #fff;
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
   z-index: 2;
-  padding: 0 24px;
   transition: 0.2s;
 }
-.index-main .banner-main .banner .arrow:hover {
-  background-color: rgba(0, 0, 0, 0.7);
-}
-.index-main .banner-main .banner .left-arrow {
-  left: 0px;
-}
-.index-main .banner-main .banner .right-arrow {
-  right: 0px;
+@media (max-width: 860px) {
+  .index-main .banner-main .banner .arrow {
+    padding: 0 16px;
+  }
 }
 .index-main .banner-main .banner .indicator-bar {
   position: absolute;

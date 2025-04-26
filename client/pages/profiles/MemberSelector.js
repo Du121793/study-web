@@ -313,7 +313,7 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
               <span className="real-name">{item.userinfo.realname}</span>
               <span className="phone">{item.userinfo.phoneNumber}</span>
               <span className="course-class">{item.userinfo.courseClass}</span>
-              <span className="grade">{item.userinfo.grade}</span>
+              <span className="grade">{item.role === 'student' ? item.userinfo.grade : null}</span>
               {item.role === 'teacher' && <span className="role">教師</span>}
               {item.role === 'student' && <span className="role">學生</span>}
               {item.role === 'admin' && <span className="role">管理員</span>}

@@ -1,12 +1,37 @@
 .access-setting-main {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  gap: 8px;
   width: 100%;
+  .btn-area {
+    width: 90%;
+    display: flex;
+    .back-btn {
+      cursor: pointer;
+      color: rgb(0, 0, 0);
+      background-color: #313131;
+      color: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 8px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      transition: 0.2s;
+      font-size: 18px;
+      transition: 0.2s;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+    }
+    .back-btn:hover {
+      background-color: #e6e6e6;
+      color: rgb(42, 42, 42);
+    }
+  }
   .main-container {
     background-color: #fff;
     display: flex;
     flex-direction: column;
-    margin: 64px;
+    width: 90%;
     padding: 24px;
     border-radius: 12px;
     border: 1px solid rgba(0, 0, 0, 0.2);
@@ -29,19 +54,6 @@
       display: flex;
       align-items: center;
       gap: 24px;
-      .back-btn {
-        cursor: pointer;
-        color: rgb(0, 0, 0);
-        background-color: #bebebe;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        padding: 8px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        transition: 0.2s;
-        font-size: 18px;
-        font-weight: bold;
-      }
       .back-btn:hover {
         background-color: #ffffff;
       }
@@ -80,13 +92,12 @@
         display: flex;
         align-items: center;
         gap: 4px;
-        max-width: 242px;
       }
+
       .studen-area {
         font-weight: bold;
         display: flex;
         align-items: center;
-        max-width: 200px;
         gap: 4px;
         .button {
           cursor: pointer;
@@ -100,11 +111,11 @@
           background-color: #e1b08a;
         }
       }
+
       .video-area {
         font-weight: bold;
         display: flex;
         align-items: center;
-        max-width: 200px;
         gap: 4px;
         .button {
           cursor: pointer;
@@ -122,13 +133,19 @@
         display: flex;
         align-items: center;
         gap: 4px;
-        // max-width: 310px;
+        .title {
+          font-weight: bold;
+        }
+        .infinity-option-area {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
         .video-record-date {
           width: 210px;
         }
       }
       .content {
-        font-weight: bold;
         font-size: 18px;
       }
       .submit-btn {
@@ -278,10 +295,59 @@
           }
         }
       }
-      .edit-area{
+      .edit-area {
         display: flex;
         align-items: center;
         gap: 4px;
+      }
+    }
+  }
+
+  @media (max-width: 860px) {
+    .main-container {
+      width: 80%;
+      flex-direction: column;
+      align-items: center;
+      .header {
+        flex-direction: column;
+        gap: 4px;
+      }
+      .add-area {
+        width: 95%;
+        .name-area {
+          width: 100%;
+          input {
+            flex: 1;
+          }
+        }
+        .studen-area {
+          width: 100%;
+          .content {
+            flex: 1;
+          }
+        }
+        .video-area {
+          width: 100%;
+          .content {
+            flex: 1;
+          }
+        }
+        .dateSetting-area {
+          .title {
+            font-size: 24px;
+          }
+          width: 100%;
+          flex-direction: column;
+        }
+        .is-private {
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+        .g-green-btn {
+          margin: 0 auto;
+        }
       }
     }
   }

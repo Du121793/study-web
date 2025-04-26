@@ -103,7 +103,7 @@
       }
       .hint {
         cursor: pointer;
-        transition: .2s;
+        transition: 0.2s;
         user-select: none;
         padding: 4px 6px;
         border-radius: 4px;
@@ -208,6 +208,18 @@
       }
       .cancel:hover {
         background-color: #febebe;
+      }
+    }
+  }
+
+  @media (max-width: 860px) {
+    width: 100vw;
+    .form-area {
+      width: 90%;
+      padding: 12px;
+      .theme-area {
+      }
+      .hints-area {
       }
     }
   }

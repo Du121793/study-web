@@ -48,13 +48,17 @@ export default function StudentSelector({ course_id, selectedVideo, setSelectedV
   const test = () => {
     console.log(videos)
   }
+
   return (
     <div className="video-selector-main">
       <div className="video-selector-container">
+        <div className="title">選擇要授權的影片</div>
         <div
-          className="title"
-          onClick={test}>
-          選擇要授權的影片
+          className="g-blue-btn"
+          onClick={() => {
+            setShowVideoSelector(false)
+          }}>
+          完成並儲存
         </div>
         <div className="info-area">
           {videos &&
@@ -76,9 +80,8 @@ export default function StudentSelector({ course_id, selectedVideo, setSelectedV
                       src={item.thumbnail}
                       alt="video shot"
                       quality={100}
-                      width={100}
-                      height={0}
-                      style={{ height: 'auto' }}></Image>
+                      width={0}
+                      height={0}></Image>
                     <div className="info">{item.title}</div>
                   </div>
                 )
@@ -95,9 +98,8 @@ export default function StudentSelector({ course_id, selectedVideo, setSelectedV
                       src={item.thumbnail}
                       alt="video shot"
                       quality={100}
-                      width={100}
-                      height={0}
-                      style={{ height: 'auto' }}></Image>
+                      width={0}
+                      height={0}></Image>
                     <div className="info">{item.title}</div>
                   </div>
                 )
@@ -105,7 +107,7 @@ export default function StudentSelector({ course_id, selectedVideo, setSelectedV
             })}
         </div>
         <div
-          className="finish-btn"
+          className="g-blue-btn"
           onClick={() => {
             setShowVideoSelector(false)
           }}>

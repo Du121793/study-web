@@ -34,7 +34,73 @@ export default function Player() {
   const [isAlignCenter, setIsAlignCenter] = useState('flex-start')
   // 使用者line縮圖
   const [userShot, setUserShot] = useState(null)
-  //   開關右邊列表
+
+  /* 根據寬度顯示畫面中間的影片清單 */
+  const [showVideoListAfterInfo, setShowVideoListAfterInfo] = useState(false)
+
+  /* 監聽全局寬度變化，寬度變化設定windowsWidth */
+  const isClient = typeof window === 'object'
+  const [windowsWidth, setWindowsWidth] = useState(0)
+  useEffect(() => {
+    if (!isClient) return false
+
+    const handleResize = () => {
+      setWindowsWidth(window.innerWidth)
+    }
+
+    window.addEventListener('resize', handleResize)
+    // 先觸發一次，保證初始值正確
+    handleResize()
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [isClient])
+
+  /* 根據寬度顯示畫面中間的影片清單 */
+  useEffect(() => {
+    if (windowsWidth <= 860) {
+      setShowVideoListAfterInfo(true)
+    }
+    if (windowsWidth > 860) {
+      setShowVideoListAfterInfo(false)
+    }
+  }, [windowsWidth])
+
+  /*
+    1. 請求獲得影片路徑
+    2. 請求獲得影片資訊
+    3. 請求獲得使用者資料
+  */
+  useEffect(() => {
+    if (token && course_id && video_id) {
+      userService.getVideoLink(token, course_id, video_id).then((res) => {
+        setVideoUrl(res.data.embedLink)
+      })
+    }
+    if (token && course_id) {
+      userService
+        .getVideoInfo(token, course_id, {
+          type: 'MainClass',
+          page: 1,
+          sortBy: 'recordDate',
+          sortOrder: 'asc',
+        })
+        .then((res) => {
+          console.log(res)
+          setVideosList(res.data)
+        })
+    }
+  }, [token, course_id, video_id])
+
+  useEffect(() => {
+    const shot = localStorage.getItem('user_line_shot')
+    if (shot) {
+      setUserShot(shot)
+    }
+  }, [])
+
+  /* 開關右方影片列表，僅在電腦寬度下出現 */
   const listSwitch = (e) => {
     if (e === 'close-button') {
       setIsAlignCenter('center')
@@ -114,39 +180,6 @@ export default function Player() {
     }
   }, [info])
 
-  /*
-  1. 請求獲得影片路徑
-  2. 請求獲得影片資訊
-  3. 請求獲得使用者資料
- */
-  useEffect(() => {
-    if (token && course_id && video_id) {
-      userService.getVideoLink(token, course_id, video_id).then((res) => {
-        setVideoUrl(res.data.embedLink)
-      })
-    }
-    if (token && course_id) {
-      userService
-        .getVideoInfo(token, course_id, {
-          type: 'MainClass',
-          page: 1,
-          sortBy: 'recordDate',
-          sortOrder: 'asc',
-        })
-        .then((res) => {
-          console.log(res)
-          setVideosList(res.data)
-        })
-    }
-  }, [token, course_id, video_id])
-
-  useEffect(() => {
-    const shot = localStorage.getItem('user_line_shot')
-    if (shot) {
-      setUserShot(shot)
-    }
-  }, [])
-
   const test = () => {
     console.log(formatTime(10))
   }
@@ -178,11 +211,11 @@ export default function Player() {
           />
         )}
       </div>
+      {/* 影片播放器、影片清單 */}
       <div className="player-area">
-        {/* 左側影片播放器 */}
+        {/* 播放器 */}
         <div className="player">
           <iframe
-            style={{ height: `${playerHeight}` }}
             id="iframe"
             src={videoUrl}
             title="Video Player"
@@ -191,9 +224,7 @@ export default function Player() {
           />
 
           {/* 影片資訊 */}
-          <div
-            className="video-info"
-            style={{ alignItems: isAlignCenter }}>
+          <div className="video-info">
             {parsedInfo && <div className="title">{parsedInfo.title}</div>}
             {parsedInfo && (
               <div className="introduce">
@@ -204,7 +235,7 @@ export default function Player() {
           </div>
         </div>
 
-        {/* 切換右側列表的按鈕 */}
+        {/* 切換清單按鈕 */}
         {!videoListIsOpen && (
           <button
             id="open-button"
@@ -220,14 +251,14 @@ export default function Player() {
           </button>
         )}
 
-        {/* 右側影片集數列表 */}
+        {/* 清單本體 */}
         <div
           className="video-info-list"
           style={{
             width: `${videoListWidth}px`,
             marginRight: `${videoListMarginRight}`,
           }}>
-          {/* 開關按鈕 */}
+          {/* 切換按鈕 */}
           <div
             id="close-button"
             className="hidden-info-btn"
@@ -246,9 +277,6 @@ export default function Player() {
                     <Link
                       className={`video ${item._id === video_id ? 'active' : ''}`}
                       key={index}
-                      onClick={() => {
-                        console.log(item)
-                      }}
                       href={{
                         pathname: `${clientIp}/videoPlay/Player`,
                         query: {
@@ -279,6 +307,47 @@ export default function Player() {
           </ul>
         </div>
       </div>
+      {showVideoListAfterInfo && (
+        <div
+          className="video-list-after-info-area"
+          onClick={() => {
+            console.log(VideosList)
+          }}>
+          {VideosList.map((item, idx) => {
+            if (item.access.isAccess) {
+              return (
+                <Link
+                  href={{
+                    pathname: `${clientIp}/videoPlay/Player`,
+                    query: {
+                      course_name: course_name,
+                      video_id: item._id,
+                      course_id: course_id,
+                      info: JSON.stringify({ description: item.description, title: item.title, time: item.recordDate }),
+                    },
+                  }}
+                  key={idx}
+                  className="info">
+                  <div className="left">
+                    <Image
+                      src={item.thumbnail !== '' ? item.thumbnail : noThumbnailImg}
+                      width={0}
+                      height={0}
+                      alt="video image"
+                      className="image"></Image>
+                    <div className="video-length">{formatTime(item.length)}</div>
+                  </div>
+                  <div className="right">
+                    <div className="title">{item.description}</div>
+                    <div className="time">{timeAgo(item.date)}</div>
+                  </div>
+                </Link>
+              )
+            }
+          })}
+        </div>
+      )}
+
       <Footer></Footer>
     </div>
   )

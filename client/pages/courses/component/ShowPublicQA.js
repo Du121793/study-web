@@ -376,7 +376,7 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, showP
           {shortcut &&
             shortcut.length > 0 &&
             shortcut.map((item, index) => (
-              <div className="shortcut">
+              <div className="shortcut" key={index}>
                 {item?.isRoot === true ? (
                   <Image
                     style={{ cursor: 'pointer' }}

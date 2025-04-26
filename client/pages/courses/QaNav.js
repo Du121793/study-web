@@ -189,7 +189,6 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
       const innerHeight = navInnerRef?.current?.clientHeight
       const headerHeight = headerRef?.current?.clientHeight
       setQaHeight(innerHeight + headerHeight + 40)
-      console.log(innerWidth)
     }
   }, [windowsWidth])
 

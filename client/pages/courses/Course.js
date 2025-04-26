@@ -13,7 +13,6 @@ import { useUserToken } from '../../method/useUserToken'
 import userService from '../../method/userService'
 
 // public
-import downArrow from '../../public/course/downArrow.png'
 import leftArrow from '../../public/course/leftArrow.png'
 
 // nav組件
@@ -31,11 +30,9 @@ export default function Course() {
   const course_id = useRef(null)
 
   // 請求參數
-  const baseUrl = `${clientIp}/`
   const backToMyCoursePageUrl = `${clientIp}/profiles/Profile`
   const [isLogined, setLogined] = useState(false)
   const [userInfo, setUserInfo] = useState(null)
-  const [isShowVideoUpload, setIsShowVideoUpload] = useState(false)
   // 檢查是否有新增qa，用於更新子組件的qa
   const [qaHasUpload, setQaHasUpload] = useState(true)
   const [userRole, setUserRole] = useState(null)
@@ -81,21 +78,23 @@ export default function Course() {
       <Header loginState={isLogined} />
       <div className="container">
         <div className="header-title-area">
-          <div className="course-title">
-            {courseName}
+          <div className="left">
+            <div className="course-title">{courseName}</div>
+            <div className="hint">{courseId}</div>
           </div>
-          <div className="hint">{courseId}</div>
-          <Link
-            className="back-to-course-btn"
-            href={backToMyCoursePageUrl}>
-            <Image
-              src={leftArrow}
-              alt="back of course page button icon"
-              width={24}
-              height={24}
-            />
-            <div className="home-btn">回到我的課程</div>
-          </Link>
+          <div className="right">
+            <Link
+              className="back-to-course-btn"
+              href={backToMyCoursePageUrl}>
+              <Image
+                src={leftArrow}
+                alt="back of course page button icon"
+                width={24}
+                height={24}
+              />
+              <div className="home-btn">回到我的課程</div>
+            </Link>
+          </div>
         </div>
 
         {/* 影片組件 */}

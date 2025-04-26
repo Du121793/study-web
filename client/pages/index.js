@@ -1,6 +1,6 @@
 // 組件庫
 import { useState, useEffect, useRef } from 'react'
-
+import Image from 'next/image'
 // 子組件
 import Header from '../components/global/Header'
 import Head from '../components/global/Globla'
@@ -13,7 +13,8 @@ import Board from './components/Board'
 import Banner from './components/Banner'
 import UploadBoard from './components/UploadBoard'
 import UploadCarousel from './components/UploadCarousel'
-
+// public
+import backgroundImage from '../public/backGroundIMG/stefanie-jockschat-9f1PRQs6Brs-unsplash.jpg'
 export default function Index() {
   const token = useUserToken()
   const [isLogined, setLogined] = useState(false)
@@ -68,6 +69,14 @@ export default function Index() {
 
   return (
     <div className="index-main">
+      <div className="background-image">
+        <Image
+          src={backgroundImage}
+          alt="back ground image"
+          className="image"
+          width={0}
+          height={0}></Image>
+      </div>
       <div className="RWD">
         {showCarouselEdit && (
           <UploadCarousel

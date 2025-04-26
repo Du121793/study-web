@@ -367,18 +367,18 @@ export default function QaPage() {
 
       {/* 標題 title區域*/}
       <div className="qa-header">
-        <button
-          className="back-btn"
-          onClick={() => {
-            window.history.back()
-          }}>
-          返回課程
-        </button>
-        <div
-          className="title"
-          onClick={test}>
-          {courseName}
-          <div className="hint">{qa_id}</div>
+        <div className="left">
+          <button
+            className="back-btn"
+            onClick={() => {
+              window.history.back()
+            }}>
+            返回課程
+          </button>
+        </div>
+        <div className="right">
+        <div className="content">{courseName}</div>
+        <div className="hint">{qa_id}</div>
         </div>
       </div>
 
@@ -478,10 +478,13 @@ export default function QaPage() {
                 <Image
                   loading="lazy"
                   className="user-shot"
-                  src={item.poster.pictureUrl || anonymous}
+                  src={item?.poster?.displayPictureUrl !== '' ? item.poster.displayPictureUrl : anonymous}
                   width={40}
                   height={40}
-                  alt="user shot"></Image>
+                  alt="user shot"
+                  onClick={() => {
+                    console.log(item)
+                  }}></Image>
               </div>
               <div className="message-info">
                 <div className="message-top">

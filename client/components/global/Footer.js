@@ -3,10 +3,9 @@ import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 // public
-import facebook from '../../public/global/facebook.png'
-import instagram from '../../public/global/instagram.png'
-import line from '../../public/global/line.png'
-import googleMap from '../../public/global/google-maps.png'
+import facebook from '../../public/SocialSoftware/facebook.png'
+import line from '../../public/SocialSoftware/line.png'
+import googleMap from '../../public/SocialSoftware/googleMap.png'
 export default function Footer() {
   const faceBookUrl = 'https://www.facebook.com/share/16DFgT3Sfb/'
   const lineUrl = 'https://line.me/R/ti/p/@910fvcei'

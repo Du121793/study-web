@@ -1,3 +1,6 @@
 {
-  "extends": ["next/babel","next/core-web-vitals"]
+  "extends": [
+    "next",                // Next 官方建議規則
+    "next/core-web-vitals" // 再加上一些效能／可存取性檢查
+  ]
 }

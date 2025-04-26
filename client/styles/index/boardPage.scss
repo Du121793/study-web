@@ -12,12 +12,20 @@
     justify-content: center;
     font-size: 36px;
     font-weight: bold;
+    align-items: flex-end;
     margin: 0 0 12px 0;
+    gap: 16px;
     .content {
       padding: 2px 20px;
       border-radius: 4px;
       background-color: #fff;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    .subTitle {
+      border-radius: 4px;
+      height: 100%;
+      font-size: 24px;
+      color: #999;
     }
   }
   .announcement {
@@ -31,44 +39,10 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
+    position: relative;
     gap: 24px;
 
-    &-header {
-      display: flex;
-      align-items: center;
-
-      .poster {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        overflow: hidden;
-        margin-right: 15px;
-
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-      }
-
-      .info {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        .title {
-          font-size: 35px;
-          font-weight: bold;
-          margin-bottom: 5px;
-        }
-      }
-
-      .subTitle {
-        font-size: 24px;
-        color: #777;
-      }
-    }
     .announcement-body {
       margin: 0 auto;
       width: 80%;
@@ -115,6 +89,11 @@
         font-style: italic;
       }
     }
+    .announcement-footer {
+      position: absolute;
+      right: 8px;
+      bottom: 4px;
+    }
     &-body {
       font-size: 1rem;
       color: #333;
@@ -143,5 +122,16 @@
     position: absolute;
     bottom: -166px;
     width: 100%;
+  }
+  @media (max-width: 860px) {
+    width: 100vw;
+    .g-btn-area {
+      flex-wrap: wrap;
+    }
+    .announcement {
+      width: 90%;
+      padding: 12px 0;
+      margin-bottom: 60px;
+    }
   }
 }
