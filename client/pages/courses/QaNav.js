@@ -1,6 +1,5 @@
 // 組件庫
 import { useEffect, useRef, useState } from 'react'
-import Masonry from 'react-masonry-css'
 import Image from 'next/image'
 import Link from 'next/link'
 // method
@@ -8,6 +7,10 @@ import { useUserToken } from '../../method/useUserToken'
 import userService from '../../method/userService'
 import adminService from '../../method/adminService'
 // public
+import dbArrowLeft from '../../public/profile/doubleArrowLeft.png'
+import dbArrowRight from '../../public/profile/doubleArrowRight.png'
+import ArrowLeft from '../../public/profile/leftArrow.png'
+import ArrowRight from '../../public/profile/rightArrow.png'
 import downArrow from '../../public/course/downArrow.png'
 import ShowMoreQA from './component/ShowMoreQA'
 import ShowPublicQA from './component/ShowPublicQA'
@@ -21,6 +24,10 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
   const token = useUserToken()
   const [courseQas, setCourseQas] = useState([])
   const [userToken, setUserToken] = useState('')
+  // 頁數控制
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(4)
+  const [totalPage, setTotalPage] = useState(1)
 
   const [defaultSortType, setDefaultSortType] = useState('')
   const [defaultSortBy, setDefaultSortBy] = useState('')
@@ -30,7 +37,6 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
   const qaContentRef = useRef(null)
   const containerRef = useRef(null)
   const [qaHeight, setQaHeight] = useState(0)
-  const [containerHeight, setContainerHeight] = useState(0)
 
   /* 控制訊息*/
   const [message, setMessage] = useState('無訊息')
@@ -45,57 +51,42 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
   const [showMoreQA, setShowMoreQA] = useState(false)
   const [showPublicQA, setShowPublicQA] = useState(false)
   const [selectBy, setSelectBy] = useState(null)
-  const [doubleCheck, setDoubleCheck] = useState(false)
-  /* Masonry */
-  const breakpointColumnsObj = { default: 4 }
-  /* get參數 */
-  const [pageSize, setPageSize] = useState(8)
-  const [page, setPage] = useState(1)
   /* 刪除qa*/
   const [removeingQA, setRemoveingQA] = useState(false)
-  /* 提問區*/
+  /* 控制顯示提問區*/
   const [showAskQA, setShowAskQA] = useState(false)
-  const [askQAHeight, setAskQAHeight] = useState(0)
   /* 全局寬度*/
   const [windowsWidth, setWindowsWidth] = useState(0)
   const isClient = typeof window === 'object'
   const headerRef = useRef(null)
   const navInnerRef = useRef(null)
-
-  /* 排序依據*/
-  const sortTypeRef = useRef(null)
-
-  const changeSort = (sortBy, timeSort) => {
-    const data = {
-      sortType: sortBy,
-      sortOrder: timeSort,
-      pageSize: pageSize,
-      page: page,
-    }
-
-    userService.getCourseQAs(token, course_id, data).then((res) => {
-      if (res.success) {
-        setCourseQas(res.data)
-        // 更新nav高度
-        setTimeout(() => {
-          setQaHeight(containerRef.current.scrollHeight)
-        }, 30)
-        setTimeout(() => {
-          setQaHeight(containerRef.current.scrollHeight)
-        }, 30)
-        setTimeout(() => {
-          setQaHeight(containerRef.current.scrollHeight)
-        }, 30)
-        if (sortBy) localStorage.setItem('qa_sort_by', sortBy)
-        if (timeSort) localStorage.setItem('qa_time_sort_by', timeSort)
-      }
-    })
-  }
+  // 控制內部卡片的寬度
+  const qa_container_ref = useRef(null)
+  const [qaCardWidth, setQaCardWidth] = useState(0)
 
   const test = () => {
     console.log(courseQas)
   }
 
+  // 切換排序
+  const changeSort = (sortBy, timeSort) => {
+    setPage(1)
+    const data = {
+      sortType: sortBy,
+      sortOrder: timeSort,
+      pageSize: pageSize,
+      page: 1,
+    }
+
+    userService.getCourseQAs(token, course_id, data).then((res) => {
+      if (res.success) {
+        setCourseQas(res.data)
+        setTimeout(() => {
+          setQaHeight(navInnerRef?.current?.clientHeight + headerRef?.current?.clientHeight + 100)
+        }, 30)
+      }
+    })
+  }
   // 切換 QA 區塊展開/收合
   const toggleQA = () => {
     if (!qaOpen) {
@@ -107,12 +98,6 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
       setQaHeight(0)
       setQaOpen(false)
     }
-  }
-
-  // 放大圖片功能
-  const clickZoomImage = (imageUrl) => {
-    setZoomImage(imageUrl)
-    setImageIsZoom(true)
   }
 
   // 控制訊息顯示
@@ -133,6 +118,7 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
     }, 2000)
   }
 
+  // 刪除QA按鈕
   const removeQAFromCourse = (qaInfo) => {
     let course_ids_temp = []
     course_ids_temp = qaInfo?.courses.filter((item) => item !== course_id)
@@ -170,12 +156,48 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
     }
   }
 
+  // 顯示公開問題按鈕
   const showPublicQAClick = () => {
     const pageSize = 9999
     adminService.publicInfo(token, pageSize).then((res) => {
       setPublicQAInfo(res.data)
       setShowPublicQA(true)
     })
+  }
+
+  // 參數:總頁數，中間頁數，從中間往左右總共要幾頁
+  function getPage(total, thisPage, pageSize = 5) {
+    if (total <= 0 || thisPage <= 0 || thisPage > total) {
+      return []
+    }
+
+    let page = []
+    if (total <= pageSize) {
+      for (let i = 0; i < total; i++) {
+        page.push(i + 1)
+      }
+      return page
+    }
+
+    const leftSize = Math.floor((pageSize - 1) / 2)
+    const rightSize = pageSize - 1 - leftSize
+
+    let start = Math.max(1, thisPage - leftSize)
+    let end = Math.min(total, thisPage + rightSize)
+
+    if (start === 1) {
+      end = Math.min(total, pageSize)
+      start = 1
+    } else if (end === total) {
+      start = Math.max(1, total - pageSize + 1)
+      end = total
+    }
+
+    for (let i = start; i <= end; i++) {
+      page.push(i)
+    }
+
+    return page
   }
 
   // 當全局寬度有變動的話，計算nav內部元素的高度來相加並加上40
@@ -209,52 +231,35 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
     }
   }, [isClient])
 
-  // 取得 localStorage 中的 token
+  // 寬度變動會改變內部qa card寬度
   useEffect(() => {
-    const localSortType = window.localStorage.getItem('qa_sort_by')
-    if (localSortType) setDefaultSortType(localSortType)
-    const localToken = window.localStorage.getItem('token')
-    if (localToken) setUserToken(localToken.split(' ')[1])
-    const localSortBy = window.localStorage.getItem('qa_time_sort_by')
-    if (localSortBy) setDefaultSortBy(localSortBy)
-  }, [])
+    if (qaContentRef) setQaCardWidth(qaContentRef?.current?.clientWidth / 5)
+    setQaHeight(navInnerRef?.current?.clientHeight + headerRef?.current?.clientHeight + 100)
+  }, [windowsWidth])
 
   // 渲染頁面時取得 QA 資料
   useEffect(() => {
     if (token) {
-      const localStorageSortBy = sortTypeRef.current.value
-      const localStorageTimeSortBy = localStorage.getItem('qa_time_sort_by')
-
       const data = {
         // 沒有就用預設state
-        sortType: localStorageSortBy ? localStorageSortBy : sortBy,
-        sortOrder: localStorageTimeSortBy ? localStorageTimeSortBy : timeSort,
-        pageSize: Infinity,
+        sortType: sortBy,
+        sortOrder: timeSort,
+        pageSize: pageSize,
         page: page,
       }
       userService.getCourseQAs(token, course_id, data).then((res) => {
         if (res.success) {
-          messageControl('加載完成', true)
           setCourseQas(res.data)
-          // 更新nav高度
+          setTotalPage(res.totalPage)
           setTimeout(() => {
-            setQaHeight(containerRef.current.scrollHeight)
+            setQaHeight(navInnerRef?.current?.clientHeight + headerRef?.current?.clientHeight + 100)
           }, 30)
-          setTimeout(() => {
-            setQaHeight(containerRef.current.scrollHeight)
-          }, 30)
-          setTimeout(() => {
-            setQaHeight(containerRef.current.scrollHeight)
-          }, 30)
-          // 沒有就用預設state，有就不變
-          localStorageSortBy ? localStorage.getItem('qa_sort_by') : localStorage.setItem('qa_sort_by', sortBy)
-          localStorageTimeSortBy ? localStorage.getItem('qa_time_sort_by') : localStorage.setItem('qa_time_sort_by', timeSort)
         } else {
           messageControl('加載失敗', true)
         }
       })
     }
-  }, [token, course_id, qaHasUpload, qaOpen, pageSize])
+  }, [token, qaHasUpload, qaOpen, page])
 
   return (
     <div
@@ -271,7 +276,7 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
         />
         <span>Q & A</span>
       </div>
-
+      {/* 圖片放大 */}
       {imageIsZoom && (
         <ImageZoom
           setImageIsZoom={setImageIsZoom}
@@ -289,9 +294,22 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
         <div
           className="container"
           ref={containerRef}>
+          {/* header */}
           <div
             className="QA-header"
             ref={headerRef}>
+            <form
+              className="search-area"
+              onSubmit={(e) => {
+                e.preventDefault()
+              }}>
+              <input type="text" />
+              <button
+                type="submit"
+                className="g-blue-btn">
+                搜尋
+              </button>
+            </form>
             <div className="sort-by-area">
               <span
                 className="sort-title"
@@ -300,8 +318,7 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
               </span>
               <select
                 className="select"
-                ref={sortTypeRef}
-                defaultValue={defaultSortType !== '' ? defaultSortType : sortBy}
+                defaultValue={sortBy}
                 onChange={(e) => {
                   setSortBy(e.target.value)
                   changeSort(e.target.value, timeSort)
@@ -312,7 +329,7 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
               </select>
             </div>
             <div className="time-sort-area">
-              <div>時間</div>
+              <div>時間排序</div>
               <select
                 className="select"
                 defaultValue={defaultSortBy !== '' ? defaultSortBy : timeSort}
@@ -328,14 +345,14 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
               <div
                 className="g-blue-btn"
                 onClick={showPublicQAClick}>
-                公共問題區
+                公共問題
               </div>
             )}
             {((user_role && user_role === 'teacher') || (user_role && user_role === 'admin')) && (
               <div
                 className="g-red-btn"
                 onClick={() => setRemoveingQA(!removeingQA)}>
-                刪除QA
+                刪除問題
               </div>
             )}
             <div
@@ -343,7 +360,7 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
               onClick={() => {
                 setShowAskQA(true)
               }}>
-              提問
+              我要提問
             </div>
             {showAskQA && (
               <AskNav
@@ -382,20 +399,91 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
             )}
           </div>
 
+          {/* 頁數切換 */}
+          <div className="page-switch">
+            <Image
+              alt="switch back to first page icon"
+              src={dbArrowLeft}
+              className="page-switcher"
+              width={24}
+              height={24}
+              onClick={() => {
+                setPage(1)
+              }}></Image>
+            <Image
+              alt="switch back one page icon"
+              src={ArrowLeft}
+              className="page-switcher"
+              width={24}
+              height={24}
+              onClick={() => {
+                if (page === 1) {
+                  return
+                } else {
+                  setPage((prop) => prop - 1)
+                }
+              }}></Image>
+            {getPage(totalPage, page).map((item, index) => {
+              if (page === item) {
+                return (
+                  <div
+                    key={index}
+                    className="now-page active">
+                    {item}
+                  </div>
+                )
+              }
+              return (
+                <div
+                  onClick={() => {
+                    setPage(item)
+                  }}
+                  key={index}
+                  className="now-page">
+                  {item}
+                </div>
+              )
+            })}
+            <Image
+              alt="switch next to left page icon"
+              src={ArrowRight}
+              className="page-switcher"
+              width={24}
+              height={24}
+              onClick={() => {
+                console.log(totalPage)
+                if (page === totalPage) {
+                  return
+                } else {
+                  setPage((prop) => prop + 1)
+                }
+              }}></Image>
+            <Image
+              alt="switch next one page icon"
+              src={dbArrowRight}
+              className="page-switcher"
+              width={24}
+              height={24}
+              onClick={() => {
+                setPage(totalPage)
+              }}></Image>
+          </div>
+
+          {/* inner */}
           <div
             className="QA-grid"
             ref={navInnerRef}>
-            <Masonry
+            <div
               className="QA-container"
-              breakpointCols={windowsWidth <= 1040 ? '1%' : breakpointColumnsObj}
-              columnClassName="my-masonry-grid_column">
+              ref={qa_container_ref}>
               {(defaultSortType !== 'none' || (sortBy && sortBy !== 'none')) &&
                 courseQas.map((item, index) => {
                   if (item.tag) {
                     return (
                       <div
                         className="QA-list"
-                        key={index}>
+                        key={index}
+                        style={{ width: qaCardWidth }}>
                         {/* 主標題 */}
                         {item.tag !== '' && (
                           <div className="QA-tag">
@@ -513,6 +601,7 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
                       <Link
                         href={`${client_URL}/courses/QaPage?qa_id=${item._id}&courseName=${courseName}&course_id=${course_id}`}
                         className="qa-info-area"
+                        style={{ width: qaCardWidth }}
                         key={index}>
                         {removeingQA && (
                           <button
@@ -560,18 +649,6 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
                     )
                   }
                 })}
-            </Masonry>
-
-            <div className="btn-area">
-              {/* {(defaultSortType === 'none' || (sortBy && sortBy === 'none')) && (
-                <button
-                  className="g-loadmore-btn "
-                  onClick={() => {
-                    setPageSize(pageSize + 8)
-                  }}>
-                  加載更多問題
-                </button>
-              )} */}
             </div>
           </div>
 

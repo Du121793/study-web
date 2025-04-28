@@ -189,6 +189,11 @@ router.get("/getCourseQAs/:course_id", async (req, res) => {
 
     // 如果 sortType 為 none，直接返回分頁後的問題列表
     if (sortType === "none") {
+      const totalQuestions = await QA.countDocuments({
+        courses: req.params.course_id,
+      });
+      const totalPage = Math.ceil(totalQuestions / pageSize);
+
       const questions = await QA.find({ courses: req.params.course_id })
         .sort({ [sortField]: sortDirection })
         .skip((page - 1) * pageSize)
@@ -203,12 +208,12 @@ router.get("/getCourseQAs/:course_id", async (req, res) => {
         }
         return doc;
       });
-
       return res.json({
         success: true,
         data: transformedQuestions,
         page,
         pageSize,
+        totalPage,
         sortBy: sortByParam,
         sortOrder,
         sortType,
@@ -266,6 +271,10 @@ router.get("/getCourseQAs/:course_id", async (req, res) => {
 
     // 執行聚合查詢
     const groups = await QA.aggregate(pipeline);
+    const totalGroups = await QA.countDocuments({
+      courses: req.params.course_id,
+    });
+    const totalPage = Math.ceil(totalGroups / pageSize);
 
     // 處理圖片URL
     const transformedGroups = groups.map((group) => {
@@ -286,6 +295,7 @@ router.get("/getCourseQAs/:course_id", async (req, res) => {
       data: transformedGroups,
       page,
       pageSize,
+      totalPage,
       sortBy: sortByParam,
       sortOrder,
       sortType,

@@ -9,7 +9,15 @@
       width: 100%;
       padding-top: 16px;
       display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
       gap: 24px;
+      .search-area {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
       .sort-by-area {
         align-items: center;
         display: flex;
@@ -56,12 +64,14 @@
       width: 100%;
       .QA-container {
         min-height: 80px;
-        padding: 24px;
+        padding: 0 24px 24px 24px;
         display: flex;
         justify-content: flex-start;
+        flex-wrap: wrap;
         gap: 12px;
         .QA-list {
           margin-bottom: 32px;
+          min-width: 220px;
           padding: 16px;
           display: flex;
           flex-direction: column;
@@ -69,7 +79,7 @@
           border: 1px solid #bebebe;
           border-radius: 8px;
           gap: 18px;
-          background-color: rgb(231, 231, 231);
+          background-color: rgb(244, 244, 244);
           .QA-tag {
             display: flex;
             .content {
@@ -193,6 +203,7 @@
           gap: 8px;
           margin-bottom: 12px;
           transition: 0.2s;
+          min-width: 220px;
 
           .qa-image {
             width: 100%;
@@ -277,7 +288,6 @@
         width: 100%;
         .QA-container {
           width: 100%;
-          align-items: center;
           justify-content: center;
           padding: 0;
           .my-masonry-grid_column {

@@ -108,7 +108,7 @@ const question = async (req, res, next) => {
       );
 
       // 如果用戶沒有相關課程權限且問題不是公開的，則拒絕訪問
-      if (commonElements.length === 0 && !foundQuestion.isPublic) {
+      if (commonElements.length === 0 ) {
         logError(
           {
             userIp: req.ip,
@@ -118,23 +118,6 @@ const question = async (req, res, next) => {
           "accessChecker.js",
           "question",
           `嘗試訪問未授權問題 ${question_id}`
-        );
-        return res
-          .status(403)
-          .json({ success: false, msg: "你沒有訪問此問題的權限" });
-      }
-
-      // 如果是公開問題，學生無法訪問（僅教師可以訪問）
-      if (foundQuestion.isPublic && req.user.role === "student") {
-        logError(
-          {
-            userIp: req.ip,
-            userId: req.user._id,
-            userName: req.user.userinfo.realname,
-          },
-          "accessChecker.js",
-          "question",
-          `學生嘗試訪問公開問題 ${question_id}`
         );
         return res
           .status(403)

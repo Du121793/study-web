@@ -85,12 +85,10 @@
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  background-color: rgba(0, 0, 0, 0.6);
   margin-bottom: 24px;
 }
 .course-main .container .nav .header {
   font-weight: bold;
-  color: #e0e0e0;
   padding-left: 24px;
   -webkit-user-select: none;
      -moz-user-select: none;
@@ -106,6 +104,7 @@
   font-size: 20px;
   z-index: 1;
   gap: 12px;
+  color: white;
 }
 .course-main .container .nav .header div {
   padding-left: 24px;
