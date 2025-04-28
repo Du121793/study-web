@@ -27,6 +27,10 @@
       align-items: center;
       position: relative;
       font-size: 42px;
+
+      @media (max-width: 860px) {
+        font-size: 32px;
+      }
       span:after {
         position: absolute;
         left: 0;
@@ -74,6 +78,10 @@
         transition: 0.3s;
         box-shadow: 1px 1px 6px 1px rgba(0, 0, 0, 0.2);
 
+        @media (max-width: 860px) {
+          height: 50px;
+        }
+
         .categories {
           .content {
             position: relative;
@@ -112,11 +120,11 @@
             .content {
               width: 130px;
               .background {
-                clip-path: polygon(0% 0%, 0% 100%, 60% 100%, 100% 0%);
+                clip-path: polygon(0% 0%, 0% 100%, 73% 100%, 100% 0%);
               }
             }
             .content::after {
-              right: 39px;
+              right: 23px;
             }
           }
         }

@@ -69,9 +69,6 @@ function MyApp({ Component, pageProps }) {
         />
         <meta
           name="viewport"
-          content="width=1024, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta>
-        <meta
-          name="viewport"
           content="width=device-width, initial-scale=1"
         />
         <meta
@@ -80,7 +77,7 @@ function MyApp({ Component, pageProps }) {
         />
         <meta
           name="description"
-          content="港明中學宿舍斜對面，只收港明的數理補習班，最專業的高中物理-- 王佑物理，我們聚焦於目標四大四中學生學習需求。"
+          content="港明中學宿舍斜對面，只收港明的數理補習班，最專業的高中物理 - 王佑物理，我們聚焦於目標四大四中學生學習需求。"
         />
         <meta
           name="keywords"

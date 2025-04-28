@@ -111,6 +111,9 @@
       .indicator-dot.active {
         background-color: rgb(255, 255, 255);
       }
+      @media (max-width: 860px) {
+        padding:0;
+      }
     }
   }
 }

@@ -75,7 +75,10 @@ export default function Course() {
 
   return (
     <div className="course-main">
-      <Header loginState={isLogined} />
+      <Header
+        loginState={isLogined}
+        inIndex="course"
+      />
       <div className="container">
         <div className="header-title-area">
           <div className="left">

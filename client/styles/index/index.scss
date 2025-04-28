@@ -21,16 +21,16 @@
     position: relative;
     z-index: 3;
     .header-container {
+      z-index: 4;
       position: relative;
-      z-index: 1;
     }
     .banner-main {
-      position: relative;
       z-index: 0;
+      position: relative;
     }
     .btn-area {
-      position: relative;
       z-index: 0;
+      position: relative;
       width: 100%;
       overflow: hidden;
       display: flex;

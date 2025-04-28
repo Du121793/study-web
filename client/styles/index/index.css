@@ -23,16 +23,16 @@
   z-index: 3;
 }
 .index-main .RWD .header-container {
+  z-index: 4;
   position: relative;
-  z-index: 1;
 }
 .index-main .RWD .banner-main {
-  position: relative;
   z-index: 0;
+  position: relative;
 }
 .index-main .RWD .btn-area {
-  position: relative;
   z-index: 0;
+  position: relative;
   width: 100%;
   overflow: hidden;
   display: flex;

@@ -1,6 +1,7 @@
 .header-container {
   display: flex;
   align-items: center;
+  justify-content: center;
   background-color: #fff;
   border-bottom: 1px solid #ccc;
   width: 100%;
@@ -10,16 +11,17 @@
     display: flex;
     align-items: center;
     .logo-img {
+      width: 200px;
+      height: 72px;
       user-select: none;
       height: auto;
     }
   }
-
   .setting-btn {
-    display: flex;
+    display: none;
     align-items: center;
     width: 0;
-    height: 100px;
+    height: 70px;
     overflow: hidden;
     position: sticky;
     transition: 0.2s;
@@ -27,7 +29,7 @@
     .menu-icon {
       padding-right: 8px;
       margin: 0 24px;
-      width: 48px;
+      width: 42px;
       height: auto;
       z-index: 10;
     }
@@ -41,11 +43,10 @@
     background-color: rgba(0, 0, 0, 0.2);
   }
   .header-main {
-    margin: 0 auto;
     position: relative;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     gap: 72px;
     height: 100px;
     overflow: hidden;
@@ -202,7 +203,7 @@
       overflow: hidden;
       gap: 32px;
       .close-menu-btn-area {
-        height: 100px;
+        height: 70px;
         width: 100%;
         overflow: hidden;
         display: flex;
@@ -249,11 +250,19 @@
       width: 100%;
       margin: 0;
       gap: 4px;
+      height: 70px;
+      gap: 48px;
       .logo-container {
         display: flex;
         align-items: center;
         justify-content: center;
+        width: 100%;
         flex: 1;
+        .logo-img {
+          margin-bottom: -7px;
+          width: 140px;
+          height: 50px;
+        }
       }
       .header-middle {
         pointer-events: none;
@@ -262,7 +271,18 @@
       }
       .header-right {
         display: none;
-        width: 0;
+      }
+      .user-avatar {
+        width: 24%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        .image {
+          width: 54px;
+          height: auto;
+          border-radius: 64px;
+          border: 1px solid rgba(0, 0, 0, 0.2);
+        }
       }
       .option-list {
         opacity: 1;

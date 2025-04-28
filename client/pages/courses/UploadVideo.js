@@ -128,23 +128,23 @@ export default function UploadVideoFc({ setshowUploadVideoUI, showUploadVideoUI,
   }
 
   // STEP 3: 建立上傳連結 → 批量上傳
-  const handleCreateUploadLink = async () => {
+  async function handleCreateUploadLink() {
     if (videoFiles.length === 0) {
       alert('請先選擇影片檔')
       return
     }
 
-    // ★ 若沒有手動選縮圖，就自動擷取影片第一秒
+    // 如果沒有手動選縮圖，就自動擷取影片第一秒
     let finalThumbnailBlob = thumbFile
     if (!finalThumbnailBlob && videoFiles.length > 0) {
       finalThumbnailBlob = await autoExtractFrame(videoFiles[0])
     }
 
-    // 逐一為每部影片建立上傳任務
-    videoFiles.forEach(async (file) => {
+    // 逐一處理每個檔案
+    for (const file of videoFiles) {
       const uploadId = Date.now() + '-' + file.name
 
-      // 放入等待上傳
+      // 加入待上傳列表
       setUploads((prev) => [
         ...prev,
         {
@@ -157,56 +157,38 @@ export default function UploadVideoFc({ setshowUploadVideoUI, showUploadVideoUI,
         },
       ])
 
+      // 準備表單資料
+      const formData = new FormData()
+      formData.append('title', title)
+      formData.append('description', description)
+      formData.append('fileSize', file.size)
+      formData.append('length', duration)
+      formData.append('recordDate', recordDate || '')
+      formData.append('type', type)
+      formData.append('isPrivate', isPublic ? 'true' : 'false')
+      if (finalThumbnailBlob) {
+        formData.append('thumbnail', finalThumbnailBlob)
+      }
+
       try {
-        const formData = new FormData()
-        formData.append('title', title)
-        formData.append('description', description)
-        formData.append('fileSize', file.size)
-        formData.append('length', duration)
-        formData.append('recordDate', recordDate || '')
-        formData.append('type', type)
-        formData.append('isPrivate', isPublic ? 'true' : 'false')
-
-        if (finalThumbnailBlob) {
-          formData.append('thumbnail', finalThumbnailBlob)
-        }
-
-        try {
-          // 建立上傳連結流程…
-          const data = await videoUploader.requestUploadLink(token, course_id, formData)
-          if (!data.success) {
-            throw new Error(data.message || '後端建立上傳連結失敗')
-          }
-          const { uploadLink, videoId } = data
-          startTusUpload(uploadLink, videoId, file, uploadId)
-        } catch (err) {
-          if (err.error.status === 520) {
-            messageControl(err.error.response.data.msg, false)
-          }
-          // 更新對應項目為「建立連結失敗」
-          setUploads((prev) => prev.map((u) => (u.id === uploadId ? { ...u, message: '建立連結失敗', progress: 0 } : u)))
-          // 3秒後自動從列表移除該項目
-          setTimeout(() => {
-            handleRemoveUploadItem(uploadId)
-          }, 3000)
-        }
-
+        // 呼叫後端取得上傳連結
+        const data = await videoUploader.requestUploadLink(token, course_id, formData)
         if (!data.success) {
           throw new Error(data.message || '後端建立上傳連結失敗')
         }
 
-        const { uploadLink, videoId } = data
-        startTusUpload(uploadLink, videoId, file, uploadId)
+        // 開始 tus 上傳
+        startTusUpload(data.uploadLink, data.videoId, file, uploadId)
       } catch (err) {
-        console.log(err)
-        if (err?.error?.status === 520) {
-          messageControl(err.error.response.data.msg, false)
-        }
+        const msg = err?.error?.response?.data?.msg || err.message
+        messageControl(msg, false)
         setUploads((prev) => prev.map((u) => (u.id === uploadId ? { ...u, message: '建立連結失敗', progress: 0 } : u)))
+        setTimeout(() => handleRemoveUploadItem(uploadId), 3000)
+        continue
       }
-    })
+    }
 
-    // 建立完所有任務後，關閉上傳視窗
+    // 全部檔案都處理完後關閉上傳視窗
     setshowUploadVideoUI(false)
     setUploadVideoUIInnerOpacity(0)
   }

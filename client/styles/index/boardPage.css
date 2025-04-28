@@ -13,6 +13,7 @@
   font-size: 36px;
   font-weight: bold;
   align-items: flex-end;
+  flex-wrap: wrap;
   margin: 0 0 12px 0;
   gap: 16px;
 }

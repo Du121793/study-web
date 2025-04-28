@@ -229,7 +229,7 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
         // 沒有就用預設state
         sortType: localStorageSortBy ? localStorageSortBy : sortBy,
         sortOrder: localStorageTimeSortBy ? localStorageTimeSortBy : timeSort,
-        pageSize: pageSize,
+        pageSize: Infinity,
         page: page,
       }
       userService.getCourseQAs(token, course_id, data).then((res) => {
@@ -563,7 +563,7 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
             </Masonry>
 
             <div className="btn-area">
-              {(defaultSortType === 'none' || (sortBy && sortBy === 'none')) && (
+              {/* {(defaultSortType === 'none' || (sortBy && sortBy === 'none')) && (
                 <button
                   className="g-loadmore-btn "
                   onClick={() => {
@@ -571,7 +571,7 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
                   }}>
                   加載更多問題
                 </button>
-              )}
+              )} */}
             </div>
           </div>
 

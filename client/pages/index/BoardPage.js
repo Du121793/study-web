@@ -123,7 +123,10 @@ export default function BoardPage() {
           <div className="loader"></div>
         </div>
       )}
-      <Header loginState={loginState} />
+      <Header
+        loginState={loginState}
+        inIndex="course"
+      />
       {showUploadBoardUI && (
         <UploadBoard
           boardInfo={boardInfo}

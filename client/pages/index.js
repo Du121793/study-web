@@ -101,7 +101,7 @@ export default function Index() {
           callBoardMoveToBoardFunction={callBoardMoveToBoardFunction}
           loginState={isLogined}
           user_line_shot={userShot}
-          inIndex={true}></Header>
+          inIndex="home"></Header>
         <Banner bannerHasChange={bannerHasChange}></Banner>
         {userRole && userRole === 'admin' && (
           <div className="btn-area">

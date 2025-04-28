@@ -177,7 +177,9 @@ export default function AccessSetting() {
 
   return (
     <div className="access-setting-main">
-      <Header loginState={loginState}></Header>
+      <Header
+        loginState={loginState}
+        inIndex="course"></Header>
       <div className="components">
         {showStudentSelector && (
           <StudentSelector

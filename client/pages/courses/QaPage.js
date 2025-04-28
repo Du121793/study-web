@@ -363,7 +363,10 @@ export default function QaPage() {
           imageUrl={zoomImage}></ImageZoom>
       )}
       {/* header */}
-      <Header loginState={isLogined} />
+      <Header
+        loginState={isLogined}
+        inIndex="course"
+      />
 
       {/* 標題 title區域*/}
       <div className="qa-header">
@@ -377,8 +380,8 @@ export default function QaPage() {
           </button>
         </div>
         <div className="right">
-        <div className="content">{courseName}</div>
-        <div className="hint">{qa_id}</div>
+          <div className="content">{courseName}</div>
+          <div className="hint">{qa_id}</div>
         </div>
       </div>
 

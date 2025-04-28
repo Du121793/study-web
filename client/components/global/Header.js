@@ -6,11 +6,11 @@ import { useRouter } from 'next/router'
 // public
 import lineIcon from '../../public/imgs/line.png'
 import logoC from '../../public/imgs/logo3.png'
-import menu from '../../public/imgs/home/homeIcon1.png'
+import menu from '../../public/imgs/menu/menu_black.png'
 import whiteMenu from '../../public/imgs/home/homeIcon2.png'
 import closeIcon from '../../public/close/close_white.png'
 
-export default function Header({ callBoardMoveToBoardFunction, loginState, user_line_shot, inIndex = false }) {
+export default function Header({ callBoardMoveToBoardFunction, loginState, user_line_shot, inIndex = '' }) {
   const router = useRouter()
   // env
   const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
@@ -174,7 +174,8 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
               className="logo-img"
               alt="logo,s image"
               src={logoC}
-              width={200}></Image>
+              width={0}
+              height={0}></Image>
           </Link>
         </div>
         <div className="header-middle">
@@ -200,20 +201,6 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
             ref={LoginLinkRef}
             style={{ display: 'none' }}
             href={loginURL}></Link>
-          <div
-            className="header-middle-nav-area"
-            id="course-info"
-            onClick={() => {
-              const isLogin = localStorage.getItem('token')
-              if (isLogin) {
-                profileLinkRef.current.click()
-              } else {
-                LoginLinkRef.current.click()
-              }
-            }}>
-            <div className="line"></div>
-            <span>我的課程</span>
-          </div>
           <Link
             href={GoogleLocation}
             className="header-middle-nav-area"
@@ -230,13 +217,35 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
             <div className="line"></div>
             <span>聯絡我們</span>
           </Link>
+          <div
+            className="header-middle-nav-area"
+            id="course-info"
+            onClick={() => {
+              const isLogin = localStorage.getItem('token')
+              if (isLogin) {
+                profileLinkRef.current.click()
+              } else {
+                LoginLinkRef.current.click()
+              }
+            }}>
+            <div className="line"></div>
+            <span>我的課程</span>
+          </div>
           {/* Not logined show line login's Link */}
         </div>
 
         <div className="header-right">
           {/* user shot */}
           {loginState === true && (
-            <Link href={ProfilePageURL}>
+            <div
+              onClick={() => {
+                const isLogin = localStorage.getItem('token')
+                if (isLogin) {
+                  profileLinkRef.current.click()
+                } else {
+                  LoginLinkRef.current.click()
+                }
+              }}>
               <div className="member-img">
                 {(user_line_shot || userShot) && (
                   <Image
@@ -245,12 +254,13 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
                     // 由於userShot在index頁面會來不及加載，因此會改為使用index傳過來的user_line_shot
                     src={user_line_shot ? user_line_shot : userShot}
                     alt="user's shot"
+                    style={{ cursor: 'pointer' }}
                     width={100}
                     height={100}
                   />
                 )}
               </div>
-            </Link>
+            </div>
           )}
           {/* Sign out */}
           {loginState === true && (
@@ -276,7 +286,7 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
           )}
         </div>
         {/* 菜單按鈕 */}
-        {inIndex && (
+        {inIndex === 'home' && (
           <div
             className="setting-btn"
             ref={openMenuBtnRef}
@@ -288,6 +298,25 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
               src={menu}
               className="menu-icon"
               alt="menu button"
+              width={0}
+              height={0}></Image>
+          </div>
+        )}
+        {/* 用戶頭像 */}
+        {inIndex === 'course' && (
+          <div className="user-avatar">
+            <Image
+              className="image"
+              src={user_line_shot ? user_line_shot : userShot}
+              alt="user avatar"
+              onClick={() => {
+                const isLogin = localStorage.getItem('token')
+                if (isLogin) {
+                  profileLinkRef.current.click()
+                } else {
+                  LoginLinkRef.current.click()
+                }
+              }}
               width={0}
               height={0}></Image>
           </div>

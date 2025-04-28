@@ -23,7 +23,7 @@ import EditMembersInfo from '../../pages/profiles/EditMembersInfo'
 // 原生組件庫
 import { useEffect, useState } from 'react'
 
-export default function Profile() {
+export default function Profile({ from }) {
   const [role, setRole] = useState('')
   const token = useUserToken()
   const [isLogined, setLogined] = useState(false)
@@ -69,7 +69,8 @@ export default function Profile() {
       <div className="top">
         <Header
           user_line_shot={userShot}
-          loginState={isLogined}></Header>
+          loginState={isLogined}
+          inIndex="course"></Header>
         {!isLogined && <Unlogined></Unlogined>}
       </div>
       <div className="bottom">

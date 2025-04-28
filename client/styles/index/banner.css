@@ -118,4 +118,9 @@
 }
 .index-main .banner-main .banner .indicator-dot.active {
   background-color: rgb(255, 255, 255);
+}
+@media (max-width: 860px) {
+  .index-main .banner-main .banner {
+    padding: 0;
+  }
 }/*# sourceMappingURL=banner.css.map */
