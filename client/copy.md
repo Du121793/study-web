@@ -22,7 +22,6 @@ cursor: pointer;
 
 @media (max-width: 860px) {}
 
-
 /* 監聽全局寬度變化，寬度變化設定windowsWidth */ 
   const isClient = typeof window === 'object'
   const [windowsWidth, setWindowsWidth] = useState(0)

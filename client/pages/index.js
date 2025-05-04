@@ -77,6 +77,13 @@ export default function Index() {
           width={0}
           height={0}></Image>
       </div>
+      <div className="header-area">
+        <Header
+          callBoardMoveToBoardFunction={callBoardMoveToBoardFunction}
+          loginState={isLogined}
+          user_line_shot={userShot}
+          inIndex="public"></Header>
+      </div>
       <div className="RWD">
         {showCarouselEdit && (
           <UploadCarousel
@@ -97,11 +104,6 @@ export default function Index() {
             uploadBoardUIHeight={uploadBoardUIHeight}
           />
         )}
-        <Header
-          callBoardMoveToBoardFunction={callBoardMoveToBoardFunction}
-          loginState={isLogined}
-          user_line_shot={userShot}
-          inIndex="home"></Header>
         <Banner bannerHasChange={bannerHasChange}></Banner>
         {userRole && userRole === 'admin' && (
           <div className="btn-area">

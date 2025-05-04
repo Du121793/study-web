@@ -286,7 +286,7 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
           )}
         </div>
         {/* 菜單按鈕 */}
-        {inIndex === 'home' && (
+        {inIndex === 'public' && (
           <div
             className="setting-btn"
             ref={openMenuBtnRef}

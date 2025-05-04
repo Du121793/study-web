@@ -7,6 +7,10 @@ import Link from 'next/link'
 // public
 import downArrow from '../../public/course/downArrow.png'
 import no_image_available_icon from '../../public/global/no-image-available-icon.jpg'
+import dbArrowLeft from '../../public/profile/doubleArrowLeft.png'
+import dbArrowRight from '../../public/profile/doubleArrowRight.png'
+import ArrowLeft from '../../public/profile/leftArrow.png'
+import ArrowRight from '../../public/profile/rightArrow.png'
 
 // method
 import { useUserToken } from '../../method/useUserToken'
@@ -46,9 +50,10 @@ export default function VideoNav({ course_id, courseName, user_role }) {
   //loading
   const [deleteLoading, setDeleteLoading] = useState(false)
   // 請求影片資訊的參數
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(8)
+  const [totalPage, setTotalPage] = useState(1)
   const [chooseType, setChooseType] = useState('')
-  const [videosShowPage, setVideosShowPage] = useState(1)
-  const [videosPageSize, setVideosPageSize] = useState(8)
   const [chooseSortOrder, setChooseSortOrder] = useState('desc')
   const [isShowVideoUpload, setIsShowVideoUpload] = useState(false)
 
@@ -85,6 +90,7 @@ export default function VideoNav({ course_id, courseName, user_role }) {
   const topContainerRef = useRef(null)
   const [cardImageWidth, setCardImageWidth] = useState(0)
   const [cardImageHeight, setCardImageHeight] = useState(0)
+
   useEffect(() => {
     setCardImageWidth(topContainerRef?.current?.clientWidth)
     setCardImageHeight(topContainerRef?.current?.scrollHeight)
@@ -215,6 +221,41 @@ export default function VideoNav({ course_id, courseName, user_role }) {
     }
   }
 
+  // 參數:總頁數，中間頁數，從中間往左右總共要幾頁
+  function getPage(total, thisPage, pageSize = 5) {
+    if (total <= 0 || thisPage <= 0 || thisPage > total) {
+      return []
+    }
+
+    let page = []
+    if (total <= pageSize) {
+      for (let i = 0; i < total; i++) {
+        page.push(i + 1)
+      }
+      return page
+    }
+
+    const leftSize = Math.floor((pageSize - 1) / 2)
+    const rightSize = pageSize - 1 - leftSize
+
+    let start = Math.max(1, thisPage - leftSize)
+    let end = Math.min(total, thisPage + rightSize)
+
+    if (start === 1) {
+      end = Math.min(total, pageSize)
+      start = 1
+    } else if (end === total) {
+      start = Math.max(1, total - pageSize + 1)
+      end = total
+    }
+
+    for (let i = start; i <= end; i++) {
+      page.push(i)
+    }
+
+    return page
+  }
+
   // 當第一次渲染打開nav
   useEffect(() => {
     if (!lock) {
@@ -261,8 +302,8 @@ export default function VideoNav({ course_id, courseName, user_role }) {
       userService
         .getVideoInfo(token, course_id, {
           type: 'MainClass',
-          page: videosShowPage,
-          pageSize: videosPageSize,
+          page: page,
+          pageSize: pageSize,
           // 類型
           sortBy: chooseType,
           // 順序
@@ -271,13 +312,13 @@ export default function VideoNav({ course_id, courseName, user_role }) {
         .then((res) => {
           if (res?.success) {
             setVideos(res.data)
-            messageControl('加載成功', true)
+            setTotalPage(res.totalPage)
           } else {
             messageControl('發生錯誤', false)
           }
         })
     }
-  }, [token, course_id, chooseType, chooseSortOrder, uploadSuccess, videosShowPage, videosPageSize, hasChange])
+  }, [token, course_id, chooseType, chooseSortOrder, uploadSuccess, page, hasChange])
 
   useEffect(() => {
     if (videoNavOpen && inputRef && videoRef && loadMoreRef) {
@@ -443,7 +484,74 @@ export default function VideoNav({ course_id, courseName, user_role }) {
             </select>
           </div>
         </div>
-
+        <div className="page-switch">
+          <Image
+            alt="switch back to first page icon"
+            src={dbArrowLeft}
+            className="page-switcher"
+            width={24}
+            height={24}
+            onClick={() => {
+              setPage(1)
+            }}></Image>
+          <Image
+            alt="switch back one page icon"
+            src={ArrowLeft}
+            className="page-switcher"
+            width={24}
+            height={24}
+            onClick={() => {
+              if (page === 1) {
+                return
+              } else {
+                setPage((prop) => prop - 1)
+              }
+            }}></Image>
+          {getPage(totalPage, page).map((item, index) => {
+            if (page === item) {
+              return (
+                <div
+                  key={index}
+                  className="now-page active">
+                  {item}
+                </div>
+              )
+            }
+            return (
+              <div
+                onClick={() => {
+                  setPage(item)
+                }}
+                key={index}
+                className="now-page">
+                {item}
+              </div>
+            )
+          })}
+          <Image
+            alt="switch next to left page icon"
+            src={ArrowRight}
+            className="page-switcher"
+            width={24}
+            height={24}
+            onClick={() => {
+              console.log(totalPage)
+              if (page === totalPage) {
+                return
+              } else {
+                setPage((prop) => prop + 1)
+              }
+            }}></Image>
+          <Image
+            alt="switch next one page icon"
+            src={dbArrowRight}
+            className="page-switcher"
+            width={24}
+            height={24}
+            onClick={() => {
+              setPage(totalPage)
+            }}></Image>
+        </div>
         {/* message */}
         {videoNavOpen && (
           <div className="meesage-area">
@@ -581,14 +689,6 @@ export default function VideoNav({ course_id, courseName, user_role }) {
                   </div>
                 </Link>
               ))}
-          </div>
-        </div>
-
-        <div className="bottom-area">
-          <div
-            className="show-more-video-btn"
-            onClick={showMoreVideos}>
-            點擊加載更多影片
           </div>
         </div>
       </div>

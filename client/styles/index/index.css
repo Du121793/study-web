@@ -16,23 +16,18 @@
   max-width: 100%;
   max-height: 100%;
 }
+.index-main .header-area {
+  position: relative;
+  width: 100%;
+  z-index: 3;
+}
 .index-main .RWD {
   width: 100%;
   overflow: hidden;
   position: relative;
-  z-index: 3;
-}
-.index-main .RWD .header-container {
-  z-index: 4;
-  position: relative;
-}
-.index-main .RWD .banner-main {
   z-index: 0;
-  position: relative;
 }
 .index-main .RWD .btn-area {
-  z-index: 0;
-  position: relative;
   width: 100%;
   overflow: hidden;
   display: flex;
@@ -42,12 +37,12 @@
 }
 .index-main .board-main {
   position: relative;
-  z-index: 1;
+  z-index: 0;
   width: 100%;
 }
 .index-main .footer-area {
   width: 100%;
   position: absolute;
   bottom: -104px;
-  z-index: 2;
+  z-index: 0;
 }/*# sourceMappingURL=index.css.map */

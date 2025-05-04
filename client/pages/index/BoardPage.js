@@ -125,7 +125,7 @@ export default function BoardPage() {
       )}
       <Header
         loginState={loginState}
-        inIndex="course"
+        inIndex="public"
       />
       {showUploadBoardUI && (
         <UploadBoard

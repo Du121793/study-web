@@ -15,22 +15,19 @@
       max-height: 100%;
     }
   }
+  .header-area {
+    position: relative;
+    width: 100%;
+    z-index: 3;
+  }
   .RWD {
     width: 100%;
     overflow: hidden;
     position: relative;
-    z-index: 3;
-    .header-container {
-      z-index: 4;
-      position: relative;
-    }
+    z-index: 0;
     .banner-main {
-      z-index: 0;
-      position: relative;
     }
     .btn-area {
-      z-index: 0;
-      position: relative;
       width: 100%;
       overflow: hidden;
       display: flex;
@@ -41,13 +38,13 @@
   }
   .board-main {
     position: relative;
-    z-index: 1;
+    z-index: 0;
     width: 100%;
   }
   .footer-area {
     width: 100%;
     position: absolute;
     bottom: -104px;
-    z-index: 2;
+    z-index: 0;
   }
 }

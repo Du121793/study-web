@@ -2,10 +2,18 @@
   background-color: #f5f5f5;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
   position: relative;
   align-items: center;
-
+  min-height: 100vh;
+  .header-container {
+    position: relative;
+    z-index: 2;
+  }
+  .upload-board-main {
+    z-index: 3;
+  }
+  .g-btn-area {
+  }
   .main-title-area {
     width: 90%;
     display: flex;

@@ -33,7 +33,7 @@ const upload = multer({ storage: multer.memoryStorage() });
  * @returns {Promise<string>} 寫入檔案的路徑
  */
 async function processThumbnailImage(file, videoId) {
-  file.buffer = await imageCompresser.compressImageBuffer(file.buffer)
+  file.buffer = await imageCompresser.compressImageBuffer(file.buffer);
   return new Promise((resolve, reject) => {
     const fileExt = path.extname(file.originalname);
     const newFilename = videoId + fileExt + ".jpg";
@@ -42,7 +42,8 @@ async function processThumbnailImage(file, videoId) {
 
     // 直接寫入 buffer 到指定路徑
     fs.writeFile(newPath, file.buffer, (err) => {
-      if (err) {x
+      if (err) {
+        x;
         console.error("寫入圖片檔案錯誤:", err);
         return reject(err);
       }
@@ -175,6 +176,10 @@ router.get("/videoInfo", async (req, res) => {
       query = query.skip(skip).limit(pageSizeNum);
     }
 
+    // 計算總數和總頁數
+    const total = await VideoInfo.countDocuments(filter);
+    const totalPage = Math.ceil(total / (pageSize || total));
+
     // 執行查詢並處理結果
     let foundVideoInfo = await query;
     foundVideoInfo = await Promise.all(
@@ -184,7 +189,7 @@ router.get("/videoInfo", async (req, res) => {
         let accessRecord = null;
 
         // 處理私有影片的訪問權限
-        if (plainItem.isPrivate && req.user.role === 'student') {
+        if (plainItem.isPrivate && req.user.role === "student") {
           const records = await VideoAccess.aggregate([
             {
               $match: {
@@ -228,7 +233,14 @@ router.get("/videoInfo", async (req, res) => {
       })
     );
 
-    return res.json({ success: true, data: foundVideoInfo });
+    return res.json({
+      success: true,
+      data: foundVideoInfo,
+      page: parseInt(page),
+      pageSize: pageSize ? parseInt(pageSize) : total,
+      total,
+      totalPage,
+    });
   } catch (e) {
     logError(
       {
