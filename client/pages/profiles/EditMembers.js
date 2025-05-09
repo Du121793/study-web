@@ -17,8 +17,6 @@ import LoadingAnime from '../../components/global/LoadingAnime'
 export default function EditMembers() {
   // env
   // const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
-
-  const [memberloading, setMemberloading] = useState()
   const token = useUserToken()
   const [selectedStudentId, setSelectedStudentId] = useState([])
   // 控制訊息
@@ -50,7 +48,7 @@ export default function EditMembers() {
   // 獲取資料
   const [members, setMembers] = useState([])
   const [userRole, setUserRole] = useState('')
-  // loading anime
+  // 旋轉讀取
   const [loading, setLoading] = useState(false)
   // rander lock
   const [randerLock, setRanderLock] = useState(0)
@@ -124,7 +122,7 @@ export default function EditMembers() {
   // 按下"加入到課程"的函式，將選擇的人加入到指定課程
   const registerMemberToCourse = async () => {
     if (courseId !== '') {
-      setMemberloading(true)
+      setLoading(true)
       adminService
         .registerMember(token, {
           user_ids: selectedStudentId, // 可以是陣列
@@ -132,24 +130,24 @@ export default function EditMembers() {
         })
         .then((res) => {
           if (res.success) {
-            setMemberloading(false)
+            setLoading(false)
             initSelector()
             getMembers()
             messageControl('加入到課程', true)
           } else {
-            setMemberloading(false)
+            setLoading(false)
             messageControl('發生錯誤', false)
           }
         })
     } else {
-      setMemberloading(false)
+      setLoading(false)
       messageControl('請先選擇課程', false)
     }
   }
 
   //  按下"移除出課程"的函式，將選擇的人加入到指定課程
   const removeRegisterCourse = () => {
-    setMemberloading(true)
+    setLoading(true)
     adminService
       .unRegisterMember(token, {
         user_ids: selectedStudentId, // 可以是陣列
@@ -157,12 +155,12 @@ export default function EditMembers() {
       })
       .then((res) => {
         if (res.success) {
-          setMemberloading(false)
+          setLoading(false)
           messageControl('移除成功', true)
           getMembers()
           initSelector()
         } else {
-          setMemberloading(false)
+          setLoading(false)
           messageControl('移除失敗', false)
         }
       })
@@ -327,7 +325,7 @@ export default function EditMembers() {
   const getMembers = () => {
     switch (method.name) {
       case 'allMemberPage':
-        setMemberloading(true)
+        setLoading(true)
         let data = {
           page: method.page,
           pageSize: pageSize,
@@ -338,19 +336,19 @@ export default function EditMembers() {
         }
         adminService.getMembers(token, data).then((res) => {
           if (res.success) {
-            setMemberloading(false)
+            setLoading(false)
             setTotalPage(res.totalPage)
             setShowMembersState('all')
             setMembers(res.data)
           } else {
-            setMemberloading(false)
+            setLoading(false)
             messageControl('發生錯誤', false)
           }
         })
         break
       case 'courseMemberPage':
         if (courseId !== '') {
-          setMemberloading(true)
+          setLoading(true)
           let data = {
             page: method.page,
             pageSize: pageSize,
@@ -363,12 +361,12 @@ export default function EditMembers() {
           }
           adminService.getMembers(token, data).then((res) => {
             if (res.success) {
-              setMemberloading(false)
+              setLoading(false)
               setTotalPage(res.totalPage)
               setShowMembersState('course members')
               setMembers(res.data)
             } else {
-              setMemberloading(false)
+              setLoading(false)
               messageControl('發生錯誤', false)
             }
           })
@@ -379,7 +377,7 @@ export default function EditMembers() {
         break
       case 'ousideMemberPage':
         if (courseId !== '') {
-          setMemberloading(true)
+          setLoading(true)
           let data = {
             page: method.page,
             pageSize: pageSize,
@@ -392,12 +390,12 @@ export default function EditMembers() {
           }
           adminService.getMembers(token, data).then((res) => {
             if (res.success) {
-              setMemberloading(false)
+              setLoading(false)
               setTotalPage(res.totalPage)
               setShowMembersState('all')
               setMembers(res.data)
             } else {
-              setMemberloading(false)
+              setLoading(false)
               messageControl('發生錯誤', false)
             }
           })
@@ -432,7 +430,7 @@ export default function EditMembers() {
         if (res.success) {
           setGetedCourse(res.data)
         } else {
-          setMemberloading(false)
+          setLoading(false)
           initSelector()
           messageControl('發生錯誤', false)
         }
@@ -450,7 +448,11 @@ export default function EditMembers() {
 
   return (
     <div className="edit-members-main">
-      {memberloading && <LoadingAnime />}
+      <div
+        className="right-bottom-loading-area"
+        style={{ right: loading ? '8px' : '-100%' }}>
+        <div className="loading"></div>
+      </div>
       <div
         style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
         className="message">

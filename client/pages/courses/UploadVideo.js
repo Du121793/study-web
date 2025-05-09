@@ -205,7 +205,6 @@ export default function UploadVideoFc({ setshowUploadVideoUI, showUploadVideoUI,
       })()
       return
     }
-
     const tusUpload = new Upload(file, {
       uploadUrl: upUrl,
       chunkSize: 5 * 1024 * 1024,
@@ -328,7 +327,9 @@ export default function UploadVideoFc({ setshowUploadVideoUI, showUploadVideoUI,
 
   function UploadProgressDisplay({ uploads }) {
     return (
-      <div className="upload-progress-container">
+      <div
+        className="upload-progress-container"
+        style={{ padding: uploads?.length > 0 ? '12px' : 'none' }}>
         {uploads.map((upload) => {
           const { id, fileName, message, progress } = upload
 

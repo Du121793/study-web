@@ -1,5 +1,6 @@
 .msg-board {
   display: flex;
+  position: relative;
   padding: 24px;
   width: 80%;
   background-color: #fff;
@@ -13,6 +14,20 @@
   }
   @media (max-width: 576px) {
     flex-direction: column;
+  }
+  .message {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    background-color: #ffffff00;
+    top: 0;
+    left: 0;
+    width: 100%;
+    .info {
+      background-color: #d6d6d6;
+      border-radius: 8px;
+      transition: 0.2s;
+    }
   }
   .image-name-area {
     display: flex;
@@ -69,7 +84,7 @@
     justify-content: center;
     align-items: center;
     gap: 12px;
-    .input-area{
+    .input-area {
       display: flex;
       gap: 4px;
       align-items: center;

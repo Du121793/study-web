@@ -25,7 +25,7 @@ import UploadOldVimeoVDO from '../components/UploadOldVimeoVDO'
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 const serverIp = process.env.NEXT_PUBLIC_SERVER_IP
 
-export default function VideoNav({ course_id, courseName, user_role }) {
+export default function VideoNav({ course_id, courseName, user_role, setLoading }) {
   const token = useUserToken()
   // 控制頁面scroll狀態
   const [page_body, setPage_body] = useState([])
@@ -120,17 +120,19 @@ export default function VideoNav({ course_id, courseName, user_role }) {
   // 獲得影片資訊
   const getCourseVideos = (changeMessage = Boolean) => {
     if (token && course_id) {
+      setLoading(true)
       userService
         .getVideoInfo(token, course_id, {
           type: 'MainClass',
-          page: videosShowPage,
-          pageSize: videosPageSize,
+          page: page,
+          pageSize: pageSize,
           sortBy: chooseType,
           sortOrder: chooseSortOrder,
         })
         .then((res) => {
           // 這行經常在剛npm run dev時出錯，有可能是api還沒啟動
           setVideos(res.data)
+          setLoading(false)
           if (changeMessage) {
             messageControl('加載完成', true)
           } else {
@@ -205,8 +207,10 @@ export default function VideoNav({ course_id, courseName, user_role }) {
     const deleteBtn = document.querySelectorAll('.delete-video-btn')
     const from = Array.from(deleteBtn)
     if (e.innerText === '在點擊一次確認刪除') {
+      setLoading(true)
       setDeleteLoading(true)
       adminService.deleteVideo(token, item._id, course_id).then((res) => {
+        setLoading(false)
         getCourseVideos(false)
         messageControl('移除成功', true)
         setDeleteLoading(false)
@@ -263,7 +267,6 @@ export default function VideoNav({ course_id, courseName, user_role }) {
         setVideoCardWidth(videoRef.current.clientWidth / 5)
         setVideoContentHeight(inputRef.current.scrollHeight + videoRef.current.scrollHeight + loadMoreRef?.current?.scrollHeight + 40)
       }
-
       setVideoNavOpen(true)
       setLock(true)
     }
@@ -299,6 +302,7 @@ export default function VideoNav({ course_id, courseName, user_role }) {
   // 問題:會跑兩次
   useEffect(() => {
     if (token && course_id) {
+      setLoading(true)
       userService
         .getVideoInfo(token, course_id, {
           type: 'MainClass',
@@ -311,6 +315,7 @@ export default function VideoNav({ course_id, courseName, user_role }) {
         })
         .then((res) => {
           if (res?.success) {
+            setLoading(false)
             setVideos(res.data)
             setTotalPage(res.totalPage)
           } else {
@@ -320,6 +325,7 @@ export default function VideoNav({ course_id, courseName, user_role }) {
     }
   }, [token, course_id, chooseType, chooseSortOrder, uploadSuccess, page, hasChange])
 
+  // 控制nav高度
   useEffect(() => {
     if (videoNavOpen && inputRef && videoRef && loadMoreRef) {
       setVideoContentHeight(inputRef?.current?.scrollHeight + videoRef?.current?.scrollHeight + loadMoreRef?.current?.scrollHeight + 100)
@@ -365,7 +371,8 @@ export default function VideoNav({ course_id, courseName, user_role }) {
           course_id={course_id}
           token={token}
           video_id={video_id}
-          video_info={choseEditVideo}></EditVideoInfo>
+          video_info={choseEditVideo}
+          setLoading={setLoading}></EditVideoInfo>
       )}
       {/* 上傳舊vimeoVDO的組件 */}
       {showUploadOldVimeoVDOUI && (

@@ -9,6 +9,11 @@
   @media (max-width: 860px) {
     width: 100vw;
   }
+  .loading-main {
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
   .title {
     margin-top: 24px;
     display: flex;
@@ -45,8 +50,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 120px;
-      height: 120px;
+      min-width: 120px;
+      min-height: 120px;
       border-radius: 50%;
       background: #ffffff;
       transition: 0.2s;
@@ -107,6 +112,7 @@
   .bottom-section {
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
     padding: 0 64px;
     @media (max-width: 860px) {
       flex-direction: column;
@@ -130,11 +136,11 @@
         @media (max-width: 860px) {
           flex-direction: column;
           gap: 4px;
-          .content{
+          .content {
             width: 80%;
           }
         }
-        .content{
+        .content {
           font-weight: bold;
         }
         input {

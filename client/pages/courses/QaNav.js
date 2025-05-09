@@ -20,7 +20,7 @@ import AskNav from './component/AskQA'
 
 const client_URL = process.env.NEXT_PUBLIC_CLIENT_IP
 
-export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_id, courseName }) {
+export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_role, course_id, courseName }) {
   const token = useUserToken()
   const [courseQas, setCourseQas] = useState([])
   const [userToken, setUserToken] = useState('')
@@ -65,7 +65,6 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
   const [qaCardWidth, setQaCardWidth] = useState(0)
 
   const test = () => {
-    console.log(courseQas)
   }
 
   // 切換排序
@@ -240,6 +239,7 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
   // 渲染頁面時取得 QA 資料
   useEffect(() => {
     if (token) {
+      setLoading(true)
       const data = {
         // 沒有就用預設state
         sortType: sortBy,
@@ -251,6 +251,7 @@ export default function QaNav({ qaHasUpload, setQaHasUpload, user_role, course_i
         if (res.success) {
           setCourseQas(res.data)
           setTotalPage(res.totalPage)
+          setLoading(false)
           setTimeout(() => {
             setQaHeight(navInnerRef?.current?.clientHeight + headerRef?.current?.clientHeight + 100)
           }, 30)

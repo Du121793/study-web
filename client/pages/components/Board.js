@@ -14,6 +14,9 @@ export default function Board({ editHasChange, moveToBoardRef }) {
   const [totalPage, setTotalPage] = useState(0)
   const boardEle = useRef(null)
 
+  // 旋轉讀取
+  const [loading, setLoading] = useState(false)
+
   useImperativeHandle(moveToBoardRef, () => ({
     doSomething: () => {
       moveToBoardEle()
@@ -26,17 +29,15 @@ export default function Board({ editHasChange, moveToBoardRef }) {
     }
   }
 
-  const test = () => {
-    console.log(totalPage)
-  }
-
   useEffect(() => {
+    setLoading(true)
     const data = {
       page: page,
       pageSize: pageSize,
     }
     userService.getBoards(data).then((res) => {
       if (res.success) {
+        setLoading(false)
         setBoards(res.data.boards)
         setTotalPage(res)
       } else {
@@ -47,6 +48,11 @@ export default function Board({ editHasChange, moveToBoardRef }) {
 
   return (
     <div className="board-main">
+      <div
+        className="right-bottom-loading-area"
+        style={{ right: loading ? '8px' : '-100%' }}>
+        <div className="loading"></div>
+      </div>
       <div
         className="board-contianer"
         ref={boardEle}>

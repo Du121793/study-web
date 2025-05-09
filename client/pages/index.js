@@ -17,7 +17,7 @@ import UploadCarousel from './components/UploadCarousel'
 import backgroundImage from '../public/backGroundIMG/stefanie-jockschat-9f1PRQs6Brs-unsplash.jpg'
 export default function Index() {
   const token = useUserToken()
-  const [isLogined, setLogined] = useState(false)
+  const [logined, setLogined] = useState(false)
   const [userShot, setUserShot] = useState(null)
   const [userRole, setUserRole] = useState(null)
   const [showCarouselEdit, setShowCarouselEdit] = useState(false)
@@ -26,6 +26,8 @@ export default function Index() {
   const [bannerHasChange, setBannerHasChange] = useState(false)
   const [boardhasChange, setBoardHasChange] = useState(false)
   const [editHasChange, setEditHasChange] = useState(false)
+  // 讀取旋轉
+  const [loading, setLoading] = useState(false)
   // 用於開關UI時覆蓋所有內部元素
   const [visibility, setVisibility] = useState('visible')
   // 移動到最新消息function
@@ -65,10 +67,14 @@ export default function Index() {
       sessionStorage.setItem('homePageScrollToNews', 0)
     }
   }, [])
-  const test = () => {}
 
   return (
     <div className="index-main">
+      <div
+        className="right-bottom-loading-area"
+        style={{ right: loading ? '8px' : '-100%' }}>
+        <div className="loading"></div>
+      </div>
       <div className="background-image">
         <Image
           src={backgroundImage}
@@ -80,7 +86,7 @@ export default function Index() {
       <div className="header-area">
         <Header
           callBoardMoveToBoardFunction={callBoardMoveToBoardFunction}
-          loginState={isLogined}
+          loginState={logined}
           user_line_shot={userShot}
           inIndex="public"></Header>
       </div>

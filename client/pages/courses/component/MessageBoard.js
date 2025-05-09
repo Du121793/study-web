@@ -11,7 +11,6 @@ export default function MessageBoard({ qa_id, submitSuccess, setSubmitSuccess })
   const [user_role, setUser_role] = useState('')
   // 大部分api需要的token
   const token = useUserToken()
-  const [uploadState, setUploadState] = useState(false)
   // 請求送出留言的參數
   const [content, setContent] = useState('')
   const [images, setImages] = useState([])
@@ -20,8 +19,6 @@ export default function MessageBoard({ qa_id, submitSuccess, setSubmitSuccess })
   const [isBest, setIsBest] = useState(false)
   // 預覽圖片
   const [preViewImage, setPreViewImage] = useState([])
-  // 按鈕綁定input
-  const imageInput = useRef(null)
   // 控制訊息
   const [message, setMessage] = useState('無訊息')
   const [messageStatus, setMessageStatus] = useState(false)
@@ -29,6 +26,10 @@ export default function MessageBoard({ qa_id, submitSuccess, setSubmitSuccess })
   // 綁定timeout，用於重計
   const messageTimer = useRef(null)
   const resetTimer = useRef(null)
+  // 用來清空message框、圖片、影片
+  const textAreaRef = useRef(null)
+  const imageRef = useRef(null)
+  const VideoRef = useRef(null)
 
   // 控制訊息
   const messageControl = (info, isSuccess) => {
@@ -52,10 +53,12 @@ export default function MessageBoard({ qa_id, submitSuccess, setSubmitSuccess })
       }, 200)
     }, 2000)
   }
+
   const test = () => {
     console.log(images)
   }
 
+  // 取得role與檢查是否登陸
   useEffect(() => {
     if (!sessionStorage.getItem('user_role') || !sessionStorage.getItem('user_id')) {
       userService.getUserInfo(token).then((res) => {
@@ -70,18 +73,23 @@ export default function MessageBoard({ qa_id, submitSuccess, setSubmitSuccess })
       setUser_role(role)
     }
   })
-  
+
   return (
     <div className="msg-board">
       <div
-        style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
+        style={{ height: messageStatus ? '100%' : '0', transition: 'none' }}
         className="message">
-        {message}
+        <div
+          className="info"
+          style={{ height: messageStatus ? '20px' : '0', backgroundColor: messageColor, padding: messageStatus ? '24px' : '0' }}>
+          {message}
+        </div>
       </div>
       <textarea
         type="text-area"
         className="text-area"
         placeholder="請輸入文字"
+        ref={textAreaRef}
         onChange={(e) => {
           setContent(e.target.value)
         }}></textarea>
@@ -94,6 +102,7 @@ export default function MessageBoard({ qa_id, submitSuccess, setSubmitSuccess })
             type="file"
             className="file-input"
             accept="video/mp4"
+            ref={VideoRef}
             onChange={(e) => {
               setVideo(e.target.files[0])
             }}
@@ -103,13 +112,13 @@ export default function MessageBoard({ qa_id, submitSuccess, setSubmitSuccess })
           <div
             className="ref g-blue-btn"
             onClick={() => {
-              imageInput.current.click()
+              imageRef.current.click()
             }}>
             上傳圖片
           </div>
           <input
             style={{ display: 'none' }}
-            ref={imageInput}
+            ref={imageRef}
             type="file"
             onChange={(e) => {
               // 檢查是否有檔案被選取
@@ -195,8 +204,13 @@ export default function MessageBoard({ qa_id, submitSuccess, setSubmitSuccess })
             fileSize={video && video.size}
             isPrivate={isPrivate}
             isBest={isBest}
+            textAreaRef={textAreaRef}
+            imageRef={imageRef}
+            VideoRef={VideoRef}
             submitSuccess={submitSuccess}
-            setSubmitSuccess={setSubmitSuccess}></QAMsgUpload>
+            setSubmitSuccess={setSubmitSuccess}
+            setImages={setImages}
+            setPreViewImage={setPreViewImage}></QAMsgUpload>
         </div>
       </div>
     </div>

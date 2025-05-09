@@ -20,6 +20,8 @@ export default function Banner({ bannerHasChange }) {
   const [slides, setSlides] = useState([])
   const [slideCount, setSlideCount] = useState([])
   const autoSlideRef = useRef(null)
+  // 旋轉讀取
+  const [loading, setLoading] = useState(false)
   // 節流鎖
   const lockRef = useRef(false)
 
@@ -100,9 +102,13 @@ export default function Banner({ bannerHasChange }) {
 
   // 取得輪播圖圖片（這裡假設回傳的資料為圖片 URL 陣列）
   useEffect(() => {
+    setLoading(true)
     userService.getCarousels().then((res) => {
-      setCarousel(res.data)
-      setCurrentIndex(1) // 重新設定起始位置
+      if (res.success) {
+        setLoading(false)
+        setCarousel(res.data)
+        setCurrentIndex(1) // 重新設定起始位置
+      }
     })
   }, [bannerHasChange])
 
@@ -144,6 +150,11 @@ export default function Banner({ bannerHasChange }) {
 
   return (
     <div className="banner-main">
+      <div
+        className="right-bottom-loading-area"
+        style={{ right: loading ? '8px' : '-100%' }}>
+        <div className="loading"></div>
+      </div>
       <div className="banner">
         {/* 左箭頭 */}
         <div

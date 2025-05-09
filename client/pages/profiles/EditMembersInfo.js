@@ -46,7 +46,7 @@ export default function EditMembersInfo() {
   // 綁定timeout，用於重計
   const messageTimer = useRef(null)
   const resetTimer = useRef(null)
-  // loading anime
+  // 旋轉讀取
   const [loading, setLoading] = useState(false)
 
   const test = () => {
@@ -208,11 +208,11 @@ export default function EditMembersInfo() {
 
   return (
     <div className="edit-members-info-main g-shadow">
-      <div
-        style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
-        className="message">
-        {message}
-      </div>
+    <div
+      className="right-bottom-loading-area"
+      style={{ right: loading ? '8px' : '-100%' }}>
+      <div className="loading"></div>
+    </div>
       {loading && (
         <div className="loading-main">
           <div className="loader"></div>

@@ -14,6 +14,8 @@ export default function RemoveUsers() {
   // get members
   const [getUsers, setGetUsers] = useState([])
   const [membersTemp, setMembersTemp] = useState([])
+  // 旋轉讀取
+  const [loading, setLoading] = useState(false)
   // 請求參數
   const [selectedUserId, setSelectedUserId] = useState([])
   const [page, setPage] = useState(1)
@@ -31,10 +33,7 @@ export default function RemoveUsers() {
   const [messageStatus, setMessageStatus] = useState(false)
   const [messageColor, setMessageColor] = useState('')
 
-  const checkSelectedMembers = () => {
-    console.log(getUsers)
-    console.log(selectedUserId)
-  }
+  const checkSelectedMembers = () => {}
 
   // 參數:總頁數，中間頁數，從中間往左右總共要幾頁
   function getPage(total, thisPage, pageSize = 5) {
@@ -91,8 +90,12 @@ export default function RemoveUsers() {
 
   //請求獲取使用者
   const getUsersFunction = () => {
+    setLoading(true)
     adminService.getMembers(token).then((res) => {
-      setGetUsers(res.data)
+      if (res?.success) {
+        setGetUsers(res.data)
+        setLoading(false)
+      }
     })
   }
 
@@ -116,13 +119,14 @@ export default function RemoveUsers() {
   // 點擊刪除發送請求
   const deleteSelectedUsers = () => {
     if (selectedUserId.length) {
+      setLoading(true)
       adminService.deleteMembers(token, selectedUserId).then((res) => {
-        console.log(res)
         if (res.success === true) {
           setSelectedUserId([])
           getUsersFunction()
           clearSelectedMemebers()
           messageControl(res.msg, true)
+          setLoading(false)
         } else {
           messageControl('發生錯誤', false)
           console.error(res)
@@ -147,8 +151,12 @@ export default function RemoveUsers() {
       pageSize: pageSize,
       grade: grade,
     }
+    setLoading(true)
     adminService.getMembers(token, data).then((res) => {
-      setGetUsers(res.data)
+      if (res?.success) {
+        setGetUsers(res.data)
+        setLoading(false)
+      }
     })
   }
 
@@ -159,10 +167,12 @@ export default function RemoveUsers() {
         page: page,
         pageSize: pageSize,
       }
+      setLoading(true)
       adminService.getMembers(token, data).then((res) => {
         if (res.success) {
           setTotalPage(res.totalPage)
           setGetUsers(res.data)
+          setLoading(false)
         }
       })
     }
@@ -170,6 +180,11 @@ export default function RemoveUsers() {
 
   return (
     <div className="remove-users-page">
+      <div
+        className="right-bottom-loading-area"
+        style={{ right: loading ? '8px' : '-100%' }}>
+        <div className="loading"></div>
+      </div>
       <div className="remove-users-title">移除成員功能</div>
       <div
         style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
@@ -179,7 +194,7 @@ export default function RemoveUsers() {
       {/* 搜尋選項: 姓名，電話，年級*/}
       <div className="remove-user-header">
         {/* 輸入姓名 */}
-        <div className='top-info-input'>
+        <div className="top-info-input">
           <div className="title">真實姓名:</div>
           <input
             onChange={(e) => {
@@ -191,7 +206,7 @@ export default function RemoveUsers() {
           />
         </div>
         {/* 輸入電話 */}
-        <div className='top-info-input'>
+        <div className="top-info-input">
           <div className="title">電話:</div>
           <input
             onChange={(e) => {
@@ -203,7 +218,7 @@ export default function RemoveUsers() {
           />
         </div>
         {/* 輸入年級 */}
-        <div className='top-info-input'>
+        <div className="top-info-input">
           <div className="title">年級 :</div>
           <input
             onChange={(e) => {

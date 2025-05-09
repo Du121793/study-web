@@ -38,6 +38,9 @@ export default function Player() {
   /* 根據寬度顯示畫面中間的影片清單 */
   const [showVideoListAfterInfo, setShowVideoListAfterInfo] = useState(false)
 
+  // 旋轉讀取
+  const [loading, setLoading] = useState(false)
+
   /* 監聽全局寬度變化，寬度變化設定windowsWidth */
   const isClient = typeof window === 'object'
   const [windowsWidth, setWindowsWidth] = useState(0)
@@ -74,11 +77,14 @@ export default function Player() {
   */
   useEffect(() => {
     if (token && course_id && video_id) {
+      setLoading(true)
       userService.getVideoLink(token, course_id, video_id).then((res) => {
+        setLoading(false)
         setVideoUrl(res.data.embedLink)
       })
     }
     if (token && course_id) {
+      setLoading(true)
       userService
         .getVideoInfo(token, course_id, {
           type: 'MainClass',
@@ -87,7 +93,7 @@ export default function Player() {
           sortOrder: 'asc',
         })
         .then((res) => {
-          console.log(res)
+          setLoading(false)
           setVideosList(res.data)
         })
     }
@@ -180,12 +186,15 @@ export default function Player() {
     }
   }, [info])
 
-  const test = () => {
-    console.log(formatTime(10))
-  }
+  const test = () => {}
 
   return (
     <div className="video-player-main">
+      <div
+        className="right-bottom-loading-area"
+        style={{ right: loading ? '8px' : '-100%' }}>
+        <div className="loading"></div>
+      </div>
       <div className="header">
         <div
           className="g-black-btn"
@@ -195,7 +204,9 @@ export default function Player() {
           回到課程
         </div>
         <Image
-          onClick={test}
+          onClick={() => {
+            setLoading(!loading)
+          }}
           src={logo}
           alt="123"
           className="logos"

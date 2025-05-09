@@ -24,7 +24,7 @@ export default function PreRegister() {
   const [messageStatus, setMessageStatus] = useState(false)
   const [messageColor, setMessageColor] = useState('')
 
-  // loading anime
+  // 旋轉讀取
   const [loading, setLoading] = useState(false)
 
   // 儲存最後要提交的使用者資料
@@ -206,9 +206,9 @@ export default function PreRegister() {
     <div className="preRegister-main">
       {/* message */}
       <div
-        style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
-        className="message">
-        {message}
+        className="right-bottom-loading-area"
+        style={{ right: loading ? '8px' : '-100%' }}>
+        <div className="loading"></div>
       </div>
       {loading && (
         <div className="loading-main">
@@ -307,7 +307,9 @@ export default function PreRegister() {
 
           <div className="copy-area">
             {inputRows.map((row, index) => (
-              <div key={index} className='input-area'>
+              <div
+                key={index}
+                className="input-area">
                 <div className="form-title">姓名:</div>
                 <input
                   className="input name-input"

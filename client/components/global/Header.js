@@ -40,6 +40,7 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
     openMenuBtnRef.current.style.opacity = '1'
     setListWidht(0)
   }
+
   // 變換顏色
   const clickSwitchColor = (element) => {
     const preColor = element.style.backgroundColor
@@ -48,6 +49,7 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
       element.style.backgroundColor = preColor
     }, 160)
   }
+
   // 登出 刪除token
   const signOut = () => {
     if (sessionStorage.getItem('user_lineID')) {

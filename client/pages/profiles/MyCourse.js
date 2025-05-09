@@ -23,6 +23,8 @@ export default function MyCourse() {
   // 假圖片，用於課程左邊頭像
   const coursesEle = useRef(null)
   const [coursesEleWidth, setCoursesEleWidth] = useState(0)
+  // 旋轉讀取
+  const [loading, setLoading] = useState(false)
 
   const searchCourse = () => {
     setCourseLoading(true)
@@ -61,12 +63,14 @@ export default function MyCourse() {
 
   // 請求所有用戶已註冊課程資訊
   useEffect(() => {
+    setLoading(true)
     if (token) {
       setCourseLoading(true)
       userService
         .getUserRegistedCourses(token)
         .then((res) => {
           if (res.success) {
+            setLoading(false)
             setCourseLoading(false)
             setGetCourses(res.data)
           }
@@ -77,6 +81,11 @@ export default function MyCourse() {
 
   return (
     <div className="myCourse-main">
+      <div
+        className="right-bottom-loading-area"
+        style={{ right: loading ? '8px' : '-100%' }}>
+        <div className="loading"></div>
+      </div>
       <div className="courses-container">
         <div
           className="course-page-header"

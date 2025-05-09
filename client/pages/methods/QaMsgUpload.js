@@ -17,7 +17,13 @@ export default function QAMsgUpload({
   isBest,
   submitSuccess,
   setSubmitSuccess,
+  textAreaRef,
+  imageRef,
+  VideoRef,
+  setImages,
+  setPreViewImage,
 }) {
+  // 組成form
   const [uploadLock, setUploadLock] = useState(false)
   const formData = new FormData()
   formData.append('content', content)
@@ -110,6 +116,13 @@ export default function QAMsgUpload({
       }
 
       if (res.success) {
+        textAreaRef.current.value = null
+        imageRef.current.value = null
+        VideoRef.current.value = null
+        setImages(null)
+        setPreViewImage(null)
+        messageControl('上傳成功', true)
+        
         if (res.data.uploadLink) {
           const { uploadLink } = res.data
           setUploadLink(uploadLink)

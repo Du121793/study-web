@@ -23,7 +23,7 @@ export default function UserProfile() {
   const messageTimer = useRef(null)
   const resetTimer = useRef(null)
 
-  // loading anime
+  // 旋轉讀取
   const [loading, setLoading] = useState(false)
 
   // patch userinfo payload
@@ -123,11 +123,11 @@ export default function UserProfile() {
 
   return (
     <div className="user-profile">
-      {loading && (
-        <div className="loading-main">
-          <div className="loader"></div>
-        </div>
-      )}
+      <div
+        className="right-bottom-loading-area"
+        style={{ right: loading ? '8px' : '-100%' }}>
+        <div className="loading"></div>
+      </div>
       {/* 訊息框 */}
       <div
         className="message"

@@ -29,6 +29,9 @@ export default function Course() {
   const { courseName, courseId } = router.query
   const course_id = useRef(null)
 
+  // 旋轉讀取，子組件控制
+  const [loading, setLoading] = useState(false)
+
   // 請求參數
   const backToMyCoursePageUrl = `${clientIp}/profiles/Profile`
   const [isLogined, setLogined] = useState(false)
@@ -75,6 +78,11 @@ export default function Course() {
 
   return (
     <div className="course-main">
+    <div
+      className="right-bottom-loading-area"
+      style={{ right: loading ? '8px' : '-100%' }}>
+      <div className="loading"></div>
+    </div>
       <Header
         loginState={isLogined}
         inIndex="course"
@@ -105,7 +113,8 @@ export default function Course() {
           <VideoNav
             user_role={userRole}
             course_id={courseId}
-            courseName={courseName}></VideoNav>
+            courseName={courseName}
+            setLoading={setLoading}></VideoNav>
         )}
         {/* Q&A 組件 */}
         {courseId !== null && userRole && (
@@ -114,7 +123,8 @@ export default function Course() {
             setQaHasUpload={setQaHasUpload}
             user_role={userRole}
             course_id={courseId}
-            courseName={courseName}></QaNav>
+            courseName={courseName}
+            setLoading={setLoading}></QaNav>
         )}
       </div>
       <Footer></Footer>

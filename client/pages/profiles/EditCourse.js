@@ -219,8 +219,9 @@ export default function EditCourse() {
     }
   }
 
-  // 小鉛筆icon ， 編輯課程
+  // 小鉛筆icon，編輯課程
   const editCourse = (_id, courseName, grade, subject, courseClass) => {
+    // 先編輯，在取得課程，兩次請求
     const data = {
       courseId: _id,
       courseName: editCourseName ? editCourseName : courseName,
@@ -228,6 +229,7 @@ export default function EditCourse() {
       grade: editGrade ? editGrade : grade,
       courseClass: editClass ? editClass : courseClass,
     }
+    setLoading(true)
     adminService.editCourse(token, data).then((res) => {
       const secData = {
         page: page,
@@ -237,52 +239,62 @@ export default function EditCourse() {
         courseClass: classInput,
       }
       if (res?.success && !addThenRegister) {
-        adminService.getCourses(token, secData).then((res) => setCoursesInfo(res.data))
-        messageControl('編輯完成', true)
+        adminService.getCourses(token, secData).then((res) => {
+          setCoursesInfo(res.data)
+          setLoading(false)
+          messageControl('編輯完成', true)
+        })
       } else {
         messageControl('編輯失敗', false)
       }
     })
   }
 
-  const test = () => {
-    console.log(userinfo)
-  }
+  // 當年級、科目、班級更改時也會更改課名
+  useEffect(() => {
+    setCourseNameInput(gradeInput + subjectInput + classInput)
+  }, [gradeInput, subjectInput, classInput])
 
   // 獲取課程資料，老師資訊
   useEffect(() => {
     if (token) {
-      setCourseLoading(true)
       let data = {
         page: page,
         pageSize: pageSize,
       }
-      adminService.getCourses(token, data).then((res) => {
-        if (res.success) {
-          setTotalPage(res.data.totalPage)
-          setCoursesInfo(res.data)
-          setCourseLoading(false)
-        } else {
-          messageControl('發生錯誤，即將跳轉回首頁', false)
-          setTimeout(() => {
-            window.location(clientIp)
-          }, 3000)
-        }
-      })
-      adminService.getMembers(token).then((res) => {
-        if (res?.success) {
-          let idTemp = []
-          res.data.forEach((item) => {
-            if (item.role === 'teacher') {
-              idTemp.push(item)
-            }
-          })
-          setTeachers(idTemp)
-        }
+      setLoading(true)
+      new Promise((resolve, reject) => {
+        adminService.getCourses(token, data).then((res) => {
+          if (res.success) {
+            setTotalPage(res.data.totalPage)
+            setCoursesInfo(res.data)
+            resolve()
+          } else {
+            reject()
+            messageControl('發生錯誤，即將跳轉回首頁', false)
+            setTimeout(() => {
+              window.location(clientIp)
+            }, 3000)
+          }
+        })
+      }).then(() => {
+        adminService.getMembers(token).then((res) => {
+          if (res?.success) {
+            let idTemp = []
+            res.data.forEach((item) => {
+              if (item.role === 'teacher') {
+                idTemp.push(item)
+              }
+            })
+            setTeachers(idTemp)
+            setLoading(false)
+          }
+        })
       })
     }
   }, [token, page])
 
+  // session取得使用者資料
   useEffect(() => {
     const name = sessionStorage.getItem('user_name')
     const id = sessionStorage.getItem('user_id')
@@ -293,11 +305,7 @@ export default function EditCourse() {
       setUser_id(id)
     }
   })
-
-  // 當年級、科目、班級更改時也會更改課名
-  useEffect(() => {
-    setCourseNameInput(gradeInput + subjectInput + classInput)
-  }, [gradeInput, subjectInput, classInput])
+  const test = () => {}
 
   return (
     <div className="edit-course-main">
@@ -333,11 +341,11 @@ export default function EditCourse() {
             </div>
           </div>
         )}
-        {loading && (
-          <div className="loading-area">
-            <div className="loading"></div>
-          </div>
-        )}
+        <div
+          className="right-bottom-loading-area"
+          style={{ right: loading ? '8px' : '-100%' }}>
+          <div className="loading"></div>
+        </div>
         {/* 標題 編輯課程 */}
         <div
           className="title"

@@ -6,7 +6,7 @@ import addIcon from '../../../public/course/addIcon.png'
 
 const serverIp = process.env.NEXT_PUBLIC_SERVER_IP
 
-export default function EditQA({ messageControl, setShowEditQAUI, token, question_id, course_id, hadEdit, setHadEdit }) {
+export default function EditQA({ setLoading, messageControl, setShowEditQAUI, token, question_id, course_id, hadEdit, setHadEdit }) {
   const imageURL = `${serverIp}/resource/questionIMG`
   const [splitToken, setSplitToken] = useState('')
   const [QAInfo, setQAInfo] = useState({})
@@ -66,7 +66,7 @@ export default function EditQA({ messageControl, setShowEditQAUI, token, questio
     hintTemp.forEach((item) => formData.append('hints', item))
     oldImageRemoveTemp.forEach((item) => formData.append('rmIMG[]', item))
     imageTemp.filter((file) => !newImageRemoveTemp.includes(file)).forEach((file) => formData.append('image', file))
-
+    
     adminService.editQAInfo(token, formData, course_id).then((res) => {
       if (res.success) {
         setHadEdit(!hadEdit)

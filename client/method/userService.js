@@ -102,7 +102,6 @@ const userService = {
         headers: authHeader,
         params: filter,
       })
-      console.log(response)
       return response.data
     } catch (e) {
       if (e.response?.status === 401) {

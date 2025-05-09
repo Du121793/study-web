@@ -118,11 +118,11 @@ export default function BoardPage() {
         </div>
       </div>
 
-      {loading && (
-        <div className="loading-main">
-          <div className="loader"></div>
-        </div>
-      )}
+      <div
+        className="right-bottom-loading-area"
+        style={{ right: loading ? '8px' : '-100%' }}>
+        <div className="loading"></div>
+      </div>
       <Header
         loginState={loginState}
         inIndex="public"

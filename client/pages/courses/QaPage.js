@@ -54,6 +54,8 @@ export default function QaPage() {
   // 30分鐘，用於判斷該qa是否超過30分鐘
   const thirtyMinutes = 30 * 60 * 1000
 
+  // 旋轉讀取
+  const [loading, setLoading] = useState(false)
   // 從url獲取參數
   const router = useRouter()
   const { qa_id, courseName, course_id } = router.query
@@ -117,10 +119,12 @@ export default function QaPage() {
   }
 
   const deleteComment = (_id) => {
+    setLoading(true)
     userService.deleteComment(token, qa_id, _id).then(() => {
       userService
         .getQaComment(token, qa_id)
         .then((res) => {
+          setLoading(false)
           setComments(res.data)
         })
         .catch((err) => {
@@ -140,10 +144,6 @@ export default function QaPage() {
         }, 3000)
       }
     })
-  }
-
-  const test = () => {
-    console.log(qaInfo)
   }
 
   // 請求修改問題設定
@@ -246,6 +246,7 @@ export default function QaPage() {
   // 2. QA的留言區
   useEffect(() => {
     if (token && qa_id) {
+      setLoading(true)
       userService
         .getQaInfo(token, qa_id)
         .then((res) => {
@@ -259,6 +260,7 @@ export default function QaPage() {
       userService
         .getQaComment(token, qa_id)
         .then((res) => {
+          setLoading(false)
           setTotalPage(res.pagination.totalPages)
           setComments(res.data)
         })
@@ -284,9 +286,11 @@ export default function QaPage() {
         })
     }
   }, [commentHasChange])
+
   // 子組件留言成功後，重新請求QA的留言資料
   useEffect(() => {
     if (token && qa_id) {
+      setLoading(true)
       let data = {
         sortOrder: sortBy,
         page: page,
@@ -295,6 +299,7 @@ export default function QaPage() {
       userService
         .getQaComment(token, qa_id, data)
         .then((res) => {
+          setLoading(false)
           setTotalPage(res.pagination.totalPages)
           setComments(res.data)
         })
@@ -328,12 +333,19 @@ export default function QaPage() {
       }
     }
   }, [])
+
   return (
     <div className="qaPage-main">
       <div
         style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
         className="message">
         {message}
+      </div>
+
+      <div
+        className="right-bottom-loading-area"
+        style={{ right: loading ? '8px' : '-100%' }}>
+        <div className="loading"></div>
       </div>
 
       {/* 編輯提問UI */}
@@ -345,7 +357,8 @@ export default function QaPage() {
           token={token}
           course_id={course_id}
           hadEdit={hadEdit}
-          setHadEdit={setHadEdit}></EditQA>
+          setHadEdit={setHadEdit}
+          setLoading={setLoading}></EditQA>
       )}
       {/* 公開提問UI */}
       {showPublicQASetting && (

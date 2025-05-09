@@ -3,7 +3,7 @@ import adminService from '../../../method/adminService'
 import Image from 'next/image'
 import { useStrictClickHandler } from '../../../method/userful'
 
-export default function EditVideoInfo({ video_info, getCourseVideos, messageControl, setShowEditVideoInfo, token, video_id, course_id }) {
+export default function EditVideoInfo({ setLoading, video_info, getCourseVideos, messageControl, setShowEditVideoInfo, token, video_id, course_id }) {
   // 請求參數
   const [thumbnail, setThumbnail] = useState(video_info?.thumbnail)
   const [title, setTitle] = useState(video_info?.title)
@@ -31,8 +31,10 @@ export default function EditVideoInfo({ video_info, getCourseVideos, messageCont
       description: description || null,
       isPrivate: isPrivate,
     }
+    setLoading(true)
     adminService.editVideoInfo(token, course_id, data).then((res) => {
       if (res.success) {
+        setLoading(false)
         setShowEditVideoInfo(false)
         getCourseVideos(false)
         messageControl('編輯完成', true)
