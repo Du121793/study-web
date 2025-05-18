@@ -184,6 +184,7 @@
   border: 1px solid rgba(0, 0, 0, 0.2);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   border-radius: 6px;
+  flex-wrap: wrap;
 }
 .edit-course-main .edit-course-function-area .courses-info-list .courses-info-area input[type=checkbox] {
   transform: scale(1.4);
@@ -192,6 +193,7 @@
   width: 100%;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 .edit-course-main .edit-course-function-area .courses-info-list .courses-info-area .info-line .count {
   font-weight: bold;

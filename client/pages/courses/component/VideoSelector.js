@@ -46,7 +46,6 @@ export default function StudentSelector({ course_id, selectedVideo, setSelectedV
   }, [token, course_id])
 
   const test = () => {
-    console.log(videos)
   }
 
   return (

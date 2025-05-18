@@ -44,7 +44,6 @@ export default function BoardPage() {
   const resetTimer = useRef(null)
 
   const test = () => {
-    console.log(boardInfo)
   }
 
   // 控制訊息
@@ -87,7 +86,9 @@ export default function BoardPage() {
   // get Board info by id
   useEffect(() => {
     if (board_id) {
+      setLoading(true)
       userService.getBoardsById(board_id).then((res) => {
+        setLoading(false)
         if (res.success) {
           // 根據回傳資料結構不同做處理
           const board = Array.isArray(res.data) ? res.data[0] : res.data.boards ? res.data.boards[0] : res.data
@@ -197,17 +198,19 @@ export default function BoardPage() {
           </Link>
         </div>
       )}
-      {boardInfo && (
-        <div
-          className="main-title-area"
-          style={{ whiteSpace: 'pre-wrap' }}
-          onClick={() => {
-            test()
-          }}>
-          <div className="content">{boardInfo.title}</div>
-          <div className="subTitle">{boardInfo.subTitle}</div>
-        </div>
-      )}
+
+      <div
+        className={`main-title-area`}
+        style={{ whiteSpace: 'pre-wrap' }}>
+        {boardInfo?.title && boardInfo?.subTitle && <div className="content">{boardInfo.title}</div>}
+        {boardInfo?.title && boardInfo?.subTitle && <div className="subTitle">{boardInfo?.subTitle}</div>}
+        {!boardInfo?.title && (
+          <div
+            className="loading-area"
+            style={{ width: '120px', height: '48px' }}></div>
+        )}
+      </div>
+
       {/* board info area */}
       {boardInfo && (
         <div className="announcement">
@@ -217,6 +220,11 @@ export default function BoardPage() {
             // 根據 content 的順序渲染所有元素（文字、圖片等）
             dangerouslySetInnerHTML={{ __html: boardInfo.content }}
           />
+          {!boardInfo?._id && (
+            <div
+              className="loading-area"
+              style={{ margin: '0 auto', width: '90%', height: '32px' }}></div>
+          )}
           {boardInfo.poster && (
             <div className="announcement-footer">
               Posted by {boardInfo.poster.username} on {new Date(boardInfo.date).toLocaleString()}

@@ -49,9 +49,7 @@ export default function EditMembersInfo() {
   // 旋轉讀取
   const [loading, setLoading] = useState(false)
 
-  const test = () => {
-    console.log(members)
-  }
+  const test = () => {}
 
   // 控制訊息
   const messageControl = (info, isSuccess) => {
@@ -103,14 +101,17 @@ export default function EditMembersInfo() {
       phoneNumber: searchPhone,
       gradeInput: searchGrade,
     }
-    adminService.getMembers(token, data).then((res) => {
-      if (res?.success) {
-        setTotalPage(res.totalPage)
-        setMembers(res.data)
-      } else {
-        console.log(res)
-      }
-    })
+    adminService
+      .getMembers(token, data)
+      .then((res) => {
+        if (res?.success) {
+          setTotalPage(res.totalPage)
+          setMembers(res.data)
+        }
+      })
+      .catch((err) => {
+        console.error(err)
+      })
   }
 
   const getMembers = () => {
@@ -208,11 +209,11 @@ export default function EditMembersInfo() {
 
   return (
     <div className="edit-members-info-main g-shadow">
-    <div
-      className="right-bottom-loading-area"
-      style={{ right: loading ? '8px' : '-100%' }}>
-      <div className="loading"></div>
-    </div>
+      <div
+        className="right-bottom-loading-area"
+        style={{ right: loading ? '8px' : '-100%' }}>
+        <div className="loading"></div>
+      </div>
       {loading && (
         <div className="loading-main">
           <div className="loader"></div>
@@ -430,7 +431,6 @@ export default function EditMembersInfo() {
             width={24}
             height={24}
             onClick={() => {
-              console.log(totalPage)
               if (page === totalPage) {
                 return
               } else {

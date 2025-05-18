@@ -70,7 +70,6 @@ export default function UploadBoard({ boardInfo, setEditHasChange, editHasChange
   }
 
   const test = () => {
-    console.log(boardInfo)
   }
 
   // 新增board

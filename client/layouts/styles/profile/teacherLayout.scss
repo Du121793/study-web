@@ -1,0 +1,10 @@
+@import "../global/variables";
+.Layout-main {
+  .Layout-container {
+    position: relative;
+    display: flex;
+    position: absolute;
+    width: 100%;
+    min-height: calc(100vh - 115px);
+  }
+}

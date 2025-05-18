@@ -1,0 +1,74 @@
+@charset "UTF-8";
+/*
+// loading anime
+const [loading, setLoading] = useState(false)
+
+{loading && (
+  <div className="loading-main">
+    <div className="loader"></div>
+  </div>
+)}
+*/
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.loading-main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+}
+.loading-main .loader {
+  z-index: 10000;
+  position: absolute;
+  width: 100%; /* Safari */
+  animation: spin 1s linear infinite;
+  position: relative;
+  border: 8px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 8px solid #3498db;
+  width: 40px;
+  height: 40px;
+}
+
+/*
+// 旋轉讀取
+const [loading, setLoading] = useState(false)
+<div
+  className="right-bottom-loading-area"
+  style={{ right: loading ? '8px' : '-100%' }}>
+  <div className="loading"></div>
+</div>
+*/
+.right-bottom-loading-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+  z-index: 99;
+  background-color: #191919;
+  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  position: fixed;
+  transition: 0.2s;
+  bottom: 8px;
+  right: -100%;
+}
+.right-bottom-loading-area .loading {
+  z-index: 10000;
+  position: relative;
+  width: 30px;
+  height: 30px;
+  border-radius: 90%;
+  background: conic-gradient(#9bd4f9, #e5e1e7, #eeb482, #f96a6a);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), black calc(100% - 4px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 5px), black calc(100% - 5px));
+  animation: spin 1s linear infinite;
+}/*# sourceMappingURL=loading.css.map */

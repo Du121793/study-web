@@ -105,14 +105,11 @@ export default function AskNav({ showAskQA, setShowAskQA, qaHasUpload, setQaHasU
         return item === themes
       })
     ) {
-      console.log('刪除')
       setTheme(
         theme.filter((item) => {
           return item !== themes
         })
       )
-    } else {
-      console.log('沒找到')
     }
   }
 
@@ -146,20 +143,16 @@ export default function AskNav({ showAskQA, setShowAskQA, qaHasUpload, setQaHasU
 
   // ask，移除標籤功能
   const removeHint = (hint) => {
-    console.log(hint)
     if (
       hints.find((item) => {
         return item === hint
       })
     ) {
-      console.log('刪除')
       setHints(
         hints.filter((item) => {
           return item !== hint
         })
       )
-    } else {
-      console.log('沒找到')
     }
   }
 
@@ -381,7 +374,6 @@ export default function AskNav({ showAskQA, setShowAskQA, qaHasUpload, setQaHasU
               className="g-blue-btn"
               onClick={() => {
                 setShowSearchTheme(true)
-                console.log(searchTheme)
               }}>
               顯示現有主題
             </button>

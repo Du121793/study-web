@@ -58,7 +58,7 @@ export default function UploadOldVimeoVDO({ course_id, uploadOldVimeoVDOInnerEle
         return item.title === ''
       })
     ) {
-      console.log('每個影片必須有標題與描述')
+      console.error('每個影片必須有標題與描述')
       return
     }
     if (
@@ -66,7 +66,7 @@ export default function UploadOldVimeoVDO({ course_id, uploadOldVimeoVDOInnerEle
         return item.description === ''
       })
     ) {
-      console.log('每個影片必須有標題與描述')
+      console.error('每個影片必須有標題與描述')
       return
     }
     let cardsTemp = cards.map((item, index) => {
@@ -93,7 +93,6 @@ export default function UploadOldVimeoVDO({ course_id, uploadOldVimeoVDOInnerEle
 
   // 控制頁面 scroll 狀態
   useEffect(() => {
-    console.log(course_id)
     if (typeof document !== 'undefined') {
       setPage_body(document.querySelector('body'))
     }

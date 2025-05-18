@@ -52,7 +52,6 @@ export default function AccessStudentList({ messageControl, editStatus, setEditS
 
   useEffect(() => {
     if (token && course_id) {
-      console.log(course_id)
       let data = {
         courses: course_id,
       }
@@ -72,7 +71,6 @@ export default function AccessStudentList({ messageControl, editStatus, setEditS
   }, [token, course_id, choseAccessId])
 
   const test = () => {
-    console.log(choseAccessInfo)
   }
   return (
     <div className="student-selector-main">

@@ -1,0 +1,142 @@
+.board-page-main {
+  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  align-items: center;
+  min-height: 100vh;
+}
+.board-page-main .header-container {
+  position: relative;
+  z-index: 2;
+}
+.board-page-main .upload-board-main {
+  z-index: 3;
+}
+.board-page-main .main-title-area {
+  width: 90%;
+  display: flex;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: bold;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin: 0 0 12px 0;
+  gap: 16px;
+}
+.board-page-main .main-title-area .content {
+  padding: 2px 20px;
+  border-radius: 4px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+.board-page-main .main-title-area .subTitle {
+  border-radius: 4px;
+  height: 100%;
+  font-size: 24px;
+  color: #999;
+}
+.board-page-main .announcement {
+  flex: 1;
+  width: 90%;
+  margin: 0 24px 24px 24px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  position: relative;
+  gap: 24px;
+}
+.board-page-main .announcement .announcement-body {
+  margin: 0 auto;
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+}
+.board-page-main .announcement .announcement-body h1 {
+  font-size: 32px;
+}
+.board-page-main .announcement .announcement-body h2 {
+  font-size: 24px;
+}
+.board-page-main .announcement .announcement-body h3 {
+  font-size: 20px;
+}
+.board-page-main .announcement .announcement-body h4 {
+  font-size: 16px;
+}
+.board-page-main .announcement .announcement-body h5 {
+  font-size: 14px;
+}
+.board-page-main .announcement .announcement-body h6 {
+  font-size: 12px;
+}
+.board-page-main .announcement .announcement-body .ql-font-serif {
+  font-family: "Times New Roman", serif;
+}
+.board-page-main .announcement .announcement-body .ql-font-monospace {
+  font-family: "Courier New", monospace;
+}
+.board-page-main .announcement .announcement-body .ql-align-center {
+  text-align: center !important;
+}
+.board-page-main .announcement .announcement-body .ql-align-right {
+  text-align: right !important;
+}
+.board-page-main .announcement .announcement-body .ql-align-justify {
+  text-align: justify !important;
+}
+.board-page-main .announcement .announcement-body blockquote {
+  padding: 0.5em 1em;
+  margin: 1em 0;
+  background-color: #f9f9f9;
+  border-left: 5px solid #ccc;
+  font-style: italic;
+}
+.board-page-main .announcement .announcement-footer {
+  position: absolute;
+  right: 8px;
+  bottom: 4px;
+}
+.board-page-main .announcement-body {
+  font-size: 1rem;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+.board-page-main .announcement-body p {
+  margin-bottom: 10px;
+}
+.board-page-main .announcement-body img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 10px auto;
+}
+.board-page-main .announcement-footer {
+  font-size: 0.9rem;
+  color: #999;
+  text-align: right;
+}
+.board-page-main .footer-area {
+  position: absolute;
+  bottom: -166px;
+  width: 100%;
+}
+@media (max-width: 860px) {
+  .board-page-main {
+    width: 100vw;
+  }
+  .board-page-main .g-btn-area {
+    flex-wrap: wrap;
+  }
+  .board-page-main .announcement {
+    width: 90%;
+    padding: 12px 0;
+    margin-bottom: 60px;
+  }
+}/*# sourceMappingURL=boardPage.css.map */

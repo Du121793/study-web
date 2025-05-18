@@ -79,16 +79,19 @@ export default function UploadCarousel({ showCarouselEdit, setShowCarouselEdit, 
     const data = {
       numbers: wantRemoveImageId,
     }
-    adminService.deleteCarousels(token, data).then((res) => {
-      if (res.success) {
-        setBannerHasChange(!bannerHasChange)
-        init()
-        messageControl('刪除成功', true)
-      } else {
-        console.log(res)
+    adminService
+      .deleteCarousels(token, data)
+      .then((res) => {
+        if (res.success) {
+          setBannerHasChange(!bannerHasChange)
+          init()
+          messageControl('刪除成功', true)
+        }
+      })
+      .catch((err) => {
+        console.error(err)
         messageControl('刪除失敗', false)
-      }
-    })
+      })
   }
 
   const init = () => {

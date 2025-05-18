@@ -90,15 +90,14 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
   const topContainerRef = useRef(null)
   const [cardImageWidth, setCardImageWidth] = useState(0)
   const [cardImageHeight, setCardImageHeight] = useState(0)
-
+  /* 影片加載 */
+  const [videoLoading, setVideoLoading] = useState(false)
   useEffect(() => {
     setCardImageWidth(topContainerRef?.current?.clientWidth)
     setCardImageHeight(topContainerRef?.current?.scrollHeight)
   }, [windowsWidth])
 
-  const test = () => {
-    console.log(videos)
-  }
+  const test = () => {}
 
   const messageControl = (info, isSuccess) => {
     setMessage(info)
@@ -121,6 +120,7 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
   const getCourseVideos = (changeMessage = Boolean) => {
     if (token && course_id) {
       setLoading(true)
+      setVideoLoading(true)
       userService
         .getVideoInfo(token, course_id, {
           type: 'MainClass',
@@ -133,6 +133,7 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
           // 這行經常在剛npm run dev時出錯，有可能是api還沒啟動
           setVideos(res.data)
           setLoading(false)
+          setVideoLoading(false)
           if (changeMessage) {
             messageControl('加載完成', true)
           } else {
@@ -199,7 +200,6 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
     } else {
       setVideoDeleteBtnHeight('0px')
     }
-    console.log(videoDeleteBtnHeight)
   }
 
   // 二次確認是否刪除該影片
@@ -303,6 +303,7 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
   useEffect(() => {
     if (token && course_id) {
       setLoading(true)
+      setVideoLoading(true)
       userService
         .getVideoInfo(token, course_id, {
           type: 'MainClass',
@@ -316,6 +317,7 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
         .then((res) => {
           if (res?.success) {
             setLoading(false)
+            setVideoLoading(false)
             setVideos(res.data)
             setTotalPage(res.totalPage)
           } else {
@@ -542,7 +544,6 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
             width={24}
             height={24}
             onClick={() => {
-              console.log(totalPage)
               if (page === totalPage) {
                 return
               } else {
@@ -582,6 +583,15 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
           )}
 
           <div className="video-area">
+            {videoLoading && (
+              <div
+                className="video-card"
+                style={{ width: videoCardWidth }}>
+                <div
+                  className="loading-area"
+                  style={{ width: '100%', height: '90%' }}></div>
+              </div>
+            )}
             {videos &&
               videos.map((item) => (
                 <Link
@@ -688,7 +698,7 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
                               item.access.isAccess &&
                               `影片授權時間至${item.date.split(/[-T:.]/)[0]}/${item.date.split(/[-T:.]/)[1]}/${item.date.split(/[-T:.]/)[2]}
                               ${item.date.split(/[-T:.]/)[3]}:${item.date.split(/[-T:.]/)[4]}:}`}
-                            {item.isPrivate === false && <div className="box">1</div>}
+                            {item.isPrivate === false && <div className="box"></div>}
                           </div>
                         </div>
                       </div>

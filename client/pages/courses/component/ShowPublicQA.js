@@ -71,24 +71,26 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, showP
       question_id: QAInfo._id,
       folders: tempFolders,
     }
-    adminService.patchQaToFolders(token, data).then((res) => {
-      if (res?.success) {
-        console.log(res)
-        let tempData = {
-          folder_id: nowFolder,
-          page: page,
-          pageSize: pageSize,
-          sortBy: 'none',
-          sortOrder: sortOrder,
-          sortType: sortType,
+    adminService
+      .patchQaToFolders(token, data)
+      .then((res) => {
+        if (res?.success) {
+          let tempData = {
+            folder_id: nowFolder,
+            page: page,
+            pageSize: pageSize,
+            sortBy: 'none',
+            sortOrder: sortOrder,
+            sortType: sortType,
+          }
+          userService.getFolderQuestions(token, tempData).then((res) => {
+            setQAsInfo(res.data)
+          })
         }
-        userService.getFolderQuestions(token, tempData).then((res) => {
-          setQAsInfo(res.data)
-        })
-      } else {
-        console.log(res)
-      }
-    })
+      })
+      .catch((err) => {
+        console.error(err)
+      })
   }
 
   // 控制訊息
@@ -200,7 +202,6 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, showP
   }
 
   const test = () => {
-    console.log(QAsInfo)
   }
 
   // session setting
@@ -376,7 +377,9 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, showP
           {shortcut &&
             shortcut.length > 0 &&
             shortcut.map((item, index) => (
-              <div className="shortcut" key={index}>
+              <div
+                className="shortcut"
+                key={index}>
                 {item?.isRoot === true ? (
                   <Image
                     style={{ cursor: 'pointer' }}

@@ -55,7 +55,6 @@ export default function MessageBoard({ qa_id, submitSuccess, setSubmitSuccess })
   }
 
   const test = () => {
-    console.log(images)
   }
 
   // 取得role與檢查是否登陸
@@ -129,7 +128,7 @@ export default function MessageBoard({ qa_id, submitSuccess, setSubmitSuccess })
 
               // 檢查是否已經選過相同的檔案（這裡可以根據需求比對檔名或其他屬性）
               if (images.find((item) => item.name === selectedFile.name)) {
-                console.log('不能上傳同樣的圖片')
+                messageControl('不能上傳同樣的圖片',false)
               } else {
                 setImages([...images, selectedFile])
                 setPreViewImage([...preViewImage, selectedFile])

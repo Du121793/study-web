@@ -359,7 +359,6 @@ export default function RemoveUsers() {
           width={24}
           height={24}
           onClick={() => {
-            console.log(totalPage)
             if (page === totalPage) {
               return
             } else {

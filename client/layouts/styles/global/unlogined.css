@@ -1,0 +1,29 @@
+.unlogined-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+  gap: 24px;
+}
+.unlogined-main .content {
+  font-weight: bold;
+  font-size: 24px;
+}
+.unlogined-main .login-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #3acd00;
+  border-radius: 8px;
+  color: white;
+  font-size: 18px;
+  transition: 5s;
+  width: 180px;
+  height: 60px;
+  font-weight: bold;
+}
+.unlogined-main .login-area .line-login-icon-area .icon {
+  width: 50px;
+  height: 50px;
+}/*# sourceMappingURL=unlogined.css.map */

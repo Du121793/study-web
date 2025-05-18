@@ -16,7 +16,6 @@ const videoUploader = {
       const response = await axios.patch(QA_URL + `/QAMethod/${question_id}/uploadVideoStatus`, reqObj, {
         headers: authHeader,
       })
-      console.log(response)
       return response
     } catch (e) {
       return e

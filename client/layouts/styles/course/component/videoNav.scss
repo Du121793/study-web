@@ -1,0 +1,316 @@
+#video-nav {
+  position: relative;
+  top: 0;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.6);
+  margin-bottom: 24px;
+
+  .header {
+    font-weight: bold;
+    color: #e0e0e0;
+    padding-left: 24px;
+    user-select: none;
+    border-radius: 8px;
+    background-color: var(--main-color);
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    min-height: 80px;
+    font-size: 20px;
+    z-index: 1;
+    gap: 12px;
+
+    div {
+      padding-left: 24px;
+    }
+  }
+
+  .video-nav-content {
+    background-color: #ffffff;
+  }
+
+  .update-video-area {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 24px;
+    padding: 24px 0 0 24px;
+    width: 100%;
+    background-color: #fff;
+    .content {
+      word-break: keep-all;
+    }
+
+    .button {
+      color: #000;
+      display: flex;
+      justify-content: center;
+      cursor: pointer;
+      outline: none;
+      margin-left: 24px;
+      padding: 6px 10px;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+      background-color: var(--button-white);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+      transition: 0.2s;
+
+      &:hover {
+        background-color: var(--botton-white-hover);
+      }
+    }
+  }
+  .page-switch {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 24px 0;
+  }
+  .bottom-area {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    user-select: none;
+    background-color: #fff;
+  }
+
+  .show-more-video-btn {
+    margin-bottom: 12px;
+    background-color: var(--button-white);
+    cursor: pointer;
+    padding: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: 0.2s;
+    font-size: clamp(16px, 1.1vw, 20px);
+
+    &:hover {
+      background-color: var(--botton-white-hover);
+    }
+  }
+
+  .video-area-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 0 0 24px 0;
+    min-height: 240px;
+  }
+
+  .video-area {
+    width: 90%;
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 12px;
+    column-gap: 24px;
+    background-color: #fff;
+
+    .video-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: 0.2s;
+      border: none;
+      .edit-btn {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        z-index: 9;
+        background-color: #fff;
+        padding: 4px 8px;
+        color: black;
+        border-radius: 4px;
+        border: 1px solid rgba(0, 0, 0, 0.6);
+        font-size: clamp(14px, 1.2vw, 20px);
+        transition: 0.2s;
+      }
+      .edit-btn:hover {
+        background-color: #f1f1f1;
+      }
+      /* ===== 縮圖區塊：強制 16:9，先裁切再填滿 ===== */
+      .top-container {
+        width: 99%;
+        aspect-ratio: 16 / 9;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        border-radius: 6px;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+        .videos-shot {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+
+        .delete-video-btn {
+          z-index: 9;
+          position: absolute;
+          top: 0;
+          left: 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          color: #000;
+          font-weight: bold;
+          background-color: #ff5555;
+          border-bottom-right-radius: 6px;
+          border-bottom-left-radius: 6px;
+          font-size: 18px;
+          padding: 0 6px;
+          transition: 0.2s;
+          height: 0;
+          line-height: 24px;
+          border: none;
+        }
+
+        .video-length {
+          position: absolute;
+          top: 2px;
+          right: 2px;
+          padding: 1px 3px;
+          font-size: 16px;
+          color: #efefff;
+          background-color: #221831;
+          border-radius: 4px;
+          border: none;
+        }
+      }
+
+      .bottom-container {
+        flex: 1;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+
+        .info {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: space-between;
+          padding: 6px 0;
+
+          border: none;
+          .time {
+            width: 95%;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.574);
+
+            .day,
+            .clock {
+              display: flex;
+            }
+          }
+
+          .title {
+            width: 95%;
+            font-weight: bold;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 8px;
+          }
+
+          .bottom-area {
+            width: 95%;
+
+            .container {
+              display: flex;
+              gap: 12px;
+              overflow: auto;
+              align-items: center;
+              /* 還原 edit-btn 原本在文檔流的位置 */
+              .edit-btn {
+                position: static !important;
+                margin: 0;
+                padding: 4px 12px;
+                border: 1px solid rgba(0, 0, 0, 0.2);
+                border-radius: 4px;
+                background-color: var(--button-white);
+                transition: 0.2s;
+                white-space: normal !important;
+
+                &:hover {
+                  background-color: var(--botton-white-hover);
+                }
+              }
+
+              .access-time {
+                color: rgba(0, 0, 0, 0.6);
+
+                &.light {
+                  color: rgb(236, 89, 89);
+                }
+
+                .box {
+                  opacity: 0;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      @media (max-width: 860px) {
+        min-width: 80%;
+        gap: 0;
+        .bottom-container {
+          padding: 0;
+          .bottom-area {
+            .container {
+              margin: 0;
+            }
+          }
+        }
+      }
+    }
+    .video-card:hover {
+      background-color: #efefef;
+    }
+    @media (max-width: 860px) {
+      gap: 0;
+    }
+  }
+}
+
+.video-card {
+  .bottom-container {
+    .info {
+      /* 標題文字改黑 */
+      .title {
+        color: #000 !important;
+      }
+      .bottom-area {
+        .container {
+          /* 按鈕靠左 */
+          justify-content: flex-start !important;
+
+          .edit-btn {
+            /* 按鈕文字與邊框改黑 */
+            color: #000 !important;
+            border-color: #000 !important;
+          }
+        }
+      }
+    }
+  }
+}

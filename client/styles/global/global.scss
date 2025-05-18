@@ -352,12 +352,19 @@ import ArrowRight from '../../public/profile/rightArrow.png'
   display: flex;
   align-items: center;
   gap: 12px;
+  margin-bottom: 12px;
   .page-switcher {
+    transition: .2s;
+    border: 1px solid gray;
+    border-radius: 2px;
     user-select: none;
     width: 24px;
     height: 24px;
     cursor: pointer;
     color: #525252;
+  }
+  .page-switcher:hover {
+    background-color: rgb(225, 225, 225);
   }
   .content {
     user-select: none;
@@ -468,3 +475,26 @@ useEffect(() => {
   }
 }, [page_body])
 */
+
+// 灰底讀取
+@keyframes loadingBgc {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+.loading-area {
+  width: 60%;
+  height: 24px;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+
+  background: linear-gradient(90deg, #d8d8d8 0%, #dbdbdb 25%, #d2d2d2 50%, #dbdbdb 75%, #d8d8d8 100%);
+  background-size: 200% 100%;
+  background-repeat: repeat-x;
+
+  animation: loadingBgc 1.2s linear infinite;
+}

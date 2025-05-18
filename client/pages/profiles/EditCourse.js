@@ -130,7 +130,6 @@ export default function EditCourse() {
   const searchCourse = () => {
     const data = { courseName: searchInput, page: page, pageSize: pageSize }
     adminService.getCourses(token, data).then((res) => {
-      console.log(res)
       setTeachers()
       setCoursesInfo(res.data)
     })
@@ -155,7 +154,6 @@ export default function EditCourse() {
         courseName: courseNameInput.trim(),
         teacherId: teachers !== '' ? seletedTeacher : undefined,
       }
-      console.log(courseInfo)
       adminService.createANewCourse(token, courseInfo).then((res) => {
         let data = {
           page: page,

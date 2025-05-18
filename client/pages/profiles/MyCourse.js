@@ -31,13 +31,17 @@ export default function MyCourse() {
     let filter = {
       courseName: searchInput,
     }
-    userService.getUserRegistedCourses(token, filter).then((res) => {
-      setCourseLoading(false)
-      if (res?.success) {
-        console.log(res)
-        setGetCourses(res.data)
-      }
-    })
+    userService
+      .getUserRegistedCourses(token, filter)
+      .then((res) => {
+        setCourseLoading(false)
+        if (res?.success) {
+          setGetCourses(res.data)
+        }
+      })
+      .catch((err) => {
+        console.error(err)
+      })
   }
 
   const test = () => {
@@ -116,6 +120,13 @@ export default function MyCourse() {
             className="courses"
             ref={coursesEle}>
             {courseLoading && <LoadingAnime />}
+            {getCourses.length === 0 && (
+              <div className="course">
+                <div
+                  className="loading-area"
+                  style={{ width: '100%', height: '100%' }}></div>
+              </div>
+            )}
             {getCourses &&
               getCourses.length > 0 &&
               getCourses.map((item, index) => (
@@ -142,12 +153,7 @@ export default function MyCourse() {
                       {item?.teacher?.userinfo?.username}
                     </div>
                     <div className="info-area">
-                      <span
-                        onClick={() => {
-                          console.log(item)
-                        }}>
-                        科目:{' '}
-                      </span>
+                      <span>科目: </span>
                       {item.subject}
                     </div>
                     <div className="info-area">

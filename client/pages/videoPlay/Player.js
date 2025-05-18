@@ -320,10 +320,7 @@ export default function Player() {
       </div>
       {showVideoListAfterInfo && (
         <div
-          className="video-list-after-info-area"
-          onClick={() => {
-            console.log(VideosList)
-          }}>
+          className="video-list-after-info-area">
           {VideosList.map((item, idx) => {
             if (item.access.isAccess) {
               return (

@@ -63,9 +63,10 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
   // 控制內部卡片的寬度
   const qa_container_ref = useRef(null)
   const [qaCardWidth, setQaCardWidth] = useState(0)
+  /* QA加載中 */
+  const [qaLoading, setQaLoading] = useState(false)
 
-  const test = () => {
-  }
+  const test = () => {}
 
   // 切換排序
   const changeSort = (sortBy, timeSort) => {
@@ -76,9 +77,12 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
       pageSize: pageSize,
       page: 1,
     }
-
+    setLoading(true)
+    setQaLoading(true)
     userService.getCourseQAs(token, course_id, data).then((res) => {
       if (res.success) {
+        setLoading(false)
+        setQaLoading(false)
         setCourseQas(res.data)
         setTimeout(() => {
           setQaHeight(navInnerRef?.current?.clientHeight + headerRef?.current?.clientHeight + 100)
@@ -128,7 +132,6 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
         course_ids: course_ids_temp,
       }
       adminService.patchQaToFolders(token, data).then((res) => {
-        console.log(res)
         const tempData = {
           // 沒有就用預設state
           sortType: sortBy,
@@ -240,6 +243,7 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
   useEffect(() => {
     if (token) {
       setLoading(true)
+      setQaLoading(true)
       const data = {
         // 沒有就用預設state
         sortType: sortBy,
@@ -252,6 +256,7 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
           setCourseQas(res.data)
           setTotalPage(res.totalPage)
           setLoading(false)
+          setQaLoading(false)
           setTimeout(() => {
             setQaHeight(navInnerRef?.current?.clientHeight + headerRef?.current?.clientHeight + 100)
           }, 30)
@@ -452,7 +457,6 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
               width={24}
               height={24}
               onClick={() => {
-                console.log(totalPage)
                 if (page === totalPage) {
                   return
                 } else {
@@ -477,6 +481,15 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
             <div
               className="QA-container"
               ref={qa_container_ref}>
+              {qaLoading && (
+                <div
+                  className="QA-list"
+                  style={{ padding: 0, border: 0, width: qaCardWidth }}>
+                  <div
+                    className="loading-area"
+                    style={{ width: '100%', height: '100%' }}></div>
+                </div>
+              )}
               {(defaultSortType !== 'none' || (sortBy && sortBy !== 'none')) &&
                 courseQas.map((item, index) => {
                   if (item.tag) {

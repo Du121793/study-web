@@ -131,7 +131,6 @@ export default function AdminLayout({ user_role }) {
 
   useEffect(() => {
     setTimeout(() => {
-      console.log(rightItemtRef.current.scrollHeight)
       setListHeight(rightItemtRef.current.scrollHeight)
     }, 100)
   }, [component, className])

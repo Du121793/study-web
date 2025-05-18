@@ -33,17 +33,14 @@ export default function ShowMoreQA({ courseName, showMoreQA, setShowMoreQA, toke
   useEffect(() => {
     if (resourceCategory === '' && token) {
       userService.getCourseQAsFromTag(token, course_id, pageSize, '無特定主題', hint).then((res) => {
-        console.log(res)
         setQaInfo(res.data)
       })
     } else if (hint === '' && token) {
       userService.getCourseQAsFromTag(token, course_id, pageSize, resourceCategory, '無特定主題').then((res) => {
-        console.log(res)
         setQaInfo(res.data)
       })
     } else {
       userService.getCourseQAsFromTag(token, course_id, pageSize, resourceCategory, hint).then((res) => {
-        console.log(res)
         setQaInfo(res.data)
       })
     }
@@ -153,13 +150,7 @@ export default function ShowMoreQA({ courseName, showMoreQA, setShowMoreQA, toke
                 </div>
                 <div className="content-area">
                   <div className="time">
-                    <div
-                      className="create-time"
-                      onClick={() => {
-                        console.log(item)
-                      }}>
-                      發布時間 : {new Date(item.date).toLocaleString()}
-                    </div>
+                    <div className="create-time">發布時間 : {new Date(item.date).toLocaleString()}</div>
                   </div>
                   <div
                     style={{ color: item?.replied === true ? 'rgb(114, 37, 255)' : 'blue' }}

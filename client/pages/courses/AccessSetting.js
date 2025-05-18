@@ -65,9 +65,7 @@ export default function AccessSetting() {
   // header login state
   const [loginState, setLoginState] = useState(false)
 
-  const test = () => {
-    console.log(accessInfo)
-  }
+  const test = () => {}
 
   // 新增權杖
   const submitNewAccess = () => {
@@ -106,13 +104,18 @@ export default function AccessSetting() {
     try {
       if (deleteDoubleCheck && access_id && course_id) {
         adminService.deleteAccess(token, course_id, access_id).then((res) => {
-          console.log(res)
-          adminService.getAccessAllInfo(token, course_id).then((res) => {
-            if (res.success === true) {
-              messageControl('刪除成功', true)
-              setAccessInfo(res.data)
-            }
-          })
+          adminService
+            .getAccessAllInfo(token, course_id)
+            .then((res) => {
+              if (res?.success === true) {
+                messageControl('刪除成功', true)
+                setAccessInfo(res.data)
+              }
+            })
+            .catch((err) => {
+              messageControl('刪除失敗', true)
+              console.error(err)
+            })
         })
       }
     } catch (err) {

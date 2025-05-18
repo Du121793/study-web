@@ -46,7 +46,6 @@ export default function AccessVideoList({ editStatus, setEditStatus, choseAccess
       } else {
         e.classList.add('active')
         setSelectedVideo([...selectedVideo, _id])
-        console.log(selectedVideo)
       }
     })
   }
@@ -94,8 +93,6 @@ export default function AccessVideoList({ editStatus, setEditStatus, choseAccess
   }, [token, course_id, choseAccessId])
 
   const test = () => {
-    console.log(choseAccessInfo)
-    console.log(student_id)
   }
 
   return (

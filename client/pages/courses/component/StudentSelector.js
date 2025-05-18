@@ -29,7 +29,6 @@ export default function StudentSelector({ course_id, selectedStudent, setSelecte
   }
 
   const test = () => {
-    console.log(members)
   }
 
   useEffect(() => {

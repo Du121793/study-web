@@ -37,6 +37,12 @@ export default function Index() {
     if (moveToBoardRef.current) moveToBoardRef.current.doSomething()
   }
 
+  const setSessionData = (key, value) => {
+    if (!sessionStorage.getItem(key)) {
+      sessionStorage.setItem(key, value)
+    }
+  }
+
   // session 設定
   useEffect(() => {
     if (token) {
@@ -46,14 +52,12 @@ export default function Index() {
           if (!res?.data?.userinfo) {
             return
           }
-          if (!sessionStorage.getItem('user_role') || !sessionStorage.getItem('user_lineID') || !sessionStorage.getItem('user_line_shot') || sessionStorage.getItem('user_id')) {
-            sessionStorage.setItem('user_lineID', res.data.lineID)
-            sessionStorage.setItem('user_id', res.data._id)
-            sessionStorage.setItem('user_line_shot', res.data.userinfo.pictureUrl)
-            sessionStorage.setItem('user_role', res.data.role)
-            sessionStorage.setItem('user_name', res.data.userinfo.username)
-            setUserShot(res.data.userinfo.pictureUrl)
-          }
+          setSessionData('user_lineID', res.data.lineID)
+          setSessionData('user_id', res.data._id)
+          setSessionData('user_line_shot', res.data.userinfo.pictureUrl)
+          setSessionData('user_role', res.data.role)
+          setSessionData('user_name', res.data.userinfo.username)
+          setUserShot(res.data.userinfo.pictureUrl)
           setUserRole(res.data.role)
           setLogined(true)
         })

@@ -1,0 +1,293 @@
+@charset "UTF-8";
+#video-nav {
+  position: relative;
+  top: 0;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.6);
+  margin-bottom: 24px;
+}
+#video-nav .header {
+  font-weight: bold;
+  color: #e0e0e0;
+  padding-left: 24px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  border-radius: 8px;
+  background-color: var(--main-color);
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  min-height: 80px;
+  font-size: 20px;
+  z-index: 1;
+  gap: 12px;
+}
+#video-nav .header div {
+  padding-left: 24px;
+}
+#video-nav .video-nav-content {
+  background-color: #ffffff;
+}
+#video-nav .update-video-area {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding: 24px 0 0 24px;
+  width: 100%;
+  background-color: #fff;
+}
+#video-nav .update-video-area .content {
+  word-break: keep-all;
+}
+#video-nav .update-video-area .button {
+  color: #000;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  outline: none;
+  margin-left: 24px;
+  padding: 6px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  background-color: var(--button-white);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: 0.2s;
+}
+#video-nav .update-video-area .button:hover {
+  background-color: var(--botton-white-hover);
+}
+#video-nav .page-switch {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+}
+#video-nav .bottom-area {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  background-color: #fff;
+}
+#video-nav .show-more-video-btn {
+  margin-bottom: 12px;
+  background-color: var(--button-white);
+  cursor: pointer;
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: 0.2s;
+  font-size: clamp(16px, 1.1vw, 20px);
+}
+#video-nav .show-more-video-btn:hover {
+  background-color: var(--botton-white-hover);
+}
+#video-nav .video-area-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 0 0 24px 0;
+  min-height: 240px;
+}
+#video-nav .video-area {
+  width: 90%;
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 12px;
+  -moz-column-gap: 24px;
+       column-gap: 24px;
+  background-color: #fff;
+}
+#video-nav .video-area .video-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: 0.2s;
+  border: none;
+  /* ===== 縮圖區塊：強制 16:9，先裁切再填滿 ===== */
+}
+#video-nav .video-area .video-card .edit-btn {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 9;
+  background-color: #fff;
+  padding: 4px 8px;
+  color: black;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.6);
+  font-size: clamp(14px, 1.2vw, 20px);
+  transition: 0.2s;
+}
+#video-nav .video-area .video-card .edit-btn:hover {
+  background-color: #f1f1f1;
+}
+#video-nav .video-area .video-card .top-container {
+  width: 99%;
+  aspect-ratio: 16/9;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+#video-nav .video-area .video-card .top-container .videos-shot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+  display: block;
+}
+#video-nav .video-area .video-card .top-container .delete-video-btn {
+  z-index: 9;
+  position: absolute;
+  top: 0;
+  left: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: #000;
+  font-weight: bold;
+  background-color: #ff5555;
+  border-bottom-right-radius: 6px;
+  border-bottom-left-radius: 6px;
+  font-size: 18px;
+  padding: 0 6px;
+  transition: 0.2s;
+  height: 0;
+  line-height: 24px;
+  border: none;
+}
+#video-nav .video-area .video-card .top-container .video-length {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  padding: 1px 3px;
+  font-size: 16px;
+  color: #efefff;
+  background-color: #221831;
+  border-radius: 4px;
+  border: none;
+}
+#video-nav .video-area .video-card .bottom-container {
+  flex: 1;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+#video-nav .video-area .video-card .bottom-container .info {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  border: none;
+}
+#video-nav .video-area .video-card .bottom-container .info .time {
+  width: 95%;
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.574);
+}
+#video-nav .video-area .video-card .bottom-container .info .time .day,
+#video-nav .video-area .video-card .bottom-container .info .time .clock {
+  display: flex;
+}
+#video-nav .video-area .video-card .bottom-container .info .title {
+  width: 95%;
+  font-weight: bold;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 8px;
+}
+#video-nav .video-area .video-card .bottom-container .info .bottom-area {
+  width: 95%;
+}
+#video-nav .video-area .video-card .bottom-container .info .bottom-area .container {
+  display: flex;
+  gap: 12px;
+  overflow: auto;
+  align-items: center;
+  /* 還原 edit-btn 原本在文檔流的位置 */
+}
+#video-nav .video-area .video-card .bottom-container .info .bottom-area .container .edit-btn {
+  position: static !important;
+  margin: 0;
+  padding: 4px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  background-color: var(--button-white);
+  transition: 0.2s;
+  white-space: normal !important;
+}
+#video-nav .video-area .video-card .bottom-container .info .bottom-area .container .edit-btn:hover {
+  background-color: var(--botton-white-hover);
+}
+#video-nav .video-area .video-card .bottom-container .info .bottom-area .container .access-time {
+  color: rgba(0, 0, 0, 0.6);
+}
+#video-nav .video-area .video-card .bottom-container .info .bottom-area .container .access-time.light {
+  color: rgb(236, 89, 89);
+}
+#video-nav .video-area .video-card .bottom-container .info .bottom-area .container .access-time .box {
+  opacity: 0;
+}
+@media (max-width: 860px) {
+  #video-nav .video-area .video-card {
+    min-width: 80%;
+    gap: 0;
+  }
+  #video-nav .video-area .video-card .bottom-container {
+    padding: 0;
+  }
+  #video-nav .video-area .video-card .bottom-container .bottom-area .container {
+    margin: 0;
+  }
+}
+#video-nav .video-area .video-card:hover {
+  background-color: #efefef;
+}
+@media (max-width: 860px) {
+  #video-nav .video-area {
+    gap: 0;
+  }
+}
+
+.video-card .bottom-container .info {
+  /* 標題文字改黑 */
+}
+.video-card .bottom-container .info .title {
+  color: #000 !important;
+}
+.video-card .bottom-container .info .bottom-area .container {
+  /* 按鈕靠左 */
+  justify-content: flex-start !important;
+}
+.video-card .bottom-container .info .bottom-area .container .edit-btn {
+  /* 按鈕文字與邊框改黑 */
+  color: #000 !important;
+  border-color: #000 !important;
+}/*# sourceMappingURL=videoNav.css.map */

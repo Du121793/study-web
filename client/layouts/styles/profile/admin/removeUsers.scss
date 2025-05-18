@@ -1,0 +1,195 @@
+.remove-users-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fefefe; // 淡色背景
+  height: 100%;
+  gap: 8px;
+  z-index: 0;
+  .container-line {
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    .member-id-input {
+      width: 24vw;
+    }
+    .title {
+      font-size: clamp(16px, 1.2vw, 20px);
+    }
+  }
+  .remove-users-title {
+    font-size: clamp(28px, 2vw, 34px);
+  }
+  .remove-user-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 12px;
+    div {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      .name-input {
+        width: 100px;
+      }
+      .grade-input {
+        width: 100px;
+      }
+      .title {
+        font-size: clamp(16px, 1.2vw, 20px);
+      }
+    }
+  }
+  .header-btns {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    .button {
+      cursor: pointer;
+      padding: 4px 8px 4px 8px;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+      transition: 0.2s;
+    }
+    .button:hover {
+      background-color: #f0f0f0;
+    }
+    #delete-btn {
+      background-color: #efb5b5;
+    }
+    #delete-btn:hover {
+      background-color: #e0aaaa;
+    }
+  }
+  .user-list-title {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 90%;
+    .container {
+      display: flex;
+      align-items: center;
+      border-radius: 4px;
+      padding: 4px 0 4px 0;
+      gap: 12px;
+      font-size: clamp(16px, 1.2vw, 20px);
+      word-break: keep-all;
+      .username {
+        width: 80px;
+        margin-left: 6px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .grade {
+        pointer-events: none;
+        width: 70px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .realname {
+        width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .phone {
+        width: 140px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .userid {
+        width: 30%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .role {
+        width: 70px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+  .user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 90%;
+    font-size: clamp(16px, 1.2vw, 20px);
+    .container {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      border-radius: 4px;
+      padding: 4px 0 4px 0;
+      gap: 12px;
+      .username {
+        pointer-events: none;
+        width: 80px;
+        margin-left: 6px;
+      }
+      .grade {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        pointer-events: none;
+        width: 70px;
+      }
+      .realname {
+        pointer-events: none;
+        width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .phone {
+        pointer-events: none;
+        width: 140px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .userid {
+        pointer-events: none;
+        width: 30%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .role {
+        pointer-events: none;
+        width: 70px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+  @media (max-width: 860px) {
+    padding-top: 72px;
+    width: 100vw;
+    .remove-user-header {
+      flex-direction: column;
+      .top-info-input {
+        display: flex;
+        width: 80%;
+        .title {
+          width: 18%;
+          word-break: keep-all;
+          display: flex;
+          justify-content: flex-end;
+        }
+        input {
+          flex: 1;
+        }
+      }
+    }
+  }
+}

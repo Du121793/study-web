@@ -116,7 +116,6 @@ export default function EditMembers() {
     })
     let arrayTemp = Array.from(new Set([...member_ids, ...selectedStudentId]))
     setSelectedStudentId(arrayTemp)
-    console.log(selectedStudentId)
   }
 
   // 按下"加入到課程"的函式，將選擇的人加入到指定課程
@@ -312,7 +311,6 @@ export default function EditMembers() {
       }
     }
     if (by === 'selected' && selectedStudentId.length) {
-      console.log('將選取的成員匯出csv檔案')
       let data = {
         page: page,
         pageSize: pageSize,
@@ -569,7 +567,6 @@ export default function EditMembers() {
         <form
           className="search-form"
           onSubmit={(e) => {
-            console.log(123)
             e.preventDefault()
             searchMembers()
           }}>

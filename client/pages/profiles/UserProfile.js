@@ -50,13 +50,9 @@ export default function UserProfile() {
     }, 2000)
   }
 
-  const test = () => {
-    console.log(hideAvatar)
-    console.log(userInfo)
-  }
+  const test = () => {}
 
   const changeUserRole = (role) => {
-    console.log(role)
     let data = {
       role,
     }
@@ -108,16 +104,19 @@ export default function UserProfile() {
   useEffect(() => {
     if (token) {
       setLoading(true)
-      userService.getUserInfo(token).then((res) => {
-        if (res && res.success) {
-          console.log(res.data.userinfo)
-          setHideAvatar(res.data.userinfo.makePictureAnonymous)
-          setUserInfo(res.data)
-          setLoading(false)
-        } else {
+      userService
+        .getUserInfo(token)
+        .then((res) => {
+          if (res && res.success) {
+            setHideAvatar(res.data.userinfo.makePictureAnonymous)
+            setUserInfo(res.data)
+            setLoading(false)
+          }
+        })
+        .catch((err) => {
           messageControl('發生錯誤，即將跳轉至首頁', false)
-        }
-      })
+          console.error(err)
+        })
     }
   }, [token])
 
@@ -151,7 +150,6 @@ export default function UserProfile() {
             className="checkbox"
             checked={hideAvatar}
             onChange={(e) => {
-              console.log(e.target.checked)
               setHideAvatar(e.target.checked)
             }}
             type="checkbox"

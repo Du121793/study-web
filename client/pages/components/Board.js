@@ -35,15 +35,18 @@ export default function Board({ editHasChange, moveToBoardRef }) {
       page: page,
       pageSize: pageSize,
     }
-    userService.getBoards(data).then((res) => {
-      if (res.success) {
-        setLoading(false)
-        setBoards(res.data.boards)
-        setTotalPage(res)
-      } else {
-        console.log(res)
-      }
-    })
+    userService
+      .getBoards(data)
+      .then((res) => {
+        if (res?.success) {
+          setLoading(false)
+          setBoards(res.data.boards)
+          setTotalPage(res)
+        }
+      })
+      .catch((err) => {
+        console.error(err)
+      })
   }, [editHasChange, pageSize])
 
   return (
@@ -57,7 +60,12 @@ export default function Board({ editHasChange, moveToBoardRef }) {
         className="board-contianer"
         ref={boardEle}>
         <div className="title">
-          <span onClick={moveToBoardEle}>最新消息</span>
+          <span
+            onClick={() => {
+              moveToBoardEle()
+            }}>
+            最新消息
+          </span>
           <Image
             className="icon"
             src={titleIcon}
@@ -67,6 +75,11 @@ export default function Board({ editHasChange, moveToBoardRef }) {
         </div>
 
         <ul className="news-link-area">
+          {!boards.length && (
+            <div
+              className="loading-area"
+              style={{ width: '100%', height: '80px' }}></div>
+          )}
           {boards &&
             boards.length > 0 &&
             boards.map((item, index) => {
@@ -89,18 +102,20 @@ export default function Board({ editHasChange, moveToBoardRef }) {
               )
             })}
         </ul>
-        <div
-          className="more-news-link"
-          onClick={() => {
-            setPageSize(pageSize + 10)
-          }}>
-          <span
+        {boards && (
+          <div
+            className="more-news-link"
             onClick={() => {
               setPageSize(pageSize + 10)
             }}>
-            查看更多最新消息 {'>>>'}
-          </span>
-        </div>
+            <span
+              onClick={() => {
+                setPageSize(pageSize + 10)
+              }}>
+              查看更多最新消息 {'>>>'}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   )

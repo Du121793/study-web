@@ -46,7 +46,6 @@ const adminService = {
   // 註冊該課程給成員
   // let { user_ids, course_ids } = req.body;
   async registerMember(token, data) {
-    console.log(data)
     // registeInfo 內存放 學生id陣列與課程id { user_ids, course_id }
     const authHeader = token ? { Authorization: token } : {}
     try {
@@ -70,7 +69,6 @@ const adminService = {
 
   // 取消註冊該課程的成員
   async unRegisterMember(token, unRegisterInfo) {
-    console.log(unRegisterInfo)
     // unRegisterInfo 內存放 學生id陣列與課程id { user_ids, course_id }
     const authHeader = token ? { Authorization: token } : {}
     try {
@@ -173,7 +171,6 @@ const adminService = {
         pageSize: pageSize,
     }*/
     try {
-      console.log(data)
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios
         .get(USER_URL + '/exportMembers', {
@@ -365,7 +362,6 @@ const adminService = {
   async deleteVideo(token, videoId, courseID) {
     try {
       const authHeader = token ? { Authorization: token } : {}
-      console.log(BASE_COURSE_URL + `/${courseID}/deleteVideo`)
       const response = await axios.delete(BASE_COURSE_URL + `/${courseID}/deleteVideo`, {
         headers: authHeader,
         data: { videoId },
@@ -482,9 +478,8 @@ const adminService = {
   // data = { courseId, courseName, subject, grade, courseClass }
   async editCourse(token, data) {
     try {
-      console.log(data)
       const authHeader = token ? { Authorization: token } : {}
-      console.log(COURSE_URL + `/patchCourse`)
+
       const response = await axios.patch(COURSE_URL + `/patchCourse`, data, {
         headers: authHeader,
       })
@@ -507,7 +502,6 @@ const adminService = {
   // { accessName, videoIDs, studentIDs, accessDate, unlimited }
   async addNewVideoAccess(token, course_id, data) {
     try {
-      console.log(data)
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.post(BASE_COURSE_URL + `/${course_id}/videoAccess/postNewAccess`, data, {
         headers: authHeader,
@@ -687,7 +681,6 @@ const adminService = {
   },
   // 刪除輪播圖
   async deleteCarousels(token, data) {
-    console.log(data)
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.delete(API_URL + `/modifyResource/deleteCarousel`, {
@@ -746,7 +739,6 @@ const adminService = {
       const response = await axios.delete(API_URL + `/modifyResource/deleteBoard/${board_id}`, {
         headers: authHeader,
       })
-      console.log(response)
       return response?.data
     } catch (e) {
       if (e.response?.status === 401) {
@@ -763,7 +755,6 @@ const adminService = {
 
   // 編輯公告
   async putBoard(token, data) {
-    console.log(data)
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.put(API_URL + `/modifyResource/putBoard`, data, {
@@ -919,7 +910,6 @@ const adminService = {
      * @param {string} folder_id - 要刪除的資料夾ID
      * @returns {Object} 刪除結果
      */
-    console.log(token)
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.delete(API_URL + `/course/question/modifyQA/folder/deleteFolder`, {

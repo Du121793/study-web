@@ -256,7 +256,7 @@ export default function QaPage() {
             setManyImages(res.data.image.length)
           }
         })
-        .catch((err) => console.log(err))
+        .catch((err) => console.error(err))
       userService
         .getQaComment(token, qa_id)
         .then((res) => {
@@ -393,6 +393,11 @@ export default function QaPage() {
           </button>
         </div>
         <div className="right">
+          {loading && (
+            <div
+              className="loading-area"
+              style={{ width: '120px', height: '48px' }}></div>
+          )}
           <div className="content">{courseName}</div>
           <div className="hint">{qa_id}</div>
         </div>
@@ -460,6 +465,11 @@ export default function QaPage() {
             />
           </div>
         )}
+        {loading && (
+          <div
+            className="loading-area"
+            style={{ width: '100%', height: '48px' }}></div>
+        )}
         <div className="time">{qaInfo && new Date(qaInfo.date).toLocaleString()}</div>
         <HtmlRenderer htmlString={qaInfo && qaInfo.description}></HtmlRenderer>
       </div>
@@ -485,6 +495,11 @@ export default function QaPage() {
           </select>
         </div>
         {/* 留言區域 */}
+        {loading && (
+          <div
+            className="loading-area"
+            style={{ width: '80%', height: '64px' }}></div>
+        )}
         {comments &&
           comments.map((item, index) => (
             <div
@@ -497,10 +512,7 @@ export default function QaPage() {
                   src={item?.poster?.displayPictureUrl !== '' ? item.poster.displayPictureUrl : anonymous}
                   width={40}
                   height={40}
-                  alt="user shot"
-                  onClick={() => {
-                    console.log(item)
-                  }}></Image>
+                  alt="user shot"></Image>
               </div>
               <div className="message-info">
                 <div className="message-top">
@@ -637,7 +649,6 @@ export default function QaPage() {
             width={24}
             height={24}
             onClick={() => {
-              console.log(totalPage)
               if (page === totalPage) {
                 return
               } else {

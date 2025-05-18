@@ -33,9 +33,7 @@ export default function UploadVideoFc({ setshowUploadVideoUI, showUploadVideoUI,
   // 控制頁面scroll狀態
   const [page_body, setPage_body] = useState([])
 
-  const test = () => {
-    console.log(preViewVideoImage)
-  }
+  const test = () => {}
 
   const getVideoPreviewImage = async (file) => {
     const blobUrl = URL.createObjectURL(await autoExtractFrame(file))
@@ -311,7 +309,7 @@ export default function UploadVideoFc({ setshowUploadVideoUI, showUploadVideoUI,
     if (found.tusInstance && (found.message === '上傳中' || found.message === '已暫停') && typeof found.tusInstance.abort === 'function') {
       found.tusInstance.abort()
     } else {
-      console.log('無有效的 tusInstance，無法真正終止上傳。')
+      console.error('無有效的 tusInstance，無法真正終止上傳。')
     }
 
     if (found.videoId) {

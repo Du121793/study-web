@@ -1,0 +1,235 @@
+.edit-members-main {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fefefe;
+  width: 100%;
+  height: 100%;
+  gap: 12px;
+}
+.edit-members-main .title {
+  margin-top: 24px;
+  font-size: clamp(28px, 2vw, 34px);
+}
+.edit-members-main .input-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: clamp(16px, 1.2vw, 20px);
+}
+.edit-members-main .member-selector-area {
+  width: 95%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+.edit-members-main .member-selector-area .option-area {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+  font-weight: bold;
+  font-size: clamp(16px, 1.2vw, 20px);
+}
+.edit-members-main .member-selector-area .option-area .button {
+  cursor: pointer;
+  transition: 0.2s;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  padding: 4px 6px;
+}
+.edit-members-main .member-selector-area .option-area .button:hover {
+  background-color: #f0f0f0;
+}
+.edit-members-main .member-selector-area .option-area .active {
+  background-color: #d4d4d4;
+  box-shadow: inset 0px 0px 4px 0.5px rgba(0, 0, 0, 0.3);
+}
+.edit-members-main .member-selector-area .option-area .active:hover {
+  background-color: #c5c5c5;
+  box-shadow: inset 0px 0px 4px 0.5px rgba(0, 0, 0, 0.3);
+}
+.edit-members-main .member-selector-area .option-area .add-member-to-course-btn {
+  background-color: #c1f49d;
+  border: 1px solid rgb(193, 193, 193);
+}
+.edit-members-main .member-selector-area .option-area .add-member-to-course-btn:hover {
+  background-color: #aedb8f;
+}
+.edit-members-main .member-selector-area .option-area .remove-member-to-course-btn {
+  background-color: #f4a8a8;
+  border: 1px solid rgb(193, 193, 193);
+}
+.edit-members-main .member-selector-area .option-area .remove-member-to-course-btn:hover {
+  background-color: #d79595;
+}
+.edit-members-main .member-selector-area .search-form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  width: 95%;
+  gap: 8px;
+}
+.edit-members-main .member-selector-area .search-form .username-input {
+  word-break: keep-all;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.edit-members-main .member-selector-area .search-form .username-input input {
+  width: 120px;
+}
+.edit-members-main .member-selector-area .search-form .realname-input {
+  word-break: keep-all;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.edit-members-main .member-selector-area .search-form .realname-input input {
+  width: 100px;
+}
+.edit-members-main .member-selector-area .search-form .phoneNumber-input {
+  word-break: keep-all;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.edit-members-main .member-selector-area .search-form .phoneNumber-input input {
+  width: 120px;
+}
+.edit-members-main .member-selector-area .search-form .grade-input {
+  word-break: keep-all;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.edit-members-main .member-selector-area .search-form .grade-input input {
+  width: 120px;
+}
+.edit-members-main .member-selector-area .search-form .role-input {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.edit-members-main .member-selector-area .member-list-area {
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 24px;
+}
+.edit-members-main .member-selector-area .member-list-area .inner-line {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  padding: 8px;
+  gap: 4px;
+  font-size: clamp(16px, 1.2vw, 20px);
+}
+.edit-members-main .member-selector-area .member-list-area .inner-line .user-name {
+  width: 20%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.edit-members-main .member-selector-area .member-list-area .inner-line .real-name {
+  width: 20%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.edit-members-main .member-selector-area .member-list-area .inner-line .phone {
+  width: 20%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.edit-members-main .member-selector-area .member-list-area .inner-line .grade {
+  width: 10%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.edit-members-main .member-selector-area .member-list-area .inner-line .role {
+  width: 20%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.edit-members-main .member-selector-area .page-switch {
+  display: flex;
+  gap: 12px;
+}
+.edit-members-main .member-selector-area .page-switch .page-switcher {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  color: #525252;
+}
+.edit-members-main .member-selector-area .page-switch .content {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  font-weight: bold;
+  color: #525252;
+}
+.edit-members-main .member-selector-area .page-switch .pointer {
+  cursor: pointer;
+}
+.edit-members-main .member-selector-area .page-switch .now-page {
+  cursor: pointer;
+  display: flex;
+  color: #9a9a9a;
+  gap: 4px;
+}
+.edit-members-main .member-selector-area .page-switch .now-page .page {
+  cursor: pointer;
+}
+.edit-members-main .member-selector-area .page-switch .active {
+  font-weight: bold;
+  color: rgb(0, 0, 0);
+}
+@media (max-width: 860px) {
+  .edit-members-main .member-selector-area {
+    width: 80vw;
+  }
+  .edit-members-main .member-selector-area .search-form {
+    flex-direction: column;
+    width: 100%;
+  }
+  .edit-members-main .member-selector-area .search-form div {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .edit-members-main .member-selector-area .search-form div .content {
+    width: 100%;
+  }
+  .edit-members-main .member-selector-area .search-form div input[type=text] {
+    width: 100%;
+  }
+  .edit-members-main .member-selector-area .search-form .role-input {
+    margin-top: 12px;
+    flex-direction: row;
+    align-items: center;
+    width: 80%;
+  }
+  .edit-members-main .member-selector-area .search-form .role-input .content {
+    flex: 0;
+    word-break: keep-all;
+  }
+  .edit-members-main .member-selector-area .search-form .role-input select {
+    flex: 1;
+    padding: 4px 8px;
+  }
+}/*# sourceMappingURL=editMembers.css.map */

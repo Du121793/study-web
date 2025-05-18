@@ -1,0 +1,102 @@
+.myCourse-main {
+  flex: 1;
+  z-index: 999;
+  gap: 12px;
+  z-index: 99;
+  height: 100%;
+  background-color: #ffffff;
+  overflow: hidden;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+  width: 100%;
+}
+.myCourse-main .courses-container {
+  width: 100%;
+  height: 100%;
+  padding: 24px 0 32px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+.myCourse-main .courses-container .course-page-header {
+  font-size: clamp(28px, 2vw, 34px);
+}
+.myCourse-main .courses-container .search-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+}
+.myCourse-main .courses-container .search-area input {
+  width: 40%;
+  padding: 7px;
+}
+.myCourse-main .courses-container .flex-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 95%;
+}
+.myCourse-main .courses-container .flex-wrapper .courses {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+}
+.myCourse-main .courses-container .flex-wrapper .courses .course {
+  overflow: hidden;
+  width: 24vw;
+  background-color: #e9e9e9;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  transition: 0.2s;
+}
+@media (max-width: 860px) {
+  .myCourse-main .courses-container .flex-wrapper .courses .course {
+    width: 95%;
+  }
+}
+.myCourse-main .courses-container .flex-wrapper .courses .course .course-header {
+  height: 60px;
+  background-color: #323232;
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  position: relative;
+}
+.myCourse-main .courses-container .flex-wrapper .courses .course .course-header .course-fake-shot {
+  width: 48px;
+  height: 48px;
+  border-radius: 64px;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  overflow: hidden;
+}
+.myCourse-main .courses-container .flex-wrapper .courses .course .course-header .course-fake-shot .shot {
+  width: 100%;
+  height: 100%;
+}
+.myCourse-main .courses-container .flex-wrapper .courses .course .course-header .course-name {
+  color: #fff;
+  font-weight: bold;
+  font-size: clamp(18px, 2vw, 24px);
+}
+.myCourse-main .courses-container .flex-wrapper .courses .course .course-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px;
+  font-size: clamp(16px, 1.2vw, 20px);
+}
+.myCourse-main .courses-container .flex-wrapper .courses .course .course-info .info-area {
+  font-weight: bold;
+}
+.myCourse-main .courses-container .flex-wrapper .courses .course .last-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}/*# sourceMappingURL=myCourse.css.map */

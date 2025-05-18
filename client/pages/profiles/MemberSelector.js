@@ -193,9 +193,7 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
     }
   }, [token, page, pageSize, roleInput])
 
-  const test = () => {
-    console.log(selectedStudentId)
-  }
+  const test = () => {}
 
   return (
     <div className="member-select-area">
@@ -214,7 +212,6 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
               className="input-name"
               onChange={(e) => {
                 setNameInput(e.target.value)
-                console.log(e.target.value)
               }}
               type="text"
             />
@@ -226,7 +223,6 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
               className="input-phone"
               onChange={(e) => {
                 setPhoneInput(e.target.value)
-                console.log(e.target.value)
               }}
               type="text"
             />
@@ -238,7 +234,6 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
               className="input-grade"
               onChange={(e) => {
                 setGradeInput(e.target.value)
-                console.log(e.target.value)
               }}
               type="text"
             />
@@ -249,7 +244,6 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
             <select
               onChange={(e) => {
                 setRoleInput(e.target.value)
-                console.log(e.target.value)
               }}>
               <option value="">全部</option>
               <option value="teacher">教師</option>
@@ -372,7 +366,6 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
           width={24}
           height={24}
           onClick={() => {
-            console.log(totalPage)
             if (page === totalPage) {
               return
             } else {

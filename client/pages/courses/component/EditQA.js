@@ -229,8 +229,7 @@ export default function EditQA({ setLoading, messageControl, setShowEditQAUI, to
           {/* 標籤區 */}
           <div className="hints-area">
             <div
-              className="content"
-              onClick={() => console.log(hintTemp)}>
+              className="content">
               輸入標籤
             </div>
             <input
