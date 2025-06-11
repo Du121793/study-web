@@ -267,6 +267,13 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
     }
   }, [token, qaHasUpload, qaOpen, page])
 
+  useEffect(() => {
+    const localToken = localStorage.getItem('token')
+    if (localToken) {
+      setUserToken(localToken.split(' ')[1])
+    }
+  }, [])
+
   return (
     <div
       className="nav"
@@ -497,7 +504,8 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
                       <div
                         className="QA-list"
                         key={index}
-                        style={{ width: qaCardWidth }}>
+                        style={{ width: qaCardWidth }}
+                        onClick={()=>{}}>
                         {/* 主標題 */}
                         {item.tag !== '' && (
                           <div className="QA-tag">
@@ -571,6 +579,9 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
                                     loading="lazy"
                                     style={{ height: 'auto' }}
                                     alt="qa-image"
+                                    onClick={() => {
+                                      console.log(doc)
+                                    }}
                                   />
                                 )}
                               </div>

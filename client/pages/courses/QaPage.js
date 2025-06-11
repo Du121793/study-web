@@ -505,20 +505,33 @@ export default function QaPage() {
             <div
               className="comment-area"
               key={index}>
+              {/* 確定發文者存在 */}
               <div className="user-shot-area">
-                <Image
-                  loading="lazy"
-                  className="user-shot"
-                  src={item?.poster?.displayPictureUrl !== '' ? item.poster.displayPictureUrl : anonymous}
-                  width={40}
-                  height={40}
-                  alt="user shot"></Image>
+                {(item?.poster?.displayPictureUrl === '' || item?.poster?.displayPictureUrl === 'null') && (
+                  <Image
+                    loading="lazy"
+                    className="user-shot"
+                    src={anonymous}
+                    width={40}
+                    height={40}
+                    alt="anonymous avatar"></Image>
+                )}
+                {item?.poster?.displayPictureUrl && (
+                  <Image
+                    loading="lazy"
+                    className="user-shot"
+                    src={item.poster.displayPictureUrl}
+                    width={40}
+                    height={40}
+                    alt="user avatar"></Image>
+                )}
               </div>
+              {/* 確定發文者存在 */}
               <div className="message-info">
                 <div className="message-top">
-                  <div className="name">{item.poster.username}</div>
-                  <div className="time">{new Date(item.date).toLocaleString()}</div>
-                  {item.isBest && (
+                  {item?.poster?.username ? <div className="name">{item.poster.username}</div> : <div className="name">用戶已刪除</div>}
+                  {item?.date && <div className="time">{new Date(item.date).toLocaleString()}</div>}
+                  {item?.isBest && (
                     <div className="isBest">
                       <Image
                         loading="lazy"
@@ -526,7 +539,7 @@ export default function QaPage() {
                         src={star}
                         width={12}
                         height={12}
-                        alt="user shot"></Image>
+                        alt="best comment icon"></Image>
                       <div
                         className="content"
                         style={{ color: '#46A3FF' }}>
@@ -535,7 +548,8 @@ export default function QaPage() {
                     </div>
                   )}
                   <div className="function-btn-area">
-                    {(userRole === 'teacher' || userRole === 'admin') && item?.isBest === true && (
+                    {/* 先確認權限，再確認是否為置頂 */}
+                    {(userRole === 'teacher' || userRole === 'admin') && item?.isBest ? (
                       <div
                         onClick={() => {
                           setCommentUnbest(item._id)
@@ -543,8 +557,7 @@ export default function QaPage() {
                         className="set-best-comment-btn">
                         取消置頂
                       </div>
-                    )}
-                    {(userRole === 'teacher' || userRole === 'admin') && item?.isBest !== true && (
+                    ) : (
                       <div
                         onClick={() => {
                           setCommentBest(item._id)
@@ -553,7 +566,7 @@ export default function QaPage() {
                         設為置頂
                       </div>
                     )}
-                    {(item.poster._id === userId || userRole === 'teacher' || userRole === 'admin') && (
+                    {(userRole === 'teacher' || userRole === 'admin' || (item?.poster?._id && item.poster._id === userId)) && (
                       <div
                         onClick={() => {
                           deleteComment(item._id)
@@ -564,36 +577,49 @@ export default function QaPage() {
                     )}
                   </div>
                 </div>
-                <div className="message-middle">{item.content}</div>
+
+                {item?.content ? (
+                  <div className="message-middle">{item.content}</div>
+                ) : (
+                  <div
+                    style={{ color: 'gray', fontWeight: 'bold' }}
+                    className="message-middle">
+                    留言內容丟失
+                  </div>
+                )}
+
                 <div className="message-bottom">
-                  {item.videoURL.map((item, index) => (
-                    <iframe
-                      key={index}
-                      id="iframe"
-                      className="file-preview"
-                      src={item}
-                      title="Video Player"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      width={'600px'}
-                      height={'240px'}
-                    />
-                  ))}
+                  {/* 影片 / 圖片 */}
+                  {item?.videoURL &&
+                    item.videoURL.map((item, index) => (
+                      <iframe
+                        key={index}
+                        id="iframe"
+                        className="file-preview"
+                        src={item}
+                        title="Video Player"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        width={'600px'}
+                        height={'240px'}
+                      />
+                    ))}
                   {/* 後端回傳圖片路徑正確不使用getImageUrl調整 */}
-                  {item.image.map((item, index) => (
-                    <Image
-                      key={index}
-                      onClick={() => {
-                        clickZoomImage(item)
-                      }}
-                      loading="lazy"
-                      className="file-preview"
-                      src={`${item}?token=${token.split(' ')[1]}`}
-                      alt="Attached image of the commenter"
-                      width={400}
-                      height={0}
-                      style={{ height: 'auto' }}></Image>
-                  ))}
+                  {item?.image &&
+                    item.image.map((item, index) => (
+                      <Image
+                        key={index}
+                        onClick={() => {
+                          clickZoomImage(item)
+                        }}
+                        loading="lazy"
+                        className="file-preview"
+                        src={`${item}?token=${token.split(' ')[1]}`}
+                        alt="Attached image of the commenter"
+                        width={400}
+                        height={0}
+                        style={{ height: 'auto' }}></Image>
+                    ))}
                 </div>
               </div>
             </div>
