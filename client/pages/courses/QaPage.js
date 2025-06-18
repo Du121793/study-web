@@ -507,7 +507,8 @@ export default function QaPage() {
               key={index}>
               {/* 確定發文者存在 */}
               <div className="user-shot-area">
-                {(item?.poster?.displayPictureUrl === '' || item?.poster?.displayPictureUrl === 'null') && (
+                {/* 當使用者[不存在]或是[匿名狀態]或是[沒有頭像] */}
+                {(!item?.poster?.displayPictureUrl || item?.poster?.displayPictureUrl === '' || item?.poster?.displayPictureUrl === 'null') && (
                   <Image
                     loading="lazy"
                     className="user-shot"
