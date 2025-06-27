@@ -54,20 +54,19 @@ export default function MessageBoard({ qa_id, submitSuccess, setSubmitSuccess })
     }, 2000)
   }
 
-  const test = () => {
-  }
+  const test = () => {}
 
   // 取得role與檢查是否登陸
   useEffect(() => {
-    if (!sessionStorage.getItem('user_role') || !sessionStorage.getItem('user_id')) {
+    if (!localStorage.getItem('user_role') || !localStorage.getItem('user_id')) {
       userService.getUserInfo(token).then((res) => {
-        sessionStorage.setItem('user_lineID', res.data.lineID)
-        sessionStorage.setItem('user_id', res.data._id)
-        sessionStorage.setItem('user_line_shot', res.data.userinfo.pictureUrl)
-        sessionStorage.setItem('user_role', res.data.role)
+        localStorage.setItem('user_lineID', res.data.lineID)
+        localStorage.setItem('user_id', res.data._id)
+        localStorage.setItem('user_line_shot', res.data.userinfo.pictureUrl)
+        localStorage.setItem('user_role', res.data.role)
       })
     }
-    const role = sessionStorage.getItem('user_role')
+    const role = localStorage.getItem('user_role')
     if (role) {
       setUser_role(role)
     }
@@ -128,7 +127,7 @@ export default function MessageBoard({ qa_id, submitSuccess, setSubmitSuccess })
 
               // 檢查是否已經選過相同的檔案（這裡可以根據需求比對檔名或其他屬性）
               if (images.find((item) => item.name === selectedFile.name)) {
-                messageControl('不能上傳同樣的圖片',false)
+                messageControl('不能上傳同樣的圖片', false)
               } else {
                 setImages([...images, selectedFile])
                 setPreViewImage([...preViewImage, selectedFile])

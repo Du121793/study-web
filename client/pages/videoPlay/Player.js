@@ -1,5 +1,5 @@
 // 組件庫
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -13,6 +13,9 @@ import userService from '../../method/userService'
 import Footer from '../../components/global/Footer'
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
+// css
+import style from './player.module.css'
+import btn_style from '../../styles/global/button.module.css'
 
 export default function Player() {
   const token = useUserToken()
@@ -44,6 +47,9 @@ export default function Player() {
   /* 監聽全局寬度變化，寬度變化設定windowsWidth */
   const isClient = typeof window === 'object'
   const [windowsWidth, setWindowsWidth] = useState(0)
+
+  const playerRef = useRef()
+
   useEffect(() => {
     if (!isClient) return false
 
@@ -189,32 +195,34 @@ export default function Player() {
   const test = () => {}
 
   return (
-    <div className="video-player-main">
+    <div className={style['video-player-main']}>
       <div
-        className="right-bottom-loading-area"
+        className={style['right-bottom-loading-area']}
         style={{ right: loading ? '8px' : '-100%' }}>
         <div className="loading"></div>
       </div>
-      <div className="header">
+      <div className={style['header']}>
+        {/* 返回按鈕 */}
         <div
-          className="g-black-btn"
+          id={style['back-btn']}
           onClick={() => {
             window.location = `${clientIp}/courses/Course?courseName=${course_name}&courseId=${course_id}`
           }}>
           回到課程
         </div>
+        {/* logo */}
         <Image
           onClick={() => {
             setLoading(!loading)
           }}
           src={logo}
           alt="123"
-          className="logos"
+          className={style['logos']}
           width={100}
           height={100}></Image>
         {userShot && (
           <Image
-            className="user-shot"
+            className={style['user-shot']}
             src={userShot}
             alt="user's shot"
             width={100}
@@ -223,11 +231,13 @@ export default function Player() {
         )}
       </div>
       {/* 影片播放器、影片清單 */}
-      <div className="player-area">
+      <div
+        className={style['player-area']}
+        ref={playerRef}>
         {/* 播放器 */}
-        <div className="player">
+        <div className={style['player']}>
           <iframe
-            id="iframe"
+            id={style['iframe']}
             src={videoUrl}
             title="Video Player"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -235,12 +245,12 @@ export default function Player() {
           />
 
           {/* 影片資訊 */}
-          <div className="video-info">
-            {parsedInfo && <div className="title">{parsedInfo.title}</div>}
+          <div className={style['video-info']}>
             {parsedInfo && (
-              <div className="introduce">
-                <div className="time">{new Date(parsedInfo.time).toLocaleString()}</div>
-                <div className="description">{parsedInfo.description}</div>
+              <div className={style['introduce']}>
+                <div className={style['title']}>{parsedInfo.title}</div>
+                <div className={style['time']}>{new Date(parsedInfo.time).toLocaleString()}</div>
+                <div className={style['description']}>{parsedInfo.description}</div>
               </div>
             )}
           </div>
@@ -250,12 +260,13 @@ export default function Player() {
         {!videoListIsOpen && (
           <button
             id="open-button"
-            className="open-button"
+            className={style['open-button']}
             onClick={(e) => {
+              console.log(playerRef.current.scrollHeight)
               listSwitch(e.target.id)
             }}>
             <Image
-              className="arrow"
+              className={style['arrow']}
               src={arrow}
               alt="switch video list's arrow button"></Image>
             打開列表
@@ -264,29 +275,28 @@ export default function Player() {
 
         {/* 清單本體 */}
         <div
-          className="video-info-list"
+          className={style['video-info-list']}
           style={{
             width: `${videoListWidth}px`,
-            marginRight: `${videoListMarginRight}`,
           }}>
           {/* 切換按鈕 */}
           <div
-            id="close-button"
-            className="hidden-info-btn"
+            id={'close-button'}
+            className={style['hidden-info-btn']}
             onClick={(e) => {
               listSwitch(e.target.id)
             }}>
             隱藏列表
           </div>
           <ul
-            className="videos-area"
+            className={style['videos-area']}
             style={{ opacity: !videoListIsOpen ? 0 : 1 }}>
             {VideosList &&
               VideosList.map((item, index) => {
                 if (item.access && item.access.isAccess === true) {
                   return (
                     <Link
-                      className={`video ${item._id === video_id ? 'active' : ''}`}
+                      className={`${style[`video${item._id === video_id ? 'active' : ''}`]}`}
                       key={index}
                       href={{
                         pathname: `${clientIp}/videoPlay/Player`,
@@ -297,19 +307,19 @@ export default function Player() {
                           info: JSON.stringify({ description: item.description, title: item.title, time: item.recordDate }),
                         },
                       }}>
-                      <div className="image-area">
+                      <div className={style['image-area']}>
                         <Image
-                          className="pre-view-image"
+                          className={style['pre-view-image']}
                           src={item.thumbnail !== '' ? item.thumbnail : noThumbnailImg}
                           width={0}
                           height={0}
                           objectFit="contain"
                           alt="video image"></Image>
-                        <div className="video-time">{formatTime(item.length)}</div>
+                        <div className={style['video-time']}>{formatTime(item.length)}</div>
                       </div>
-                      <div className="info">
-                        <div className="video-title">{item.title}</div>
-                        <div className="video-time">{timeAgo(item.date)}</div>
+                      <div className={style['info']}>
+                        <div className={style['video-title']}>{item.title}</div>
+                        <div className={style['video-time']}>{timeAgo(item.date)}</div>
                       </div>
                     </Link>
                   )
@@ -319,8 +329,7 @@ export default function Player() {
         </div>
       </div>
       {showVideoListAfterInfo && (
-        <div
-          className="video-list-after-info-area">
+        <div className={style['video-list-after-info-area']}>
           {VideosList.map((item, idx) => {
             if (item.access.isAccess) {
               return (
@@ -335,19 +344,19 @@ export default function Player() {
                     },
                   }}
                   key={idx}
-                  className="info">
-                  <div className="left">
+                  className={style['info']}>
+                  <div className={style['left']}>
                     <Image
                       src={item.thumbnail !== '' ? item.thumbnail : noThumbnailImg}
                       width={0}
                       height={0}
                       alt="video image"
-                      className="image"></Image>
-                    <div className="video-length">{formatTime(item.length)}</div>
+                      className={style['image']}></Image>
+                    <div className={style['video-length']}>{formatTime(item.length)}</div>
                   </div>
-                  <div className="right">
-                    <div className="title">{item.description}</div>
-                    <div className="time">{timeAgo(item.date)}</div>
+                  <div className={style['right']}>
+                    <div className={style['title']}>{item.description}</div>
+                    <div className={style['time']}>{timeAgo(item.date)}</div>
                   </div>
                 </Link>
               )
@@ -355,7 +364,6 @@ export default function Player() {
           })}
         </div>
       )}
-
       <Footer></Footer>
     </div>
   )

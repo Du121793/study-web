@@ -10,11 +10,6 @@ import '../styles/global/loading.css'
 import '../styles/global/font.css'
 // index
 import '../styles/index/index.css'
-import '../styles/index/banner.css'
-import '../styles/index/board.css'
-import '../styles/index/boardPage.css'
-import '../styles/index/uploadBoardUI.css'
-import '../styles/index/uploadCarousel.css'
 // profile的list
 import '../styles/profile/list.css'
 // profile/admin
@@ -47,7 +42,7 @@ import '../styles/course/component/askQA.css'
 import '../styles/course/component/videoNav.css'
 import '../styles/course/component/QANav.css'
 // videoPlay
-import '../styles/videoPlay/player.css'
+// import '../styles/videoPlay/player.css'
 //method的layout
 import '../styles/method/completeInfo.css'
 

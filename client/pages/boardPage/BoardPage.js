@@ -10,7 +10,7 @@ import userService from '../../method/userService'
 import { useUserToken } from '../../method/useUserToken'
 import adminService from '../../method/adminService'
 // child component
-import UploadBoard from '../components/UploadBoard'
+import UploadBoard from '../components/uploadBoard/UploadBoard'
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
@@ -43,8 +43,7 @@ export default function BoardPage() {
   const messageTimer = useRef(null)
   const resetTimer = useRef(null)
 
-  const test = () => {
-  }
+  const test = () => {}
 
   // 控制訊息
   const messageControl = (info, isSuccess) => {
@@ -83,7 +82,7 @@ export default function BoardPage() {
     })
   }
 
-  // get Board info by id
+  // 獲取公告
   useEffect(() => {
     if (board_id) {
       setLoading(true)
@@ -98,10 +97,10 @@ export default function BoardPage() {
     }
   }, [token, board_id, editHasChange])
 
-  // check sessionStorage
+  /* 檢查是否有登陸 */
   useEffect(() => {
-    if (sessionStorage.getItem('user_role')) {
-      const role = sessionStorage.getItem('user_role')
+    if (localStorage.getItem('user_role')) {
+      const role = localStorage.getItem('user_role')
       setUserRole(role)
       if (role) {
         setLoginState(true)

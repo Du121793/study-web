@@ -42,15 +42,15 @@ export default function Course() {
 
   // 設定sessionStorage
   useEffect(() => {
-    if (!sessionStorage.getItem('user_role') || !sessionStorage.getItem('user_id')) {
+    if (!localStorage.getItem('user_role') || !localStorage.getItem('user_id')) {
       userService.getUserInfo(token).then((res) => {
-        sessionStorage.setItem('user_lineID', res.data.lineID)
-        sessionStorage.setItem('user_id', res.data._id)
-        sessionStorage.setItem('user_line_shot', res.data.userinfo.pictureUrl)
-        sessionStorage.setItem('user_role', res.data.role)
+        localStorage.setItem('user_lineID', res.data.lineID)
+        localStorage.setItem('user_id', res.data._id)
+        localStorage.setItem('user_line_shot', res.data.userinfo.pictureUrl)
+        localStorage.setItem('user_role', res.data.role)
       })
     }
-    const role = sessionStorage.getItem('user_role')
+    const role = localStorage.getItem('user_role')
     if (role) {
       setUserRole(role)
     }
@@ -78,11 +78,11 @@ export default function Course() {
 
   return (
     <div className="course-main">
-    <div
-      className="right-bottom-loading-area"
-      style={{ right: loading ? '8px' : '-100%' }}>
-      <div className="loading"></div>
-    </div>
+      <div
+        className="right-bottom-loading-area"
+        style={{ right: loading ? '8px' : '-100%' }}>
+        <div className="loading"></div>
+      </div>
       <Header
         loginState={isLogined}
         inIndex="course"

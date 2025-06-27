@@ -2,12 +2,13 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 // method
-import { useUserToken } from '../../method/useUserToken'
-import userService from '../../method/userService'
-import adminService from '../../method/adminService'
+import { useUserToken } from '../../../method/useUserToken'
+import userService from '../../../method/userService'
+import adminService from '../../../method/adminService'
 
-// public
-import trashCanIcon from '../../public/index/banner/trashCanIcon.png'
+// css
+import style from './uploadCarousel.module.css'
+import btn_style from '../../../styles/global/button.module.css'
 
 export default function UploadCarousel({ showCarouselEdit, setShowCarouselEdit, bannerHasChange, setBannerHasChange }) {
   // 控制body滑動條
@@ -128,27 +129,28 @@ export default function UploadCarousel({ showCarouselEdit, setShowCarouselEdit, 
   const test = () => {}
 
   return (
-    <div className="upload-carousel-main">
+    <div className={style['upload-carousel-main']}>
       <div
-        className="upload-ui"
+        className={style['upload-ui']}
         onClick={(e) => {
           e.stopPropagation()
         }}>
-        <div
+        {/* 未修復 */}
+        {/* <div
           style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
-          className="message">
+          className={style['message']}>
           {message}
-        </div>
+        </div> */}
         <div
-          className="title"
+          className={style['title']}
           onClick={test}>
           編輯輪播圖功能
         </div>
         {carousel && carousel.length > 0 ? (
-          <div className="image-area">
-            <div className="setting-area">
+          <div className={style['image-area']}>
+            <div className={style['setting-area']}>
               <div
-                className="g-red-btn"
+                className={btn_style['g-red-btn']}
                 onClick={() => {
                   page_body.style.overflow = 'auto'
                   setShowCarouselEdit(false)
@@ -156,20 +158,20 @@ export default function UploadCarousel({ showCarouselEdit, setShowCarouselEdit, 
                 關閉介面
               </div>
               <div
-                className="g-blue-btn"
+                className={btn_style['g-blue-btn']}
                 onClick={() => {
                   inputHandle.current.click()
                 }}>
                 選擇圖片
               </div>
               <div
-                className="g-blue-btn"
+                className={btn_style['g-blue-btn']}
                 onClick={postCarousel}>
                 執行上傳
               </div>
               <input
                 type="file"
-                className="file-input"
+                className={style['file-input']}
                 accept="image/png image/jpg"
                 style={{ display: 'none' }}
                 ref={inputHandle}
@@ -180,17 +182,17 @@ export default function UploadCarousel({ showCarouselEdit, setShowCarouselEdit, 
                 }}
               />
             </div>
-            <div className="images">
+            <div className={style['images']}>
               {carousel.map((item, index) => (
                 <div
-                  className="image"
+                  className={style['image']}
                   key={index}
                   onClick={() => {}}>
-                  <div className="image-btn-area">
+                  <div className={style['image-btn-area']}>
                     {/* 刪除按鈕 */}
                     {wantRemoveImageId !== item.split('/').pop().split('-')[1].split('.')[0] && (
                       <button
-                        className="g-red-btn"
+                        className={btn_style['g-red-btn']}
                         onClick={() => {
                           setWantRemoveImageId(item.split('/').pop().split('-')[1].split('.')[0])
                         }}>
@@ -199,7 +201,7 @@ export default function UploadCarousel({ showCarouselEdit, setShowCarouselEdit, 
                     )}
                     {wantRemoveImageId === item.split('/').pop().split('-')[1].split('.')[0] && (
                       <div
-                        className="g-red-btn"
+                        className={btn_style['g-red-btn']}
                         onClick={() => {
                           deleteCarousel()
                         }}>
@@ -208,7 +210,7 @@ export default function UploadCarousel({ showCarouselEdit, setShowCarouselEdit, 
                     )}
                     {wantRemoveImageId === item.split('/').pop().split('-')[1].split('.')[0] && (
                       <div
-                        className="g-green-btn"
+                        className={btn_style['g-green-btn']}
                         onClick={() => {
                           setWantRemoveImageId('')
                         }}>
@@ -222,7 +224,7 @@ export default function UploadCarousel({ showCarouselEdit, setShowCarouselEdit, 
                         return imageNumber !== item.split('/').pop().split('-')[1].split('.')[0]
                       }) && (
                         <div
-                          className="g-blue-btn"
+                          className={btn_style['g-blue-btn']}
                           onClick={() => {
                             const image_number = item.split('/').pop().split('-')[1].split('.')[0]
                             setHideBackImage([...hideBackImage, image_number])
@@ -233,7 +235,7 @@ export default function UploadCarousel({ showCarouselEdit, setShowCarouselEdit, 
 
                     {hideBackImage && hideBackImage.length > 0 && hideBackImage.find((imageNumber) => imageNumber === item.split('/').pop().split('-')[1].split('.')[0]) && (
                       <div
-                        className="g-blue-btn"
+                        className={btn_style['g-blue-btn']}
                         onClick={() => {
                           const image_number = item.split('/').pop().split('-')[1].split('.')[0]
                           const newArray = hideBackImage.filter((imageNumber) => imageNumber !== image_number)
@@ -255,28 +257,28 @@ export default function UploadCarousel({ showCarouselEdit, setShowCarouselEdit, 
                         : 'auto',
                     }}
                     alt="banner preview"
-                    className="carousel"></Image>
+                    className={style['carousel']}></Image>
                 </div>
               ))}
             </div>
           </div>
         ) : (
-          <div className="h2">現在還沒有圖片</div>
+          <div className={style['h2']}>現在還沒有圖片</div>
         )}
-        <div className="hint-content">圖片預覽區域</div>
-        <div className="preview-image-area">
+        <div className={style['hint-content']}>圖片預覽區域</div>
+        <div className={style['preview-image-area']}>
           {previewUrl && (
             <Image
               alt="selected image preview"
               src={previewUrl}
-              className="image"
+              className={style['image']}
               width={0}
               height={0}
               style={{ height: 'auto' }}></Image>
           )}
         </div>
       </div>
-      <div className="announcement-area"></div>
+      <div className={style['announcement-area']}></div>
     </div>
   )
 }

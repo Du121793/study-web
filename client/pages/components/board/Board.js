@@ -1,11 +1,13 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import titleIcon from '../../public/index/board/boardTitle.svg'
+import titleIcon from '../../../public/index/board/boardTitle.svg'
 import { useEffect, useRef, useState, useImperativeHandle } from 'react'
-import userService from '../../method/userService'
+import userService from '../../../method/userService'
 
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 const serverIp = process.env.NEXT_PUBLIC_SERVER_IP
+
+import style from './board.module.css'
 
 export default function Board({ editHasChange, moveToBoardRef }) {
   const [boards, setBoards] = useState([])
@@ -50,16 +52,16 @@ export default function Board({ editHasChange, moveToBoardRef }) {
   }, [editHasChange, pageSize])
 
   return (
-    <div className="board-main">
+    <div className={style['board-main']}>
       <div
-        className="right-bottom-loading-area"
+        className={style['right-bottom-loading-area']}
         style={{ right: loading ? '8px' : '-100%' }}>
-        <div className="loading"></div>
+        <div className={style['loading']}></div>
       </div>
       <div
-        className="board-contianer"
+        className={style['board-contianer']}
         ref={boardEle}>
-        <div className="title">
+        <div className={style['title']}>
           <span
             onClick={() => {
               moveToBoardEle()
@@ -67,17 +69,17 @@ export default function Board({ editHasChange, moveToBoardRef }) {
             最新消息
           </span>
           <Image
-            className="icon"
+            className={style['icon']}
             src={titleIcon}
             alt="new info,s icon"
             width={40}
             height={40}></Image>
         </div>
 
-        <ul className="news-link-area">
+        <ul className={style['news-link-area']}>
           {!boards.length && (
             <div
-              className="loading-area"
+              className={style['loading-area']}
               style={{ width: '100%', height: '80px' }}></div>
           )}
           {boards &&
@@ -88,23 +90,23 @@ export default function Board({ editHasChange, moveToBoardRef }) {
               }
               return (
                 <Link
-                  className="news-container"
+                  className={style['news-container']}
                   key={index}
                   href={{ pathname: `${clientIp}/index/BoardPage`, query: data }}>
-                  <div className="categories">
-                    <div className="content">
-                      <div className="background"></div>
-                      <div className="text">{item.subTitle}</div>
+                  <div className={style['categories']}>
+                    <div className={style['content']}>
+                      <div className={style['background']}></div>
+                      <div className={style['text']}>{item.subTitle}</div>
                     </div>
                   </div>
-                  <div className="info">{item.title}</div>
+                  <div className={style['info']}>{item.title}</div>
                 </Link>
               )
             })}
         </ul>
         {boards && (
           <div
-            className="more-news-link"
+            className={style['more-news-link']}
             onClick={() => {
               setPageSize(pageSize + 10)
             }}>

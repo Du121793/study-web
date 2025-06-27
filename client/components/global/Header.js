@@ -52,17 +52,17 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
 
   // 登出 刪除token
   const signOut = () => {
-    if (sessionStorage.getItem('user_lineID')) {
-      sessionStorage.removeItem('user_lineID')
+    if (localStorage.getItem('user_lineID')) {
+      localStorage.removeItem('user_lineID')
     }
-    if (sessionStorage.getItem('user_role')) {
-      sessionStorage.removeItem('user_role')
+    if (localStorage.getItem('user_role')) {
+      localStorage.removeItem('user_role')
     }
-    if (sessionStorage.getItem('user_id')) {
-      sessionStorage.removeItem('user_id')
+    if (localStorage.getItem('user_id')) {
+      localStorage.removeItem('user_id')
     }
-    if (sessionStorage.getItem('user_line_shot')) {
-      sessionStorage.removeItem('user_line_shot')
+    if (localStorage.getItem('user_line_shot')) {
+      localStorage.removeItem('user_line_shot')
     }
     localStorage.removeItem('token')
     window.location.replace('/')
@@ -70,7 +70,7 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
 
   // session
   useEffect(() => {
-    const user_line_shot_temp = sessionStorage.getItem('user_line_shot')
+    const user_line_shot_temp = localStorage.getItem('user_line_shot')
     if (user_line_shot_temp) {
       setUserShot(user_line_shot_temp)
     }
@@ -111,8 +111,8 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
                   alt="user avatar"
                   // 由於userShot在index頁面會來不及加載，因此會改為使用index傳過來的user_line_shot
                   src={user_line_shot ? user_line_shot : userShot}
-                  width={0}
-                  height={0}
+                  width={1}
+                  height={1}
                 />
               )}
             </Link>
@@ -130,7 +130,7 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
                 callBoardMoveToBoardFunction()
                 closeList()
               } else {
-                sessionStorage.setItem('homePageScrollToNews', 1)
+                localStorage.setItem('homePageScrollToNews', 1)
                 router.push('/')
                 closeList()
               }
@@ -188,7 +188,7 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
               if (router.pathname === '/') {
                 callBoardMoveToBoardFunction()
               } else {
-                sessionStorage.setItem('homePageScrollToNews', 1)
+                localStorage.setItem('homePageScrollToNews', 1)
                 router.push('/')
               }
             }}>
@@ -305,7 +305,7 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
           </div>
         )}
         {/* 用戶頭像 */}
-        {inIndex === 'course' && (
+        {inIndex === 'course' && user_line_shot && (
           <div className="user-avatar">
             <Image
               className="image"
@@ -319,8 +319,8 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
                   LoginLinkRef.current.click()
                 }
               }}
-              width={0}
-              height={0}></Image>
+              width={1}
+              height={1}></Image>
           </div>
         )}
       </div>

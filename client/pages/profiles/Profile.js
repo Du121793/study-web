@@ -34,6 +34,7 @@ export default function Profile({ from }) {
 
   const [switchState, setSwitchState] = useState('myCourse')
 
+  // 用來切換子組件
   const changeRightItemState = () => {
     if (switchState === 'myCourse') return <MyCourse />
     if (switchState === 'profile') return <UserProfile />
@@ -45,22 +46,22 @@ export default function Profile({ from }) {
   }
 
   useEffect(() => {
-    if (!sessionStorage.getItem('user_role') || !sessionStorage.getItem('user_id')) {
+    if (!localStorage.getItem('user_role') || !localStorage.getItem('user_id')) {
       userService.getUserInfo(token).then((res) => {
-        sessionStorage.setItem('user_lineID', res.data.lineID)
-        sessionStorage.setItem('user_id', res.data._id)
-        sessionStorage.setItem('user_line_shot', res.data.userinfo.pictureUrl)
-        sessionStorage.setItem('user_role', res.data.role)
+        localStorage.setItem('user_lineID', res.data.lineID)
+        localStorage.setItem('user_id', res.data._id)
+        localStorage.setItem('user_line_shot', res.data.userinfo.pictureUrl)
+        localStorage.setItem('user_role', res.data.role)
       })
     }
-    if (sessionStorage.getItem('user_id')) {
+    if (localStorage.getItem('user_id')) {
       setLogined(true)
     }
-    if (sessionStorage.getItem('user_role')) {
-      setUserRole(sessionStorage.getItem('user_role'))
+    if (localStorage.getItem('user_role')) {
+      setUserRole(localStorage.getItem('user_role'))
     }
-    if (sessionStorage.getItem('user_shot')) {
-      setUserShot(sessionStorage.getItem('user_shot'))
+    if (localStorage.getItem('user_shot')) {
+      setUserShot(localStorage.getItem('user_shot'))
     }
   }, [])
 

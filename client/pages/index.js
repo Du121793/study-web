@@ -3,18 +3,19 @@ import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 // 子組件
 import Header from '../components/global/Header'
-import Head from '../components/global/Globla'
 import Footer from '../components/global/Footer'
 // method
 import { useUserToken } from '../method/useUserToken'
 import userService from '../method/userService'
 // component
-import Board from './components/Board'
-import Banner from './components/Banner'
-import UploadBoard from './components/UploadBoard'
-import UploadCarousel from './components/UploadCarousel'
+import Board from './components/board/Board'
+import Banner from './components/banner/Banner'
+import UploadBoard from './components/uploadBoard/UploadBoard'
+import UploadCarousel from './components/uploadCarousel/UploadCarousel'
 // public
 import backgroundImage from '../public/backGroundIMG/stefanie-jockschat-9f1PRQs6Brs-unsplash.jpg'
+// css
+
 export default function Index() {
   const token = useUserToken()
   const [logined, setLogined] = useState(false)
@@ -37,14 +38,9 @@ export default function Index() {
     if (moveToBoardRef.current) moveToBoardRef.current.doSomething()
   }
 
-  const setSessionData = (key, value) => {
-    if (!sessionStorage.getItem(key)) {
-      sessionStorage.setItem(key, value)
-    }
-  }
-
   // session 設定
   useEffect(() => {
+    /* 獲取userinfo存到sessionStorage */
     if (token) {
       userService
         .getUserInfo(token)
@@ -52,11 +48,24 @@ export default function Index() {
           if (!res?.data?.userinfo) {
             return
           }
-          setSessionData('user_lineID', res.data.lineID)
-          setSessionData('user_id', res.data._id)
-          setSessionData('user_line_shot', res.data.userinfo.pictureUrl)
-          setSessionData('user_role', res.data.role)
-          setSessionData('user_name', res.data.userinfo.username)
+          if (!localStorage.getItem('user_lineID') || localStorage.getItem('user_lineID') !== res.data.lineID) {
+            localStorage.setItem('user_lineID', res.data.lineID)
+          }
+          if (!localStorage.getItem('user_id') || localStorage.getItem('user_id') !== res.data._id) {
+            localStorage.setItem('user_id', res.data._id)
+          }
+          if (!localStorage.getItem('user_line_shot') || localStorage.getItem('user_line_shot') !== res.data.userinfo.pictureUrl) {
+            localStorage.setItem('user_line_shot', res.data.userinfo.pictureUrl)
+          }
+          if (!localStorage.getItem('user_role') || localStorage.getItem('user_role') !== res.data.role) {
+            localStorage.setItem('user_role', res.data.role)
+          }
+          if (!localStorage.getItem('user_name') || localStorage.getItem('user_name') !== res.data.userinfo.username) {
+            localStorage.setItem('user_name', res.data.userinfo.username)
+          }
+          if (!localStorage.getItem('token')) {
+            localStorage.setItem('token', token)
+          }
           setUserShot(res.data.userinfo.pictureUrl)
           setUserRole(res.data.role)
           setLogined(true)
@@ -83,9 +92,7 @@ export default function Index() {
         <Image
           src={backgroundImage}
           alt="back ground image"
-          className="image"
-          width={0}
-          height={0}></Image>
+          className="image"></Image>
       </div>
       <div className="header-area">
         <Header

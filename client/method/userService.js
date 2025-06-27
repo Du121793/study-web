@@ -10,13 +10,13 @@ const QA_URL = `${serverIp}/course/question`
 
 // 登出函式
 const signOut = () => {
-  sessionStorage.removeItem('user_lineID')
-  sessionStorage.removeItem('user_role')
-  sessionStorage.removeItem('user_id')
-  sessionStorage.removeItem('user_role')
-  sessionStorage.removeItem('user_name')
+  localStorage.removeItem('user_lineID')
+  localStorage.removeItem('user_role')
+  localStorage.removeItem('user_id')
+  localStorage.removeItem('user_role')
+  localStorage.removeItem('user_name')
   localStorage.removeItem('token')
-  window.location.replace('/')
+  // window.location.replace('/')
 }
 
 const userService = {

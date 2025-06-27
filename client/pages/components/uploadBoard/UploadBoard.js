@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
-const MyReactQuill = dynamic(() => import('../../components/MyReactQuill'), { ssr: false })
-import { useStrictClickHandler } from '../../method/userful'
-import adminService from '../../method/adminService'
-import { useUserToken } from '../../method/useUserToken'
+const MyReactQuill = dynamic(() => import('../../../components/MyReactQuill'), { ssr: false })
+import { useStrictClickHandler } from '../../../method/userful'
+import adminService from '../../../method/adminService'
+import { useUserToken } from '../../../method/useUserToken'
+// css
+import style from './uploadBoard.module.css'
+import btn_style from '../../../styles/global/button.module.css'
 
 export default function UploadBoard({ boardInfo, setEditHasChange, editHasChange, board_id = null, whichMethod = 'upload', setShowUploadBoardUI, setUploadBoardUIHeight, uploadBoardUIHeight, visibility, setVisibility }) {
   const token = useUserToken()
@@ -69,8 +72,7 @@ export default function UploadBoard({ boardInfo, setEditHasChange, editHasChange
     }, 200)
   }
 
-  const test = () => {
-  }
+  const test = () => {}
 
   // 新增board
   const uploadBoard = () => {
@@ -119,28 +121,28 @@ export default function UploadBoard({ boardInfo, setEditHasChange, editHasChange
 
   return (
     <div
-      className="upload-board-main"
+      className={style['upload-board-main']}
       {...strictClickCloseUI}>
       <div
         style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
-        className="message">
+        className={style['message']}>
         {message}
       </div>
       <div
-        className="upload-board-ui"
+        className={style['upload-board-ui']}
         ref={uiElement}
         style={{ height: getUiHeight }}
         onClick={(e) => e.stopPropagation()}>
         {whichMethod === 'edit' ? (
           <div
-            className="title"
+            className={style['title']}
             style={{ visibility: visibility }}
             onClick={test}>
             編輯公告
           </div>
         ) : (
           <div
-            className="title"
+            className={style['title']}
             style={{ visibility: visibility }}
             onClick={test}>
             上傳公告
@@ -148,12 +150,12 @@ export default function UploadBoard({ boardInfo, setEditHasChange, editHasChange
         )}
 
         <div
-          className="input-container"
+          className={style['input-container']}
           style={{ visibility: visibility }}>
-          <div className="content">公告標題 :</div>
+          <div className={style['content']}>公告標題 :</div>
           <input
             type="text"
-            className="input"
+            className={style['input']}
             defaultValue={boardInfo?.title}
             onChange={(e) => {
               setTitle(e.target.value)
@@ -163,7 +165,7 @@ export default function UploadBoard({ boardInfo, setEditHasChange, editHasChange
           <div className="content">副標題 :</div>
           <input
             type="text"
-            className="input"
+            className={style['input']}
             defaultValue={boardInfo?.subTitle}
             onChange={(e) => {
               setSubTitle(e.target.value)
@@ -172,9 +174,9 @@ export default function UploadBoard({ boardInfo, setEditHasChange, editHasChange
           />
         </div>
         <div
-          className="textarea-container"
+          className={style['textarea-container']}
           style={{ visibility: visibility }}>
-          <div className="content">公告內文</div>
+          <div className={style['content']}>公告內文</div>
           <MyReactQuill
             value={content}
             onChange={(value) => {
@@ -184,32 +186,32 @@ export default function UploadBoard({ boardInfo, setEditHasChange, editHasChange
           />
         </div>
         <div
-          className="g-btn-area"
+          className={btn_style['g-btn-area']}
           style={{ visibility: visibility }}>
           {whichMethod === 'edit' ? (
-            <div className="btn-area">
+            <div className={btn_style['btn-area']}>
               <div
-                className="g-blue-btn submit"
+                className={btn_style['g-blue-btn submit']}
                 style={{ visibility: visibility }}
                 onClick={editBoard}>
                 編輯公告
               </div>
               <div
-                className="g-red-btn"
+                className={btn_style['g-red-btn']}
                 {...strictClickCloseUI}>
                 關閉介面
               </div>
             </div>
           ) : (
-            <div className="btn-area">
+            <div className={btn_style['btn-area']}>
               <div
-                className="g-blue-btn submit"
+                className={(btn_style['g-blue-btn'], style['submit'])}
                 style={{ visibility: visibility }}
                 onClick={uploadBoard}>
                 上傳公告
               </div>
               <div
-                className="g-red-btn"
+                className={btn_style['g-red-btn']}
                 {...strictClickCloseUI}>
                 關閉介面
               </div>

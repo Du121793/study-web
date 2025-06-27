@@ -2,11 +2,13 @@
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 // method
-import { useUserToken } from '../../method/useUserToken'
-import userService from '../../method/userService'
+import { useUserToken } from '../../../method/useUserToken'
+import userService from '../../../method/userService'
 // public
-import blackRightArrow from '../../public/arrow/right_arrow_black.png'
-import blackleftArrow from '../../public/arrow/left_arrow_black.png'
+import blackRightArrow from '../../../public/arrow/right_arrow_black.png'
+import blackleftArrow from '../../../public/arrow/left_arrow_black.png'
+// css
+import style from './banner.module.css'
 
 export default function Banner({ bannerHasChange }) {
   const token = useUserToken()
@@ -25,6 +27,7 @@ export default function Banner({ bannerHasChange }) {
   // 節流鎖
   const lockRef = useRef(false)
 
+  
   // 利用克隆方法：當原始陣列不為空時，在前面加上最後一張，在後面加上第一張
   const getSlides = () => {
     setSlideCount(carousel.length)
@@ -96,7 +99,7 @@ export default function Banner({ bannerHasChange }) {
 
   // 取得 user_role
   useEffect(() => {
-    const userRole = sessionStorage.getItem('user_role')
+    const userRole = localStorage.getItem('user_role')
     if (userRole) setRole(userRole)
   }, [])
 
@@ -149,19 +152,19 @@ export default function Banner({ bannerHasChange }) {
   }, [carousel])
 
   return (
-    <div className="banner-main">
+    <div className={style['banner-main']}>
       <div
-        className="right-bottom-loading-area"
+        className={style['right-bottom-loading-area']}
         style={{ right: loading ? '8px' : '-100%' }}>
-        <div className="loading"></div>
+        <div className={style['loading']}></div>
       </div>
-      <div className="banner">
+      <div className={style['banner']}>
         {/* 左箭頭 */}
         <div
-          className="left-arrow-area"
+          className={style['left-arrow-area']}
           onClick={prevSlide}>
           <Image
-            className="arrow"
+            className={style['arrow']}
             src={blackleftArrow}
             width={32}
             height={32}
@@ -169,7 +172,7 @@ export default function Banner({ bannerHasChange }) {
         </div>
         {/* 輪播圖 */}
         <div
-          className="carousel-container"
+          className={style['carousel-container']}
           style={{
             transform: `translateX(-${currentIndex * 100}%)`,
             transition: transitionEnabled ? 'transform 0.5s ease-in-out' : 'none',
@@ -178,9 +181,10 @@ export default function Banner({ bannerHasChange }) {
           {slides.map((item, index) => (
             <div
               key={index}
-              className="carousel-item">
+              className={style['carousel-item']}>
               <Image
                 src={item}
+                loading="lazy"
                 alt={`banner image ${index}`}
                 layout="fill"
                 objectFit="contain"
@@ -190,24 +194,24 @@ export default function Banner({ bannerHasChange }) {
         </div>
         {/* 右箭頭 */}
         <div
-          className="right-arror-area"
+          className={style['right-arror-area']}
           onClick={nextSlide}>
           <Image
-            className="arrow"
+            className={style['arrow']}
             src={blackRightArrow}
             width={32}
             height={32}
             alt="banner right arrow icon"></Image>
         </div>
         {/* 底部指示器 */}
-        <div className="indicator-bar">
-          <div className="indicator">
+        <div className={style['indicator-bar']}>
+          <div className={style['indicator']}>
             {carousel &&
               carousel.length > 0 &&
               carousel.map((_, idx) => (
                 <div
                   key={idx}
-                  className={`indicator-dot ${getRealIndex() === idx ? 'active' : ''}`}
+                  className={`${style['indicator-dot']} ${getRealIndex() === idx ? style['active'] : ''}`}
                   onClick={() => handleIndicatorClick(idx)}></div>
               ))}
           </div>
