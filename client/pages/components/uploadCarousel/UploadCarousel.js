@@ -29,7 +29,7 @@ export default function UploadCarousel({ showCarouselEdit, setShowCarouselEdit, 
   const [carousel, setCarousel] = useState(null)
 
   // 控制訊息
-  const [message, setMessage] = useState('無訊息')
+  const [message, setMessage] = useState('')
   const [messageStatus, setMessageStatus] = useState(false)
   const [messageColor, setMessageColor] = useState('')
   // 綁定timeout，用於重計

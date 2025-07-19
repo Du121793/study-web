@@ -25,34 +25,12 @@ export default function UploadBoard({ boardInfo, setEditHasChange, editHasChange
   const uiElement = useRef(null)
   const [getUiHeight, setGetUiHeight] = useState(0)
   // 控制訊息
-  const [message, setMessage] = useState('無訊息')
+  const [message, setMessage] = useState('')
   const [messageStatus, setMessageStatus] = useState(false)
   const [messageColor, setMessageColor] = useState('')
   // 綁定timeout，用於重計
   const messageTimer = useRef(null)
   const resetTimer = useRef(null)
-  // 控制訊息
-  const messageControl = (info, isSuccess) => {
-    setMessage(info)
-    setMessageStatus(true)
-    if (isSuccess) {
-      setMessageColor('rgba(195, 240, 178, 0.8)')
-    } else {
-      setMessageColor('rgba(240, 178, 178, 0.8)')
-    }
-
-    // 清除之前的 timer
-    if (messageTimer.current) clearTimeout(messageTimer.current)
-    if (resetTimer.current) clearTimeout(resetTimer.current)
-
-    messageTimer.current = setTimeout(() => {
-      setMessageStatus(false)
-      resetTimer.current = setTimeout(() => {
-        setMessage('無訊息')
-        setMessageColor('')
-      }, 200)
-    }, 2000)
-  }
   // 嚴格onclick
   const strictClickCloseUI = useStrictClickHandler(() => {
     setVisibility('hidden')
@@ -203,17 +181,17 @@ export default function UploadBoard({ boardInfo, setEditHasChange, editHasChange
               </div>
             </div>
           ) : (
-            <div className={btn_style['btn-area']}>
-              <div
-                className={(btn_style['g-blue-btn'], style['submit'])}
-                style={{ visibility: visibility }}
-                onClick={uploadBoard}>
-                上傳公告
-              </div>
+            <div className={`${btn_style['btn-area']} btn-area`}>
               <div
                 className={btn_style['g-red-btn']}
                 {...strictClickCloseUI}>
                 關閉介面
+              </div>
+              <div
+                className={btn_style['g-blue-btn']}
+                style={{ visibility: visibility }}
+                onClick={uploadBoard}>
+                上傳公告
               </div>
             </div>
           )}

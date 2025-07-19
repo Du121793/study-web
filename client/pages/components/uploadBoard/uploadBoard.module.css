@@ -7,7 +7,7 @@
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.15);
-  z-index: 3;
+  z-index: 5;
 }
 .upload-board-main .upload-board-ui {
   position: relative;
@@ -60,6 +60,9 @@
   height: 240px;
   resize: none;
 }
+.upload-board-main .upload-board-ui .btn-area {
+  display: flex;
+}
 @media (max-width: 860px) {
   .upload-board-main .upload-board-ui {
     width: 80%;
@@ -69,5 +72,8 @@
     gap: 8px;
     display: flex;
     flex-direction: row;
+  }
+  .upload-board-main .upload-board-ui .textarea-container {
+    margin-bottom: 128px;
   }
 }/*# sourceMappingURL=uploadBoard.module.css.map */

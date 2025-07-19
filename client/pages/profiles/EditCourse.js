@@ -470,39 +470,26 @@ export default function EditCourse() {
             </button>
           </form>
           {/* list title */}
-          <div
-            className="courses-info-area"
-            id="title-area">
-            <div className="count"></div>
-            <div className="course-name">課程名稱</div>
-            <div className="course-grade">年級</div>
-            <div className="course-subject">科目</div>
-            <div className="course-class">班級</div>
-            <div className="image-area">
-              <Image
-                src={editIcon}
-                className="image"
-                alt=""
-                width={24}
-                height={24}></Image>
-              <Image
-                src={deleteIcon}
-                className="image"
-                alt=""
-                width={24}
-                height={24}></Image>
+          <div className="courses-info-area title-area">
+            <div className="info-line">
+              <div className="count"></div>
+              <div className="course-name title-area">課程名稱</div>
+              <div className="course-grade title-area">年級</div>
+              <div className="course-subject title-area">科目</div>
+              <div className="course-class">班級</div>
             </div>
           </div>
-          {/* list info */}
+          {/* loading anime */}
           {courseLoading && (
             <div className="courses-info-area">
               <LoadingAnime />
             </div>
           )}
+          {/* list info */}
           {coursesInfo &&
             coursesInfo.courses.map((item, index) => (
               <div
-                className="courses-info-area"
+                className="courses-info-area info-area"
                 key={index}>
                 {/* 若true，則將內部元素改為input，用於編輯 */}
                 {index === editStatusIndex ? (

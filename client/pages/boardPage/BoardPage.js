@@ -11,13 +11,16 @@ import { useUserToken } from '../../method/useUserToken'
 import adminService from '../../method/adminService'
 // child component
 import UploadBoard from '../components/uploadBoard/UploadBoard'
+
+import style from './boardPage.module.css'
+
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
 export default function BoardPage() {
   const token = useUserToken()
   const router = useRouter()
-  const { board_id } = router.query
+  const { board_id } = router.query // 拿到id
   const [loginState, setLoginState] = useState(false)
   const [showUploadBoardUI, setShowUploadBoardUI] = useState(false)
   const [uploadBoardUIHeight, setUploadBoardUIHeight] = useState(0)
@@ -109,7 +112,7 @@ export default function BoardPage() {
   }, [])
 
   return (
-    <div className="board-page-main">
+    <div className={style['board-page-main']}>
       <div className="messaege-area">
         <div
           style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
@@ -119,7 +122,7 @@ export default function BoardPage() {
       </div>
 
       <div
-        className="right-bottom-loading-area"
+        className={style['right-bottom-loading-area']}
         style={{ right: loading ? '8px' : '-100%' }}>
         <div className="loading"></div>
       </div>
@@ -143,7 +146,7 @@ export default function BoardPage() {
       )}
       {/* edit btn */}
       {userRole && userRole === 'admin' ? (
-        <div className="g-btn-area">
+        <div className={style['g-btn-area']}>
           <Link
             href={clientIp}
             className="g-black-btn">
@@ -199,10 +202,10 @@ export default function BoardPage() {
       )}
 
       <div
-        className={`main-title-area`}
+        className={style[`main-title-area`]}
         style={{ whiteSpace: 'pre-wrap' }}>
-        {boardInfo?.title && boardInfo?.subTitle && <div className="content">{boardInfo.title}</div>}
-        {boardInfo?.title && boardInfo?.subTitle && <div className="subTitle">{boardInfo?.subTitle}</div>}
+        {boardInfo?.title && boardInfo?.subTitle && <div className={style['content']}>{boardInfo.title}</div>}
+        {boardInfo?.title && boardInfo?.subTitle && <div className={style['subTitle']}>{boardInfo?.subTitle}</div>}
         {!boardInfo?.title && (
           <div
             className="loading-area"
@@ -212,9 +215,9 @@ export default function BoardPage() {
 
       {/* board info area */}
       {boardInfo && (
-        <div className="announcement">
+        <div className={style['announcement']}>
           <div
-            className="announcement-body"
+            className={style['announcement-body']}
             style={{ whiteSpace: 'pre-wrap' }}
             // 根據 content 的順序渲染所有元素（文字、圖片等）
             dangerouslySetInnerHTML={{ __html: boardInfo.content }}
@@ -225,13 +228,13 @@ export default function BoardPage() {
               style={{ margin: '0 auto', width: '90%', height: '32px' }}></div>
           )}
           {boardInfo.poster && (
-            <div className="announcement-footer">
+            <div className={style['announcement-footer']}>
               Posted by {boardInfo.poster.username} on {new Date(boardInfo.date).toLocaleString()}
             </div>
           )}
         </div>
       )}
-      <div className="footer-area">
+      <div className={style['footer-area']}>
         <Footer></Footer>
       </div>
     </div>

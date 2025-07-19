@@ -49,6 +49,7 @@ export default function Player() {
   const [windowsWidth, setWindowsWidth] = useState(0)
 
   const playerRef = useRef()
+  const hideListRef = useRef()
 
   useEffect(() => {
     if (!isClient) return false
@@ -213,6 +214,7 @@ export default function Player() {
         {/* logo */}
         <Image
           onClick={() => {
+            console.log(VideosList)
             setLoading(!loading)
           }}
           src={logo}
@@ -282,22 +284,28 @@ export default function Player() {
           {/* 切換按鈕 */}
           <div
             id={'close-button'}
+            ref={hideListRef}
             className={style['hidden-info-btn']}
             onClick={(e) => {
               listSwitch(e.target.id)
             }}>
             隱藏列表
           </div>
+
+          {/* 影片列表 */}
           <ul
             className={style['videos-area']}
             style={{ opacity: !videoListIsOpen ? 0 : 1 }}>
             {VideosList &&
               VideosList.map((item, index) => {
-                if (item.access && item.access.isAccess === true) {
+                if (item.access && item.access.isAccess === true && item._id !== video_id) {
                   return (
                     <Link
-                      className={`${style[`video${item._id === video_id ? 'active' : ''}`]}`}
+                      className={style['video']}
                       key={index}
+                      onClick={() => {
+                        hideListRef.current.click()
+                      }}
                       href={{
                         pathname: `${clientIp}/videoPlay/Player`,
                         query: {
@@ -308,13 +316,16 @@ export default function Player() {
                         },
                       }}>
                       <div className={style['image-area']}>
-                        <Image
-                          className={style['pre-view-image']}
-                          src={item.thumbnail !== '' ? item.thumbnail : noThumbnailImg}
-                          width={0}
-                          height={0}
-                          objectFit="contain"
-                          alt="video image"></Image>
+                        {item.thumbnail !== '' && (
+                          <Image
+                            className={style['pre-view-image']}
+                            src={item.thumbnail !== '' && item.thumbnail !== undefined ? item.thumbnail : noThumbnailImg}
+                            width={0}
+                            height={0}
+                            objectFit="contain"
+                            alt="video image"></Image>
+                        )}
+
                         <div className={style['video-time']}>{formatTime(item.length)}</div>
                       </div>
                       <div className={style['info']}>

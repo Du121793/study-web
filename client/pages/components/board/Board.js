@@ -92,7 +92,7 @@ export default function Board({ editHasChange, moveToBoardRef }) {
                 <Link
                   className={style['news-container']}
                   key={index}
-                  href={{ pathname: `${clientIp}/index/BoardPage`, query: data }}>
+                  href={{ pathname: `${clientIp}/boardPage/BoardPage`, query: data }}>
                   <div className={style['categories']}>
                     <div className={style['content']}>
                       <div className={style['background']}></div>

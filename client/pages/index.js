@@ -102,26 +102,30 @@ export default function Index() {
           inIndex="public"></Header>
       </div>
       <div className="RWD">
-        {showCarouselEdit && (
-          <UploadCarousel
-            showCarouselEdit={showCarouselEdit}
-            setShowCarouselEdit={setShowCarouselEdit}
-            bannerHasChange={bannerHasChange}
-            setBannerHasChange={setBannerHasChange}
-          />
-        )}
-        {showUploadBoardUI && (
-          <UploadBoard
-            editHasChange={editHasChange}
-            setEditHasChange={setEditHasChange}
-            visibility={visibility}
-            setVisibility={setVisibility}
-            setShowUploadBoardUI={setShowUploadBoardUI}
-            setUploadBoardUIHeight={setUploadBoardUIHeight}
-            uploadBoardUIHeight={uploadBoardUIHeight}
-          />
-        )}
-        <Banner bannerHasChange={bannerHasChange}></Banner>
+        <div className="popup">
+          {showCarouselEdit && (
+            <UploadCarousel
+              showCarouselEdit={showCarouselEdit}
+              setShowCarouselEdit={setShowCarouselEdit}
+              bannerHasChange={bannerHasChange}
+              setBannerHasChange={setBannerHasChange}
+            />
+          )}
+          {showUploadBoardUI && (
+            <UploadBoard
+              editHasChange={editHasChange}
+              setEditHasChange={setEditHasChange}
+              visibility={visibility}
+              setVisibility={setVisibility}
+              setShowUploadBoardUI={setShowUploadBoardUI}
+              setUploadBoardUIHeight={setUploadBoardUIHeight}
+              uploadBoardUIHeight={uploadBoardUIHeight}
+            />
+          )}
+        </div>
+        <div className="banner-area">
+          <Banner bannerHasChange={bannerHasChange}></Banner>
+        </div>
         {userRole && userRole === 'admin' && (
           <div className="btn-area">
             <div

@@ -175,58 +175,68 @@
       .courses-info-area {
         width: 80%;
         display: flex;
-        align-items: center;
-        justify-content: center;
         padding: 6px 12px;
         border: 1px solid rgba(0, 0, 0, 0.2);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); // 柔和陰影
         border-radius: 6px;
-        flex-wrap: wrap;
+        // 放大checkbox
         input[type="checkbox"] {
           transform: scale(1.4);
         }
         .info-line {
-          width: 100%;
           display: flex;
           align-items: center;
-          justify-content: center;
           .count {
+            width: 3%;
             font-weight: bold;
-            width: 32px;
             font-size: clamp(16px, 1.2vw, 20px);
           }
+          // 班級名稱
           .course-name {
+            width: 11vw;
             font-size: clamp(16px, 1.2vw, 20px);
             display: flex;
             align-items: center;
             height: 100%;
-            width: 200px;
             border-left: 1px solid rgba(0, 0, 0, 0.2);
             padding-left: 4px;
           }
+          .course-name.title-area {
+            width: 11.4vw;
+            border: none;
+          }
+          // 年級
           .course-grade {
+            width: 6vw;
             display: flex;
             align-items: center;
             height: 100%;
-            width: 128px;
             border-left: 1px solid rgba(0, 0, 0, 0.2);
             padding-left: 4px;
             font-size: clamp(16px, 1.2vw, 20px);
           }
+          .course-grade.title-area {
+            width: 6.1vw;
+          }
+          // 科目
           .course-subject {
+            width: 6vw;
             display: flex;
             align-items: center;
             height: 100%;
-            width: 128px;
             border-left: 1px solid rgba(0, 0, 0, 0.2);
             padding-left: 4px;
             font-size: clamp(16px, 1.2vw, 20px);
           }
+          .course-subject.title-area {
+            width: 6.1vw;
+          }
+          // 班級
           .course-class {
+            width: 8vw;
             display: flex;
             align-items: center;
             height: 100%;
-            width: 128px;
             border-left: 1px solid rgba(0, 0, 0, 0.2);
             padding-left: 4px;
             font-size: clamp(16px, 1.2vw, 20px);
@@ -259,6 +269,7 @@
           display: flex;
           gap: 12px;
           font-size: clamp(16px, 1.2vw, 20px);
+          margin-left: auto;
 
           .complate-course-button {
             cursor: pointer;
@@ -289,6 +300,7 @@
           }
         }
       }
+
       #title-area {
         border: none;
         box-shadow: none;
@@ -308,12 +320,11 @@
   }
 
   @media (max-width: 860px) {
-    width: 100vw;
     .edit-course-function-area {
       .input-area {
         flex-direction: column;
         width: 80vw;
-        select{
+        select {
           min-width: 85%;
           padding: 8px 6px;
         }
@@ -330,6 +341,40 @@
           width: 80%;
         }
       }
+      .courses-info-list {
+        .search-area {
+          flex-wrap: wrap;
+        }
+        .courses-info-area.title-area {
+          .info-line {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            .count {
+              display: none;
+            }
+          }
+        }
+        .courses-info-area.info-area {
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+          .info-line {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            .count {
+              display: none;
+            }
+            .course-name{
+              border: none;
+            }
+          }
+          .image-area {
+            margin: 0;
+          }
+        }
+      }
     }
     .checkbox-area {
       width: 60%;
@@ -339,27 +384,6 @@
         }
         input[type="checkbox"] {
           transform: scale(1.6);
-        }
-      }
-    }
-    .courses-info-list {
-      width: 90%;
-      .search-area {
-        flex-direction: column;
-      }
-      .courses-info-area {
-        word-break: keep-all;
-      }
-      .courses-info-area {
-        flex-direction: column;
-      }
-      #title-area {
-        flex-direction: row;
-        gap: 4px;
-        justify-items: center;
-        overflow: hidden;
-        .image-area {
-          width: 0;
         }
       }
     }
