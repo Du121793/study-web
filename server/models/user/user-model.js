@@ -39,6 +39,10 @@ const userSchema = new Schema({
     enum: ["student", "teacher", "admin"],
     default: "student",
   },
+  lastLogin: {
+    type: Date,
+    default: Date.now,
+  },
   date: {
     type: Date,
     default: Date.now,

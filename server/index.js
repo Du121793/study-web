@@ -24,7 +24,7 @@ const { log, logError } = require("./utils/logger");
 const accessConfig = require("./config/accessConfig.json");
 
 // 取得第二個ip作為req.ip
-// app.set("trust proxy", 2);
+app.set("trust proxy", 2);
 
 // =====================
 // 載入配置和路由
@@ -197,6 +197,7 @@ app.use("/publicResource", publicResourceRoute);
 app.use("/modifyResource", tokenCheck, modifyResourceRoute);
 app.use("/user", tokenCheck, userRoute);
 app.use("/course", tokenCheck, courseRoute);
+app.use("/system", tokenCheck, require("./routes").system);
 
 // 錯誤處理中間件
 app.use((err, req, res, next) => {

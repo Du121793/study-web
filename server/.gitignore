@@ -4,3 +4,4 @@ resource/public/carousel/**
 resource/questionIMG/**
 resource/videoIMG/**
 methods/*/*.json
+backup/*

@@ -14,4 +14,5 @@ module.exports = {
   course: require("./course"), // 課程相關路由
   publicResource: require("./publicResource"), // 公開資源路由
   modifyResource: require("./modifyResource"), // 資源修改路由
+  system: require("./system"), // 系統管理路由
 };

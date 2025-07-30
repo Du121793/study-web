@@ -13,7 +13,6 @@ require("../config/passport");
 // require("./config/passport")(passport);
 const User = require("../models").user;
 const jwt = require("jsonwebtoken");
-const { user } = require("../models");
 const accessConfig = require("../config/accessConfig.json");
 const { log, logError } = require("../utils/logger");
 
@@ -64,6 +63,10 @@ router.get(
       const token = jwt.sign(tokenObject, process.env.PASSPORT_SECRET, {
         expiresIn: accessConfig.token.expiration.accessToken,
       });
+
+      let foundUser = await User.findById(req.user._id);
+      foundUser.lastLogin = Date.now();
+      await foundUser.save();
 
       // 導回前端的某個頁面，帶上正式 JWT
       return res.redirect(

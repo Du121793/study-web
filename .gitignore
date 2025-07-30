@@ -146,3 +146,4 @@ server/resource/public/carousel/**
 server/resource/questionIMG/**
 server/resource/videoIMG/**
 server/methods/*/*.json
+server/backup/*

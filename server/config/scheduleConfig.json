@@ -16,5 +16,8 @@
       "start": "03:30",
       "end": "23:00"
     }
+  },
+  "autoBackup": {
+    "cronTime": "0 3 * * 1"
   }
 }

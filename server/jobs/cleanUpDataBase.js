@@ -14,6 +14,8 @@ const QAmessage = require("../models/").QAmessage;
 const vimeoSchedule = require("../models").vimeoSchedule;
 const VimeoMethods = require("../methods").vimeoMethods;
 const { log, logError } = require("../utils/logger");
+const { backup } = require("../utils/backup");
+const fs = require("fs");
 
 // 讀取config
 const scheduleConfig = require("../config/scheduleConfig.json");
@@ -182,7 +184,11 @@ async function processGetSchedule() {
         continue;
       }
 
-      return { success: false, processed: processCount, APILimit: findResp.APILimit };
+      return {
+        success: false,
+        processed: processCount,
+        APILimit: findResp.APILimit,
+      };
     }
 
     // 處理成功找到影片的情況
@@ -288,7 +294,11 @@ async function processDeleteSchedule() {
         }
         continue;
       }
-      return { success: false, processed: processCount, APILimit: deleteResp.APILimit };
+      return {
+        success: false,
+        processed: processCount,
+        APILimit: deleteResp.APILimit,
+      };
     }
     if (deleteResp.data && deleteResp.success === true) {
       await vimeoSchedule.findByIdAndDelete(schedule._id);
@@ -332,7 +342,10 @@ cron.schedule(
     try {
       const result = await processGetSchedule();
       if (result.success && result.processed > 0) {
-        log({}, `GET 排程執行結果:${result.success},處理了${result.processed}個檔案`);
+        log(
+          {},
+          `GET 排程執行結果:${result.success},處理了${result.processed}個檔案`
+        );
       } else if (!result.success) {
         // console.log("GET 排程因 API 回傳失敗而跳過本輪處理");
       }
@@ -364,7 +377,10 @@ cron.schedule(
     try {
       const result = await processDeleteSchedule();
       if (result.success && result.processed > 0) {
-        log({}, `DELETE 排程執行結果:${result.success},處理了${result.processed}個檔案`);
+        log(
+          {},
+          `DELETE 排程執行結果:${result.success},處理了${result.processed}個檔案`
+        );
       } else if (!result.success) {
         // console.log("DELETE 排程因 API 回傳失敗而跳過本輪處理");
       }
@@ -374,6 +390,34 @@ cron.schedule(
   },
   { timezone: "Asia/Taipei" }
 );
+
+// 自動備份任務
+cron.schedule(scheduleConfig.autoBackup.cronTime, async () => {
+  try {
+    log({ userName: "系統" }, "自動備份任務啟動");
+    const backupFile = await backup({ mongoUri: process.env.DB_IP });
+    log({ userName: "系統" }, `自動備份完成: ${backupFile}`);
+    // 保留最新 10 個備份，刪除多餘的
+    const backupDir = "backup";
+    const files = fs
+      .readdirSync(backupDir)
+      .filter((f) => f.endsWith(".zip"))
+      .map((f) => ({
+        name: f,
+        time: fs.statSync(path.join(backupDir, f)).mtime.getTime(),
+      }))
+      .sort((a, b) => b.time - a.time);
+    if (files.length > 10) {
+      const toDelete = files.slice(10);
+      toDelete.forEach((f) => {
+        fs.unlinkSync(path.join(backupDir, f.name));
+        log({ userName: "系統" }, `自動刪除舊備份: ${f.name}`);
+      });
+    }
+  } catch (err) {
+    logError({ userName: "系統" }, "cleanUpDataBase.js", "autoBackup", {}, err);
+  }
+});
 
 // 匯出供外部使用
 module.exports = {

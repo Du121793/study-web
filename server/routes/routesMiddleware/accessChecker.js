@@ -95,8 +95,11 @@ const question = async (req, res, next) => {
 
     // 查詢問題是否存在
     let foundQuestion = await QA.findOne({ _id: question_id })
-  .populate("poster", "userinfo.username userinfo.pictureUrl userinfo.makePictureAnonymous")
-  .exec();
+      .populate(
+        "poster",
+        "userinfo.username userinfo.pictureUrl userinfo.makePictureAnonymous"
+      )
+      .exec();
     if (!foundQuestion)
       return res.status(400).json({ success: false, msg: "無法找到問題" });
 
@@ -108,7 +111,7 @@ const question = async (req, res, next) => {
       );
 
       // 如果用戶沒有相關課程權限且問題不是公開的，則拒絕訪問
-      if (commonElements.length === 0 ) {
+      if (commonElements.length === 0) {
         logError(
           {
             userIp: req.ip,
