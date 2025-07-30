@@ -537,12 +537,12 @@ export default function EditMembers() {
           <div
             className="g-black-btn"
             onClick={selectAll}>
-            全選
+            全選此頁
           </div>
           <div
             className="g-black-btn"
             onClick={unSelectAll}>
-            反選
+            反選此頁
           </div>
         </div>
         {userRole && userRole === 'admin' && (

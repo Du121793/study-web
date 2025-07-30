@@ -305,28 +305,28 @@ export default function EditMembersInfo() {
                   className="inner-line"
                   key={idx}>
                   <input
-                    value={item.userinfo.username}
+                    defaultValue={item.userinfo.username}
                     type="text"
                     className="input user-name"
                     onChange={(e) => {
                       setUserNameInput(e.target.value)
                     }}></input>
                   <input
-                    value={item.userinfo.realname}
+                    defaultValue={item.userinfo.realname}
                     type="text"
                     className="input real-name"
                     onChange={(e) => {
                       setRealNameInput(e.target.value)
                     }}></input>
                   <input
-                    value={item.userinfo.phoneNumber}
+                    defaultValue={item.userinfo.phoneNumber}
                     type="text"
                     className="input phone"
                     onChange={(e) => {
                       setPhoneInput(e.target.value)
                     }}></input>
                   <input
-                    value={item.userinfo.grade}
+                    defaultValue={item.userinfo.grade}
                     type="text"
                     className="input grade"
                     onChange={(e) => {
