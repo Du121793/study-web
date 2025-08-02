@@ -40,3 +40,10 @@ cursor: pointer;
       window.removeEventListener('resize', handleResize)
     }
   }, [isClient])
+
+
+  fix:profile/editcourse layout
+  change:profile/backup mode use full
+  feat:profile/backup double check and alert popup
+  change:profile/background main backgroun color
+  

@@ -2,8 +2,9 @@
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 // 子組件
-import Header from '../components/global/Header'
-import Footer from '../components/global/Footer'
+// import Header from '../components/global/Header'
+import Header from '../components/header/Header'
+import Footer from '../components/footer/Footer'
 // method
 import { useUserToken } from '../method/useUserToken'
 import userService from '../method/userService'
@@ -14,18 +15,17 @@ import UploadBoard from './components/uploadBoard/UploadBoard'
 import UploadCarousel from './components/uploadCarousel/UploadCarousel'
 // public
 import backgroundImage from '../public/backGroundIMG/stefanie-jockschat-9f1PRQs6Brs-unsplash.jpg'
-// css
+// style
+import style from './index.module.css'
 
 export default function Index() {
   const token = useUserToken()
   const [logined, setLogined] = useState(false)
   const [userShot, setUserShot] = useState(null)
   const [userRole, setUserRole] = useState(null)
-  const [showCarouselEdit, setShowCarouselEdit] = useState(false)
   const [showUploadBoardUI, setShowUploadBoardUI] = useState(false)
   const [uploadBoardUIHeight, setUploadBoardUIHeight] = useState(0)
   const [bannerHasChange, setBannerHasChange] = useState(false)
-  const [boardhasChange, setBoardHasChange] = useState(false)
   const [editHasChange, setEditHasChange] = useState(false)
   // 讀取旋轉
   const [loading, setLoading] = useState(false)
@@ -33,6 +33,9 @@ export default function Index() {
   const [visibility, setVisibility] = useState('visible')
   // 移動到最新消息function
   const moveToBoardRef = useRef(null)
+
+  // 控制滑條
+  const mainRef = useRef()
 
   const callBoardMoveToBoardFunction = () => {
     if (moveToBoardRef.current) moveToBoardRef.current.doSomething()
@@ -82,77 +85,51 @@ export default function Index() {
   }, [])
 
   return (
-    <div className="index-main">
+    <div
+      ref={mainRef}
+      className={style['index-main']}>
       <div
         className="right-bottom-loading-area"
         style={{ right: loading ? '8px' : '-100%' }}>
         <div className="loading"></div>
       </div>
-      <div className="background-image">
+      <div className={style['background-image']}>
         <Image
           src={backgroundImage}
           alt="back ground image"
-          className="image"></Image>
+          className={style['image']}></Image>
       </div>
-      <div className="header-area">
+      <div className={style['header-area']}>
         <Header
           callBoardMoveToBoardFunction={callBoardMoveToBoardFunction}
           loginState={logined}
           user_line_shot={userShot}
           inIndex="public"></Header>
       </div>
-      <div className="RWD">
-        <div className="popup">
-          {showCarouselEdit && (
-            <UploadCarousel
-              showCarouselEdit={showCarouselEdit}
-              setShowCarouselEdit={setShowCarouselEdit}
-              bannerHasChange={bannerHasChange}
-              setBannerHasChange={setBannerHasChange}
-            />
-          )}
-          {showUploadBoardUI && (
-            <UploadBoard
-              editHasChange={editHasChange}
-              setEditHasChange={setEditHasChange}
-              visibility={visibility}
-              setVisibility={setVisibility}
-              setShowUploadBoardUI={setShowUploadBoardUI}
-              setUploadBoardUIHeight={setUploadBoardUIHeight}
-              uploadBoardUIHeight={uploadBoardUIHeight}
-            />
-          )}
-        </div>
-        <div className="banner-area">
-          <Banner bannerHasChange={bannerHasChange}></Banner>
-        </div>
+      <div className={style['banner-area']}>
+        <Banner bannerHasChange={bannerHasChange}></Banner>
+      </div>
+      <div className={style['pops']}>
         {userRole && userRole === 'admin' && (
-          <div className="btn-area">
-            <div
-              className="g-blue-btn"
-              onClick={() => {
-                setShowCarouselEdit(true)
-              }}>
-              編輯輪播圖
-            </div>
-            <div
-              className="g-blue-btn"
-              onClick={() => {
-                setShowUploadBoardUI(true)
-                setTimeout(() => {
-                  setUploadBoardUIHeight(800)
-                  setVisibility('visible')
-                }, 1)
-              }}>
-              上傳公告
-            </div>
-          </div>
+          <UploadCarousel
+            bannerHasChange={bannerHasChange}
+            setBannerHasChange={setBannerHasChange}
+          />
+        )}
+        {userRole && userRole === 'admin' && (
+          <UploadBoard
+            editHasChange={editHasChange}
+            setEditHasChange={setEditHasChange}
+            setShowUploadBoardUI={setShowUploadBoardUI}
+            setUploadBoardUIHeight={setUploadBoardUIHeight}
+            uploadBoardUIHeight={uploadBoardUIHeight}
+          />
         )}
       </div>
       <Board
         moveToBoardRef={moveToBoardRef}
         editHasChange={editHasChange}></Board>
-      <div className="footer-area">
+      <div className={style['footer-area']}>
         <Footer></Footer>
       </div>
     </div>

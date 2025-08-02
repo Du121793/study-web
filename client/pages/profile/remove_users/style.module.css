@@ -1,0 +1,222 @@
+.remove_users_page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  gap: 8px;
+  z-index: 0;
+}
+.remove_users_page .remove_users_title {
+  margin-top: 24px;
+  font-size: clamp(28px, 2vw, 34px);
+  background-color: #fff;
+  padding: 12px;
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+.remove_users_page .option-container {
+  width: 85%;
+  background-color: #fff;
+  padding: 24px;
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.remove_users_page .option-container .remove_user_header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 12px;
+}
+.remove_users_page .option-container .remove_user_header div {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.remove_users_page .option-container .remove_user_header div .name_input {
+  width: 100px;
+}
+.remove_users_page .option-container .remove_user_header div .grade_input {
+  width: 100px;
+}
+.remove_users_page .option-container .remove_user_header div .title {
+  font-size: clamp(16px, 1.2vw, 20px);
+}
+.remove_users_page .option-container .header_btns {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.remove_users_page .option-container .header_btns .button {
+  cursor: pointer;
+  padding: 4px 8px 4px 8px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  transition: 0.2s;
+}
+.remove_users_page .option-container .header_btns .button:hover {
+  background-color: #f0f0f0;
+}
+.remove_users_page .option-container .header_btns #delete-btn {
+  background-color: #efb5b5;
+}
+.remove_users_page .option-container .header_btns #delete-btn:hover {
+  background-color: #e0aaaa;
+}
+.remove_users_page .option-container .container_line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.remove_users_page .option-container .container_line .member_id_input {
+  width: 24vw;
+}
+.remove_users_page .option-container .container_line .title {
+  font-size: clamp(16px, 1.2vw, 20px);
+}
+.remove_users_page .list-container {
+  width: 85%;
+  background-color: #fff;
+  padding: 24px;
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.remove_users_page .list-container .user_list_title {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 90%;
+}
+.remove_users_page .list-container .user_list_title .container {
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  padding: 4px 0 4px 0;
+  gap: 12px;
+  font-size: clamp(16px, 1.2vw, 20px);
+  word-break: keep-all;
+}
+.remove_users_page .list-container .user_list_title .container .username {
+  width: 80px;
+  margin-left: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.remove_users_page .list-container .user_list_title .container .grade {
+  pointer-events: none;
+  width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.remove_users_page .list-container .user_list_title .container .realname {
+  width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.remove_users_page .list-container .user_list_title .container .phone {
+  width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.remove_users_page .list-container .user_list_title .container .userid {
+  width: 30%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.remove_users_page .list-container .user_list_title .container .role {
+  width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.remove_users_page .list-container .user_list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 90%;
+  font-size: clamp(16px, 1.2vw, 20px);
+}
+.remove_users_page .list-container .user_list .container {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  padding: 4px 0 4px 0;
+  gap: 12px;
+}
+.remove_users_page .list-container .user_list .container .username {
+  pointer-events: none;
+  width: 80px;
+  margin-left: 6px;
+}
+.remove_users_page .list-container .user_list .container .grade {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+  width: 70px;
+}
+.remove_users_page .list-container .user_list .container .realname {
+  pointer-events: none;
+  width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.remove_users_page .list-container .user_list .container .phone {
+  pointer-events: none;
+  width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.remove_users_page .list-container .user_list .container .userid {
+  pointer-events: none;
+  width: 30%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.remove_users_page .list-container .user_list .container .role {
+  pointer-events: none;
+  width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 860px) {
+  .remove_users_page {
+    padding-top: 72px;
+    width: 100vw;
+  }
+  .remove_users_page .remove_user_header {
+    flex-direction: column;
+  }
+  .remove_users_page .remove_user_header .top_info_input {
+    display: flex;
+    width: 80%;
+  }
+  .remove_users_page .remove_user_header .top_info_input .title {
+    width: 18%;
+    word-break: keep-all;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .remove_users_page .remove_user_header .top_info_input input {
+    flex: 1;
+  }
+}

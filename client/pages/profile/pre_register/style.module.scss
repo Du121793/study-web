@@ -1,0 +1,158 @@
+.preRegister_main {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  gap: 8px;
+  .header {
+    margin-top: 24px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    .title {
+      margin-top: 24px;
+      font-size: clamp(28px, 2vw, 34px);
+      background-color: #fff;
+      padding: 12px;
+      border-radius: 4px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  .chose_courses_card_area {
+    display: flex;
+    gap: 12px;
+    .course_card {
+      padding: 4px 6px;
+      border: 1px solid rgba(0, 0, 0, 0.4);
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      .delete_btn {
+        cursor: pointer;
+        border-radius: 64px;
+        font-size: 14px;
+        padding: 2px 6px;
+        color: #545454;
+        transition: 0.2s;
+      }
+      .delete_btn:hover {
+        background-color: #e7e7e7;
+      }
+    }
+  }
+  .form {
+    position: relative;
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 24px;
+    .form_line {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      justify-content: center;
+      background-color: #fff;
+      padding: 24px;
+      border-radius: 4px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+      .form_selects {
+        left: 0;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 32px;
+        font-size: clamp(16px, 1.2vw, 20px);
+
+        select {
+          border: 1px solid rgba(0, 0, 0, 0.4);
+          outline: none;
+        }
+        .chose_grade {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .choose_role_cantainer {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .choose_course_cantainer {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+      }
+      .copy_area {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        div {
+          gap: 12px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: clamp(16px, 1.2vw, 20px);
+          .input {
+            width: 200px;
+          }
+          .name_input {
+            width: 9vw;
+          }
+          .grade_input {
+            width: 9vw;
+          }
+          .name_title {
+            width: 96px;
+          }
+          .phone_title {
+            width: 7vw;
+          }
+        }
+      }
+    }
+  }
+  .form_submit {
+    position: relative;
+    right: 0;
+    top: 12px;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 24px;
+    .submit {
+      padding: 6px 64px;
+    }
+  }
+  @media (max-width: 860px) {
+    width: 100vw;
+    .form {
+      .form_line {
+        .form_selects {
+          flex-wrap: wrap;
+        }
+        .copy_area {
+          align-items: center;
+          gap: 64px;
+          .input_area {
+            width: 80%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 0;
+            input {
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+}

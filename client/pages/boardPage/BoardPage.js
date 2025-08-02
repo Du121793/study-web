@@ -3,8 +3,8 @@ import { useRouter } from 'next/router'
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 // globel component
-import Header from '../../components/global/Header'
-import Footer from '../../components/global/Footer'
+import Header from '../../components/header/Header'
+import Footer from '../../components/footer/Footer'
 // method
 import userService from '../../method/userService'
 import { useUserToken } from '../../method/useUserToken'
@@ -120,16 +120,17 @@ export default function BoardPage() {
           {message}
         </div>
       </div>
-
       <div
         className={style['right-bottom-loading-area']}
         style={{ right: loading ? '8px' : '-100%' }}>
         <div className="loading"></div>
       </div>
-      <Header
-        loginState={loginState}
-        inIndex="public"
-      />
+      <div className={style['header']}>
+        <Header
+          loginState={loginState}
+          inIndex="public"
+        />
+      </div>
       {showUploadBoardUI && (
         <UploadBoard
           boardInfo={boardInfo}

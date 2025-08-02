@@ -10,12 +10,11 @@ import noThumbnailImg from '../../public/global/no-image-available-icon.jpg'
 // method
 import { useUserToken } from '../../method/useUserToken'
 import userService from '../../method/userService'
-import Footer from '../../components/global/Footer'
+import Footer from '../../components/footer/Footer'
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 // css
 import style from './player.module.css'
-import btn_style from '../../styles/global/button.module.css'
 
 export default function Player() {
   const token = useUserToken()
@@ -207,19 +206,18 @@ export default function Player() {
         <div
           id={style['back-btn']}
           onClick={() => {
-            window.location = `${clientIp}/courses/Course?courseName=${course_name}&courseId=${course_id}`
+            window.location = `${clientIp}/course/Course?courseName=${course_name}&courseId=${course_id}`
           }}>
           回到課程
         </div>
         {/* logo */}
         <Image
           onClick={() => {
-            console.log(VideosList)
             setLoading(!loading)
           }}
           src={logo}
-          alt="123"
-          className={style['logos']}
+          alt="logo"
+          className={style['logo']}
           width={100}
           height={100}></Image>
         {userShot && (

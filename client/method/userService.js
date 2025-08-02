@@ -16,7 +16,9 @@ const signOut = () => {
   localStorage.removeItem('user_role')
   localStorage.removeItem('user_name')
   localStorage.removeItem('token')
-  // window.location.replace('/')
+  setTimeout(() => {
+    window.location.replace('/')
+  }, 100)
 }
 
 const userService = {

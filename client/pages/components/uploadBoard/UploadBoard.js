@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react'
-import Image from 'next/image'
+import { useState, useRef, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import dynamic from 'next/dynamic'
 const MyReactQuill = dynamic(() => import('../../../components/MyReactQuill'), { ssr: false })
 import { useStrictClickHandler } from '../../../method/userful'
@@ -9,8 +9,10 @@ import { useUserToken } from '../../../method/useUserToken'
 import style from './uploadBoard.module.css'
 import btn_style from '../../../styles/global/button.module.css'
 
-export default function UploadBoard({ boardInfo, setEditHasChange, editHasChange, board_id = null, whichMethod = 'upload', setShowUploadBoardUI, setUploadBoardUIHeight, uploadBoardUIHeight, visibility, setVisibility }) {
+export default function UploadBoard({ boardInfo, setEditHasChange, editHasChange, board_id = null, whichMethod = 'upload', setShowUploadBoardUI }) {
   const token = useUserToken()
+  // 控制UI顯示
+  const [visibility, setVisibility] = useState(false)
   // 控制body滑動條
   const [page_body, setPage_body] = useState([])
   // 請求參數
@@ -28,21 +30,8 @@ export default function UploadBoard({ boardInfo, setEditHasChange, editHasChange
   const [message, setMessage] = useState('')
   const [messageStatus, setMessageStatus] = useState(false)
   const [messageColor, setMessageColor] = useState('')
-  // 綁定timeout，用於重計
-  const messageTimer = useRef(null)
-  const resetTimer = useRef(null)
-  // 嚴格onclick
-  const strictClickCloseUI = useStrictClickHandler(() => {
-    setVisibility('hidden')
-    setGetUiHeight(0)
-    page_body.style.overflow = 'auto'
-    setTimeout(() => {
-      setShowUploadBoardUI(false)
-    }, 200)
-  })
 
   const uploadSuccess = () => {
-    setVisibility('hidden')
     setGetUiHeight(0)
     page_body.style.overflow = 'auto'
     setTimeout(() => {
@@ -50,10 +39,11 @@ export default function UploadBoard({ boardInfo, setEditHasChange, editHasChange
     }, 200)
   }
 
-  const test = () => {}
-
   // 新增board
   const uploadBoard = () => {
+    if (title === '' || title === null || content === '' || content === null || subTitle === '' || subTitle === null) {
+      return
+    }
     const data = {
       title: title,
       content: content,
@@ -70,133 +60,126 @@ export default function UploadBoard({ boardInfo, setEditHasChange, editHasChange
   // 編輯board
   const editBoard = () => {
     if (board_id) {
+      /*
+        若無輸入，會用舊值
+      */
       const data = { board_id: board_id, title: editTitle, subTitle: editSubTitle, content: editContent }
       adminService.putBoard(token, data).then((res) => {
         if (res.success) {
           setEditHasChange(!editHasChange)
           setShowUploadBoardUI(false)
-          page_body.style.overflow = 'auto'
         }
       })
     }
   }
-
-  // 控制頁面scroll狀態
-  useEffect(() => {
-    if (uiElement?.current?.scrollHeight) {
-      setGetUiHeight(uiElement.current.scrollHeight)
-      setTimeout(() => {
-        setGetUiHeight(uiElement.current.scrollHeight)
-      }, 100)
-    }
-    if (typeof document !== 'undefined') {
-      setPage_body(document.querySelector('body'))
-    }
-    if (page_body && page_body.style) {
-      page_body.style.overflow = 'hidden'
-    }
-  }, [page_body, uiElement])
-
   return (
-    <div
-      className={style['upload-board-main']}
-      {...strictClickCloseUI}>
+    <div>
       <div
-        style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
-        className={style['message']}>
-        {message}
+        className="g-blue-btn"
+        onClick={() => {
+          setVisibility(true)
+        }}>
+        上傳公告
       </div>
-      <div
-        className={style['upload-board-ui']}
-        ref={uiElement}
-        style={{ height: getUiHeight }}
-        onClick={(e) => e.stopPropagation()}>
-        {whichMethod === 'edit' ? (
-          <div
-            className={style['title']}
-            style={{ visibility: visibility }}
-            onClick={test}>
-            編輯公告
-          </div>
-        ) : (
-          <div
-            className={style['title']}
-            style={{ visibility: visibility }}
-            onClick={test}>
-            上傳公告
-          </div>
-        )}
+      <AnimatePresence>
+        {visibility && (
+          <motion.div
+            className={style['upload-board-main']}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.1 }}>
+            <motion.div
+              className={style['upload-board-ui']}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{ duration: 0.1 }}
+              onClick={(e) => e.stopPropagation()} // 防止點到背景關閉
+            >
+              {/* message */}
+              <div
+                style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
+                className={style['message']}>
+                {message}
+              </div>
+              <div
+                className={style['upload-board-ui']}
+                ref={uiElement}
+                onClick={(e) => e.stopPropagation()}>
+                {whichMethod === 'edit' ? <div className={`${style['title']}`}>編輯公告</div> : <div className={style['title']}>上傳公告</div>}
 
-        <div
-          className={style['input-container']}
-          style={{ visibility: visibility }}>
-          <div className={style['content']}>公告標題 :</div>
-          <input
-            type="text"
-            className={style['input']}
-            defaultValue={boardInfo?.title}
-            onChange={(e) => {
-              setTitle(e.target.value)
-              setEditTitle(e.target.value)
-            }}
-          />
-          <div className="content">副標題 :</div>
-          <input
-            type="text"
-            className={style['input']}
-            defaultValue={boardInfo?.subTitle}
-            onChange={(e) => {
-              setSubTitle(e.target.value)
-              setEditSubTitle(e.target.value)
-            }}
-          />
-        </div>
-        <div
-          className={style['textarea-container']}
-          style={{ visibility: visibility }}>
-          <div className={style['content']}>公告內文</div>
-          <MyReactQuill
-            value={content}
-            onChange={(value) => {
-              setContent(value)
-              setEditContent(value) // 同時更新另一個狀態
-            }}
-          />
-        </div>
-        <div
-          className={btn_style['g-btn-area']}
-          style={{ visibility: visibility }}>
-          {whichMethod === 'edit' ? (
-            <div className={btn_style['btn-area']}>
-              <div
-                className={btn_style['g-blue-btn submit']}
-                style={{ visibility: visibility }}
-                onClick={editBoard}>
-                編輯公告
+                <div className={style['input-container']}>
+                  <div className={style['content']}>公告標題 :</div>
+                  <input
+                    type="text"
+                    className={style['input']}
+                    defaultValue={boardInfo?.title}
+                    onChange={(e) => {
+                      setTitle(e.target.value)
+                      setEditTitle(e.target.value)
+                    }}
+                  />
+                  <div className="content">副標題 :</div>
+                  <input
+                    type="text"
+                    className={style['input']}
+                    defaultValue={boardInfo?.subTitle}
+                    onChange={(e) => {
+                      setSubTitle(e.target.value)
+                      setEditSubTitle(e.target.value)
+                    }}
+                  />
+                </div>
+                <div className={style['textarea-container']}>
+                  <div className={style['content']}>公告內文</div>
+                  <MyReactQuill
+                    className={style['editor']}
+                    value={content}
+                    onChange={(value) => {
+                      setContent(value)
+                      setEditContent(value) // 同時更新另一個狀態
+                    }}
+                  />
+                </div>
+                <div>
+                  {whichMethod === 'edit' ? (
+                    <div className={style['btn-area']}>
+                      <div
+                        className={`${btn_style['g-blue-btn']} submit`}
+                        onClick={editBoard}>
+                        編輯公告
+                      </div>
+                      <div
+                        className={btn_style['g-red-btn']}
+                        onClick={() => {
+                          setVisibility(false)
+                        }}>
+                        關閉介面
+                      </div>
+                    </div>
+                  ) : (
+                    <div className={`${style['btn-area']}`}>
+                      <div
+                        className={btn_style['g-red-btn']}
+                        onClick={() => {
+                          setVisibility(false)
+                        }}>
+                        關閉介面
+                      </div>
+                      <div
+                        className={btn_style['g-blue-btn']}
+                        onClick={uploadBoard}>
+                        上傳公告
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div
-                className={btn_style['g-red-btn']}
-                {...strictClickCloseUI}>
-                關閉介面
-              </div>
-            </div>
-          ) : (
-            <div className={`${btn_style['btn-area']} btn-area`}>
-              <div
-                className={btn_style['g-red-btn']}
-                {...strictClickCloseUI}>
-                關閉介面
-              </div>
-              <div
-                className={btn_style['g-blue-btn']}
-                style={{ visibility: visibility }}
-                onClick={uploadBoard}>
-                上傳公告
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

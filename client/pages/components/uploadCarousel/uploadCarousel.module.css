@@ -1,26 +1,34 @@
 .upload-carousel-main {
   position: fixed;
   top: 0;
+  left: 0;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
   background-color: rgba(0, 0, 0, 0.2);
   width: 100%;
   height: 100%;
-  z-index: 9999;
+  z-index: 4;
   gap: 12px;
 }
-.upload-carousel-main .title {
+.upload-carousel-main .upload-carousel-container {
+  z-index: 9999;
+  width: 90%;
+  height: 90%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.upload-carousel-main .upload-carousel-container .title {
   font-size: 28px;
   background-color: #f3f3f3;
   padding: 8px 16px;
   border-radius: 8px;
   box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.3);
 }
-.upload-carousel-main .upload-ui {
-  background-color: #fff;
+.upload-carousel-main .upload-carousel-container .upload-ui {
+  background-color: rgba(255, 255, 255, 0.8980392157);
   padding: 24px;
-  margin: 24px;
   transition: 0.2s;
   display: flex;
   flex-direction: column;
@@ -30,103 +38,114 @@
   gap: 8px;
   overflow: auto;
   transition: 0.2s;
-  min-width: 80%;
-  max-width: 95%;
-  height: 80%;
+  width: 95%;
+  height: 95%;
   border-radius: 8px;
 }
-.upload-carousel-main .upload-ui .image-area {
+.upload-carousel-main .upload-carousel-container .upload-ui .image-area {
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  width: 80%;
+  align-items: center;
+  width: 100%;
   gap: 8px;
 }
-.upload-carousel-main .upload-ui .image-area .images {
+.upload-carousel-main .upload-carousel-container .upload-ui .image-area .images {
+  width: 100%;
   overflow: hidden;
   display: flex;
+  justify-content: center;
+  align-items: center;
   flex-direction: column;
   gap: 4px;
   flex: 1;
-  width: 70%;
   transition: 0.2s;
 }
-.upload-carousel-main .upload-ui .image-area .images .image {
+.upload-carousel-main .upload-carousel-container .upload-ui .image-area .images .image {
   display: flex;
   flex-direction: column;
   position: relative;
+  width: 90%;
+  transition: 0.2s;
+}
+.upload-carousel-main .upload-carousel-container .upload-ui .image-area .images .image .carousel {
+  transition: 0.2s;
   width: 100%;
-  transition: 0.2s;
-}
-.upload-carousel-main .upload-ui .image-area .images .image .carousel {
-  transition: 0.2s;
-  min-width: 100%;
+  border: 1px solid #ccc;
   border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.4);
 }
-.upload-carousel-main .upload-ui .image-area .images .image .image-btn-area {
+.upload-carousel-main .upload-carousel-container .upload-ui .image-area .images .image .image-btn-area {
   position: absolute;
   display: flex;
-  border-radius: 4px;
+  top: 8px;
+  left: 8px;
   gap: 6px;
   background-color: rgba(255, 255, 255, 0.6);
   padding: 6px 12px;
-  margin: 4px 0 0 4px;
 }
 @media (max-width: 860px) {
-  .upload-carousel-main .upload-ui .image-area .images .image .image-btn-area {
+  .upload-carousel-main .upload-carousel-container .upload-ui .image-area .images .image .image-btn-area {
     margin: 0;
     width: 100%;
     flex-wrap: wrap;
   }
-  .upload-carousel-main .upload-ui .image-area .images .image .image-btn-area .g-blue-btn {
+  .upload-carousel-main .upload-carousel-container .upload-ui .image-area .images .image .image-btn-area .g-blue-btn {
     font-size: 14px;
     padding: 4px 8px;
   }
-  .upload-carousel-main .upload-ui .image-area .images .image .image-btn-area .g-red-btn {
+  .upload-carousel-main .upload-carousel-container .upload-ui .image-area .images .image .image-btn-area .g-red-btn {
     font-size: 14px;
     padding: 4px 8px;
   }
-  .upload-carousel-main .upload-ui .image-area .images .image .image-btn-area .g-green-btn {
+  .upload-carousel-main .upload-carousel-container .upload-ui .image-area .images .image .image-btn-area .g-green-btn {
     font-size: 14px;
     padding: 4px 8px;
   }
 }
-.upload-carousel-main .upload-ui .image-area .setting-area {
-  background-color: #f3f3f3;
+.upload-carousel-main .upload-carousel-container .upload-ui .image-area .setting-area {
+  width: 90%;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background-color: #1b1b1b;
   box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
   display: flex;
   flex-wrap: wrap;
-  flex-direction: column;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 24px;
   padding: 24px 24px;
 }
+.upload-carousel-main .upload-carousel-container .upload-ui .image-area .setting-area .header-option-btn {
+  padding: 12px 32px;
+}
 @media (max-width: 860px) {
-  .upload-carousel-main .upload-ui .image-area {
+  .upload-carousel-main .upload-carousel-container .upload-ui .image-area {
     flex-direction: column;
     align-items: center;
     width: 100%;
   }
-  .upload-carousel-main .upload-ui .image-area .setting-area {
+  .upload-carousel-main .upload-carousel-container .upload-ui .image-area .setting-area {
     flex-direction: row;
     padding: 16px;
     justify-content: center;
   }
 }
-.upload-carousel-main .upload-ui .file-input {
+.upload-carousel-main .upload-carousel-container .upload-ui .file-input {
   width: 200px;
 }
-.upload-carousel-main .upload-ui .btn-area {
+.upload-carousel-main .upload-carousel-container .upload-ui .btn-area {
   display: flex;
   gap: 6px;
 }
-.upload-carousel-main .upload-ui .preview-image-area {
+.upload-carousel-main .upload-carousel-container .upload-ui .preview-image-area {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
   gap: 12px;
   width: 90%;
 }
-.upload-carousel-main .upload-ui .preview-image-area .image {
+.upload-carousel-main .upload-carousel-container .upload-ui .preview-image-area .image {
   width: 70%;
-}/*# sourceMappingURL=uploadCarousel.module.css.map */
+}

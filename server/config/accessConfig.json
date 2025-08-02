@@ -4,6 +4,6 @@
       "accessToken": "3d",
       "tempToken": "30m"
     },
-    "bindIP": true
+    "bindIP": false
   }
 }

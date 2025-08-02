@@ -1,5 +1,5 @@
 // 組件庫
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
 // method
 import { useUserToken } from '../../../method/useUserToken'
@@ -10,7 +10,7 @@ import blackleftArrow from '../../../public/arrow/left_arrow_black.png'
 // css
 import style from './banner.module.css'
 
-export default function Banner({ bannerHasChange }) {
+export default function Banner({ bannerHasChange = null }) {
   const token = useUserToken()
   const [role, setRole] = useState('')
   const [carousel, setCarousel] = useState([])
@@ -27,9 +27,8 @@ export default function Banner({ bannerHasChange }) {
   // 節流鎖
   const lockRef = useRef(false)
 
-  
   // 利用克隆方法：當原始陣列不為空時，在前面加上最後一張，在後面加上第一張
-  const getSlides = () => {
+  const getSlides = useCallback(() => {
     setSlideCount(carousel.length)
     if (carousel.length === 0) {
       setSlides([])
@@ -40,7 +39,7 @@ export default function Banner({ bannerHasChange }) {
     slides.push(...carousel)
     slides.push(carousel[0]) // 克隆第一張放最後面
     setSlides(slides)
-  }
+  })
 
   useEffect(() => {
     if (carousel) {
@@ -184,7 +183,7 @@ export default function Banner({ bannerHasChange }) {
               className={style['carousel-item']}>
               <Image
                 src={item}
-                loading="lazy"
+                loading={index === 0 ? 'eager' : 'lazy'}
                 alt={`banner image ${index}`}
                 layout="fill"
                 objectFit="contain"
@@ -211,8 +210,11 @@ export default function Banner({ bannerHasChange }) {
               carousel.map((_, idx) => (
                 <div
                   key={idx}
-                  className={`${style['indicator-dot']} ${getRealIndex() === idx ? style['active'] : ''}`}
-                  onClick={() => handleIndicatorClick(idx)}></div>
+                  className={style['indicator-dot-container']}>
+                  <div
+                    className={`${style['indicator-dot']} ${getRealIndex() === idx ? style['active'] : ''}`}
+                    onClick={() => handleIndicatorClick(idx)}></div>
+                </div>
               ))}
           </div>
         </div>

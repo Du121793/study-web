@@ -13,6 +13,7 @@
     "@ckeditor/ckeditor5-react": "^9.5.0",
     "axios": "^1.7.9",
     "dompurify": "^3.2.4",
+    "framer-motion": "^12.23.12",
     "fs": "^0.0.1-security",
     "isomorphic-dompurify": "^2.22.0",
     "lodash": "^4.17.21",

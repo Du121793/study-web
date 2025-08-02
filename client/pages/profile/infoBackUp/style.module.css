@@ -1,0 +1,257 @@
+@charset "UTF-8";
+.body {
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.body .container {
+  width: 90%;
+  height: 90%;
+  border: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  gap: 12px;
+  position: relative;
+}
+.body .container .title {
+  font-size: 28px;
+}
+.body .container .hint-title {
+  font-size: 18px;
+  color: rgb(213, 1, 1);
+  font-weight: bold;
+}
+.body .container .hints {
+  width: 60%;
+  font-size: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.body .container .hints li {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid #ccc;
+  padding: 12px;
+  border-radius: 4px;
+}
+@media (max-width: 768px) {
+  .body .container .hints {
+    width: 80%;
+  }
+}
+.body .container .popup-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(220, 220, 220, 0.6); /* 淺灰透明 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+.body .container .popup-overlay .popup {
+  background-color: #fff;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 11;
+  width: 85%;
+  height: 85%;
+}
+.body .container .popup-overlay .popup .popup-content {
+  font-size: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  border-radius: 8px;
+}
+@media (max-width: 860px) {
+  .body .container .popup-overlay .popup .popup-content {
+    flex-direction: column;
+  }
+}
+.body .container .popup-overlay .popup .popup-content .outside-option-btns {
+  width: 100%;
+  padding: 12px 0;
+  top: 0;
+  background-color: #3a3a3a;
+  position: sticky;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  gap: 12px;
+}
+.body .container .popup-overlay .popup .popup-content .outside-option-btns .backup-btn {
+  margin-right: 24px;
+}
+.body .container .popup-overlay .popup .popup-content .back-list {
+  width: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+}
+.body .container .popup-overlay .popup .popup-content .back-list .back-list-container {
+  width: 100%;
+  border-radius: 8px;
+  background-color: #2e2e2e;
+  padding: 18px 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  font-size: clamp(16px, 1.2vw, 20px);
+  color: white;
+  font-weight: bold;
+}
+@media (max-width: 860px) {
+  .body .container .popup-overlay .popup .popup-content .back-list .back-list-container {
+    padding: 12px 0;
+    width: 100%;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+.body .container .popup-overlay .popup .popup-content .back-list .back-list-container .text-area {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.body .container .popup-overlay .popup .popup-content .back-list .back-list-container .btns {
+  display: flex;
+  gap: 4px;
+}
+.body .container .popup-overlay .popup .popup-content .back-list .back-list-container .btns .blue-btn {
+  font-family: "微軟正黑體", sans-serif;
+  cursor: pointer;
+  padding: 6px 20px;
+  font-size: clamp(16px, 1.1vw, 20px);
+  border-radius: 4px;
+  background-color: #007bff;
+  color: white;
+  font-weight: 400;
+  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@media (max-width: 860px) {
+  .body .container .popup-overlay .popup .popup-content .back-list .back-list-container .btns .blue-btn {
+    padding: 6px12px;
+  }
+}
+.body .container .popup-overlay .popup .popup-content .back-list .back-list-container .btns .red-btn {
+  cursor: pointer;
+  padding: 6px 20px;
+  font-size: clamp(16px, 1.1vw, 20px);
+  border-radius: 4px;
+  background-color: #f84343;
+  color: white;
+  font-weight: 400;
+  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@media (max-width: 860px) {
+  .body .container .popup-overlay .popup .popup-content .back-list .back-list-container .btns .red-btn {
+    padding: 6px 12px;
+  }
+}
+.body .container .popup-overlay .popup .popup-content .back-list .back-list-container .btns .green-btn {
+  cursor: pointer;
+  padding: 6px 20px;
+  font-size: clamp(16px, 1.1vw, 20px);
+  border-radius: 4px;
+  background-color: #29ce34;
+  color: white;
+  font-weight: 400;
+  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@media (max-width: 860px) {
+  .body .container .popup-overlay .popup .popup-content .back-list .back-list-container .btns .green-btn {
+    padding: 6px 12px;
+  }
+}
+.body .container .next-popup-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(220, 220, 220, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+.body .container .next-popup-overlay .popup {
+  background-color: rgba(255, 255, 255, 0.901);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 11;
+  min-width: 60%;
+  min-height: 40%;
+}
+.body .container .next-popup-overlay .popup .popup-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80%;
+  gap: 24px;
+}
+.body .container .next-popup-overlay .popup .popup-content .hint {
+  font-weight: 500;
+  color: #e92929;
+  font-size: 22px;
+}
+@media (max-width: 860px) {
+  .body .container .next-popup-overlay .popup .popup-content .hint {
+    font-size: 18px;
+  }
+}
+.body .container .next-popup-overlay .popup .popup-content .confirm-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: 500;
+  font-size: 18px;
+}
+@media (max-width: 860px) {
+  .body .container .next-popup-overlay .popup .popup-content .confirm-message {
+    font-size: 16px;
+  }
+}
+.body .container .next-popup-overlay .popup .popup-content .btns {
+  display: flex;
+  justify-content: center;
+  width: 80%;
+  gap: 12px;
+}

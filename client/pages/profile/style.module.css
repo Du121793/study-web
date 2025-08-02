@@ -1,0 +1,35 @@
+.profile-main {
+  height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow-x: hidden;
+}
+.profile-main .top {
+  position: relative;
+  z-index: 3;
+}
+.profile-main .bottom {
+  z-index: 2;
+  position: relative;
+  flex: 1;
+  display: flex;
+}
+.profile-main .bottom .left-item {
+  z-index: 2;
+  position: sticky;
+  top: 0;
+  left: 0;
+  height: 100%;
+}
+@media (max-width: 860px) {
+  .profile-main .bottom .left-item {
+    position: absolute;
+  }
+}
+.profile-main .bottom .right-item {
+  flex: 1;
+  z-index: 0;
+  pointer-events: all;
+}

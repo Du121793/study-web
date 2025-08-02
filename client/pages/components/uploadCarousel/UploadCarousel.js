@@ -1,16 +1,18 @@
 // 組件庫
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
+import { motion, AnimatePresence, scale } from 'framer-motion'
 // method
 import { useUserToken } from '../../../method/useUserToken'
 import userService from '../../../method/userService'
 import adminService from '../../../method/adminService'
-
 // css
 import style from './uploadCarousel.module.css'
 import btn_style from '../../../styles/global/button.module.css'
 
-export default function UploadCarousel({ showCarouselEdit, setShowCarouselEdit, bannerHasChange, setBannerHasChange }) {
+export default function UploadCarousel({ bannerHasChange, setBannerHasChange }) {
+  // 控制UI的顯示
+  const [showCarouselEdit, setShowCarouselEdit] = useState(false)
   // 控制body滑動條
   const [page_body, setPage_body] = useState([])
   // 二次確認刪除用
@@ -116,169 +118,175 @@ export default function UploadCarousel({ showCarouselEdit, setShowCarouselEdit, 
     }
   }, [token])
 
-  // 控制頁面scroll狀態
-  useEffect(() => {
-    if (typeof document !== 'undefined') {
-      setPage_body(document.querySelector('body'))
-    }
-    if (page_body && page_body.style) {
-      page_body.style.overflow = 'hidden'
-    }
-  }, [page_body])
-
   const test = () => {}
 
   return (
-    <div className={style['upload-carousel-main']}>
+    <div>
       <div
-        className={style['upload-ui']}
-        onClick={(e) => {
-          e.stopPropagation()
+        className={'g-blue-btn'}
+        onClick={() => {
+          setShowCarouselEdit(true)
         }}>
-        {/* 未修復 */}
-        {/* <div
-          style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
-          className={style['message']}>
-          {message}
-        </div> */}
-        <div
-          className={style['title']}
-          onClick={test}>
-          編輯輪播圖功能
-        </div>
-        {carousel && carousel.length > 0 ? (
-          <div className={style['image-area']}>
-            <div className={style['setting-area']}>
-              <div
-                className={btn_style['g-red-btn']}
-                onClick={() => {
-                  page_body.style.overflow = 'auto'
-                  setShowCarouselEdit(false)
-                }}>
-                關閉介面
-              </div>
-              <div
-                className={btn_style['g-blue-btn']}
-                onClick={() => {
-                  inputHandle.current.click()
-                }}>
-                選擇圖片
-              </div>
-              <div
-                className={btn_style['g-blue-btn']}
-                onClick={postCarousel}>
-                執行上傳
-              </div>
-              <input
-                type="file"
-                className={style['file-input']}
-                accept="image/png image/jpg"
-                style={{ display: 'none' }}
-                ref={inputHandle}
-                onClick={(e) => (e.target.value = null)}
-                onChange={(e) => {
-                  setPreviewUrl(URL.createObjectURL(e.target.files[0]))
-                  setFiles(e.target.files[0])
-                }}
-              />
-            </div>
-            <div className={style['images']}>
-              {carousel.map((item, index) => (
-                <div
-                  className={style['image']}
-                  key={index}
-                  onClick={() => {}}>
-                  <div className={style['image-btn-area']}>
-                    {/* 刪除按鈕 */}
-                    {wantRemoveImageId !== item.split('/').pop().split('-')[1].split('.')[0] && (
-                      <button
-                        className={btn_style['g-red-btn']}
-                        onClick={() => {
-                          setWantRemoveImageId(item.split('/').pop().split('-')[1].split('.')[0])
-                        }}>
-                        刪除
-                      </button>
-                    )}
-                    {wantRemoveImageId === item.split('/').pop().split('-')[1].split('.')[0] && (
-                      <div
-                        className={btn_style['g-red-btn']}
-                        onClick={() => {
-                          deleteCarousel()
-                        }}>
-                        確定刪除
-                      </div>
-                    )}
-                    {wantRemoveImageId === item.split('/').pop().split('-')[1].split('.')[0] && (
-                      <div
-                        className={btn_style['g-green-btn']}
-                        onClick={() => {
-                          setWantRemoveImageId('')
-                        }}>
-                        取消
-                      </div>
-                    )}
-
-                    {/* 收放圖片 */}
-                    {hideBackImage &&
-                      hideBackImage.every((imageNumber) => {
-                        return imageNumber !== item.split('/').pop().split('-')[1].split('.')[0]
-                      }) && (
-                        <div
-                          className={btn_style['g-blue-btn']}
-                          onClick={() => {
-                            const image_number = item.split('/').pop().split('-')[1].split('.')[0]
-                            setHideBackImage([...hideBackImage, image_number])
-                          }}>
-                          收起圖片
-                        </div>
-                      )}
-
-                    {hideBackImage && hideBackImage.length > 0 && hideBackImage.find((imageNumber) => imageNumber === item.split('/').pop().split('-')[1].split('.')[0]) && (
-                      <div
-                        className={btn_style['g-blue-btn']}
-                        onClick={() => {
-                          const image_number = item.split('/').pop().split('-')[1].split('.')[0]
-                          const newArray = hideBackImage.filter((imageNumber) => imageNumber !== image_number)
-                          setHideBackImage(newArray)
-                        }}>
-                        復原圖片
-                      </div>
-                    )}
-                  </div>
-                  <Image
-                    src={item}
-                    width={0}
-                    height={0}
-                    style={{
-                      height: hideBackImage.find((imageNumber) => {
-                        return imageNumber === item.split('/').pop().split('-')[1].split('.')[0]
-                      })
-                        ? 100
-                        : 'auto',
-                    }}
-                    alt="banner preview"
-                    className={style['carousel']}></Image>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className={style['h2']}>現在還沒有圖片</div>
-        )}
-        <div className={style['hint-content']}>圖片預覽區域</div>
-        <div className={style['preview-image-area']}>
-          {previewUrl && (
-            <Image
-              alt="selected image preview"
-              src={previewUrl}
-              className={style['image']}
-              width={0}
-              height={0}
-              style={{ height: 'auto' }}></Image>
-          )}
-        </div>
+        編輯輪播圖
       </div>
-      <div className={style['announcement-area']}></div>
+      <AnimatePresence>
+        {showCarouselEdit && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.1 }}
+            className={style['upload-carousel-main']}>
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{ duration: 0.1 }}
+              className={style['upload-carousel-container']}>
+              <div
+                className={style['upload-ui']}
+                onClick={(e) => {
+                  e.stopPropagation()
+                }}>
+                <div
+                  className={style['title']}
+                  onClick={test}>
+                  編輯輪播圖功能
+                </div>
+                {carousel && carousel.length > 0 ? (
+                  <div className={style['image-area']}>
+                    <div className={style['setting-area']}>
+                      <div
+                        className={`${btn_style['g-red-btn']} ${style['header-option-btn']}`}
+                        onClick={() => {
+                          setShowCarouselEdit(false)
+                        }}>
+                        關閉介面
+                      </div>
+                      <div
+                        className={`${btn_style['g-blue-btn']} ${style['header-option-btn']}`}
+                        onClick={() => {
+                          inputHandle.current.click()
+                        }}>
+                        選擇圖片
+                      </div>
+                      <div
+                        className={`${btn_style['g-blue-btn']} ${style['header-option-btn']}`}
+                        onClick={postCarousel}>
+                        執行上傳
+                      </div>
+                      <input
+                        type="file"
+                        className={style['file-input']}
+                        accept="image/png image/jpg"
+                        style={{ display: 'none' }}
+                        ref={inputHandle}
+                        onClick={(e) => (e.target.value = null)}
+                        onChange={(e) => {
+                          setPreviewUrl(URL.createObjectURL(e.target.files[0]))
+                          setFiles(e.target.files[0])
+                        }}
+                      />
+                    </div>
+                    <div className={style['images']}>
+                      {carousel.map((item, index) => (
+                        <div
+                          className={style['image']}
+                          key={index}
+                          onClick={() => {}}>
+                          <div className={style['image-btn-area']}>
+                            {/* 刪除按鈕 */}
+                            {wantRemoveImageId !== item.split('/').pop().split('-')[1].split('.')[0] && (
+                              <button
+                                className={btn_style['g-red-btn']}
+                                onClick={() => {
+                                  setWantRemoveImageId(item.split('/').pop().split('-')[1].split('.')[0])
+                                }}>
+                                刪除
+                              </button>
+                            )}
+                            {wantRemoveImageId === item.split('/').pop().split('-')[1].split('.')[0] && (
+                              <div
+                                className={btn_style['g-red-btn']}
+                                onClick={() => {
+                                  deleteCarousel()
+                                }}>
+                                確定刪除
+                              </div>
+                            )}
+                            {wantRemoveImageId === item.split('/').pop().split('-')[1].split('.')[0] && (
+                              <div
+                                className={btn_style['g-green-btn']}
+                                onClick={() => {
+                                  setWantRemoveImageId('')
+                                }}>
+                                取消
+                              </div>
+                            )}
+
+                            {/* 收放圖片 */}
+                            {hideBackImage &&
+                              hideBackImage.every((imageNumber) => {
+                                return imageNumber !== item.split('/').pop().split('-')[1].split('.')[0]
+                              }) && (
+                                <div
+                                  className={btn_style['g-blue-btn']}
+                                  onClick={() => {
+                                    const image_number = item.split('/').pop().split('-')[1].split('.')[0]
+                                    setHideBackImage([...hideBackImage, image_number])
+                                  }}>
+                                  收起圖片
+                                </div>
+                              )}
+
+                            {hideBackImage && hideBackImage.length > 0 && hideBackImage.find((imageNumber) => imageNumber === item.split('/').pop().split('-')[1].split('.')[0]) && (
+                              <div
+                                className={btn_style['g-blue-btn']}
+                                onClick={() => {
+                                  const image_number = item.split('/').pop().split('-')[1].split('.')[0]
+                                  const newArray = hideBackImage.filter((imageNumber) => imageNumber !== image_number)
+                                  setHideBackImage(newArray)
+                                }}>
+                                復原圖片
+                              </div>
+                            )}
+                          </div>
+                          <Image
+                            src={item}
+                            width={0}
+                            height={0}
+                            style={{
+                              height: hideBackImage.find((imageNumber) => {
+                                return imageNumber === item.split('/').pop().split('-')[1].split('.')[0]
+                              })
+                                ? 100
+                                : 'auto',
+                            }}
+                            alt="banner preview"
+                            className={style['carousel']}></Image>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className={style['h2']}>現在還沒有圖片</div>
+                )}
+                <div className={style['preview-image-area']}>
+                  {previewUrl && (
+                    <Image
+                      alt="selected image preview"
+                      src={previewUrl}
+                      className={style['image']}
+                      width={0}
+                      height={0}
+                      style={{ height: 'auto' }}></Image>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

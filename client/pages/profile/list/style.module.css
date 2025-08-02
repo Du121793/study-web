@@ -1,0 +1,102 @@
+.list_main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
+}
+.list_main .show_list_btn_area {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.list_main .show_list_btn_area .show_list_btn {
+  background-color: #ffffff;
+  padding: 9px;
+  transition: 0.2s;
+  z-index: 2;
+  border-bottom-right-radius: 24px;
+}
+.list_main .list_info_area {
+  background-color: #fff;
+  height: 100%;
+  z-index: 1;
+  transition: 0.2s;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+@media (max-width: 860px) {
+  .list_main .list_info_area {
+    width: 100vw;
+  }
+}
+.list_main .list_info_area .close_list_btn_area {
+  display: flex;
+  justify-content: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  transition: 0.2s;
+}
+.list_main .list_info_area .close_list_btn_area .close_list_btn {
+  transition: 0.2s;
+  padding: 8px;
+}
+.list_main .list_info_area .close_list_btn_area:hover {
+  background-color: #dbdbdb;
+}
+.list_main .list_info_area .list_option {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 24px 24px 24px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  gap: 12px;
+}
+.list_main .list_info_area .list_option .funciton_area {
+  display: flex;
+  flex-direction: column;
+  transition: 0.2s;
+  width: 100%;
+  gap: 12px;
+}
+.list_main .list_info_area .list_option .funciton_area .title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 4px;
+  font-weight: bold;
+  font-size: clamp(24px, 1.2vw, 30px);
+}
+.list_main .list_info_area .list_option .funciton_area .options {
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: clamp(18px, 1.2vw, 20px);
+}
+.list_main .list_info_area .list_option .funciton_area .options .item_area {
+  display: flex;
+  margin-left: 16px;
+}
+.list_main .list_info_area .list_option .funciton_area .options .item_area .right_arrow {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  top: 1px;
+  transition: 0.2s;
+}
+.list_main .list_info_area .list_option .funciton_area .options .item_area .item {
+  cursor: pointer;
+  transition: 0.2s;
+  color: rgb(111, 111, 111);
+}
+.list_main .list_info_area .list_option .funciton_area .options .item_area .item:hover {
+  color: rgb(42, 42, 42);
+}

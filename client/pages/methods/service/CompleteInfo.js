@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 
 // global組件
-import Header from '../../../components/global/Header'
+import Header from '../../../components/header/Header'
 // method
 import userService from '../../../method/userService'
 export default function ComplateInfo() {

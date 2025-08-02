@@ -1,0 +1,194 @@
+.user_profile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  @media (max-width: 860px) {
+    width: 100vw;
+    padding: 12px 0;
+  }
+  .loading_main {
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+  .container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.4);
+    background-color: #ffffffc8;
+    border: 1px solid #ccc;
+    padding: 12px;
+    border-radius: 8px;
+    width: 90%;
+    @media (max-width: 860px) {
+      width: 60%;
+    }
+
+    .title {
+      margin-top: 24px;
+      display: flex;
+      justify-content: center;
+      font-size: clamp(28px, 2vw, 34px);
+    }
+
+    .top_section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      width: 90%;
+      padding: 12px;
+      @media (max-width: 860px) {
+        flex-wrap: wrap;
+        flex-direction: column;
+        align-items: center;
+        padding: 0;
+      }
+      // 頭像
+      .avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 120px;
+        min-height: 120px;
+        border-radius: 50%;
+        background: #ffffff;
+        transition: 0.2s;
+        margin-right: 24px;
+        box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
+        position: relative;
+        overflow: hidden;
+        transition: 0.2s;
+        .content {
+          transition: 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+          color: #ffffff;
+          font-weight: bold;
+          background-color: #0000003c;
+        }
+        .image {
+          transition: 0.2s;
+          position: absolute;
+          width: 100%;
+          height: 100%;
+        }
+      }
+
+      .edit.avatar:hover {
+        cursor: pointer;
+        background-color: #f3f3f3;
+      }
+
+      .info_bar {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        gap: 8px;
+        width: 40%;
+        @media (max-width: 860px) {
+          flex-direction: column;
+          align-items: center;
+          width: 90%;
+          gap: 8px;
+        }
+        .hide_avatar {
+          display: flex;
+          align-items: center;
+        }
+        .content {
+          display: flex;
+          align-items: center;
+          background-color: #fdfdfd;
+          font-size: clamp(16px, 1.2vw, 20px);
+          padding: 8px 12px;
+          flex: 1;
+          box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.2);
+          gap: 8px;
+          border-radius: 12px;
+          @media (max-width: 860px) {
+            width: 100%;
+          }
+        }
+      }
+      /* 右側區塊 (綠色框) */
+      .right_panel {
+        display: flex;
+        flex-direction: column;
+        padding: 4px;
+        height: 100%;
+        .button_group {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+      }
+    }
+
+    .bottom_section {
+      width: 60%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      .content_area {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        @media (max-width: 860px) {
+          flex-direction: column;
+        }
+        .content {
+          width: 64px;
+          display: flex;
+          justify-content: end;
+          align-items: center;
+          font-weight: bold;
+          @media (max-width: 860px) {
+            justify-content: start;
+          }
+        }
+        .content_info {
+          flex: 1;
+          padding: 4px 12px;
+          border-radius: 8px;
+          background-color: #fff;
+          box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.2);
+          gap: 12px;
+          word-break: break-word;
+          white-space: normal;
+          button {
+            padding: 2px 8px;
+            background-color: #282828;
+            color: white;
+            font-weight: bold;
+            transition: 0.2s;
+            border-radius: 8px;
+            &:hover {
+              padding: 3px 9px;
+            }
+          }
+        }
+        .hint {
+          font-size: 14px;
+          color: rgba(0, 0, 0, 0.4);
+        }
+      }
+    }
+  }
+}

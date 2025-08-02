@@ -1,0 +1,182 @@
+.member_select_area {
+  margin-top: 24px;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  padding-top: 64px;
+  padding: 24px 24px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  background-color: #fff; // 讓清單區域白底
+  width: 90%;
+  input[type="checkbox"] {
+    transform: scale(1.3);
+  }
+  .member_select_header {
+    font-size: clamp(28px, 2vw, 34px);
+  }
+  .classification {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+    .search_inputs {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: clamp(16px, 1.2vw, 20px);
+      span {
+        font-weight: 500;
+        color: #333;
+        margin-right: 4px;
+      }
+      input {
+        outline: none;
+        padding: 4px 6px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+        transition: border-color 0.2s;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+      }
+      .input_name {
+        width: 60px;
+      }
+      .input_grade {
+        width: 60px;
+      }
+      .role_inputs {
+        display: flex;
+      }
+      select {
+        outline: none;
+        padding: 4px 6px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+        transition: border-color 0.2s;
+        option {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+  .classification::after {
+    content: "";
+    position: absolute;
+    bottom: -24px;
+    right: 0;
+    width: 100%;
+    height: 1px;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  .btns {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 12px;
+    .search_option_btn {
+      outline: none;
+      padding: 4px 12px;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+      transition: border-color 0.2s;
+      background-color: #fff;
+      transition: 0.3s;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    }
+    .search_option_btn:hover {
+      background-color: #efefef;
+    }
+  }
+  .member_list_area {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    border-radius: 8px;
+    padding: 24px;
+    .inner_line {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      border: 2px solid rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+      padding: 8px;
+      gap: 4px;
+      font-size: clamp(16px, 1.2vw, 20px);
+      .user_name {
+        width: 20%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      .real_name {
+        width: 20%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      .phone {
+        width: 20%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      .grade {
+        width: 10%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      .role {
+        width: 20%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+    }
+  }
+  @media (max-width: 860px) {
+    width: 70vw;
+    .classification {
+      flex-direction: column;
+      .search_inputs {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        div {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          .input_name {
+            width: 80%;
+          }
+          .input_phone {
+            width: 80%;
+          }
+          .input_grade {
+            width: 80%;
+          }
+        }
+        .role_inputs {
+          display: flex;
+          width: 85%;
+          select{
+            width: 100%;
+          }
+        }
+      }
+      .btns{
+        flex-direction: column;
+        gap: 4px;
+      }
+    }
+  }
+}

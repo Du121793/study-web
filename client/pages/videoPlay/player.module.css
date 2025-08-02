@@ -24,7 +24,7 @@
 .video-player-main .header #back-btn {
   background-color: #282828;
   color: white;
-  margin: 0 32px;
+  margin: 0 0 0 32px;
   transition: 0.2s;
   padding: 8px 20px;
   border-radius: 4px;
@@ -35,7 +35,7 @@
   color: black;
   background-color: rgb(213, 213, 213);
 }
-.video-player-main .header .logos {
+.video-player-main .header .logo {
   margin: 0 auto;
   border-radius: 4px;
   display: flex;
@@ -52,6 +52,11 @@
   justify-content: center;
   width: 50px;
   height: 50px;
+}
+@media (max-width: 860px) {
+  .video-player-main .header .user-shot {
+    display: none;
+  }
 }
 .video-player-main .player-area {
   max-width: 100%;
@@ -312,4 +317,4 @@
 }
 .video-player-main .video-list-after-info-area .info:hover {
   background-color: #eeeeee;
-}/*# sourceMappingURL=player.module.css.map */
+}

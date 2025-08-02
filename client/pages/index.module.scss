@@ -1,0 +1,48 @@
+.index-main {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  .background-image {
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    left: 0;
+    height: 100%;
+    .image {
+      max-width: 100%;
+      max-height: 100%;
+    }
+  }
+  .header-area {
+    position: relative;
+    width: 100%;
+    z-index: 1;
+    @media (max-width: 860px) {
+      z-index: 3;
+    }
+  }
+  .banner-area {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+  .pops {
+    position: relative;
+    display: flex;
+    gap: 8px;
+    z-index: 3;
+    margin: 12px 0;
+  }
+  .board-main {
+    position: relative;
+    width: 100%;
+    z-index: 1;
+  }
+  .footer-area {
+    width: 100%;
+    position: relative;
+    z-index: 1;
+  }
+}

@@ -16,13 +16,13 @@
 .banner-main {
   position: relative;
   height: 100%;
-  width: 100vw;
 }
 .banner-main .banner {
   position: relative;
   overflow: hidden;
   height: 60vw;
   max-height: 60vh;
+  width: 98.2vw;
   background-color: rgba(255, 255, 255, 0.3);
   padding-bottom: 32px;
   padding-top: 32px;
@@ -61,8 +61,8 @@
   position: absolute;
   display: flex;
   align-items: center;
+  top: 0px;
   right: 0px;
-  top: 0;
   height: 100%;
   padding: 0 64px;
   z-index: 3;
@@ -96,33 +96,48 @@
   bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
-  display: flex;
+  transition: 0.2s;
 }
 .banner-main .banner .indicator {
   display: flex;
-  gap: 16px;
   width: 100%;
+  display: flex;
+  align-items: center;
 }
 @media (max-width: 860px) {
   .banner-main .banner .indicator {
     display: none;
   }
 }
-.banner-main .banner .indicator-dot {
-  max-width: 40px;
-  width: 8vw;
-  height: 6px;
-  background-color: rgba(255, 255, 255, 0.4);
-  border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.4);
-  cursor: pointer;
-  transition: background-color 0.3s;
+.banner-main .banner .indicator-dot-container {
+  width: 40px;
+  display: flex;
+  justify-content: center;
 }
-.banner-main .banner .indicator-dot.active {
-  background-color: rgb(255, 255, 255);
+.banner-main .banner .indicator-dot-container .indicator-dot {
+  max-width: 40px;
+  width: 10px;
+  height: 10px;
+  background-color: rgb(208, 208, 208);
+  border-radius: 50%;
+  border: 1px solid rgb(135, 135, 135);
+  cursor: pointer;
+  transition: 0.3s;
+}
+.banner-main .banner .indicator-dot-container .indicator-dot:hover {
+  width: 24px;
+  border-radius: 8px;
+  border: none;
+  background-color: rgb(42, 81, 238);
+}
+.banner-main .banner .indicator-dot-container .indicator-dot.active {
+  width: 24px;
+  border-radius: 8px;
+  border: none;
+  background-color: rgb(32, 32, 32);
 }
 @media (max-width: 860px) {
   .banner-main .banner {
     padding: 0;
   }
-}/*# sourceMappingURL=banner.module.css.map */
+}

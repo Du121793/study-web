@@ -1,0 +1,23 @@
+@charset "UTF-8";
+@keyframes floatFade {
+  0% {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px); /* 往上飄 */
+  }
+}
+.floating_message {
+  position: absolute;
+  padding: 12px 24px;
+  background-color: #3d3d3d;
+  color: white;
+  font-size: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  animation: floatFade 2.5s ease forwards;
+  pointer-events: none; /* 不阻擋點擊 */
+  z-index: 9999;
+}

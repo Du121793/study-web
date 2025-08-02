@@ -1,0 +1,153 @@
+.edit_members_info_main {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  gap: 24px;
+  height: 100%;
+}
+.edit_members_info_main .header_title {
+  margin-top: 24px;
+  font-size: clamp(28px, 2vw, 34px);
+  background-color: #fff;
+  padding: 12px;
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+.edit_members_info_main .search_area {
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  width: 90%;
+  padding: 12px 20px;
+  gap: 8px;
+}
+.edit_members_info_main .search_area .input_area {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 0 12px;
+  gap: 8px;
+}
+.edit_members_info_main .search_area .input_area .content {
+  font-size: clamp(16px, 1.2vw, 20px);
+}
+.edit_members_info_main .search_area .input_area .id input {
+  width: 320px;
+}
+.edit_members_info_main .search_area .btn_area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+.edit_members_info_main .member_list_area {
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 24px;
+  background-color: #fff;
+}
+.edit_members_info_main .member_list_area .inner_line {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  padding: 8px;
+  gap: 4px;
+  font-size: clamp(16px, 1.2vw, 20px);
+}
+.edit_members_info_main .member_list_area .inner_line .user_name {
+  width: 8%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.edit_members_info_main .member_list_area .inner_line .input.user_name {
+  width: 7%;
+}
+.edit_members_info_main .member_list_area .inner_line .real_name {
+  width: 8%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.edit_members_info_main .member_list_area .inner_line .input.real_name {
+  width: 6%;
+}
+.edit_members_info_main .member_list_area .inner_line .phone {
+  width: 16%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.edit_members_info_main .member_list_area .inner_line .input.phone {
+  width: 15%;
+}
+.edit_members_info_main .member_list_area .inner_line .grade {
+  width: 8%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.edit_members_info_main .member_list_area .inner_line .input.grade {
+  width: 7%;
+}
+.edit_members_info_main .member_list_area .inner_line .role {
+  width: 10%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.edit_members_info_main .member_list_area .inner_line .input.role {
+  width: 10%;
+}
+.edit_members_info_main .member_list_area .inner_line .id {
+  flex: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+@media (max-width: 860px) {
+  .edit_members_info_main {
+    width: 100vw;
+    padding-top: 64px;
+  }
+  .edit_members_info_main .search_area .input_area {
+    flex-direction: column;
+    align-items: center;
+    width: 80%;
+  }
+  .edit_members_info_main .search_area .input_area .realName {
+    width: 100%;
+  }
+  .edit_members_info_main .search_area .input_area .realName input {
+    width: 100%;
+  }
+  .edit_members_info_main .search_area .input_area .phone {
+    width: 100%;
+  }
+  .edit_members_info_main .search_area .input_area .phone input {
+    width: 100%;
+  }
+  .edit_members_info_main .search_area .input_area .grade {
+    width: 100%;
+  }
+  .edit_members_info_main .search_area .input_area .grade input {
+    width: 100%;
+  }
+  .edit_members_info_main .search_area .input_area .id {
+    width: 100%;
+  }
+  .edit_members_info_main .search_area .input_area .id input {
+    width: 100%;
+  }
+}

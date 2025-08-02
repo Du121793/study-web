@@ -9,6 +9,7 @@ const COURSE_URL = `${serverIp}/course/modifyCourse`
 const QA_URL = `${serverIp}/course/question/modifyQA`
 const INDEX_URL = `${serverIp}/course/question`
 const USER_URL = `${serverIp}/user`
+const SYSTEM_URL = serverIp + '/system'
 
 // 登出函式
 const signOut = () => {
@@ -18,7 +19,9 @@ const signOut = () => {
   sessionStorage.removeItem('user_role')
   sessionStorage.removeItem('user_name')
   localStorage.removeItem('token')
-  window.location.replace('/')
+  setTimeout(() => {
+    window.location.replace('/')
+  }, 100)
 }
 
 const adminService = {
@@ -450,8 +453,8 @@ const adminService = {
     }
   },
 
-  // 獲取公開QA的info
   async publicInfo(token, pageSize) {
+    // 獲取公開QA的info
     try {
       const authHeader = token ? { Authorization: token } : {}
       const payload = { pageSize }
@@ -474,9 +477,9 @@ const adminService = {
     }
   },
 
-  // 編輯修改course
-  // data = { courseId, courseName, subject, grade, courseClass }
   async editCourse(token, data) {
+    // 編輯修改course
+    // data = { courseId, courseName, subject, grade, courseClass }
     try {
       const authHeader = token ? { Authorization: token } : {}
 
@@ -498,9 +501,9 @@ const adminService = {
     }
   },
 
-  // 新增權杖
-  // { accessName, videoIDs, studentIDs, accessDate, unlimited }
   async addNewVideoAccess(token, course_id, data) {
+    // 新增權杖
+    // { accessName, videoIDs, studentIDs, accessDate, unlimited }
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.post(BASE_COURSE_URL + `/${course_id}/videoAccess/postNewAccess`, data, {
@@ -521,8 +524,8 @@ const adminService = {
     }
   },
 
-  // 獲取所有權杖
   async getAccessAllInfo(token, course_id, choseAccessId) {
+    // 獲取所有權杖
     try {
       const data = {
         access_id: choseAccessId || undefined,
@@ -547,9 +550,9 @@ const adminService = {
     }
   },
 
-  // 編輯權杖
-  // Body 參數: { accessName, videoIDs, studentIDs, accessDate, unlimited }
   async editAccessInfo(token, course_id, choseAccessId, data) {
+    // 編輯權杖
+    // Body 參數: { accessName, videoIDs, studentIDs, accessDate, unlimited }
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.patch(BASE_COURSE_URL + `/${course_id}/videoAccess/patchAccess/${choseAccessId}`, data, {
@@ -570,8 +573,8 @@ const adminService = {
     }
   },
 
-  // 刪除權杖
   async deleteAccess(token, course_id, choseAccessId) {
+    // 刪除權杖
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.delete(BASE_COURSE_URL + `/${course_id}/videoAccess/deleteAccess/${choseAccessId}`, {
@@ -592,17 +595,17 @@ const adminService = {
     }
   },
 
-  // 編輯影片
   async editVideoInfo(token, courseID, data) {
+    // 編輯影片
     /* 
-  data={
-    videoID = videoID
-    thumbnail = null
-    title = ''
-    description = null
-    isPrivate = true || false
-  }
- */
+      data={
+        videoID = videoID
+        thumbnail = null
+        title = ''
+        description = null
+        isPrivate = true || false
+      }
+    */
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.patch(BASE_COURSE_URL + `/${courseID}/patchVideo`, data, {
@@ -623,20 +626,20 @@ const adminService = {
     }
   },
 
-  // 編輯QA
-  async editQAInfo(token, data, courseID) {
+  async editQAInfo(token, data) {
+    // 編輯QA
     /* 
-  data =  {
-        question_id,
-        course_ids,
-        isPublic,
-        description,
-        resourceCategories,
-        hints,
-        rmIMG,
-        replied,
-      } = req.body;
-  */
+      data =  {
+          question_id,
+          course_ids,
+          isPublic,
+          description,
+          resourceCategories,
+          hints,
+          rmIMG,
+          replied,
+        } = req.body;
+    */
     try {
       // 設定 Authorization 標頭，若 token 存在則加入
       const authHeader = token ? { Authorization: token } : {}
@@ -679,8 +682,9 @@ const adminService = {
       }
     }
   },
-  // 刪除輪播圖
+
   async deleteCarousels(token, data) {
+    // 刪除輪播圖
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.delete(API_URL + `/modifyResource/deleteCarousel`, {
@@ -702,16 +706,16 @@ const adminService = {
     }
   },
 
-  // 新增公告
   async postBoard(token, data) {
+    // 新增公告
     /* 
-  {
-    title,
-    content,
-    poster: req.user._id,
-    image: [],
-  }
-  */
+    {
+      title,
+      content,
+      poster: req.user._id,
+      image: [],
+    }
+    */
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.post(API_URL + `/modifyResource/postNewBoard`, data, {
@@ -732,8 +736,8 @@ const adminService = {
     }
   },
 
-  // 刪除公告
   async deleteBoard(token, board_id) {
+    // 刪除公告
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.delete(API_URL + `/modifyResource/deleteBoard/${board_id}`, {
@@ -753,8 +757,8 @@ const adminService = {
     }
   },
 
-  // 編輯公告
   async putBoard(token, data) {
+    // 編輯公告
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.put(API_URL + `/modifyResource/putBoard`, data, {
@@ -775,8 +779,8 @@ const adminService = {
     }
   },
 
-  // 推送新增舊video
   async batchCreate(token, data, course_id) {
+    // 推送新增舊video
     // data = {videos : [{title,description,length(可選),recordDate(可選),isPrivate}]}
     try {
       const authHeader = token ? { Authorization: token } : {}
@@ -841,12 +845,12 @@ const adminService = {
     }
   },
 
-  /*
-   * @param {string} name - 資料夾名稱
-   * @param {string} parentFolder - 父資料夾ID
-   * @returns {Object} 新創建的資料夾
-   */
   async addNewFolder(token, data) {
+    /*
+     * @param {string} name - 資料夾名稱
+     * @param {string} parentFolder - 父資料夾ID
+     * @returns {Object} 新創建的資料夾
+     */
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.post(API_URL + `/course/question/modifyQA/folder/createFolder`, data, {
@@ -995,9 +999,6 @@ const adminService = {
   },
 
   async changeRole(token, data) {
-    /*
-  role
-  */
     try {
       const authHeader = token ? { Authorization: token } : {}
       const response = await axios.post(API_URL + `/user/changeRole`, data, {
@@ -1015,6 +1016,112 @@ const adminService = {
       } else {
         return e
       }
+    }
+  },
+
+  async getBackupList(token) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.get(SYSTEM_URL + '/getBackupList', {
+        headers: authHeader,
+      })
+      if (response.status === 200) return response.data
+    } catch (err) {
+      if (err.response?.status === 401) {
+        const message = {
+          msg: '距離上次登陸超過24小時，請重新登錄',
+        }
+        return message
+      }
+      console.error(err)
+    }
+  },
+
+  async downloadBackup(token, filename) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.get(SYSTEM_URL + `/getBackupFile/${filename}`, {
+        headers: authHeader,
+        responseType: 'blob',
+      })
+      if (response.status === 200) {
+        return response.data
+      }
+    } catch (err) {
+      if (err.response?.status === 401) {
+        const message = {
+          msg: '距離上次登陸超過24小時，請重新登錄',
+        }
+        return message
+      }
+      console.error(err)
+    }
+  },
+
+  async runBackup(token) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.post(
+        SYSTEM_URL + '/runBackup',
+        {},
+        {
+          headers: authHeader,
+        }
+      )
+      if (response.status === 200) return response.data
+    } catch (err) {
+      console.log(err)
+      if (err.response?.status === 401) {
+        const message = {
+          status: 401,
+          msg: '距離上次登陸超過24小時，請重新登錄',
+          errorInfo: err,
+        }
+        return message
+      }
+      console.error(err)
+    }
+  },
+
+  async applyBackup(token, filename, body) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.post(SYSTEM_URL + `/enableBackup/${filename}`, body, {
+        headers: authHeader,
+      })
+      if (response.status === 200) return response.data
+    } catch (err) {
+      console.log(err)
+      if (err.response?.status === 401) {
+        const message = {
+          status: 401,
+          msg: '距離上次登陸超過24小時，請重新登錄',
+          errorInfo: err,
+        }
+        return message
+      }
+      console.error(err)
+    }
+  },
+
+  async deleteBackup(token, filename) {
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.delete(SYSTEM_URL + `/deleteBackupFile/${filename}`, {
+        headers: authHeader,
+      })
+      if (response.status === 200) return response.data
+    } catch (err) {
+      console.log(err)
+      if (err.response?.status === 401) {
+        const message = {
+          status: 401,
+          msg: '距離上次登陸超過24小時，請重新登錄',
+          errorInfo: err,
+        }
+        return message
+      }
+      console.error(err)
     }
   },
 }

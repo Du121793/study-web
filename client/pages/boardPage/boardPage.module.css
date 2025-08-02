@@ -3,13 +3,28 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  position: relative;
   align-items: center;
+  position: relative;
+  overflow-x: hidden;
+}
+.board-page-main .header {
+  width: 100%;
+  position: relative;
+}
+@media (max-width: 860px) {
+  .board-page-main .header {
+    z-index: 2;
+  }
 }
 .board-page-main .g-btn-area {
   margin: 12px 0 12px 0;
   display: flex;
   gap: 12px;
+}
+@media (max-width: 860px) {
+  .board-page-main .g-btn-area {
+    justify-content: center;
+  }
 }
 .board-page-main .main-title-area {
   width: 90%;
@@ -19,8 +34,10 @@
   font-weight: bold;
   align-items: flex-end;
   flex-wrap: wrap;
+  position: relative;
   margin: 0 0 12px 0;
   gap: 16px;
+  z-index: 1;
 }
 .board-page-main .main-title-area .content {
   padding: 2px 20px;
@@ -35,6 +52,7 @@
   color: #999;
 }
 .board-page-main .announcement {
+  position: relative;
   flex: 1;
   width: 90%;
   margin: 0 24px 24px 24px;
@@ -46,8 +64,8 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  position: relative;
   gap: 24px;
+  z-index: 1;
 }
 .board-page-main .announcement .announcement-body {
   margin: 0 auto;
@@ -121,9 +139,11 @@
   text-align: right;
 }
 .board-page-main .footer-area {
+  position: relative;
   position: absolute;
   bottom: -166px;
   width: 100%;
+  z-index: 1;
 }
 @media (max-width: 860px) {
   .board-page-main {
@@ -137,4 +157,4 @@
     padding: 12px 0;
     margin-bottom: 60px;
   }
-}/*# sourceMappingURL=boardPage.module.css.map */
+}
