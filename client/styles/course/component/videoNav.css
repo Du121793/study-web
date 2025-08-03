@@ -2,17 +2,22 @@
 #video-nav {
   position: relative;
   top: 0;
-  width: 100%;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   background-color: rgba(0, 0, 0, 0.6);
   margin-bottom: 24px;
+  width: 90%;
+}
+@media (max-width: 860px) {
+  #video-nav {
+    width: 100%;
+    border-radius: 0px;
+  }
 }
 #video-nav .header {
   font-weight: bold;
   color: #e0e0e0;
-  padding-left: 24px;
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
@@ -27,6 +32,11 @@
   font-size: 20px;
   z-index: 1;
   gap: 12px;
+}
+@media (max-width: 860px) {
+  #video-nav .header {
+    border-radius: 0px;
+  }
 }
 #video-nav .header div {
   padding-left: 24px;

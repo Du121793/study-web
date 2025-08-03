@@ -1,3 +1,4 @@
+@charset "UTF-8";
 .index-main {
   position: relative;
   display: flex;
@@ -17,19 +18,23 @@
   max-height: 100%;
 }
 .index-main .header-area {
+  /*
+    因為有手機選單所以zindex在js內動態處理
+  */
   position: relative;
   width: 100%;
   z-index: 1;
 }
 @media (max-width: 860px) {
   .index-main .header-area {
-    z-index: 3;
+    z-index: 4;
   }
 }
 .index-main .banner-area {
   position: relative;
   z-index: 1;
   overflow: hidden;
+  width: 100%;
 }
 .index-main .pops {
   position: relative;

@@ -122,6 +122,10 @@
   gap: 6px;
   font-size: clamp(16px, 1.2vw, 20px);
 }
+.edit_course_main .edit_course_function_area .input-area-container .input_area .btn_area {
+  display: flex;
+  gap: 4px;
+}
 .edit_course_main .edit_course_function_area .input-area-container .input_area .grade_input {
   width: 10%;
 }

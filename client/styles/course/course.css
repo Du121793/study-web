@@ -5,6 +5,7 @@
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
+  width: 100%;
 }
 .course-main .course-header {
   position: relative;
@@ -22,10 +23,10 @@
   align-items: center;
   position: relative;
   z-index: 1;
-  width: 90%;
+  width: 100%;
 }
 .course-main .container .header-title-area {
-  width: 100%;
+  width: 90%;
   display: flex;
   align-items: center;
   position: relative;
@@ -73,9 +74,9 @@
   background-color: #ececec;
 }
 .course-main .container .nav {
+  width: 100%;
   position: relative;
   top: 0;
-  width: 100%;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
@@ -83,7 +84,6 @@
 }
 .course-main .container .nav .header {
   font-weight: bold;
-  padding-left: 24px;
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
@@ -105,7 +105,7 @@
 }
 @media (max-width: 920px) {
   .course-main {
-    width: 100vw;
+    width: 100%;
   }
   .course-main .container {
     width: 100%;
@@ -115,7 +115,6 @@
   .course-main .container .header-title-area {
     position: relative;
     flex-wrap: wrap;
-    width: 90%;
     gap: 0;
   }
   .course-main .container .header-title-area .left {
@@ -128,39 +127,22 @@
   .course-main .container .header-title-area .right {
     top: 18px;
   }
-  .course-main .container #video-nav {
-    border-radius: 0;
-    margin: 0;
-  }
-  .course-main .container #video-nav #video-header {
-    border-radius: 0;
-  }
-  .course-main .container #qa-nav {
-    border-radius: 0;
-    margin: 0;
-  }
-  .course-main .container #qa-nav .header {
-    border-radius: 0;
-  }
-  .course-main .container .nav {
+  .course-main .container .video-nav-content {
     width: 100%;
   }
-  .course-main .container .nav .video-nav-content {
-    width: 100%;
-  }
-  .course-main .container .nav .video-nav-content .update-video-area {
+  .course-main .container .video-nav-content .update-video-area {
     width: 100%;
     overflow: hidden;
   }
-  .course-main .container .nav .video-nav-content .video-area-container {
+  .course-main .container .video-nav-content .video-area-container {
     width: 100%;
   }
-  .course-main .container .nav .video-nav-content .video-area-container .video-area {
+  .course-main .container .video-nav-content .video-area-container .video-area {
     min-width: 100%;
     flex-direction: column;
     align-items: center;
   }
-  .course-main .container .nav .video-nav-content .video-area-container .video-area .video-card {
+  .course-main .container .video-nav-content .video-area-container .video-area .video-card {
     display: flex;
     flex-direction: row;
   }

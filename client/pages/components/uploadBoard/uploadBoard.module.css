@@ -8,7 +8,6 @@
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.15);
-  z-index: 5;
 }
 .upload-board-main .upload-board-ui {
   position: relative;
@@ -19,8 +18,15 @@
   overflow: auto;
   transition: 0.2s;
   background-color: #fff;
+  border: 1px solid #ccc;
   border-radius: 8px;
   padding: 24px;
+  overflow-x: hidden;
+}
+@media (max-width: 860px) {
+  .upload-board-main .upload-board-ui {
+    height: 80%;
+  }
 }
 .upload-board-main .upload-board-ui .input-container {
   display: flex;
@@ -34,12 +40,6 @@
 .upload-board-main .upload-board-ui .title {
   font-size: 30px;
   font-weight: bold;
-}
-.upload-board-main .upload-board-ui .textarea-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-bottom: 48px;
 }
 .upload-board-main .upload-board-ui .textarea-container .editor {
   height: 320px;
@@ -61,21 +61,20 @@
 }
 .upload-board-main .upload-board-ui .btn-area {
   display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
+  width: 100%;
+  justify-content: center;
+  position: relative;
   gap: 12px;
+  margin-top: 24px;
+}
+@media (max-width: 860px) {
+  .upload-board-main .upload-board-ui .btn-area {
+    margin-top: 152px;
+  }
 }
 @media (max-width: 860px) {
   .upload-board-main .upload-board-ui {
     width: 80%;
     margin: 0;
-  }
-  .upload-board-main .upload-board-ui .g-btn-area .btn-area {
-    gap: 8px;
-    display: flex;
-    flex-direction: row;
-  }
-  .upload-board-main .upload-board-ui .textarea-container {
-    margin-bottom: 128px;
   }
 }

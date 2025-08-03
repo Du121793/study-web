@@ -51,7 +51,9 @@ export default function UserProfile() {
     }, 2000)
   }
 
-  const test = () => {}
+  const test = () => {
+    console.log(userInfo)
+  }
 
   // 編輯成員資訊
   const patchUserInfo = () => {
@@ -193,15 +195,25 @@ export default function UserProfile() {
             )}
             {/* 隱藏頭像 */}
             <div className={`${style.content}`}>
-              <div className={style['text']}>隱藏頭像</div>
-              <input
-                className={style.checkbox}
-                checked={hideAvatar}
-                onChange={(e) => {
-                  setHideAvatar(e.target.checked)
-                }}
-                type="checkbox"
-              />
+              {!editState && <div className={style['text']}>{userInfo?.userinfo?.makePictureAnonymous === true ? '已隱藏頭像' : '正常顯示頭像'}</div>}
+              {editState && (
+                <div
+                  className={`${style['hide-avatar-option']} ${hideAvatar === true && style['active']}`}
+                  onClick={() => {
+                    setHideAvatar(true)
+                  }}>
+                  隱藏頭像
+                </div>
+              )}
+              {editState && (
+                <div
+                  className={`${style['hide-avatar-option']} ${hideAvatar === false && style['active']}`}
+                  onClick={() => {
+                    setHideAvatar(false)
+                  }}>
+                  顯示頭像
+                </div>
+              )}
             </div>
           </div>
           {/* 按鈕們 */}

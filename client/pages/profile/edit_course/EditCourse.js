@@ -384,12 +384,6 @@ export default function EditCourse() {
               onChange={(e) => {
                 setSeletedTeacher(e.target.value)
               }}>
-              <option
-                value=""
-                disabled
-                selected>
-                請選擇...
-              </option>
               <option value={user_id}>{user_name}</option>
               {teachers &&
                 teachers.length > 0 &&

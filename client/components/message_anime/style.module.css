@@ -20,4 +20,5 @@
   animation: floatFade 2.5s ease forwards;
   pointer-events: none; /* 不阻擋點擊 */
   z-index: 9999;
+  word-break: keep-all;
 }

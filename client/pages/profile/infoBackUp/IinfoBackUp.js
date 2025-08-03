@@ -18,6 +18,9 @@ function InfoBackUp() {
   const [showPup, setShowPup] = useState(false) // 二次彈窗
   const [actionType, setActionType] = useState(null) // 儲存要執行的動作
   const [selectedBackup, setSelectedBackup] = useState(null) // 儲存要操作的備份檔名
+
+  const alertList = [`本備份機制僅在緊急遷移服務器或重大資料遺失時使用。`, `使用者若超過 24 小時未重新登入，將無法執行備份或還原等敏感操作。`, `備份會將圖片與文件資料回復至指定的時間點。`, `恢復資料不會回復 Vimeo 影片的狀態，且之後的刪除/新增影片仍會保留。`, `因為 Vimeo 影片狀態不一致，可能導致影片失去索引或殘留於平台，操作前請謹慎。`, `系統最多保留最近 10 筆備份（含手動建立的備份）。`, `每週日凌晨 03:00 執行一次備份，並依排程刪除超出保留上限的舊備份。`, `建議在進行任何還原前先手動建立並下載一筆備份以防萬一。`, `被刪除的備份在移除前可先下載備份檔以保留一份本地備份。`]
+
   // 獲取備份
   const getBackupList = () => {
     const token = localStorage.getItem('token')
@@ -91,7 +94,11 @@ function InfoBackUp() {
     adminService.deleteBackup(token, filename + '.zip').then((res) => {
       if (res?.success) {
         getBackupList()
+        setHasMessage('成功刪除')
       }
+      setTimeout(() => {
+        setHasMessage(null)
+      }, 1000)
       setLoading(false)
     })
   }
@@ -102,30 +109,14 @@ function InfoBackUp() {
         <div className={style['title']}>備份功能</div>
         <div className={style['hint-title']}>備份須知:</div>
         <ul className={style['hints']}>
-          <li>
-            <span>1</span>
-            <span>備份功能用於緊急遷移服務器或者發生重大資料遺失事件</span>
-          </li>
-          <li>
-            <span>2</span>
-            <span>登入時間超過1天不允許操作</span>
-          </li>
-          <li>
-            <span>3</span>
-            <span>備份會將圖片資料，文件資料回覆到特定時間</span>
-          </li>
-          <li>
-            <span>4</span>
-            <span>恢復到特定時間並不會回覆Vimeo影片狀態，也表示你在此回覆點之後做的刪除影片新增影片都會保留，這將會造成影片失去索引或者影片遺留於Vimeo，進行此操作請謹慎執行</span>
-          </li>
-          <li>
-            <span>5</span>
-            <span>備份資料最多保留10個，包含手動備份（刪除前可以先下載） 建議進行資料恢復前，先手動備份一次並下載</span>
-          </li>
-          <li>
-            <span>6</span>
-            <span>每周日會自動備份</span>
-          </li>
+          {alertList.map((item, idx) => {
+            return (
+              <li key={idx}>
+                <span>{idx + 1}</span>
+                <span>{item}</span>
+              </li>
+            )
+          })}
         </ul>
         <div
           className="g-blue-btn"
@@ -155,15 +146,19 @@ function InfoBackUp() {
                 onClick={(e) => e.stopPropagation()} // 防止點擊內容區域關閉
               >
                 <div className={style['popup-content']}>
-                  {loading && <LoadingAnime top={'12px'}></LoadingAnime>}
-                  {hasMessage && (
-                    <MessageAnime
-                      message={hasMessage}
-                      top="100px"
-                      duration={2000}
-                    />
-                  )}
-
+                  <div className={style['alerts']}>
+                    {/* 加載動畫 */}
+                    {loading && <LoadingAnime top={'12px'}></LoadingAnime>}
+                    {/* 訊息框 */}
+                    {hasMessage && (
+                      <MessageAnime
+                        message={hasMessage}
+                        top="100px"
+                        duration={2000}
+                      />
+                    )}
+                  </div>
+                  {/* 頂部按鈕 */}
                   <div className={style['outside-option-btns']}>
                     <div
                       className={`g-red-btn ${style['close-btn']}`}
@@ -180,6 +175,7 @@ function InfoBackUp() {
                       立即備份
                     </div>
                   </div>
+                  {/* 備份列表 */}
                   <ul className={style['back-list']}>
                     {backupList.map((item, idx) => {
                       return (

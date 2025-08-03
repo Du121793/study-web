@@ -358,7 +358,7 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
               <div
                 className="g-blue-btn"
                 onClick={showPublicQAClick}>
-                公共問題
+                問題資料夾
               </div>
             )}
             {((user_role && user_role === 'teacher') || (user_role && user_role === 'admin')) && (

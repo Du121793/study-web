@@ -1,298 +1,292 @@
-.QA-area {
-  background-color: #f5f5f5;
-  .container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 24px; /* 區塊間距 */
-    .QA-header {
-      width: 100%;
-      padding-top: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 24px;
-      .search-area {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-      .sort-by-area {
-        align-items: center;
-        display: flex;
-        gap: 8px;
-      }
-      .time-sort-area {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .select {
-        height: 32px;
-      }
-
-      .show-public-QA {
-        cursor: pointer;
-        padding: 4px 6px;
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        border-radius: 2px;
-        background-color: #cbf6ff;
-        box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
-        transition: 0.2s;
-      }
-      .show-public-QA:hover {
-        background-color: #bae1e9;
-      }
-      .show-delete-btn {
-        cursor: pointer;
-        padding: 4px 6px;
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        border-radius: 2px;
-        background-color: #ffb7b7;
-        box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
-        transition: 0.2s;
-      }
-      .show-delete-btn:hover {
-        background-color: #e7a5a5;
-      }
-    }
-    .sort-title {
-      margin-left: 24px;
-    }
-    .QA-grid {
-      width: 100%;
-      .QA-container {
-        min-height: 80px;
-        padding: 0 24px 24px 24px;
-        display: flex;
-        justify-content: flex-start;
-        flex-wrap: wrap;
-        gap: 12px;
-        .QA-list {
-          margin-bottom: 32px;
-          min-width: 220px;
-          padding: 16px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          border: 1px solid #bebebe;
-          border-radius: 8px;
-          gap: 18px;
-          background-color: rgb(244, 244, 244);
-          .QA-tag {
-            display: flex;
-            .content {
-              font-weight: bold;
-              font-size: 22px;
-              padding: 4px 8px;
-              background-color: #f6b594;
-              border-radius: 4px;
-              box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
-            }
-          }
-          .qa-info {
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            width: 90%;
-            border: 1px solid #ababab;
-            padding: 12px;
-            border-radius: 4px;
-            gap: 8px;
-            background-color: #ffffff;
-            transition: 0.2s;
-            .btn-area {
-              display: flex;
-              gap: 12px;
-              .into-qa-btn {
-                color: black;
-                flex: 1;
-                padding: 4px 6px;
-                border: 1px solid rgba(0, 0, 0, 0.2);
-                display: flex;
-                justify-content: center;
-                background-color: var(--button-white);
-                transition: 0.2s;
-              }
-              .into-qa-btn:hover {
-                background-color: var(--botton-white-hover);
-              }
-              .remove-btn {
-                color: black;
-                padding: 4px 6px;
-                border: 1px solid rgba(0, 0, 0, 0.2);
-                display: flex;
-                justify-content: center;
-                background-color: #ffdada;
-                transition: 0.2s;
-                cursor: pointer;
-              }
-              .remove-btn:hover {
-                background-color: #ebc1c1;
-              }
-            }
-            .qa-info-title {
-              display: flex;
-              flex-wrap: wrap;
-              gap: 4px;
-              .content {
-                font-weight: bold;
-                font-size: 18px;
-                padding: 4px 8px;
-                background-color: #b9cdf9;
-                border-radius: 4px;
-                box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
-                color: black;
-              }
-            }
-            .qa-image-area {
-              display: flex;
-              flex-wrap: wrap;
-              .qa-image {
-                width: 100%;
-                border-radius: 4px;
-                border: 1px solid rgba(0, 0, 0, 0.2);
-              }
-              .qa-images {
-                width: 33%;
-              }
-            }
-            .time-replied-area {
-              display: flex;
-              flex-wrap: wrap;
-              align-items: center;
-              justify-content: space-between;
-              font-size: 15px;
-              .time {
-                color: rgba(0, 0, 0, 0.5);
-              }
-              .not-replied {
-                color: blue;
-              }
-              .is-replied {
-                color: rgb(114, 37, 255);
-              }
-            }
-            .qa-description {
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-              color: black;
-              width: 90%;
-              border: 1px solid rgba(0, 0, 0, 0.2);
-              border-radius: 4px;
-              background-color: #f1f1f1;
-              padding: 4px 8px;
-              margin-top: -6px;
-            }
-          }
-          .qa-info:hover {
-            background-color: #dfefff;
-          }
-        }
-        .qa-info-area {
-          color: black;
-          cursor: pointer;
-          padding: 16px;
-          box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.2);
-          background-color: #fff;
-          border-radius: 4px;
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          margin-bottom: 12px;
-          transition: 0.2s;
-          min-width: 220px;
-
-          .qa-image {
-            width: 100%;
-            border-radius: 8px;
-          }
-          .content {
-            font-size: clamp(16px, 1.2vw, 18px);
-            display: flex;
-            word-break: keep-all;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: -4px;
-            .is-replied {
-              display: flex;
-              align-items: center;
-              gap: 12px;
-            }
-            .time {
-              color: rgb(122, 122, 122);
-              word-break: keep-all;
-              font-size: 12px;
-            }
-          }
-          .into-qa-btn {
-            color: black;
-            flex: 1;
-            padding: 4px 6px;
-            border: 1px solid rgba(0, 0, 0, 0.2);
-            display: flex;
-            justify-content: center;
-            background-color: var(--button-white);
-            transition: 0.2s;
-          }
-          .into-qa-btn:hover {
-            background-color: var(--botton-white-hover);
-          }
-          .description-area {
-            padding: 8px;
-            border-radius: 2px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            background-color: rgba(0, 0, 0, 0.06);
-          }
-        }
-        .qa-info-area:hover {
-          background-color: #f5f5f5;
-        }
-        .load-more-btn {
-          cursor: pointer;
-          padding: 12px;
-          border: 1px solid rgba(0, 0, 0, 0.2);
-          border-radius: 4px;
-          background-color: white;
-        }
-      }
-      .btn-area {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        .g-black-btn {
-          margin-bottom: 24px;
-        }
-      }
-    }
-  }
+#qa-nav {
+  width: 90%;
   @media (max-width: 860px) {
     width: 100%;
+    border-radius: 0px;
+  }
+  .header {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    @media (max-width: 860px) {
+      border-radius: 0px;
+    }
+  }
+  .QA-area {
+    background-color: #f5f5f5;
     .container {
       width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 24px; /* 區塊間距 */
       .QA-header {
-        width: 90%;
-        padding: 8px;
-        flex-direction: column;
-        gap: 4px;
-        .sort-by-area {
-          .sort-title {
-            margin: 0;
-          }
+        width: 100%;
+        padding-top: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 24px;
+        .search-area {
+          display: flex;
+          align-items: center;
+          gap: 12px;
         }
+        .sort-by-area {
+          align-items: center;
+          display: flex;
+          gap: 8px;
+        }
+        .time-sort-area {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .select {
+          height: 32px;
+        }
+
+        .show-public-QA {
+          cursor: pointer;
+          padding: 4px 6px;
+          border: 1px solid rgba(0, 0, 0, 0.2);
+          border-radius: 2px;
+          background-color: #cbf6ff;
+          box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
+          transition: 0.2s;
+        }
+        .show-public-QA:hover {
+          background-color: #bae1e9;
+        }
+        .show-delete-btn {
+          cursor: pointer;
+          padding: 4px 6px;
+          border: 1px solid rgba(0, 0, 0, 0.2);
+          border-radius: 2px;
+          background-color: #ffb7b7;
+          box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
+          transition: 0.2s;
+        }
+        .show-delete-btn:hover {
+          background-color: #e7a5a5;
+        }
+      }
+      .sort-title {
+        margin-left: 24px;
       }
       .QA-grid {
         width: 100%;
         .QA-container {
-          width: 100%;
-          justify-content: center;
-          padding: 0;
-          .my-masonry-grid_column {
+          min-height: 80px;
+          padding: 0 24px 24px 24px;
+          display: flex;
+          justify-content: flex-start;
+          flex-wrap: wrap;
+          gap: 12px;
+          @media (max-width: 860px) {
+            width: 80vw;
+            padding: 0;
             flex-direction: column;
-            padding: 0 30px;
+            align-items: center;
+          }
+          .QA-list {
+            margin-bottom: 32px;
+            min-width: 220px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid #bebebe;
+            border-radius: 8px;
+            gap: 18px;
+            background-color: rgb(244, 244, 244);
+            @media (max-width: 860px) {
+              min-width: 100%;
+            }
+            .QA-tag {
+              display: flex;
+              .content {
+                font-weight: bold;
+                font-size: 22px;
+                padding: 4px 8px;
+                background-color: #f6b594;
+                border-radius: 4px;
+                box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
+              }
+            }
+            .qa-info {
+              display: flex;
+              flex-direction: column;
+              position: relative;
+              width: 90%;
+              border: 1px solid #ababab;
+              padding: 12px;
+              border-radius: 4px;
+              gap: 8px;
+              background-color: #ffffff;
+              transition: 0.2s;
+              .btn-area {
+                display: flex;
+                gap: 12px;
+                .into-qa-btn {
+                  color: black;
+                  flex: 1;
+                  padding: 4px 6px;
+                  border: 1px solid rgba(0, 0, 0, 0.2);
+                  display: flex;
+                  justify-content: center;
+                  background-color: var(--button-white);
+                  transition: 0.2s;
+                }
+                .into-qa-btn:hover {
+                  background-color: var(--botton-white-hover);
+                }
+                .remove-btn {
+                  color: black;
+                  padding: 4px 6px;
+                  border: 1px solid rgba(0, 0, 0, 0.2);
+                  display: flex;
+                  justify-content: center;
+                  background-color: #ffdada;
+                  transition: 0.2s;
+                  cursor: pointer;
+                }
+                .remove-btn:hover {
+                  background-color: #ebc1c1;
+                }
+              }
+              .qa-info-title {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
+                .content {
+                  font-weight: bold;
+                  font-size: 18px;
+                  padding: 4px 8px;
+                  background-color: #b9cdf9;
+                  border-radius: 4px;
+                  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
+                  color: black;
+                }
+              }
+              .qa-image-area {
+                display: flex;
+                flex-wrap: wrap;
+                .qa-image {
+                  width: 100%;
+                  border-radius: 4px;
+                  border: 1px solid rgba(0, 0, 0, 0.2);
+                }
+                .qa-images {
+                  width: 33%;
+                }
+              }
+              .time-replied-area {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                font-size: 15px;
+                .time {
+                  color: rgba(0, 0, 0, 0.5);
+                }
+                .not-replied {
+                  color: blue;
+                }
+                .is-replied {
+                  color: rgb(114, 37, 255);
+                }
+              }
+              .qa-description {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                color: black;
+                width: 90%;
+                border: 1px solid rgba(0, 0, 0, 0.2);
+                border-radius: 4px;
+                background-color: #f1f1f1;
+                padding: 4px 8px;
+                margin-top: -6px;
+              }
+            }
+            .qa-info:hover {
+              background-color: #dfefff;
+            }
+          }
+          .qa-info-area {
+            color: black;
+            cursor: pointer;
+            padding: 16px;
+            box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.2);
+            background-color: #fff;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+            transition: 0.2s;
+            min-width: 220px;
+
+            .qa-image {
+              width: 100%;
+              border-radius: 8px;
+            }
+            .content {
+              font-size: clamp(16px, 1.2vw, 18px);
+              display: flex;
+              word-break: keep-all;
+              align-items: center;
+              justify-content: space-between;
+              gap: 12px;
+              margin-bottom: -4px;
+              .is-replied {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+              }
+              .time {
+                color: rgb(122, 122, 122);
+                word-break: keep-all;
+                font-size: 12px;
+              }
+            }
+            .into-qa-btn {
+              color: black;
+              flex: 1;
+              padding: 4px 6px;
+              border: 1px solid rgba(0, 0, 0, 0.2);
+              display: flex;
+              justify-content: center;
+              background-color: var(--button-white);
+              transition: 0.2s;
+            }
+            .into-qa-btn:hover {
+              background-color: var(--botton-white-hover);
+            }
+            .description-area {
+              padding: 8px;
+              border-radius: 2px;
+              border: 1px solid rgba(0, 0, 0, 0.1);
+              background-color: rgba(0, 0, 0, 0.06);
+            }
+          }
+          .qa-info-area:hover {
+            background-color: #f5f5f5;
+          }
+          .load-more-btn {
+            cursor: pointer;
+            padding: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            background-color: white;
+          }
+        }
+        .btn-area {
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          .g-black-btn {
+            margin-bottom: 24px;
           }
         }
       }

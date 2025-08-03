@@ -189,6 +189,8 @@ export default function PreRegister() {
     )
   }
 
+  const test = () => {}
+
   // 獲取課程給select
   useEffect(() => {
     if (token) {

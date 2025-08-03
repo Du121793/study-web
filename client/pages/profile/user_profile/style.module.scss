@@ -121,6 +121,25 @@
           @media (max-width: 860px) {
             width: 100%;
           }
+          .hide-avatar-option {
+            cursor: pointer;
+            border-radius: 4px;
+            background-color: #fefefe;
+            color: #171717;
+            padding: 4px 8px;
+            transition: 0.2s;
+            border: 1px solid #ccc;
+            box-shadow: 1px 1px 12px 0px rgba(0, 0, 0, 0.1);
+            &:hover {
+              background-color: #dedede;
+            }
+          }
+          .hide-avatar-option.active {
+            pointer-events: none;
+            background-color: #d4d4d4;
+            box-shadow: inset 0 1px 12px rgba(0, 0, 0, 0.4); /* 點擊後的內陰影 */
+            transform: translateY(1px); /* 輕微下沉效果 */
+          }
         }
       }
       /* 右側區塊 (綠色框) */

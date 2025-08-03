@@ -116,6 +116,10 @@
         width: 100%;
         gap: 6px;
         font-size: clamp(16px, 1.2vw, 20px);
+        .btn_area {
+          display: flex;
+          gap: 4px;
+        }
         .grade_input {
           width: 10%;
           @media (max-width: 860px) {
@@ -140,8 +144,7 @@
             width: 60%;
           }
         }
-        .content
-        .btn_area {
+        .content .btn_area {
           display: flex;
           gap: 6px;
           .button {

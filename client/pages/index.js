@@ -27,10 +27,10 @@ export default function Index() {
   const [uploadBoardUIHeight, setUploadBoardUIHeight] = useState(0)
   const [bannerHasChange, setBannerHasChange] = useState(false)
   const [editHasChange, setEditHasChange] = useState(false)
+  // 調整header的index用
+  const [hasPop, setHasPop] = useState(false)
   // 讀取旋轉
   const [loading, setLoading] = useState(false)
-  // 用於開關UI時覆蓋所有內部元素
-  const [visibility, setVisibility] = useState('visible')
   // 移動到最新消息function
   const moveToBoardRef = useRef(null)
 
@@ -99,7 +99,9 @@ export default function Index() {
           alt="back ground image"
           className={style['image']}></Image>
       </div>
-      <div className={style['header-area']}>
+      <div
+        style={{ zIndex: hasPop ? 3 : 4 }}
+        className={style['header-area']}>
         <Header
           callBoardMoveToBoardFunction={callBoardMoveToBoardFunction}
           loginState={logined}
@@ -114,6 +116,7 @@ export default function Index() {
           <UploadCarousel
             bannerHasChange={bannerHasChange}
             setBannerHasChange={setBannerHasChange}
+            setHasPop={setHasPop}
           />
         )}
         {userRole && userRole === 'admin' && (
@@ -123,6 +126,7 @@ export default function Index() {
             setShowUploadBoardUI={setShowUploadBoardUI}
             setUploadBoardUIHeight={setUploadBoardUIHeight}
             uploadBoardUIHeight={uploadBoardUIHeight}
+            setHasPop={setHasPop}
           />
         )}
       </div>

@@ -5,6 +5,7 @@
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
+  width: 100%;
   .course-header {
     position: relative;
     width: 100%;
@@ -19,9 +20,9 @@
     align-items: center;
     position: relative;
     z-index: 1;
-    width: 90%;
+    width: 100%;
     .header-title-area {
-      width: 100%;
+      width: 90%;
       display: flex;
       align-items: center;
       position: relative;
@@ -69,17 +70,17 @@
       }
     }
     .nav {
+      width: 100%;
       position: relative;
       top: 0;
-      width: 100%;
       border-radius: 8px;
       overflow: hidden;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
       margin-bottom: 24px;
-
+      @media (max-width: 860px) {
+      }
       .header {
         font-weight: bold;
-        padding-left: 24px;
         user-select: none;
         border-radius: 8px;
         background-color: var(--main-color);
@@ -100,7 +101,7 @@
     }
   }
   @media (max-width: 920px) {
-    width: 100vw;
+    width: 100%;
     .container {
       width: 100%;
       gap: 12px;
@@ -108,7 +109,6 @@
       .header-title-area {
         position: relative;
         flex-wrap: wrap;
-        width: 90%;
         gap: 0;
         .left {
           flex-direction: column;
@@ -123,38 +123,21 @@
           top: 18px;
         }
       }
-      #video-nav {
-        border-radius: 0;
-        margin: 0;
-        #video-header {
-          border-radius: 0;
-        }
-      }
-      #qa-nav {
-        border-radius: 0;
-        margin: 0;
-        .header {
-          border-radius: 0;
-        }
-      }
-      .nav {
+      .video-nav-content {
         width: 100%;
-        .video-nav-content {
+        .update-video-area {
           width: 100%;
-          .update-video-area {
-            width: 100%;
-            overflow: hidden;
-          }
-          .video-area-container {
-            width: 100%;
-            .video-area {
-              min-width: 100%;
-              flex-direction: column;
-              align-items: center;
-              .video-card {
-                display: flex;
-                flex-direction: row;
-              }
+          overflow: hidden;
+        }
+        .video-area-container {
+          width: 100%;
+          .video-area {
+            min-width: 100%;
+            flex-direction: column;
+            align-items: center;
+            .video-card {
+              display: flex;
+              flex-direction: row;
             }
           }
         }

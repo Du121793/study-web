@@ -9,7 +9,7 @@ import { useUserToken } from '../../../method/useUserToken'
 import style from './uploadBoard.module.css'
 import btn_style from '../../../styles/global/button.module.css'
 
-export default function UploadBoard({ boardInfo, setEditHasChange, editHasChange, board_id = null, whichMethod = 'upload', setShowUploadBoardUI }) {
+export default function UploadBoard({ setHasPop, boardInfo, setEditHasChange, editHasChange, board_id = null, whichMethod = 'upload', setShowUploadBoardUI }) {
   const token = useUserToken()
   // 控制UI顯示
   const [visibility, setVisibility] = useState(false)
@@ -78,6 +78,7 @@ export default function UploadBoard({ boardInfo, setEditHasChange, editHasChange
         className="g-blue-btn"
         onClick={() => {
           setVisibility(true)
+          setHasPop(true)
         }}>
         上傳公告
       </div>
@@ -154,6 +155,7 @@ export default function UploadBoard({ boardInfo, setEditHasChange, editHasChange
                         className={btn_style['g-red-btn']}
                         onClick={() => {
                           setVisibility(false)
+                          setHasPop(false)
                         }}>
                         關閉介面
                       </div>

@@ -10,7 +10,7 @@ import adminService from '../../../method/adminService'
 import style from './uploadCarousel.module.css'
 import btn_style from '../../../styles/global/button.module.css'
 
-export default function UploadCarousel({ bannerHasChange, setBannerHasChange }) {
+export default function UploadCarousel({ setHasPop, bannerHasChange, setBannerHasChange }) {
   // 控制UI的顯示
   const [showCarouselEdit, setShowCarouselEdit] = useState(false)
   // 控制body滑動條
@@ -126,6 +126,7 @@ export default function UploadCarousel({ bannerHasChange, setBannerHasChange }) 
         className={'g-blue-btn'}
         onClick={() => {
           setShowCarouselEdit(true)
+          setHasPop(true)
         }}>
         編輯輪播圖
       </div>
@@ -160,6 +161,7 @@ export default function UploadCarousel({ bannerHasChange, setBannerHasChange }) 
                         className={`${btn_style['g-red-btn']} ${style['header-option-btn']}`}
                         onClick={() => {
                           setShowCarouselEdit(false)
+                          setHasPop(false)
                         }}>
                         關閉介面
                       </div>
