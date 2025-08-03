@@ -83,6 +83,13 @@
 #qa-nav .QA-area .container .QA-grid {
   width: 100%;
 }
+@media (max-width: 860px) {
+  #qa-nav .QA-area .container .QA-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
 #qa-nav .QA-area .container .QA-grid .QA-container {
   min-height: 80px;
   padding: 0 24px 24px 24px;

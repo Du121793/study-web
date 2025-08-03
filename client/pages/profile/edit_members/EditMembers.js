@@ -14,20 +14,16 @@ import ArrowRight from '../../../public/profile/rightArrow.png'
 
 // global
 import LoadingAnime from '../../../components/loading_anime/LoadingAnime'
+import MessageAnime from '../../../components/message_anime/MessageAnime'
 
 // components
 import BackGround from '../components/back_ground/BackGround'
 export default function EditMembers() {
-  // env
   // const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
   const token = useUserToken()
   const [selectedStudentId, setSelectedStudentId] = useState([])
   // 控制訊息
-  const [message, setMessage] = useState('無訊息')
-  const [messageStatus, setMessageStatus] = useState(false)
-  const [messageColor, setMessageColor] = useState('')
-  const messageTimer = useRef(null)
-  const resetTimer = useRef(null)
+  const [message, setMessage] = useState(null)
   // 請求參數
   const [getedCourse, setGetedCourse] = useState({ courses: [] })
   const [page, setPage] = useState(1)
@@ -61,29 +57,6 @@ export default function EditMembers() {
   const [phoneNumberInput, setPhoneNumberInput] = useState('')
   const [gradeInput, setGradeInput] = useState('')
   const [role, setRole] = useState('')
-
-  // 控制訊息
-  const messageControl = (info, isSuccess) => {
-    setMessage(info)
-    setMessageStatus(true)
-    if (isSuccess) {
-      setMessageColor('rgba(195, 240, 178, 0.8)')
-    } else {
-      setMessageColor('rgba(240, 178, 178, 0.8)')
-    }
-
-    // 清除之前的 timer
-    if (messageTimer.current) clearTimeout(messageTimer.current)
-    if (resetTimer.current) clearTimeout(resetTimer.current)
-
-    messageTimer.current = setTimeout(() => {
-      setMessageStatus(false)
-      resetTimer.current = setTimeout(() => {
-        setMessage('無訊息')
-        setMessageColor('')
-      }, 200)
-    }, 2000)
-  }
 
   // 初始化選擇狀態
   const initSelector = () => {
@@ -134,16 +107,15 @@ export default function EditMembers() {
           if (res.success) {
             setLoading(false)
             initSelector()
-            getMembers()
-            messageControl('加入到課程', true)
+            getMembers()('加入到課程', true)
           } else {
             setLoading(false)
-            messageControl('發生錯誤', false)
+            setMessage('發生錯誤', false)
           }
         })
     } else {
       setLoading(false)
-      messageControl('請先選擇課程', false)
+      setMessage('請先選擇課程', false)
     }
   }
 
@@ -158,23 +130,14 @@ export default function EditMembers() {
       .then((res) => {
         if (res.success) {
           setLoading(false)
-          messageControl('移除成功', true)
+          setMessage('移除成功', true)
           getMembers()
           initSelector()
         } else {
           setLoading(false)
-          messageControl('移除失敗', false)
+          setMessage('移除失敗', false)
         }
       })
-  }
-
-  // 按下打勾變色
-  const checkboxClickEvent = (e) => {
-    if (e.parentNode.style.border === '2px solid rgb(124, 225, 180)') {
-      e.parentNode.style.border = '2px solid rgb(0, 0, 0,0.2)'
-    } else {
-      e.parentNode.style.border = '2px solid rgb(124, 225, 180)'
-    }
   }
 
   // 參數:總頁數，中間頁數，從中間往左右總共要幾頁
@@ -221,12 +184,14 @@ export default function EditMembers() {
       gradeInput: gradeInput,
       role: role,
     }
+    setLoading(true)
     adminService.getMembers(token, data).then((res) => {
       if (res?.success) {
         const memberIds = new Set(members.map((m) => m._id))
         const common = res.data.filter((item) => memberIds.has(item._id))
         setMembers(common)
       }
+      setLoading(false)
     })
   }
 
@@ -343,7 +308,7 @@ export default function EditMembers() {
             setMembers(res.data)
           } else {
             setLoading(false)
-            messageControl('發生錯誤', false)
+            setMessage('發生錯誤', false)
           }
         })
         break
@@ -368,11 +333,11 @@ export default function EditMembers() {
               setMembers(res.data)
             } else {
               setLoading(false)
-              messageControl('發生錯誤', false)
+              setMessage('發生錯誤', false)
             }
           })
         } else {
-          messageControl('請選擇課程', false)
+          setMessage('請選擇課程', false)
           setMembers([])
         }
         break
@@ -397,11 +362,11 @@ export default function EditMembers() {
               setMembers(res.data)
             } else {
               setLoading(false)
-              messageControl('發生錯誤', false)
+              setMessage('發生錯誤', false)
             }
           })
         } else {
-          messageControl('請選擇課程', false)
+          setMessage('請選擇課程', false)
           setMembers([])
         }
         break
@@ -433,7 +398,7 @@ export default function EditMembers() {
         } else {
           setLoading(false)
           initSelector()
-          messageControl('發生錯誤', false)
+          setMessage('發生錯誤', false)
         }
       })
     }
@@ -450,16 +415,14 @@ export default function EditMembers() {
   return (
     <div className={`${style.edit_members_main}`}>
       <BackGround></BackGround>
-      <div
-        className="right-bottom-loading-area"
-        style={{ right: loading ? '8px' : '-100%' }}>
-        <div className="loading"></div>
-      </div>
-      <div
-        style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
-        className="message">
-        {message}
-      </div>
+      {loading && <LoadingAnime></LoadingAnime>}
+      {message && (
+        <MessageAnime
+          message={message}
+          top="30%"
+          duration={2000}
+        />
+      )}
       <div
         className={style.title}
         onClick={test}>

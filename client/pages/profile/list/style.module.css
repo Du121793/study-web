@@ -10,11 +10,16 @@
   top: 0;
 }
 .list_main .show_list_btn_area .show_list_btn {
-  background-color: #ffffff;
+  background-color: #eeeeee;
   padding: 9px;
   transition: 0.2s;
   z-index: 2;
   border-bottom-right-radius: 24px;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+.list_main .show_list_btn_area .show_list_btn:hover {
+  background-color: #cfcfcf;
 }
 .list_main .list_info_area {
   background-color: #fff;

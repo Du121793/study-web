@@ -10,46 +10,21 @@ import adminService from '../../../method/adminService'
 import anonymous from '../../../public/course/anonymous.png'
 // components
 import BackGround from '../components/back_ground/BackGround'
+import LoadingAnime from '../../../components/loading_anime/LoadingAnime'
+import MessageAnime from '../../../components/message_anime/MessageAnime'
 
 export default function UserProfile() {
   const token = useUserToken()
   const [userInfo, setUserInfo] = useState([])
   // 切換編輯狀態
-  const avatarHandler = useRef(null)
   const [editState, setEditState] = useState(false)
   // 訊息相關
-  const [message, setMessage] = useState('無訊息')
-  const [messageStatus, setMessageStatus] = useState(false)
-  const [messageColor, setMessageColor] = useState('')
-  const messageTimer = useRef(null)
-  const resetTimer = useRef(null)
-
+  const [message, setMessage] = useState(null)
   // 旋轉讀取
   const [loading, setLoading] = useState(false)
-
   // patch userinfo payload
   const [username, setUsername] = useState('')
-  const [realname, setRealname] = useState(false)
-  const [phoneNumber, setPhoneNumber] = useState(false)
   const [hideAvatar, setHideAvatar] = useState(userInfo?.makePictureAnonymous)
-
-  // 控制訊息外觀與隱藏計時
-  const messageControl = (info, isSuccess) => {
-    setMessage(info)
-    setMessageStatus(true)
-    setMessageColor(isSuccess ? 'rgba(195, 240, 178, 0.8)' : 'rgba(240, 178, 178, 0.8)')
-
-    if (messageTimer.current) clearTimeout(messageTimer.current)
-    if (resetTimer.current) clearTimeout(resetTimer.current)
-
-    messageTimer.current = setTimeout(() => {
-      setMessageStatus(false)
-      resetTimer.current = setTimeout(() => {
-        setMessage('無訊息')
-        setMessageColor('')
-      }, 200)
-    }, 2000)
-  }
 
   const test = () => {
     console.log(userInfo)
@@ -66,16 +41,20 @@ export default function UserProfile() {
       if (res?.success) {
         setEditState(false)
         setLoading(false)
+        setMessage('儲存成功')
         userService.getUserInfo(token).then((res) => {
           if (res && res.success) {
             setHideAvatar(res.data.userinfo.makePictureAnonymous)
             setUserInfo(res.data)
             setLoading(false)
           } else {
-            messageControl('發生錯誤，即將跳轉至首頁', false)
+            setMessage('發生錯誤')
           }
         })
       }
+      setTimeout(() => {
+        setMessage(null)
+      }, 2000)
     })
   }
 
@@ -120,22 +99,15 @@ export default function UserProfile() {
   return (
     <div className={`${style.user_profile}`}>
       <BackGround></BackGround>
-      <div
-        className="right-bottom-loading-area"
-        style={{ right: loading ? '8px' : '-100%' }}>
-        <div className="loading"></div>
-      </div>
-      {/* 訊息框 */}
-      <div
-        className="message"
-        style={{
-          height: messageStatus ? '20px' : '0',
-          padding: messageStatus ? '24px' : '0',
-          backgroundColor: messageColor,
-        }}>
-        {message}
-      </div>
       <div className={style['container']}>
+        {loading && <LoadingAnime top={'10%'}></LoadingAnime>}
+        {message && (
+          <MessageAnime
+            message={message}
+            top="100px"
+            duration={2000}
+          />
+        )}
         <div
           className={style.title}
           onClick={test}>
@@ -227,13 +199,15 @@ export default function UserProfile() {
                 }}>
                 編輯資訊
               </button>
-              <button
-                className="g-blue-btn"
-                onClick={() => {
-                  patchUserInfo()
-                }}>
-                儲存
-              </button>
+              {editState && (
+                <button
+                  className="g-blue-btn"
+                  onClick={() => {
+                    patchUserInfo()
+                  }}>
+                  儲存
+                </button>
+              )}
               <button
                 className="g-red-btn"
                 onClick={() => {

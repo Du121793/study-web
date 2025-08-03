@@ -17,6 +17,7 @@ import BackGround from '../components/back_ground/BackGround'
 import MemberSelector from '../member_selector/MemberSelector'
 // global
 import LoadingAnime from '../../../components/loading_anime/LoadingAnime'
+import MessageAnime from '../../../components/message_anime/MessageAnime'
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
@@ -48,7 +49,6 @@ export default function EditCourse() {
   const [editClass, setEditClass] = useState(null)
   const [editSubject, setEditSubject] = useState(null)
   let courseInfo = {}
-  let registerInfo = {}
   const [needToDeleteCourseId, setNeedToDeleteCourseId] = useState('')
   // get req
   const [coursesInfo, setCoursesInfo] = useState(null)
@@ -60,35 +60,7 @@ export default function EditCourse() {
   // search info
   const [searchInput, setSearchInput] = useState('')
   // 控制訊息
-  const [message, setMessage] = useState('無訊息')
-  const [messageStatus, setMessageStatus] = useState(false)
-  const [messageColor, setMessageColor] = useState('')
-  // 綁定timeout，用於重計
-  const messageTimer = useRef(null)
-  const resetTimer = useRef(null)
-
-  // 控制訊息
-  const messageControl = (info, isSuccess) => {
-    setMessage(info)
-    setMessageStatus(true)
-    if (isSuccess) {
-      setMessageColor('rgba(195, 240, 178, 0.8)')
-    } else {
-      setMessageColor('rgba(240, 178, 178, 0.8)')
-    }
-
-    // 清除之前的 timer
-    if (messageTimer.current) clearTimeout(messageTimer.current)
-    if (resetTimer.current) clearTimeout(resetTimer.current)
-
-    messageTimer.current = setTimeout(() => {
-      setMessageStatus(false)
-      resetTimer.current = setTimeout(() => {
-        setMessage('無訊息')
-        setMessageColor('')
-      }, 200)
-    }, 2000)
-  }
+  const [message, setMessage] = useState(null)
 
   // 參數:總頁數，中間頁數，從中間往左右總共要幾頁
   function getPage(total, thisPage, pageSize = 5) {
@@ -128,9 +100,10 @@ export default function EditCourse() {
   // 搜尋課程功能
   const searchCourse = () => {
     const data = { courseName: searchInput, page: page, pageSize: pageSize }
+    setLoading(true)
     adminService.getCourses(token, data).then((res) => {
-      setTeachers()
       setCoursesInfo(res.data)
+      setLoading(false)
     })
   }
 
@@ -139,7 +112,6 @@ export default function EditCourse() {
     setGradeInput('')
     setSubjectInput('')
     setClassInput('')
-    setSeletedTeacher('')
   }
 
   // 1. 新增課程
@@ -153,16 +125,18 @@ export default function EditCourse() {
         courseName: courseNameInput.trim(),
         teacherId: teachers !== '' ? seletedTeacher : undefined,
       }
+      setLoading(true)
       adminService.createANewCourse(token, courseInfo).then((res) => {
         let data = {
           page: page,
           pageSize: pageSize,
         }
         if (res.success && !addThenRegister) {
-          messageControl(res.msg, true)
+          setMessage(res.msg)
         } else {
-          messageControl(res.data.msg, false)
+          setMessage(res.data.msg)
         }
+        setLoading(true)
         // 如果有選擇學生，並且addThenRegister為true，
         // (有勾選是否要在新增課程時也將選擇的成員加入課程)
         if (selectedStudentId.length && addThenRegister) {
@@ -173,11 +147,12 @@ export default function EditCourse() {
           }
           adminService.registerMember(token, data).then((res) => {
             if (res.success) {
-              messageControl(`${res.msg}`, true)
+              setMessage(`${res.msg}`)
               return
             } else {
-              messageControl(`發生錯誤`, false)
+              setMessage(`發生錯誤`)
             }
+            setLoading(false)
           })
         }
         // 初始化: 課程list，input欄位
@@ -202,14 +177,13 @@ export default function EditCourse() {
       setLoading(true)
       adminService.deleteCourse(token, needToDeleteCourseId).then((res) => {
         if (res.success) {
-          messageControl('移除成功', true)
+          setMessage('移除成功')
         } else {
-          messageControl('移除失敗', false)
+          setMessage('移除失敗')
         }
         setNeedToDeleteCourseId('')
         adminService.getCourses(token, data).then((res) => {
           setLoading(false)
-
           setCoursesInfo(res.data)
         })
       })
@@ -239,10 +213,10 @@ export default function EditCourse() {
         adminService.getCourses(token, secData).then((res) => {
           setCoursesInfo(res.data)
           setLoading(false)
-          messageControl('編輯完成', true)
+          setMessage('編輯完成')
         })
       } else {
-        messageControl('編輯失敗', false)
+        setMessage('編輯失敗')
       }
     })
   }
@@ -268,7 +242,7 @@ export default function EditCourse() {
             resolve()
           } else {
             reject()
-            messageControl('發生錯誤，即將跳轉回首頁', false)
+            setMessage('發生錯誤，即將跳轉回首頁', false)
             setTimeout(() => {
               window.location(clientIp)
             }, 3000)
@@ -284,6 +258,7 @@ export default function EditCourse() {
               }
             })
             setTeachers(idTemp)
+
             setLoading(false)
           }
         })
@@ -307,12 +282,15 @@ export default function EditCourse() {
   return (
     <div className={`${style.edit_course_main}`}>
       <BackGround></BackGround>
+      {loading && <LoadingAnime top={'20%'}></LoadingAnime>}
+      {message && (
+        <MessageAnime
+          message={message}
+          top="50%"
+          duration={2000}
+        />
+      )}
       <div className={`${style.edit_course_function_area}`}>
-        <div
-          style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
-          className={'message'}>
-          {message}
-        </div>
         {doubleCheck && (
           <div className={`${style.double_check_area}`}>
             <div className={`${style.double_check_background}`}>

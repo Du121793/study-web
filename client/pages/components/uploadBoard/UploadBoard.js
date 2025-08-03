@@ -33,7 +33,6 @@ export default function UploadBoard({ setHasPop, boardInfo, setEditHasChange, ed
 
   const uploadSuccess = () => {
     setGetUiHeight(0)
-    page_body.style.overflow = 'auto'
     setTimeout(() => {
       setShowUploadBoardUI(false)
     }, 200)
@@ -53,6 +52,8 @@ export default function UploadBoard({ setHasPop, boardInfo, setEditHasChange, ed
       if (res.success) {
         setEditHasChange(!editHasChange)
         uploadSuccess()
+        setVisibility(false)
+        setHasPop(false)
       }
     })
   }
@@ -72,6 +73,7 @@ export default function UploadBoard({ setHasPop, boardInfo, setEditHasChange, ed
       })
     }
   }
+
   return (
     <div>
       <div

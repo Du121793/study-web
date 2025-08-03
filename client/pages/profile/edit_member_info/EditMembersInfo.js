@@ -15,6 +15,8 @@ import ArrowRight from '../../../public/profile/rightArrow.png'
 
 // components
 import BackGround from '../components/back_ground/BackGround'
+import LoadingAnime from '../../../components/loading_anime/LoadingAnime'
+import MessageAnime from '../../../components/message_anime/MessageAnime'
 export default function EditMembersInfo() {
   const token = useUserToken()
 
@@ -42,40 +44,13 @@ export default function EditMembersInfo() {
   // get req
   const [members, setMembers] = useState(null)
   // 控制訊息
-  const [message, setMessage] = useState('無訊息')
-  const [messageStatus, setMessageStatus] = useState(false)
-  const [messageColor, setMessageColor] = useState('')
-  // 綁定timeout，用於重計
-  const messageTimer = useRef(null)
-  const resetTimer = useRef(null)
+  const [message, setMessage] = useState(null)
   // 旋轉讀取
   const [loading, setLoading] = useState(false)
 
   const test = () => {}
 
-  // 控制訊息
-  const messageControl = (info, isSuccess) => {
-    setMessage(info)
-    setMessageStatus(true)
-    if (isSuccess) {
-      setMessageColor('rgba(195, 240, 178, 0.8)')
-    } else {
-      setMessageColor('rgba(240, 178, 178, 0.8)')
-    }
-
-    // 清除之前的 timer
-    if (messageTimer.current) clearTimeout(messageTimer.current)
-    if (resetTimer.current) clearTimeout(resetTimer.current)
-
-    messageTimer.current = setTimeout(() => {
-      setMessageStatus(false)
-      resetTimer.current = setTimeout(() => {
-        setMessage('無訊息')
-        setMessageColor('')
-      }, 200)
-    }, 2000)
-  }
-
+  // 初始化
   const initSearchInput = () => {
     setSearchRealName(undefined)
     setSearchPhone(undefined)
@@ -87,6 +62,7 @@ export default function EditMembersInfo() {
     IdRef.current.value = ''
   }
 
+  // 初始化
   const initInputValue = () => {
     setUserNameInput(undefined)
     setRealNameInput(undefined)
@@ -95,6 +71,7 @@ export default function EditMembersInfo() {
     setRoleInput(undefined)
   }
 
+  // 搜尋成員
   const searchMembers = () => {
     let data = {
       page: page,
@@ -103,6 +80,7 @@ export default function EditMembersInfo() {
       phoneNumber: searchPhone,
       gradeInput: searchGrade,
     }
+    setLoading(true)
     adminService
       .getMembers(token, data)
       .then((res) => {
@@ -112,10 +90,15 @@ export default function EditMembersInfo() {
         }
       })
       .catch((err) => {
-        console.error(err)
+        setMessage('發生錯誤')
       })
+    setLoading(false)
+    setTimeout(() => {
+      setMessage(null)
+    }, 2000)
   }
 
+  // 取得成員
   const getMembers = () => {
     let data = {
       page: page,
@@ -159,10 +142,10 @@ export default function EditMembersInfo() {
     for (let i = start; i <= end; i++) {
       page.push(i)
     }
-
     return page
   }
 
+  // 編輯成員資訊
   const patchMemberInfo = (memberId) => {
     let data = {
       memberId: memberId,
@@ -174,19 +157,24 @@ export default function EditMembersInfo() {
         role: roleInput,
       },
     }
+    setLoading(true)
     adminService.patchUsersInfo(token, data).then((res) => {
       if (res?.success) {
         initInputValue()
         setEditMemberId('')
         getMembers()
-        messageControl('修改成功', true)
+        setMessage('修改成功')
       } else {
         if (res?.msg === '請提供要更新的資料' || res?.msg === '用戶暱稱不能為空、真實姓名不能為空、電話號碼不能為空、角色不能為空') {
           initInputValue()
           setEditMemberId('')
         }
       }
+      setLoading(false)
     })
+    setTimeout(() => {
+      setMessage(null)
+    }, 2000)
   }
 
   // getMembers
@@ -211,23 +199,21 @@ export default function EditMembersInfo() {
 
   return (
     <div className={`${style.edit_members_info_main} g-shadow`}>
-      <div
-        className="right-bottom-loading-area"
-        style={{ right: loading ? '8px' : '-100%' }}>
-        <div className="loading"></div>
-      </div>
-      {loading && (
-        <div className="loading-main">
-          <div className="loader"></div>
-        </div>
-      )}
       <BackGround></BackGround>
+      {loading && <LoadingAnime top={'20%'}></LoadingAnime>}
+      {message && (
+        <MessageAnime
+          message={message}
+          top="50%"
+          duration={2000}
+        />
+      )}
       <div
         className={`${style.header_title}`}
         onClick={test}>
         編輯成員資訊功能
       </div>
-      
+
       <div className={`${style.search_area}`}>
         <div className={`${style.input_area}`}>
           <div className={style.realName}>

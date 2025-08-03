@@ -7,6 +7,8 @@ import adminService from '../../../method/adminService'
 import { useUserToken } from '../../../method/useUserToken'
 // components
 import BackGround from '../components/back_ground/BackGround'
+import LoadingAnime from '../../../components/loading_anime/LoadingAnime'
+import MessageAnime from '../../../components/message_anime/MessageAnime'
 export default function PreRegister() {
   const token = useUserToken()
   const [getCourses, setGetCourses] = useState([])
@@ -19,12 +21,8 @@ export default function PreRegister() {
   const [chooseCoursesName, setChooseCoursesName] = useState([])
   // 使用 state 儲存所有使用者輸入的行資料
   const [inputRows, setInputRows] = useState([{ name: '', grade: '', phone: '' }])
-  // 存儲user_id
-  const [user_id, setUser_id] = useState([])
   // 控制訊息
-  const [message, setMessage] = useState('無訊息')
-  const [messageStatus, setMessageStatus] = useState(false)
-  const [messageColor, setMessageColor] = useState('')
+  const [message, setMessage] = useState(null)
 
   // 旋轉讀取
   const [loading, setLoading] = useState(false)
@@ -32,24 +30,6 @@ export default function PreRegister() {
   // 儲存最後要提交的使用者資料
   let users = []
   let Busers = []
-
-  // 控制訊息
-  const messageControl = (info, isSuccess) => {
-    setMessage(info)
-    setMessageStatus(true)
-    if (isSuccess) {
-      setMessageColor('rgba(195, 240, 178, 0.8)')
-    } else {
-      setMessageColor('rgba(240, 178, 178, 0.8)')
-    }
-    setTimeout(() => {
-      setMessageStatus(false)
-      setTimeout(() => {
-        setMessage('無訊息')
-        setMessageColor('')
-      }, 200)
-    }, 2000)
-  }
 
   // 處理各欄位輸入
   const handleInputChange = (index, field, value) => {
@@ -75,10 +55,9 @@ export default function PreRegister() {
         adminService.registerMember(token, data).then((res) => {
           if (!hasAlreadyRegister) {
             if (res.success) {
-              messageControl('註冊成功', true)
+              setMessage('註冊成功')
             } else {
-              messageControl(`發生錯誤`, false)
-              console.error(res)
+              setMessage(`發生錯誤`)
             }
           }
         })
@@ -91,11 +70,17 @@ export default function PreRegister() {
   const submitBtnClick = () => {
     // 檢查是否選擇身分組
     if (!chooseRole) {
-      messageControl(`請選擇身分組`, false)
+      setMessage(`請選擇身分組`)
+      setTimeout(() => {
+        setMessage(null)
+      }, 2000)
       return
     }
     if (!inputRows) {
-      messageControl(`請輸入欲註冊的用戶資訊`, false)
+      setMessage(`請輸入欲註冊的用戶資訊`)
+      setTimeout(() => {
+        setMessage(null)
+      }, 2000)
       return
     }
 
@@ -110,13 +95,13 @@ export default function PreRegister() {
         role: chooseRole,
       }))
     if (userArray.length === 0) {
-      messageControl('請完整輸入欲註冊的用戶資訊', false)
+      setMessage('請完整輸入欲註冊的用戶資訊')
       return
     }
     // 用some檢查物件內是否有重複資料
     const duplicateFound = userArray.some((newUser) => users.some((existingUser) => existingUser.realname === newUser.realname && existingUser.phoneNumber === newUser.phoneNumber && existingUser.role === newUser.role))
     if (duplicateFound) {
-      messageControl('註冊失敗，已有相同的用戶資料', false)
+      setMessage('註冊失敗，已有相同的用戶資料')
       return
     }
 
@@ -149,10 +134,10 @@ export default function PreRegister() {
         // 如果有成員是被註冊過的
         if (res.data.successMsg.alreadyRegistered !== '') {
           let content = res.data.successMsg.alreadyRegistered
-          messageControl(`新增成員成功，${content}`, true)
+          setMessage(`新增成員成功，${content}`)
           return res
         } else if (res.data.successMsg.successStudentId.length > 0 && chooseCourses.length === 0) {
-          messageControl('新增成員成功', true)
+          messageControl('新增成員成功')
           return res
         }
         return res
@@ -168,6 +153,9 @@ export default function PreRegister() {
     // 重置 state，用於清空欄位
     setInputRows([{ name: '', phone: '' }])
     setChooseRole('')
+    setTimeout(() => {
+      setMessage(null)
+    }, 2000)
   }
 
   // 切換身分組時更改State，用於控制年級選擇是否顯示
@@ -208,6 +196,14 @@ export default function PreRegister() {
 
   return (
     <div className={`${style.preRegister_main}`}>
+      {loading && <LoadingAnime top={'10%'}></LoadingAnime>}
+      {message && (
+        <MessageAnime
+          message={message}
+          top="100px"
+          duration={2000}
+        />
+      )}
       {/* message */}
       <div
         className="right-bottom-loading-area"

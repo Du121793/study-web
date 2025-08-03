@@ -12,6 +12,8 @@ import { useUserToken } from '../../../method/useUserToken'
 import adminService from '../../../method/adminService'
 // components
 import BackGround from '../components/back_ground/BackGround'
+import LoadingAnime from '../../../components/loading_anime/LoadingAnime'
+import MessageAnime from '../../../components/message_anime/MessageAnime'
 export default function RemoveUsers() {
   const token = useUserToken()
   // get members
@@ -32,9 +34,7 @@ export default function RemoveUsers() {
   // 初始化所有資料的邊框
   const [optionBorder, setOptionBorder] = useState('2px solid rgba(0, 0, 0, 0.2)')
   // 控制訊息
-  const [message, setMessage] = useState('無訊息')
-  const [messageStatus, setMessageStatus] = useState(false)
-  const [messageColor, setMessageColor] = useState('')
+  const [message, setMessage] = useState(null)
 
   const checkSelectedMembers = () => {}
 
@@ -71,24 +71,6 @@ export default function RemoveUsers() {
     }
 
     return page
-  }
-
-  // 控制訊息
-  const messageControl = (info, isSuccess) => {
-    setMessage(info)
-    setMessageStatus(true)
-    if (isSuccess) {
-      setMessageColor('rgba(195, 240, 178, 0.8)')
-    } else {
-      setMessageColor('rgba(240, 178, 178, 0.8)')
-    }
-    setTimeout(() => {
-      setMessageStatus(false)
-      setTimeout(() => {
-        setMessage('無訊息')
-        setMessageColor('')
-      }, 200)
-    }, 2000)
   }
 
   //請求獲取使用者
@@ -130,12 +112,18 @@ export default function RemoveUsers() {
           clearSelectedMemebers()
           messageControl(res.msg, true)
           setLoading(false)
+          setMessage('刪除完成')
         } else {
-          messageControl('發生錯誤', false)
+          setMessage('發生錯誤')
           console.error(res)
         }
       })
+    } else {
+      setMessage('請選擇要刪除的成員')
     }
+    setTimeout(() => {
+      setMessage(null)
+    }, 2000)
   }
 
   // 取消選取所有已選取的成員
@@ -183,17 +171,14 @@ export default function RemoveUsers() {
 
   return (
     <div className={`${style.remove_users_page}`}>
-      <div
-        className="right-bottom-loading-area"
-        style={{ right: loading ? '8px' : '-100%' }}>
-        <div className="loading"></div>
-      </div>
-      <div className={`${style.remove_users_title}`}>移除成員功能</div>
-      <div
-        style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
-        className="message">
-        {message}
-      </div>
+      {loading && <LoadingAnime></LoadingAnime>}
+      {message && (
+        <MessageAnime
+          message={message}
+          top="100px"
+          duration={2000}
+        />
+      )}
       <BackGround></BackGround>
       <div className={style['option-container']}>
         {/* 搜尋選項: 姓名，電話，年級*/}

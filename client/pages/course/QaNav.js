@@ -311,7 +311,8 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
           <div
             className="QA-header"
             ref={headerRef}>
-            <form
+            {/* 目前無用途 */}
+            {/* <form
               className="search-area"
               onSubmit={(e) => {
                 e.preventDefault()
@@ -322,7 +323,7 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
                 className="g-blue-btn">
                 搜尋
               </button>
-            </form>
+            </form> */}
             <div className="sort-by-area">
               <span
                 className="sort-title"

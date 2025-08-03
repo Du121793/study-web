@@ -134,18 +134,20 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
                 to: 'myCourse',
               },
             }}>
-            <div
-              className={style.content}
-              onClick={() => {
-                const isLogin = localStorage.getItem('token')
-                if (isLogin) {
-                  profileLinkRef.current.click()
-                } else {
-                  LoginLinkRef.current.click()
-                }
-              }}>
-              我的課程
-            </div>
+            {loginState === true && (
+              <div
+                className={style.content}
+                onClick={() => {
+                  const isLogin = localStorage.getItem('token')
+                  if (isLogin) {
+                    profileLinkRef.current.click()
+                  } else {
+                    LoginLinkRef.current.click()
+                  }
+                }}>
+                我的課程
+              </div>
+            )}
           </Link>
 
           <Link
@@ -211,27 +213,30 @@ export default function Header({ callBoardMoveToBoardFunction, loginState, user_
             <div className={style.line}></div>
             <span>聯絡我們</span>
           </Link>
-          <Link
-            href={{
-              pathname: profilePage,
-              query: {
-                fc: 'public',
-                to: 'myCourse',
-              },
-            }}
-            className={style['header-middle-nav-area']}
-            id="course-info"
-            onClick={() => {
-              const isLogin = localStorage.getItem('token')
-              if (isLogin) {
-                profileLinkRef.current.click()
-              } else {
-                LoginLinkRef.current.click()
-              }
-            }}>
-            <div className={style.line}></div>
-            <span>我的課程</span>
-          </Link>
+          {loginState === true && (
+            <Link
+              href={{
+                pathname: profilePage,
+                query: {
+                  fc: 'public',
+                  to: 'myCourse',
+                },
+              }}
+              className={style['header-middle-nav-area']}
+              id="course-info"
+              onClick={() => {
+                const isLogin = localStorage.getItem('token')
+                if (isLogin) {
+                  profileLinkRef.current.click()
+                } else {
+                  LoginLinkRef.current.click()
+                }
+              }}>
+              <div className={style.line}></div>
+              <span>我的課程</span>
+            </Link>
+          )}
+
           {/* Not logined show line login's Link */}
         </div>
 
