@@ -49,6 +49,14 @@ router.get("/getBackupFile/:filename", (req, res) => {
     const file = path.join(backupDir, req.params.filename);
     if (!fs.existsSync(file))
       return res.status(404).json({ success: false, message: "檔案不存在" });
+    log(
+      {
+        userName: req.user.userinfo.realname,
+        userId: req.user._id,
+        userIp: req.ip,
+      },
+      `用戶下載了備份檔案`
+    );
     res.download(file);
   } catch (err) {
     logError(
@@ -68,6 +76,14 @@ router.get("/getBackupFile/:filename", (req, res) => {
 router.post("/runBackup", async (req, res) => {
   try {
     const backupFile = await backup({ mongoUri: process.env.DB_IP });
+    log(
+      {
+        userName: req.user.userinfo.realname,
+        userId: req.user._id,
+        userIp: req.ip,
+      },
+      `執行了備份程序`
+    );
     res.json({ success: true, backupFile });
   } catch (err) {
     logError(

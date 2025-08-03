@@ -63,7 +63,7 @@ const log = (options, action) => {
 const logError = (options, file, route, input, error) => {
   const baseMessage = formatLogMessage(options, `${file}(${route})`);
   const inputStr = JSON.stringify(input);
-  console.error(`${baseMessage} 用戶傳入值:${inputStr} 錯誤:`, error);
+  console.error(`${baseMessage} 錯誤簡述&傳入值:${inputStr} 錯誤:`, error);
 };
 
 module.exports = {

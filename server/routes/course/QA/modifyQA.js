@@ -214,8 +214,6 @@ router.post("/postQuestion", upload, async (req, res) => {
         userId: req.user._id,
         userName: req.user.userinfo.realname,
       },
-      "modifyQA.js",
-      "postQuestion",
       `新增問題 ${qaId}`
     );
 
@@ -344,8 +342,6 @@ router.patch(
           userId: req.user._id,
           userName: req.user.userinfo.realname,
         },
-        "modifyQA.js",
-        "patchQuestion",
         `更新問題 ${question_id}`
       );
 
@@ -363,8 +359,7 @@ router.patch(
         },
         "modifyQA.js",
         "patchQuestion",
-        `更新問題失敗`,
-        e
+        `更新問題失敗`
       );
       return res.status(500).json({ success: false, msg: "伺服器發生問題" });
     }
@@ -403,8 +398,6 @@ router.delete(
           userId: req.user._id,
           userName: req.user.userinfo.realname,
         },
-        "modifyQA.js",
-        "deleteQuestion",
         `刪除問題 ${question_id}`
       );
 

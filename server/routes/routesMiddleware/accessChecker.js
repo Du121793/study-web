@@ -201,7 +201,13 @@ const updateAndDeleteQuestion = async (req, res, next) => {
       }
 
       // 檢查學生是否嘗試修改不允許的欄位
-      const forbiddenKeys = ["isPublic", "replied", "courses", "poster"];
+      const forbiddenKeys = [
+        "isPublic",
+        "replied",
+        "course_ids",
+        "poster",
+        "question_id",
+      ];
       const invalidKeys = updateFields.filter((key) =>
         forbiddenKeys.includes(key)
       );
@@ -296,9 +302,10 @@ const updateAndDeleteQuestion = async (req, res, next) => {
         const allowedKeys = [
           "isPublic",
           "replied",
-          "courses",
+          "course_ids",
           "hints",
           "resourceCategories",
+          "question_id",
         ];
         const invalidKeys = updateFields.filter(
           (key) => !allowedKeys.includes(key)
@@ -311,9 +318,9 @@ const updateAndDeleteQuestion = async (req, res, next) => {
         }
 
         // 如果更新包含 courses 欄位，進行額外檢查
-        if (updateFields.includes("courses")) {
+        if (updateFields.includes("course_ids")) {
           // 確保 courses 是陣列
-          if (!Array.isArray(req.body.courses)) {
+          if (!Array.isArray(req.body.course_ids)) {
             return res.status(400).json({
               success: false,
               msg: "courses 必須為陣列",
@@ -322,7 +329,7 @@ const updateAndDeleteQuestion = async (req, res, next) => {
 
           // 獲取更新前後的課程列表
           const oldCourses = resource.courses;
-          const newCourses = req.body.courses;
+          const newCourses = req.body.course_ids;
 
           // 計算被移除和新增的課程
           const removedCourses = oldCourses.filter(

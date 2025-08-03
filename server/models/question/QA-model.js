@@ -87,7 +87,7 @@ async function removeQuestionFolder(doc) {
         fs.rmSync(questionFolder, { recursive: true, force: true });
       }
     } catch (error) {
-      logError({}, "QA-model.js", "清理問題資源", {}, error);
+      logError({}, "QA-model.js", "清理問題資源 hook", {}, error);
       throw error;
     }
   }
@@ -106,7 +106,7 @@ QASchema.pre("findOneAndDelete", async function (next) {
     }
     next();
   } catch (error) {
-    logError({}, "QA-model.js", "刪除問題", {}, error);
+    logError({}, "QA-model.js", "刪除問題 hook", {}, error);
     next(error);
   }
 });
@@ -121,7 +121,7 @@ QASchema.pre("remove", async function (next) {
     await removeQuestionFolder(this);
     next();
   } catch (error) {
-    logError({}, "QA-model.js", "移除問題", {}, error);
+    logError({}, "QA-model.js", "移除問題 hook", {}, error);
     next(error);
   }
 });
@@ -136,7 +136,7 @@ QASchema.pre("deleteOne", async function (next) {
     await removeQuestionFolder(this);
     next();
   } catch (error) {
-    logError({}, "QA-model.js", "刪除問題", {}, error);
+    logError({}, "QA-model.js", "刪除問題 hook", {}, error);
     next(error);
   }
 });
@@ -155,7 +155,7 @@ QASchema.pre("deleteMany", async function (next) {
     }
     next();
   } catch (error) {
-    logError({}, "QA-model.js", "批次刪除問題", {}, error);
+    logError({}, "QA-model.js", "QA delete hook", {}, error);
     next(error);
   }
 });
@@ -185,7 +185,7 @@ QASchema.pre("update", async function (next) {
     }
     next();
   } catch (error) {
-    logError({}, "QA-model.js", "更新問題", {}, error);
+    logError({}, "QA-model.js", "QA hook", {}, error);
     next(error);
   }
 });
@@ -214,7 +214,7 @@ QASchema.pre("updateMany", async function (next) {
     }
     next();
   } catch (error) {
-    logError({}, "QA-model.js", "批次更新問題", {}, error);
+    logError({}, "QA-model.js", "批次更新問題 hook", {}, error);
     next(error);
   }
 });
@@ -236,23 +236,13 @@ QASchema.pre("save", async function (next) {
         this.courses.length === 0 &&
         (!this.folders || this.folders.length === 0)
       ) {
-        await mongoose.model("QA").findOneAndDelete({ _id: this._id });
-        log(
-          {},
-          "QA-model.js",
-          "儲存問題",
-          "由於QA已經設定為公開，且沒有任何課程或資料夾，因此被刪除"
-        );
+        this.$locals.shouldAutoDelete = true;
+        log({}, "由於QA已經設定為公開，且沒有任何課程或資料夾，因此被刪除");
         next();
       }
       if (!this.public && this.courses.length === 0) {
-        await mongoose.model("QA").findOneAndDelete({ _id: this._id });
-        log(
-          {},
-          "QA-model.js",
-          "儲存問題",
-          "由於QA已經設定為非公開，且沒有任何課程，因此被刪除"
-        );
+        this.$locals.shouldAutoDelete = true;
+        log({}, "由於QA已經設定為非公開，且沒有任何課程，因此被刪除");
         next();
       }
     }
@@ -260,6 +250,20 @@ QASchema.pre("save", async function (next) {
   } catch (error) {
     logError({}, "QA-model.js", "儲存問題", {}, error);
     next(error);
+  }
+});
+
+QASchema.post("save", async function (doc, next) {
+  try {
+    if (this.$locals?.shouldAutoDelete) {
+      await mongoose.model("QA").findOneAndDelete({ _id: doc._id });
+      log({}, "由於條件不符，自動處理刪除記號 QA " + doc._id.toString());
+    }
+    next();
+  } catch (err) {
+    // 如果刪除出錯，記 log 但不要讓原本流程崩潰
+    logError({}, "QA-model.js", "儲存問題(post-save) 自動刪除失敗", {}, err);
+    next();
   }
 });
 

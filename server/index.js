@@ -121,14 +121,20 @@ app.use(
 // =====================
 // 資料庫連接
 // =====================
-mongoose
-  .connect(process.env.DB_IP)
-  .then(() => {
-    log({}, "資料庫連接成功");
-  })
-  .catch((e) => {
-    logError({}, "index.js", "資料庫連接", {}, e);
-  });
+(function databaseConnect() {
+  mongoose
+    .connect(process.env.DB_IP)
+    .then(() => {
+      log({}, "資料庫連接成功");
+    })
+    .catch((e) => {
+      console.error("資料庫連接失敗，將於10秒後重新連接");
+      logError({}, "index.js", "資料庫連接", {}, e);
+      setTimeout(() => {
+        databaseConnect();
+      }, 10000);
+    });
+})();
 
 // 配置請求體解析中間件
 app.use(express.json({ limit: "6MB" }));
@@ -149,14 +155,11 @@ app.use(passport.session()); // 啟用 session 支援（主要用於 OAuth）
 const tokenCheck = (req, res, next) => {
   passport.authenticate("jwt", { session: false }, (err, user, info) => {
     if (err) {
-      logError({}, "index.js", "tokenCheck", { path: req.path }, err);
+      logError({}, "index.js", "tokenCheck", {}, err);
       return next(err);
     }
     if (!user) {
-      logError({}, "index.js", "tokenCheck", {
-        path: req.path,
-        reason: "未授權",
-      });
+      logError({}, "index.js", "tokenCheck", {});
       return res.status(401).json({ message: "Unauthorized" });
     }
 
