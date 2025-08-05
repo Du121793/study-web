@@ -1,0 +1,357 @@
+.access-setting-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+.access-setting-main .btn-area {
+  width: 90%;
+  display: flex;
+}
+.access-setting-main .btn-area .back-btn {
+  cursor: pointer;
+  color: rgb(0, 0, 0);
+  background-color: #313131;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 8px 12px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  transition: 0.2s;
+  font-size: 18px;
+  transition: 0.2s;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+.access-setting-main .btn-area .back-btn:hover {
+  background-color: #e6e6e6;
+  color: rgb(42, 42, 42);
+}
+.access-setting-main .main-container {
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  gap: 12px;
+}
+.access-setting-main .main-container .message {
+  background-color: #e2e2e2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  overflow: hidden;
+  left: 50%;
+  transform: translate(-50%, 0);
+  transition: 0.2s;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 18px;
+}
+.access-setting-main .main-container .header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.access-setting-main .main-container .header .back-btn:hover {
+  background-color: #ffffff;
+}
+.access-setting-main .main-container .header .title {
+  font-size: 24px;
+  font-weight: bold;
+}
+.access-setting-main .main-container .header .btn {
+  cursor: pointer;
+  color: rgb(0, 0, 0);
+  background-color: #b7f7bd;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  transition: 0.2s;
+  font-size: 18px;
+  font-weight: bold;
+}
+.access-setting-main .main-container .header .btn:hover {
+  background-color: #9fefa7;
+}
+.access-setting-main .main-container .add-area {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  padding: 12px;
+  gap: 12px;
+  background-color: rgba(208, 208, 208, 0.411);
+}
+.access-setting-main .main-container .add-area .name-area {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.access-setting-main .main-container .add-area .studen-area {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.access-setting-main .main-container .add-area .studen-area .button {
+  cursor: pointer;
+  transition: 0.2s;
+  padding: 4px 6px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  background-color: #f8c39a;
+}
+.access-setting-main .main-container .add-area .studen-area .button:hover {
+  background-color: #e1b08a;
+}
+.access-setting-main .main-container .add-area .video-area {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.access-setting-main .main-container .add-area .video-area .button {
+  cursor: pointer;
+  transition: 0.2s;
+  padding: 4px 6px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  background-color: #f8c39a;
+}
+.access-setting-main .main-container .add-area .video-area .button:hover {
+  background-color: #e1b08a;
+}
+.access-setting-main .main-container .add-area .dateSetting-area {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.access-setting-main .main-container .add-area .dateSetting-area .title {
+  font-weight: bold;
+}
+.access-setting-main .main-container .add-area .dateSetting-area .infinity-option-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.access-setting-main .main-container .add-area .dateSetting-area .video-record-date {
+  width: 210px;
+}
+.access-setting-main .main-container .add-area .content {
+  font-size: 18px;
+}
+.access-setting-main .main-container .add-area .submit-btn {
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  background-color: #fff;
+  transition: 0.2s;
+  cursor: pointer;
+  background-color: #f8c39a;
+}
+.access-setting-main .main-container .add-area .submit-btn:hover {
+  background-color: #e1b08a;
+}
+.access-setting-main .main-container .add-area .is-private {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.access-setting-main .main-container .add-area .is-private .hint {
+  font-size: 14px;
+  color: red;
+}
+.access-setting-main .main-container .access-info {
+  background: linear-gradient(60deg, #a7c4ec, #c1f8f6);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  padding: 12px;
+  gap: 24px;
+  align-items: center;
+}
+.access-setting-main .main-container .access-info .name-area {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.access-setting-main .main-container .access-info .date-area {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  gap: 4px;
+}
+.access-setting-main .main-container .access-info .checkbox {
+  margin-left: 4px;
+}
+.access-setting-main .main-container .access-info .input-area {
+  width: 140px;
+}
+.access-setting-main .main-container .access-info .student {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: bold;
+}
+.access-setting-main .main-container .access-info .video {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: bold;
+}
+.access-setting-main .main-container .access-info .list-btn {
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  background-color: #f4f4f4;
+  padding: 4px;
+  transition: 0.2s;
+}
+.access-setting-main .main-container .access-info .list-btn:hover {
+  background-color: #e7e7e7;
+}
+.access-setting-main .main-container .access-info .date {
+  font-weight: bold;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  background-color: #fff;
+  padding: 4px 8px;
+}
+.access-setting-main .main-container .access-info .image-area {
+  max-height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.access-setting-main .main-container .access-info .image-area .complate-btn {
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 0.5px solid rgba(0, 0, 0, 0.4);
+  background-color: #c2f8b1;
+  transition: 0.2s;
+}
+.access-setting-main .main-container .access-info .image-area .complate-btn:hover {
+  background-color: #aedf9f;
+}
+.access-setting-main .main-container .access-info .image-area .image {
+  cursor: pointer;
+  border-radius: 64px;
+  transition: 0.2s;
+  padding: 4px;
+}
+.access-setting-main .main-container .access-info .image-area .image:hover {
+  background-color: #ffffff;
+}
+.access-setting-main .main-container .access-info .image-area .double-check-area {
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  gap: 4px;
+  transition: 0.2s;
+}
+.access-setting-main .main-container .access-info .image-area .double-check-area .content {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  font-weight: bold;
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 0.5px solid rgba(0, 0, 0, 0.4);
+  background-color: #fff;
+}
+.access-setting-main .main-container .access-info .image-area .double-check-area .confirm-btn {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 0.5px solid rgba(0, 0, 0, 0.4);
+  background-color: #c2f8b1;
+  transition: 0.2s;
+}
+.access-setting-main .main-container .access-info .image-area .double-check-area .confirm-btn:hover {
+  background-color: #b3e6a4;
+}
+.access-setting-main .main-container .access-info .image-area .double-check-area .cancel-btn {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 0.5px solid rgba(0, 0, 0, 0.4);
+  background-color: #f59f9f;
+  transition: 0.2s;
+}
+.access-setting-main .main-container .access-info .image-area .double-check-area .cancel-btn:hover {
+  background-color: #e49393;
+}
+.access-setting-main .main-container .access-info .edit-area {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+@media (max-width: 860px) {
+  .access-setting-main .main-container {
+    width: 80%;
+    flex-direction: column;
+    align-items: center;
+  }
+  .access-setting-main .main-container .header {
+    flex-direction: column;
+    gap: 4px;
+  }
+  .access-setting-main .main-container .add-area {
+    width: 95%;
+  }
+  .access-setting-main .main-container .add-area .name-area {
+    width: 100%;
+  }
+  .access-setting-main .main-container .add-area .name-area input {
+    flex: 1;
+  }
+  .access-setting-main .main-container .add-area .studen-area {
+    width: 100%;
+  }
+  .access-setting-main .main-container .add-area .studen-area .content {
+    flex: 1;
+  }
+  .access-setting-main .main-container .add-area .video-area {
+    width: 100%;
+  }
+  .access-setting-main .main-container .add-area .video-area .content {
+    flex: 1;
+  }
+  .access-setting-main .main-container .add-area .dateSetting-area {
+    width: 100%;
+    flex-direction: column;
+  }
+  .access-setting-main .main-container .add-area .dateSetting-area .title {
+    font-size: 24px;
+  }
+  .access-setting-main .main-container .add-area .is-private {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .access-setting-main .main-container .add-area .g-green-btn {
+    margin: 0 auto;
+  }
+}

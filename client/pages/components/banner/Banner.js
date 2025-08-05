@@ -10,10 +10,10 @@ import blackleftArrow from '../../../public/arrow/left_arrow_black.png'
 // css
 import style from './banner.module.css'
 
-export default function Banner({ bannerHasChange = null }) {
+export default function Banner({ bannerHasChange = null, initialCarousel = [] }) {
   const token = useUserToken()
   const [role, setRole] = useState('')
-  const [carousel, setCarousel] = useState([])
+  const [carousel, setCarousel] = useState(initialCarousel)
   // currentIndex 以克隆後的陣列來定位，初始值為 1（即第一個真實圖片）
   const [currentIndex, setCurrentIndex] = useState(1)
   // 控制是否開啟 CSS transition（在跳轉時關閉，以達到無縫效果）

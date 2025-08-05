@@ -18,7 +18,26 @@ import backgroundImage from '../public/backGroundIMG/stefanie-jockschat-9f1PRQs6
 // style
 import style from './index.module.css'
 
-export default function Index() {
+export async function getStaticProps() {
+  try {
+    // banner
+    const carouselRes = await userService.getCarousels()
+    const initialCarousel = carouselRes.success ? carouselRes.data : []
+
+    return {
+      props: { initialCarousel },
+      revalidate: 60,
+    }
+  } catch (error) {
+    console.error('Carousel fetch error:', error)
+    return {
+      props: { initialCarousel: [] },
+      revalidate: 60,
+    }
+  }
+}
+
+export default function Index({ initialCarousel, initialHeader }) {
   const token = useUserToken()
   const [logined, setLogined] = useState(false)
   const [userShot, setUserShot] = useState(null)
@@ -103,13 +122,18 @@ export default function Index() {
         style={{ zIndex: hasPop ? 3 : 4 }}
         className={style['header-area']}>
         <Header
+          initialHeader={initialHeader}
           callBoardMoveToBoardFunction={callBoardMoveToBoardFunction}
           loginState={logined}
           user_line_shot={userShot}
           inIndex="public"></Header>
       </div>
-      <div className={style['banner-area']}>
-        <Banner bannerHasChange={bannerHasChange}></Banner>
+      <div
+        className={style['banner-area']}
+        onClick={() => {}}>
+        <Banner
+          bannerHasChange={bannerHasChange}
+          initialCarousel={initialCarousel}></Banner>
       </div>
       <div className={style['pops']}>
         {userRole && userRole === 'admin' && (
@@ -127,6 +151,7 @@ export default function Index() {
             setUploadBoardUIHeight={setUploadBoardUIHeight}
             uploadBoardUIHeight={uploadBoardUIHeight}
             setHasPop={setHasPop}
+            mode={'upload'}
           />
         )}
       </div>

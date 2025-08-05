@@ -17,6 +17,8 @@
   }
 }
 .board-page-main .g-btn-area {
+  position: relative;
+  z-index: 4;
   margin: 12px 0 12px 0;
   display: flex;
   gap: 12px;

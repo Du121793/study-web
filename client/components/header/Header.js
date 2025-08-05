@@ -10,7 +10,7 @@ import menu from '../../public/imgs/menu/menu_black.png'
 import closeIcon from '../../public/close/close_white.png'
 // style
 import style from './style.module.css'
-export default function Header({ callBoardMoveToBoardFunction, loginState, user_line_shot, inIndex = '' }) {
+export default function Header({ initialHeader = [], callBoardMoveToBoardFunction, loginState, user_line_shot, inIndex = '' }) {
   const router = useRouter()
   // env
   const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP

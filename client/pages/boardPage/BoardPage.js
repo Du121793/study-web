@@ -9,7 +9,7 @@ import Footer from '../../components/footer/Footer'
 import userService from '../../method/userService'
 import { useUserToken } from '../../method/useUserToken'
 import adminService from '../../method/adminService'
-// child component
+// component
 import UploadBoard from '../components/uploadBoard/UploadBoard'
 
 import style from './boardPage.module.css'
@@ -24,10 +24,7 @@ export default function BoardPage() {
   const [loginState, setLoginState] = useState(false)
   const [showUploadBoardUI, setShowUploadBoardUI] = useState(false)
   const [uploadBoardUIHeight, setUploadBoardUIHeight] = useState(0)
-  const [whichMethod, setWhichMethod] = useState('edit')
   const [editHasChange, setEditHasChange] = useState(false)
-  // 用於開關UI時覆蓋所有內部元素
-  const [visibility, setVisibility] = useState('visible')
   // 從sessionStorage獲取userRole
   const [userRole, setUserRole] = useState(null)
   // 初始設為 null，代表尚未取得公告資料
@@ -45,6 +42,8 @@ export default function BoardPage() {
   // 綁定timeout，用於重計
   const messageTimer = useRef(null)
   const resetTimer = useRef(null)
+  //
+  const [popUp, setHasPop] = useState(false)
 
   const test = () => {}
 
@@ -153,17 +152,12 @@ export default function BoardPage() {
             className="g-black-btn">
             回到上一頁
           </Link>
-          <div
-            className="g-blue-btn"
-            onClick={() => {
-              setShowUploadBoardUI(true)
-              setTimeout(() => {
-                setUploadBoardUIHeight(800)
-                setVisibility('visible')
-              }, 1)
-            }}>
-            編輯公告
-          </div>
+          <UploadBoard
+            setHasPop={setHasPop}
+            mode={'edit'}
+            board_id={board_id}
+            setEditHasChange={setEditHasChange}
+            boardInfo={boardInfo}></UploadBoard>
           {!dbcheckDelete && (
             <div
               className="g-red-btn"

@@ -1,0 +1,337 @@
+@charset "UTF-8";
+.qa-nav {
+  position: relative;
+  top: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.6);
+  margin-bottom: 24px;
+  width: 90%;
+}
+@media (max-width: 860px) {
+  .qa-nav {
+    width: 100%;
+    border-radius: 0px;
+  }
+}
+.qa-nav .header {
+  font-weight: bold;
+  color: #e0e0e0;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  border-radius: 8px;
+  background-color: var(--main-color);
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  min-height: 80px;
+  font-size: 20px;
+  z-index: 1;
+  gap: 12px;
+}
+@media (max-width: 860px) {
+  .qa-nav .header {
+    border-radius: 0px;
+  }
+}
+.qa-nav .QA-area {
+  background-color: #f5f5f5;
+}
+.qa-nav .QA-area .container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px; /* 區塊間距 */
+}
+.qa-nav .QA-area .container .QA-header {
+  width: 100%;
+  padding-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+.qa-nav .QA-area .container .QA-header .search-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.qa-nav .QA-area .container .QA-header .sort-by-area {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+.qa-nav .QA-area .container .QA-header .time-sort-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.qa-nav .QA-area .container .QA-header .select {
+  height: 32px;
+}
+.qa-nav .QA-area .container .QA-header .show-public-QA {
+  cursor: pointer;
+  padding: 4px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  background-color: #cbf6ff;
+  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
+  transition: 0.2s;
+}
+.qa-nav .QA-area .container .QA-header .show-public-QA:hover {
+  background-color: #bae1e9;
+}
+.qa-nav .QA-area .container .QA-header .show-delete-btn {
+  cursor: pointer;
+  padding: 4px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  background-color: #ffb7b7;
+  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
+  transition: 0.2s;
+}
+.qa-nav .QA-area .container .QA-header .show-delete-btn:hover {
+  background-color: #e7a5a5;
+}
+.qa-nav .QA-area .container .page-switch {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.qa-nav .QA-area .container .sort-title {
+  margin-left: 24px;
+}
+.qa-nav .QA-area .container .QA-grid {
+  width: 100%;
+}
+@media (max-width: 860px) {
+  .qa-nav .QA-area .container .QA-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+.qa-nav .QA-area .container .QA-grid .QA-container {
+  min-height: 80px;
+  padding: 0 24px 24px 24px;
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+@media (max-width: 860px) {
+  .qa-nav .QA-area .container .QA-grid .QA-container {
+    width: 80vw;
+    padding: 0;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .QA-list {
+  margin-bottom: 32px;
+  min-width: 220px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #bebebe;
+  border-radius: 8px;
+  gap: 18px;
+  background-color: rgb(244, 244, 244);
+}
+@media (max-width: 860px) {
+  .qa-nav .QA-area .container .QA-grid .QA-container .QA-list {
+    min-width: 100%;
+  }
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .QA-list .QA-tag {
+  display: flex;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .QA-list .QA-tag .content {
+  font-weight: bold;
+  font-size: 22px;
+  padding: 4px 8px;
+  background-color: #f6b594;
+  border-radius: 4px;
+  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 90%;
+  border: 1px solid #ababab;
+  padding: 12px;
+  border-radius: 4px;
+  gap: 8px;
+  background-color: #ffffff;
+  transition: 0.2s;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .btn-area {
+  display: flex;
+  gap: 12px;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .btn-area .into-qa-btn {
+  color: black;
+  flex: 1;
+  padding: 4px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  background-color: var(--button-white);
+  transition: 0.2s;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .btn-area .into-qa-btn:hover {
+  background-color: var(--botton-white-hover);
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .btn-area .remove-btn {
+  color: black;
+  padding: 4px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  background-color: #ffdada;
+  transition: 0.2s;
+  cursor: pointer;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .btn-area .remove-btn:hover {
+  background-color: #ebc1c1;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .qa-info-title {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .qa-info-title .content {
+  font-weight: bold;
+  font-size: 18px;
+  padding: 4px 8px;
+  background-color: #b9cdf9;
+  border-radius: 4px;
+  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
+  color: black;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .qa-image-area {
+  display: flex;
+  flex-wrap: wrap;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .qa-image-area .qa-image {
+  width: 100%;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .qa-image-area .qa-images {
+  width: 33%;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .time-replied-area {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15px;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .time-replied-area .time {
+  color: rgba(0, 0, 0, 0.5);
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .time-replied-area .not-replied {
+  color: blue;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .time-replied-area .is-replied {
+  color: rgb(114, 37, 255);
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .qa-description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: black;
+  width: 90%;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  background-color: #f1f1f1;
+  padding: 4px 8px;
+  margin-top: -6px;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info:hover {
+  background-color: #dfefff;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .qa-info-area {
+  color: black;
+  cursor: pointer;
+  padding: 16px;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.2);
+  background-color: #fff;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+  transition: 0.2s;
+  min-width: 220px;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .qa-info-area .qa-image {
+  width: 100%;
+  border-radius: 8px;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .qa-info-area .content {
+  font-size: clamp(16px, 1.2vw, 18px);
+  display: flex;
+  word-break: keep-all;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: -4px;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .qa-info-area .content .is-replied {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .qa-info-area .content .time {
+  color: rgb(122, 122, 122);
+  word-break: keep-all;
+  font-size: 12px;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .qa-info-area .into-qa-btn {
+  color: black;
+  flex: 1;
+  padding: 4px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  background-color: var(--button-white);
+  transition: 0.2s;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .qa-info-area .into-qa-btn:hover {
+  background-color: var(--botton-white-hover);
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .qa-info-area .description-area {
+  padding: 8px;
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.06);
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .qa-info-area:hover {
+  background-color: #f5f5f5;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .load-more-btn {
+  cursor: pointer;
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  background-color: white;
+}
+.qa-nav .QA-area .container .QA-grid .btn-area {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.qa-nav .QA-area .container .QA-grid .btn-area .g-black-btn {
+  margin-bottom: 24px;
+}

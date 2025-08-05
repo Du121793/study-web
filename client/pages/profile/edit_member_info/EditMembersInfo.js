@@ -187,6 +187,7 @@ export default function EditMembersInfo() {
       }
       adminService.getMembers(token, data).then((res) => {
         if (res?.success) {
+          console.log(res.data)
           setLoading(false)
           setTotalPage(res.totalPage)
           setMembers(res.data)

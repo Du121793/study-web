@@ -4,7 +4,6 @@ import Image from 'next/image'
 import style from './style.module.css'
 // method
 import adminService from '../../../method/adminService'
-import userService from '../../../method/userService'
 import { useUserToken } from '../../../method/useUserToken'
 //public
 import dbArrowLeft from '../../../public/profile/doubleArrowLeft.png'
@@ -57,7 +56,8 @@ export default function EditMembers() {
   const [phoneNumberInput, setPhoneNumberInput] = useState('')
   const [gradeInput, setGradeInput] = useState('')
   const [role, setRole] = useState('')
-
+  // 用於搜索身分組時，根據該課程所有id匹配
+  const [courseMemberIds, setCourseMemberIds] = useState([])
   // 初始化選擇狀態
   const initSelector = () => {
     let allActive = document.querySelectorAll('.select-active')
@@ -176,7 +176,11 @@ export default function EditMembers() {
   }
 
   /* 搜尋功能 */
-  const searchMembers = () => {
+  const searchMembers = (role) => {
+    /* 
+      由於api沒有根據課程拿到成員，
+      根據目前搜尋根據成員的ID來比對
+     */
     let data = {
       username: usernameInput,
       realname: realnameInput,
@@ -185,9 +189,13 @@ export default function EditMembers() {
       role: role,
     }
     setLoading(true)
+    if (role === '') {
+      setMethod({ name: 'courseMemberPage', page: 1 })
+      return
+    }
     adminService.getMembers(token, data).then((res) => {
       if (res?.success) {
-        const memberIds = new Set(members.map((m) => m._id))
+        const memberIds = new Set(courseMemberIds.map((m) => m._id))
         const common = res.data.filter((item) => memberIds.has(item._id))
         setMembers(common)
       }
@@ -306,6 +314,7 @@ export default function EditMembers() {
             setTotalPage(res.totalPage)
             setShowMembersState('all')
             setMembers(res.data)
+            setCourseMemberIds(res.data)
           } else {
             setLoading(false)
             setMessage('發生錯誤', false)
@@ -331,6 +340,7 @@ export default function EditMembers() {
               setTotalPage(res.totalPage)
               setShowMembersState('course members')
               setMembers(res.data)
+              setCourseMemberIds(res.data)
             } else {
               setLoading(false)
               setMessage('發生錯誤', false)
@@ -339,6 +349,7 @@ export default function EditMembers() {
         } else {
           setMessage('請選擇課程', false)
           setMembers([])
+          setCourseMemberIds([])
         }
         break
       case 'ousideMemberPage':
@@ -360,6 +371,7 @@ export default function EditMembers() {
               setTotalPage(res.totalPage)
               setShowMembersState('all')
               setMembers(res.data)
+              setCourseMemberIds(res.data)
             } else {
               setLoading(false)
               setMessage('發生錯誤', false)
@@ -368,6 +380,7 @@ export default function EditMembers() {
         } else {
           setMessage('請選擇課程', false)
           setMembers([])
+          setCourseMemberIds([])
         }
         break
       default:
@@ -579,7 +592,7 @@ export default function EditMembers() {
               <select
                 className=""
                 onChange={(e) => {
-                  setRole(e.target.value)
+                  searchMembers(e.target.value)
                 }}>
                 <option value="">全部</option>
                 <option value="teacher">教師</option>

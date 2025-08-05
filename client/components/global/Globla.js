@@ -2,7 +2,7 @@ import Head from 'next/head'
 export default function Home(isLogined) {
   isLogined = false
   return (
-    <head>
+    <Head>
       <meta charset="utf-8" />
       <meta
         name="viewport"
@@ -12,12 +12,12 @@ export default function Home(isLogined) {
         rel="icon"
         href="/favicon.ico"
         type="image/x-icon"
-      />
+      /> 
       <link
         rel="shortcut icon"
         href="/favicon.ico"
         type="image/x-icon"
       />
-    </head>
+    </Head>
   )
 }

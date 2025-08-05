@@ -1,0 +1,129 @@
+.msg-board {
+  display: flex;
+  position: relative;
+  padding: 24px;
+  width: 80%;
+  background-color: #fff;
+  border-radius: 12px;
+  gap: 12px;
+  margin-bottom: 24px;
+  transition: 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  @media (max-width: 576px) {
+    flex-direction: column;
+  }
+  .settings-area {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 30%;
+    @media (max-width: 576px) {
+      width: 100%;
+    }
+    .upload-video-btn-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      .file-input {
+        display: none;
+      }
+    }
+    .image-name-area {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 100%;
+      .image-name {
+        margin-bottom: 4px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+        height: 29px;
+        background-color: #f3f3f3;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 4px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        user-select: none;
+        .remove-image-btn {
+          cursor: pointer;
+          font-size: 16px;
+          transition: 0.2s;
+        }
+        .remove-image-btn:hover {
+          font-size: 22px;
+        }
+      }
+    }
+    .checkbox-area {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      .contianer {
+        width: 60%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2px 4px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+    }
+    .submit-btn-area {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      button {
+        padding: 4px 8px 4px 8px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        transition: 0.2s;
+      }
+      button:hover {
+        background-color: #e7e7e7;
+      }
+    }
+  }
+  .message {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    background-color: #ffffff00;
+    top: 0;
+    left: 0;
+    width: 100%;
+    .info {
+      background-color: #d6d6d6;
+      border-radius: 8px;
+      transition: 0.2s;
+    }
+  }
+  .text-area {
+    resize: none;
+    outline: none;
+    width: 90%;
+    border: 1px solid #ccc;
+    background-color: #eeeeee;
+    padding: 8px;
+    transition: 0.2s;
+    @media (max-width: 576px) {
+      height: 320px;
+    }
+  }
+  .is-private-checkbox-area {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    .input-area {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+  }
+}

@@ -415,6 +415,12 @@ export default function EditCourse() {
           </div>
         </div>
 
+        {addThenRegister && (
+          <MemberSelector
+            selectedStudentId={selectedStudentId}
+            setSelectedStudentId={setSelectedStudentId}></MemberSelector>
+        )}
+
         <div className={`${style.courses_info_list}`}>
           <form
             className={`${style.search_area}`}
@@ -665,12 +671,6 @@ export default function EditCourse() {
               }}></Image>
           </div>
         </div>
-
-        {addThenRegister && (
-          <MemberSelector
-            selectedStudentId={selectedStudentId}
-            setSelectedStudentId={setSelectedStudentId}></MemberSelector>
-        )}
       </div>
     </div>
   )

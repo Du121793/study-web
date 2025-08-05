@@ -1,0 +1,194 @@
+.upload-old-vimeo-vdo-area {
+  width: 100%;
+  height: 100%;
+}
+.upload-old-vimeo-vdo-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9;
+  background-color: rgba(0, 0, 0, 0.4);
+  width: 100%;
+  height: 100%;
+  .container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    .ui {
+      height: 80%;
+      width: 80%;
+      overflow: auto;
+      background-color: #fff;
+      display: flex;
+      position: absolute;
+      border-radius: 12px;
+      transition: 0.2s;
+      .inner-element {
+        padding: 24px;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        .btn-area {
+          position: relative;
+          display: flex;
+          justify-content: center;
+          flex-wrap: wrap;
+          width: 100%;
+          gap: 12px;
+          .confirm {
+            position: absolute;
+            right: 0;
+            @media screen and (max-width: 800px) {
+              position: relative;
+            }
+          }
+        }
+        .card-area {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: flex-start;
+          gap: 24px;
+          width: 100%;
+          padding: 24px;
+          @media screen and (max-width: 1350px) {
+            justify-content: center;
+          }
+          .card {
+            display: flex;
+            flex-wrap: wrap;
+            box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
+            padding: 24px;
+            width: 20vw;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            gap: 12px;
+            .uid {
+              font-size: 20px;
+              font-weight: bold;
+            }
+            .description-area {
+              display: flex;
+              flex-direction: column;
+            }
+            .movePath {
+              word-break: break-all;
+            }
+            .content.active {
+              font-size: 20px;
+              font-weight: bold;
+            }
+            .inner-text {
+              width: 95%;
+              position: relative;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              padding: 8px;
+              border-radius: 8px;
+              border: 1px solid rgba(0, 0, 0, 0.4);
+              z-index: 1;
+              word-break: break-all;
+              .title-copy-btn {
+                position: absolute;
+                right: 4px;
+                border-radius: 4px;
+                border: 1px solid rgba(0, 0, 0, 0.4);
+                padding: 4px;
+                font-size: 14px;
+                transition: 0.2s;
+                cursor: pointer;
+                user-select: none;
+              }
+              .description-copy-btn {
+                z-index: 2;
+                position: absolute;
+                right: 4px;
+                bottom: 4px;
+                border-radius: 4px;
+                border: 1px solid rgba(0, 0, 0, 0.5);
+                padding: 4px;
+                font-size: 14px;
+                transition: 0.2s;
+                cursor: pointer;
+                user-select: none;
+              }
+              .description-copy-btn:hover {
+                background-color: #ebebeb;
+              }
+              .title-copy-btn:hover {
+                background-color: #ebebeb;
+              }
+            }
+            .input-area {
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+              width: 100%;
+              textarea {
+                width: 100%;
+                height: 120px;
+                resize: none;
+              }
+              .title-area {
+                display: flex;
+                justify-content: space-between;
+                .g-red-btn {
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: #fff;
+                  padding: 0;
+                  width: 24px;
+                  height: 24px;
+                }
+              }
+              .title-area.active {
+                font-weight: bold;
+                font-size: 20px;
+              }
+            }
+            .input-area.checkbox {
+              flex-direction: row;
+              justify-content: center;
+            }
+          }
+        }
+      }
+    }
+  }
+  @media (max-width: 860px) {
+    width: 100%;
+    .container {
+      max-width: 100vw;
+      min-width: 100vw;
+      .ui {
+        max-width: 100%;
+        min-width: 95vw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        .inner-element {
+          width: 90%;
+          padding: 0;
+          padding: 12px 0;
+          .card-area {
+            width: 100%;
+            .card {
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+}

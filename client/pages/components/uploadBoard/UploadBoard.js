@@ -1,24 +1,26 @@
+// 組件庫
 import { useState, useRef, useEffect } from 'react'
+// 附加庫
 import { motion, AnimatePresence } from 'framer-motion'
 import dynamic from 'next/dynamic'
 const MyReactQuill = dynamic(() => import('../../../components/MyReactQuill'), { ssr: false })
-import { useStrictClickHandler } from '../../../method/userful'
+// method
 import adminService from '../../../method/adminService'
 import { useUserToken } from '../../../method/useUserToken'
 // css
 import style from './uploadBoard.module.css'
 import btn_style from '../../../styles/global/button.module.css'
 
-export default function UploadBoard({ setHasPop, boardInfo, setEditHasChange, editHasChange, board_id = null, whichMethod = 'upload', setShowUploadBoardUI }) {
+export default function UploadBoard({ mode, setHasPop, boardInfo, setEditHasChange, editHasChange, board_id = null, whichMethod = 'upload', setShowUploadBoardUI }) {
   const token = useUserToken()
   // 控制UI顯示
   const [visibility, setVisibility] = useState(false)
   // 控制body滑動條
   const [page_body, setPage_body] = useState([])
   // 請求參數
-  const [title, setTitle] = useState(boardInfo?.title ? boardInfo.title : '')
-  const [content, setContent] = useState(boardInfo?.content ? boardInfo.content : '')
-  const [subTitle, setSubTitle] = useState(boardInfo?.subTitle ? boardInfo.subTitle : '')
+  const [title, setTitle] = useState('')
+  const [content, setContent] = useState('')
+  const [subTitle, setSubTitle] = useState('')
   // edit請求參數
   const [editTitle, setEditTitle] = useState(boardInfo?.title ? boardInfo.title : '')
   const [editContent, setEditContent] = useState(boardInfo?.content ? boardInfo.content : '')
@@ -64,15 +66,25 @@ export default function UploadBoard({ setHasPop, boardInfo, setEditHasChange, ed
       /*
         若無輸入，會用舊值
       */
-      const data = { board_id: board_id, title: editTitle, subTitle: editSubTitle, content: editContent }
+      const data = { board_id: board_id, title: editTitle ? editTitle : boardInfo.title, subTitle: editSubTitle ? editSubTitle : boardInfo.subTitle, content: editContent ? editContent : boardInfo.content }
       adminService.putBoard(token, data).then((res) => {
         if (res.success) {
           setEditHasChange(!editHasChange)
-          setShowUploadBoardUI(false)
+          setVisibility(false)
+          window.location.reload()
         }
       })
     }
   }
+
+  useEffect(() => {
+    if (mode === 'upload') {
+      setContent('')
+    }
+    if (mode === 'edit') {
+      setContent(boardInfo?.content)
+    }
+  }, [visibility])
 
   return (
     <div>
@@ -82,7 +94,8 @@ export default function UploadBoard({ setHasPop, boardInfo, setEditHasChange, ed
           setVisibility(true)
           setHasPop(true)
         }}>
-        上傳公告
+        {mode === 'upload' && '上傳公告'}
+        {mode === 'edit' && '編輯公告'}
       </div>
       <AnimatePresence>
         {visibility && (
@@ -110,7 +123,7 @@ export default function UploadBoard({ setHasPop, boardInfo, setEditHasChange, ed
                 className={style['upload-board-ui']}
                 ref={uiElement}
                 onClick={(e) => e.stopPropagation()}>
-                {whichMethod === 'edit' ? <div className={`${style['title']}`}>編輯公告</div> : <div className={style['title']}>上傳公告</div>}
+                {mode === 'edit' ? <div className={`${style['title']}`}>編輯公告</div> : <div className={style['title']}>上傳公告</div>}
 
                 <div className={style['input-container']}>
                   <div className={style['content']}>公告標題 :</div>
@@ -146,7 +159,7 @@ export default function UploadBoard({ setHasPop, boardInfo, setEditHasChange, ed
                   />
                 </div>
                 <div>
-                  {whichMethod === 'edit' ? (
+                  {mode === 'edit' ? (
                     <div className={style['btn-area']}>
                       <div
                         className={`${btn_style['g-blue-btn']} submit`}

@@ -16,8 +16,8 @@ import userService from '../../method/userService'
 import leftArrow from '../../public/course/leftArrow.png'
 
 // nav組件
-import VideoNav from './VideoNav'
-import QaNav from './QaNav'
+import VideoNav from './component/video_nav/VideoNav'
+import QaNav from './component/qa_nav/QaNav'
 
 // style
 import style from './style.module.css'
@@ -44,22 +44,22 @@ export default function CoursePage() {
   const [userRole, setUserRole] = useState(null)
 
   // 設定sessionStorage
-  useEffect(() => {
-    if (!localStorage.getItem('user_role') || !localStorage.getItem('user_id')) {
-      userService.getUserInfo(token).then((res) => {
-        localStorage.setItem('user_lineID', res.data.lineID)
-        localStorage.setItem('user_id', res.data._id)
-        localStorage.setItem('user_line_shot', res.data.userinfo.pictureUrl)
-        localStorage.setItem('user_role', res.data.role)
-      })
-    }
-    const role = localStorage.getItem('user_role')
-    if (role) {
-      setUserRole(role)
-    }
-  }, [])
+  // useEffect(() => {
+  //   if (!localStorage.getItem('user_role') || !localStorage.getItem('user_id')) {
+  //     userService.getUserInfo(token).then((res) => {
+  //       localStorage.setItem('user_lineID', res.data.lineID)
+  //       localStorage.setItem('user_id', res.data._id)
+  //       localStorage.setItem('user_line_shot', res.data.userinfo.pictureUrl)
+  //       localStorage.setItem('user_role', res.data.role)
+  //     })
+  //   }
+  //   const role = localStorage.getItem('user_role')
+  //   if (role) {
+  //     setUserRole(role)
+  //   }
+  // }, [])
 
-  // 請求使用者資料
+  // // 請求使用者資料
   useEffect(() => {
     if (token) {
       userService
@@ -67,6 +67,7 @@ export default function CoursePage() {
         .then((res) => {
           setUserInfo(res.data)
           setLogined(true)
+          setUserRole(res.data.role)
         })
         .catch((err) => console.error('Error:', err.message))
     }
@@ -80,57 +81,53 @@ export default function CoursePage() {
   }, [courseName, courseId])
 
   return (
-    <div className="course-main">
+    <div className={style['course-main']}>
       <div
         className="right-bottom-loading-area"
         style={{ right: loading ? '8px' : '-100%' }}>
         <div className="loading"></div>
       </div>
-      <div className="course-header">
+      <div className={style['course-header']}>
         <Header
           loginState={isLogined}
           inIndex="course"
         />
       </div>
-      <div className="container">
-        <div className="header-title-area">
-          <div className="left">
-            <div className="course-title">{courseName}</div>
-            <div className="hint">{courseId}</div>
+      <div className={style['container']}>
+        <div className={style['header-title-area']}>
+          <div className={style['left']}>
+            <div className={style['course-title']}>{courseName}</div>
+            <div className={style['hint']}>{courseId}</div>
           </div>
-          <div className="right">
+          <div className={style['right']}>
             <Link
-              className="back-to-course-btn"
-              href={backToMyCoursePageUrl}>
+              className={style['back-to-course-btn']}
+              href={{ pathname: backToMyCoursePageUrl, query: { fc: 'public', to: 'myCourse' } }}>
               <Image
                 src={leftArrow}
                 alt="back of course page button icon"
                 width={24}
                 height={24}
               />
-              <div className="home-btn">回到我的課程</div>
+              <div className={style['home-btn']}>回到我的課程</div>
             </Link>
           </div>
         </div>
 
         {/* 影片組件 */}
-        {courseId !== null && userRole && (
-          <VideoNav
-            user_role={userRole}
-            course_id={courseId}
-            courseName={courseName}
-            setLoading={setLoading}></VideoNav>
-        )}
+        <VideoNav
+          user_role={userRole}
+          course_id={courseId}
+          courseName={courseName}
+          setLoading={setLoading}></VideoNav>
         {/* Q&A 組件 */}
-        {courseId !== null && userRole && (
-          <QaNav
-            qaHasUpload={qaHasUpload}
-            setQaHasUpload={setQaHasUpload}
-            user_role={userRole}
-            course_id={courseId}
-            courseName={courseName}
-            setLoading={setLoading}></QaNav>
-        )}
+        <QaNav
+          qaHasUpload={qaHasUpload}
+          setQaHasUpload={setQaHasUpload}
+          user_role={userRole}
+          course_id={courseId}
+          courseName={courseName}
+          setLoading={setLoading}></QaNav>
       </div>
       <Footer></Footer>
     </div>

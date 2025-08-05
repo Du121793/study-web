@@ -206,7 +206,7 @@ export default function Player() {
         <div
           id={style['back-btn']}
           onClick={() => {
-            window.location = `${clientIp}/course/Course?courseName=${course_name}&courseId=${course_id}`
+            window.location = `${clientIp}/course?courseName=${course_name}&courseId=${course_id}`
           }}>
           回到課程
         </div>

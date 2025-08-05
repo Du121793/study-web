@@ -6,7 +6,6 @@ import userService from '../../method/userService'
 import styles from '../../styles/course/methods/qaMsgUpload.module.css'
 
 export default function QAMsgUpload({
-  messageControl,
   token,
   question_id,
   file, // 影片檔案 (File)
@@ -121,8 +120,7 @@ export default function QAMsgUpload({
         VideoRef.current.value = null
         setImages(null)
         setPreViewImage(null)
-        messageControl('上傳成功', true)
-        
+
         if (res.data.uploadLink) {
           const { uploadLink } = res.data
           setUploadLink(uploadLink)

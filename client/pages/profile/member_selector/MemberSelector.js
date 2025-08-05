@@ -1,7 +1,7 @@
 // 組件庫
 import { useEffect, useState, useRef } from 'react'
 import Image from 'next/image'
-import style from "./style.module.css"
+import style from './style.module.css'
 // method組件
 import adminService from '../../../method/adminService'
 import { useUserToken } from '../../../method/useUserToken'
@@ -196,13 +196,8 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
 
   return (
     <div className={`${style.member_select_area}`}>
-      <div
-        style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
-        className="message">
-        {message}
-      </div>
       <div className={`${style.member_select_header}`}>成員搜尋功能</div>
-      <div className="classification">
+      <div className={style['classification']}>
         <div className={`${style.search_inputs}`}>
           {/* 姓名 */}
           <div>
@@ -239,7 +234,7 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
           </div>
           {/* 身分組 */}
           <div className={`${style.role_inputs}`}>
-            <div className="content">身分組:</div>
+            <div className={style['content']}>身分組:</div>
             <select
               onChange={(e) => {
                 setRoleInput(e.target.value)
@@ -251,7 +246,7 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
           </div>
         </div>
         {/* 三個按鈕 */}
-        <div className="btns">
+        <div className={style['btns']}>
           <button
             className="g-black-btn"
             onClick={selectAllStudent}>
@@ -277,9 +272,9 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
         <div className={`${style.inner_line}`}>
           <span className={`${style.user_name}`}>暱稱</span>
           <span className={`${style.real_name}`}>姓名</span>
-          <span className="phone">電話號碼</span>
-          <span className="grade">年級</span>
-          <span className="role">身分組</span>
+          <span className={style['phone']}>電話號碼</span>
+          <span className={style['grade']}>年級</span>
+          <span className={style['role']}>身分組</span>
         </div>
         {memberloading && <LoadingAnime />}
         {members &&
@@ -304,12 +299,12 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
               {item.userinfo.username === undefined && <span className={`${style.user_name}`}>無</span>}
               {item.userinfo.username !== undefined && <span className={`${style.user_name}`}>{item.userinfo.username}</span>}
               <span className={`${style.real_name}`}>{item.userinfo.realname}</span>
-              <span className="phone">{item.userinfo.phoneNumber}</span>
-              <span className="course-class">{item.userinfo.courseClass}</span>
-              <span className="grade">{item.role === 'student' ? item.userinfo.grade : null}</span>
-              {item.role === 'teacher' && <span className="role">教師</span>}
-              {item.role === 'student' && <span className="role">學生</span>}
-              {item.role === 'admin' && <span className="role">管理員</span>}
+              <span className={style['phone']}>{item.userinfo.phoneNumber}</span>
+              <span className={style['course-class']}>{item.userinfo.courseClass}</span>
+              <span className={style['grade']}>{item.role === 'student' ? item.userinfo.grade : null}</span>
+              {item.role === 'teacher' && <span className={style['role']}>教師</span>}
+              {item.role === 'student' && <span className={style['role']}>學生</span>}
+              {item.role === 'admin' && <span className={style['role']}>管理員</span>}
             </div>
           ))}
       </ul>
