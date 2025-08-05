@@ -4,10 +4,9 @@
  * @author StudyWeb Team
  * @date 2024-03-30
  */
-
 const router = require("express").Router();
 const Course = require("../../models").course;
-const QA = require("../../models").QA;
+const User = require("../../models").user;
 const courseMethodRouter = require("./courseMethod");
 const modifyCourseRouter = require("./modifyCourse");
 const QARouter = require("./QA");
@@ -84,8 +83,8 @@ router.get("/getCourses", checkTeacherAccess, async (req, res) => {
     const total = await Course.countDocuments(filter);
     const totalPage = parseInt(total / pageSize) + 1;
 
-     // 處理不分頁的情況
-     if (!(page && pageSize)) {
+    // 處理不分頁的情況
+    if (!(page && pageSize)) {
       const courses = await Course.find(filter).populate(
         "teacher",
         "_id userinfo.username userinfo.pictureUrl"
@@ -96,12 +95,12 @@ router.get("/getCourses", checkTeacherAccess, async (req, res) => {
       });
     }
 
-     // 執行分頁查詢
-     const skip = (currentPage - 1) * limit;
-     const courses = await Course.find(filter)
-       .populate("teacher", "_id userinfo.username userinfo.pictureUrl")
-       .skip(skip)
-       .limit(limit);
+    // 執行分頁查詢
+    const skip = (currentPage - 1) * limit;
+    const courses = await Course.find(filter)
+      .populate("teacher", "_id userinfo.username userinfo.pictureUrl")
+      .skip(skip)
+      .limit(limit);
 
     return res.json({
       success: true,
@@ -116,6 +115,29 @@ router.get("/getCourses", checkTeacherAccess, async (req, res) => {
       },
       "course/index.js",
       "GET /getCourses",
+      req.query,
+      e
+    );
+    return res.status(500).json({ success: false, msg: "伺服器發生問題" });
+  }
+});
+
+router.get("/getGrades", checkTeacherAccess, async (req, res) => {
+  try {
+    const grades = await User.distinct("userinfo.grade");
+    res.json({
+      success: true,
+      data: { grades },
+    });
+  } catch (e) {
+    logError(
+      {
+        userIp: req.ip,
+        userId: req.user._id,
+        userName: req.user.userinfo.realname,
+      },
+      "course/index.js",
+      "GET /getGrades",
       req.query,
       e
     );
