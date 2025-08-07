@@ -31,6 +31,13 @@
       gap: 12px;
       flex-wrap: wrap;
       font-size: clamp(16px, 1.2vw, 20px);
+      .grade-container {
+        display: flex;
+        align-items: center;
+        .input-area{
+          position: relative;
+        }
+      }
       span {
         font-weight: 500;
         color: #333;
@@ -52,6 +59,8 @@
       }
       .role_inputs {
         display: flex;
+        align-items: center;
+        gap: 4px;
       }
       select {
         outline: none;
@@ -168,12 +177,12 @@
         .role_inputs {
           display: flex;
           width: 85%;
-          select{
+          select {
             width: 100%;
           }
         }
       }
-      .btns{
+      .btns {
         flex-direction: column;
         gap: 4px;
       }

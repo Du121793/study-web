@@ -113,6 +113,17 @@
     align-items: center;
   }
 }
+.edit_course_main .edit_course_function_area .input-area-container .grade-input {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.edit_course_main .edit_course_function_area .input-area-container .grade-input .input-area {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
 .edit_course_main .edit_course_function_area .input-area-container .input_area {
   display: flex;
   flex-wrap: wrap;

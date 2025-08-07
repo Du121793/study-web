@@ -94,29 +94,6 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, cours
       })
   }
 
-  // 控制訊息
-  const messageControl = (info, isSuccess) => {
-    setMessage(info)
-    setMessageStatus(true)
-    if (isSuccess) {
-      setMessageColor('rgba(195, 240, 178, 0.8)')
-    } else {
-      setMessageColor('rgba(240, 178, 178, 0.8)')
-    }
-
-    // 清除之前的 timer
-    if (messageTimer.current) clearTimeout(messageTimer.current)
-    if (resetTimer.current) clearTimeout(resetTimer.current)
-
-    messageTimer.current = setTimeout(() => {
-      setMessageStatus(false)
-      resetTimer.current = setTimeout(() => {
-        setMessage('無訊息')
-        setMessageColor('')
-      }, 200)
-    }, 2000)
-  }
-
   // 移除資料夾
   const removeFolder = (folder_id) => {
     if (folder_id) {
@@ -242,12 +219,10 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, cours
         .getFolderQuestions(token, data)
         .then((res) => {
           if (res.message === 'Network Error') {
-            setShowPublicQA(false)
           }
           setTimeout(() => {
             if (!res) {
               setLoading(false)
-              messageControl('回應超時，請稍後在試', false)
             }
           }, 3000)
           if (res?.success) {
@@ -257,8 +232,7 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, cours
           }
         })
         .catch((err) => {
-          console(err)
-          setShowPublicQA(false)
+          console.log(err)
         })
     }
   }
@@ -283,71 +257,68 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, cours
     }
   }, [])
 
-  // // get root
-  // useEffect(() => {
-  //   if (token) {
-  //     setRequesting(true)
-  //     setLoading(true)
-  //     userService.getRootFolder(token).then((res) => {
-  //       if (!res?.success) return
-  //       setRootFolder(res.data.find((item) => item?.name === 'root'))
-  //       setNowFolder(res.data.find((item) => item?.name === 'root')._id)
-  //       const root = res.data.find((item) => item?.name === 'root')
-  //       // 先將捷徑設為root
-  //       setShortcut([root])
-  //       // 檢查是否為root
-  //       if (root?.isRoot === true) {
-  //         let data = { folder_id: root._id }
-  //         userService.getChildFolders(token, data).then((res) => {
-  //           if (res?.success) {
-  //             setChildFolders(res.data)
-  //             setLoading(false)
-  //             setRequesting(false)
-  //           }
-  //         })
-  //       }
-  //     })
-  //   }
-  // }, [token])
+  // get root
+  useEffect(() => {
+    if (token) {
+      setRequesting(true)
+      setLoading(true)
+      userService.getRootFolder(token).then((res) => {
+        if (!res?.success) return
+        setRootFolder(res.data.find((item) => item?.name === 'root'))
+        setNowFolder(res.data.find((item) => item?.name === 'root')._id)
+        const root = res.data.find((item) => item?.name === 'root')
+        // 先將捷徑設為root
+        setShortcut([root])
+        // 檢查是否為root
+        if (root?.isRoot === true) {
+          let data = { folder_id: root._id }
+          userService.getChildFolders(token, data).then((res) => {
+            if (res?.success) {
+              setChildFolders(res.data)
+              setLoading(false)
+              setRequesting(false)
+            }
+          })
+        }
+      })
+    }
+  }, [token])
 
-  // // get folder's qa
-  // useEffect(() => {
-  //   if (nowFolder) {
-  //     setLoading(true)
-  //     setRequesting(true)
-  //     let data = {
-  //       folder_id: nowFolder,
-  //       page: page,
-  //       pageSize: pageSize,
-  //       sortBy: sortBy,
-  //       sortType: 'none',
-  //       sortOrder: sortOrder,
-  //     }
+  // get folder's qa
+  useEffect(() => {
+    if (nowFolder) {
+      setLoading(true)
+      setRequesting(true)
+      let data = {
+        folder_id: nowFolder,
+        page: page,
+        pageSize: pageSize,
+        sortBy: sortBy,
+        sortType: 'none',
+        sortOrder: sortOrder,
+      }
 
-  //     userService
-  //       .getFolderQuestions(token, data)
-  //       .then((res) => {
-  //         if (res.message === 'Network Error') {
-  //           setShowPublicQA(false)
-  //         }
-  //         setTimeout(() => {
-  //           if (!res) {
-  //             setLoading(false)
-  //             messageControl('回應超時，請稍後在試', false)
-  //           }
-  //         }, 3000)
-  //         if (res?.success) {
-  //           setQAsInfo(res.data)
-  //           setLoading(false)
-  //           setRequesting(false)
-  //         }
-  //       })
-  //       .catch((err) => {
-  //         console(err)
-  //         setShowPublicQA(false)
-  //       })
-  //   }
-  // }, [nowFolder])
+      userService
+        .getFolderQuestions(token, data)
+        .then((res) => {
+          if (res.message === 'Network Error') {s
+          }
+          setTimeout(() => {
+            if (!res) {
+              setLoading(false)
+            }
+          }, 3000)
+          if (res?.success) {
+            setQAsInfo(res.data)
+            setLoading(false)
+            setRequesting(false)
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    }
+  }, [nowFolder])
 
   return (
     <div className={style['show-more-public-main']}>
@@ -356,7 +327,6 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, cours
           className={'g-blue-btn'}
           onClick={() => {
             setVisibility(true)
-            getRoot()
           }}>
           問題資料夾
         </div>

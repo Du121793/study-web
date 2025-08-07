@@ -10,10 +10,13 @@ import ArrowRight from '../../../public/profile/rightArrow.png'
 // 導入method
 import { useUserToken } from '../../../method/useUserToken'
 import adminService from '../../../method/adminService'
+import userService from '../../../method/userService'
 // components
 import BackGround from '../components/back_ground/BackGround'
 import LoadingAnime from '../../../components/loading_anime/LoadingAnime'
 import MessageAnime from '../../../components/message_anime/MessageAnime'
+import DropDown from '../../../components/dropDown/DropDown'
+
 export default function RemoveUsers() {
   const token = useUserToken()
   // get members
@@ -35,6 +38,16 @@ export default function RemoveUsers() {
   const [optionBorder, setOptionBorder] = useState('2px solid rgba(0, 0, 0, 0.2)')
   // 控制訊息
   const [message, setMessage] = useState(null)
+
+  // input的下拉式選單
+  const [gradeList, setGradeList] = useState([])
+  const [gradeListFlag, setGradeListFlag] = useState(false)
+  const [returnValue, setReturnValue] = useState('')
+  const handleBlur = () => {
+    setTimeout(() => {
+      setGradeListFlag(false)
+    }, 20)
+  }
 
   const checkSelectedMembers = () => {}
 
@@ -151,6 +164,10 @@ export default function RemoveUsers() {
     })
   }
 
+  useEffect(() => {
+    setGrade(returnValue)
+  }, [returnValue])
+
   // 刷新渲染使用者資料
   useEffect(() => {
     if (token) {
@@ -165,6 +182,11 @@ export default function RemoveUsers() {
           setGetUsers(res.data)
           setLoading(false)
         }
+      })
+    }
+    if (token) {
+      userService.getGradeList(token).then((res) => {
+        setGradeList(res.data.grades)
       })
     }
   }, [token, page])
@@ -209,14 +231,28 @@ export default function RemoveUsers() {
           {/* 輸入年級 */}
           <div className={`${style.top_info_input}`}>
             <div className={style.title}>年級 :</div>
-            <input
-              onChange={(e) => {
-                setGrade(e.target.value)
-              }}
-              className={`${style.grade_input}`}
-              type="text"
-              placeholder="選填"
-            />
+            <div className={style['input-area']}>
+              <input
+                onFocus={() => {
+                  setGradeListFlag(true)
+                }}
+                onBlur={() => {
+                  handleBlur()
+                }}
+                onChange={(e) => {
+                  setGrade(e.target.value)
+                }}
+                value={grade}
+                className={`${style.grade_input}`}
+                type="text"
+                placeholder="選填"
+              />
+              {gradeListFlag && (
+                <DropDown
+                  setReturnValue={setReturnValue}
+                  dataList={gradeList}></DropDown>
+              )}
+            </div>
           </div>
         </div>
         {/* 搜尋選項: 用戶ID，身分組 */}

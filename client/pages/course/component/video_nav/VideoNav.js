@@ -30,11 +30,10 @@ const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
 export default function VideoNav({ course_id, courseName, user_role, setLoading }) {
   const token = useUserToken()
-  const flags = useRef({ videoInfo: false })
   // 控制頁面scroll狀態
   const [page_body, setPage_body] = useState([])
   // nav 高度- 使用 ref 與 state 控制展開/收合
-  const [videoNavOpen, setVideoNavOpen] = useState(false)
+  const [videoNavOpen, setVideoNavOpen] = useState(true)
   const videoContentRef = useRef(null)
   const [videoContentHeight, setVideoContentHeight] = useState(0)
   // 控制上傳影片UI
@@ -81,7 +80,6 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
   const inputRef = useRef(null)
   const videoRef = useRef(null)
   const loadMoreRef = useRef(null)
-  const [navTotalHeight, setNavTotalHeight] = useState(0)
   const isClient = typeof window === 'object'
   // 影片區域動態變更內容寬度
   const [videoCardWidth, setVideoCardWidth] = useState(0)
@@ -256,32 +254,6 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
     return page
   }
 
-  function getVideos() {
-    if (token && course_id) {
-      setLoading(true)
-      userService
-        .getVideoInfo(token, course_id, {
-          type: 'MainClass',
-          page: page,
-          pageSize: pageSize,
-          // 類型
-          sortBy: chooseType,
-          // 順序
-          sortOrder: chooseSortOrder,
-        })
-        .then((res) => {
-          if (res?.success) {
-            setLoading(false)
-            setVideoLoading(false)
-            setVideos(res.data)
-            setTotalPage(res.totalPage)
-          } else {
-            messageControl('發生錯誤', false)
-          }
-        })
-    }
-  }
-
   // 若是任何一個有改變，重新發一次影片請求
   useEffect(() => {
     if (token && course_id) {
@@ -340,7 +312,7 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
   // 控制nav高度
   useEffect(() => {
     if (videoNavOpen && inputRef && videoRef && loadMoreRef) {
-      setVideoContentHeight(inputRef?.current?.scrollHeight + videoRef?.current?.scrollHeight + loadMoreRef?.current?.scrollHeight + 100)
+      setVideoContentHeight(videoRef?.current?.scrollHeight + componentsRef?.current?.scrollHeight)
     }
   }, [videos, videoNavOpen])
 
@@ -633,6 +605,9 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
                         alt={item.title}
                         width={0}
                         height={0}
+                        onLoadingComplete={() => {
+                          setVideoContentHeight(videoRef?.current?.scrollHeight + componentsRef?.current?.scrollHeight)
+                        }}
                       />
                     ) : (
                       <Image
@@ -642,6 +617,9 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
                         alt={'no videos shot icon'}
                         width={0}
                         height={0}
+                        onLoadingComplete={() => {
+                          setVideoContentHeight(videoRef?.current?.scrollHeight + componentsRef?.current?.scrollHeight)
+                        }}
                       />
                     )}
                     {/* 影片長度 */}

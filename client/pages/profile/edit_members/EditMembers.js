@@ -4,6 +4,7 @@ import Image from 'next/image'
 import style from './style.module.css'
 // method
 import adminService from '../../../method/adminService'
+import userService from '../../../method/userService'
 import { useUserToken } from '../../../method/useUserToken'
 //public
 import dbArrowLeft from '../../../public/profile/doubleArrowLeft.png'
@@ -58,6 +59,20 @@ export default function EditMembers() {
   const [role, setRole] = useState('')
   // 用於搜索身分組時，根據該課程所有id匹配
   const [courseMemberIds, setCourseMemberIds] = useState([])
+
+  // input的下拉式選單
+  const [gradeList, setGradeList] = useState([])
+  const [gradeListFlag, setGradeListFlag] = useState(false)
+  const [returnValue, setReturnValue] = useState('')
+  const handleBlur = () => {
+    setTimeout(() => {
+      setGradeListFlag(false)
+    }, 20)
+  }
+  useEffect(() => {
+    setGradeInput(returnValue)
+  }, [returnValue])
+
   // 初始化選擇狀態
   const initSelector = () => {
     let allActive = document.querySelectorAll('.select-active')
@@ -107,7 +122,7 @@ export default function EditMembers() {
           if (res.success) {
             setLoading(false)
             initSelector()
-            getMembers()('加入到課程', true)
+            getMembers()
           } else {
             setLoading(false)
             setMessage('發生錯誤', false)
@@ -413,6 +428,11 @@ export default function EditMembers() {
           initSelector()
           setMessage('發生錯誤', false)
         }
+      })
+    }
+    if (token) {
+      userService.getGradeList(token).then((res) => {
+        setGradeList(res.data.grades)
       })
     }
   }, [token])

@@ -42,6 +42,8 @@
       .btn-area {
         display: flex;
         justify-content: space-between;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 12px;
       }
 
       .input-area {
@@ -53,35 +55,39 @@
 
       .shortcut-area {
         display: flex;
-        align-items: center;
         flex-wrap: wrap;
-        gap: 12px;
+        align-items: center;
+        width: 100%;
+        gap: 24px;
+        border-bottom: 1px solid #ccc;
+        padding: 12px 0;
         .shortcut {
           display: flex;
           align-items: center;
           .home-icon {
-            border-radius: 64px;
-            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 8px 12px;
+            border-radius: 8px;
             transition: 0.2s;
-            padding: 2px;
-          }
-          .home-icon:hover {
-            background-color: #e0e0e0;
+            &:hover {
+              background-color: #cdcdcd;
+            }
           }
           .folder-area {
             display: flex;
             align-items: center;
-            gap: 4px;
-            border: 1px solid rgba(0, 0, 0, 0.211);
-            border-radius: 4px;
-            padding: 2px 8px;
+            gap: 8px;
+            border: 1px solid #ccc;
+            padding: 6px 12px;
+            border-radius: 8px;
             transition: 0.2s;
-            .name {
-              font-size: clamp(16px, 1.2vw, 24px);
+            &:hover {
+              background-color: #cdcdcd;
             }
           }
-          .folder-area:hover {
-            background-color: #e0e0e0;
+          .container {
+            display: flex;
+            align-items: center;
           }
         }
         .content {
@@ -110,21 +116,19 @@
         .folder-btn {
           display: flex;
           align-items: center;
-          gap: 12px;
           cursor: pointer;
-          min-width: 230px;
-          height: 60px;
-          border: 1px solid rgba(0, 0, 0, 0.211);
-          border-radius: 4px;
           transition: 0.2s;
           .inner-content {
-            width: 100%;
             display: flex;
-            justify-content: flex-start;
             align-items: center;
-            position: relative;
-            gap: 8px;
-            padding: 0 16px;
+            gap: 12px;
+            border: 1px solid #ccc;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: 0.2s;
+            &:hover {
+              background-color: #e9e9e9;
+            }
             .g-green-btn {
               position: absolute;
               right: 14px;

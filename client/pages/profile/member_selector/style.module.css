@@ -34,6 +34,13 @@
   flex-wrap: wrap;
   font-size: clamp(16px, 1.2vw, 20px);
 }
+.member_select_area .classification .search_inputs .grade-container {
+  display: flex;
+  align-items: center;
+}
+.member_select_area .classification .search_inputs .grade-container .input-area {
+  position: relative;
+}
 .member_select_area .classification .search_inputs span {
   font-weight: 500;
   color: #333;
@@ -55,6 +62,8 @@
 }
 .member_select_area .classification .search_inputs .role_inputs {
   display: flex;
+  align-items: center;
+  gap: 4px;
 }
 .member_select_area .classification .search_inputs select {
   outline: none;

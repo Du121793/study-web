@@ -108,6 +108,17 @@
       @media (max-width: 860px) {
         align-items: center;
       }
+      .grade-input {
+        display: flex;
+        align-items: center;
+        position: relative;
+        .input-area {
+          position: relative;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+      }
       .input_area {
         display: flex;
         flex-wrap: wrap;

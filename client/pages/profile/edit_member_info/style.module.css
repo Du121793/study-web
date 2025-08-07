@@ -32,6 +32,9 @@
   padding: 0 12px;
   gap: 8px;
 }
+.edit_members_info_main .search_area .input_area .grade .input-area {
+  position: relative;
+}
 .edit_members_info_main .search_area .input_area .content {
   font-size: clamp(16px, 1.2vw, 20px);
 }

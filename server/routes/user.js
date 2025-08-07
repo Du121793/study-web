@@ -279,7 +279,7 @@ router.get("/getMembers", checkTeacherAccess, async (req, res) => {
       filter.role = role;
     }
     if (courses) {
-      filter.courses = courses;
+      filter.courses = { $in: [ courses ] };
     }
     if (withoutCourses) {
       filter.courses = { $nin: [withoutCourses] };

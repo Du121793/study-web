@@ -343,6 +343,7 @@ export default function QaPage() {
 
       {imageIsZoom && (
         <ImageZoom
+          imageIsZoom={imageIsZoom}
           setImageIsZoom={setImageIsZoom}
           imageUrl={zoomImage}
         />

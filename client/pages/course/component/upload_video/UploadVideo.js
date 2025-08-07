@@ -541,7 +541,7 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
                     type="radio"
                     name="contact"
                     defaultValue="confirm"
-                    defaultChecked={!isPublic}
+                    defaultChecked={true}
                     onClick={() => {
                       setIsPublic(false)
                     }}
@@ -553,7 +553,7 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
                     type="radio"
                     name="contact"
                     defaultValue="reject"
-                    defaultChecked={isPublic}
+                    defaultChecked={false}
                     onClick={() => {
                       setIsPublic(true)
                     }}

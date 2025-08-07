@@ -32,6 +32,11 @@
       justify-content: center;
       width: 100%;
       gap: 12px;
+      .top_info_input {
+        .input-area {
+          position: relative;
+        }
+      }
       div {
         display: flex;
         align-items: center;

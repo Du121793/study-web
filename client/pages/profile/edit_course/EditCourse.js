@@ -15,9 +15,11 @@ import complateIcon from '../../../public/global/complate.png'
 // components
 import BackGround from '../components/back_ground/BackGround'
 import MemberSelector from '../member_selector/MemberSelector'
+import DropDown from '../../../components/dropDown/DropDown'
 // global
 import LoadingAnime from '../../../components/loading_anime/LoadingAnime'
 import MessageAnime from '../../../components/message_anime/MessageAnime'
+import userService from '../../../method/userService'
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
@@ -25,7 +27,6 @@ export default function EditCourse() {
   // session
   const [user_id, setUser_id] = useState('')
   const [user_name, setUser_name] = useState('')
-  //
   const [courseLoading, setCourseLoading] = useState(false)
   const token = useUserToken()
   const [editStatusIndex, setEditStatusIndex] = useState(null)
@@ -61,6 +62,31 @@ export default function EditCourse() {
   const [searchInput, setSearchInput] = useState('')
   // 控制訊息
   const [message, setMessage] = useState(null)
+  // 取得grade list
+  // input的下拉式選單
+  const [gradeList, setGradeList] = useState([])
+  const [gradeListFlag, setGradeListFlag] = useState(false)
+  const [returnValue, setReturnValue] = useState('')
+
+  // 初始化Msg與loading
+  const initMessage = () => {
+    setTimeout(() => {
+      setMessage('')
+    }, 2000)
+    setLoading(false)
+  }
+
+  // 初始化新增課程用的欄位
+  const initAddInfo = () => {
+    setGradeInput('')
+    setSubjectInput('')
+    setClassInput('')
+  }
+  const handleBlur = () => {
+    setTimeout(() => {
+      setGradeListFlag(false)
+    }, 20)
+  }
 
   // 參數:總頁數，中間頁數，從中間往左右總共要幾頁
   function getPage(total, thisPage, pageSize = 5) {
@@ -107,53 +133,92 @@ export default function EditCourse() {
     })
   }
 
-  const initAddInfo = () => {
-    // 清空新增課程用的欄位
-    setGradeInput('')
-    setSubjectInput('')
-    setClassInput('')
-  }
-
   // 1. 新增課程
   // 2. 當addThenRegister為true，將學生註冊到新增的課程
   const addNewCourse = () => {
-    if (courseNameInput !== '') {
-      courseInfo = {
-        grade: gradeInput.trim(),
-        subject: subjectInput.trim(),
-        courseClass: classInput.trim(),
-        courseName: courseNameInput.trim(),
-        teacherId: teachers !== '' ? seletedTeacher : undefined,
-      }
-      setLoading(true)
-      adminService.createANewCourse(token, courseInfo).then((res) => {
-        let data = {
-          page: page,
-          pageSize: pageSize,
+    if (courseNameInput === '') {
+      setMessage('資料提供不完整')
+      initMessage()
+      return
+    }
+
+    courseInfo = {
+      grade: gradeInput.trim(),
+      subject: subjectInput.trim(),
+      courseClass: classInput.trim(),
+      courseName: courseNameInput.trim(),
+      teacherId: teachers !== '' ? seletedTeacher : undefined,
+    }
+    let data = {
+      page: page,
+      pageSize: pageSize,
+    }
+    setLoading(true)
+    adminService
+      .createANewCourse(token, courseInfo)
+      .then((res) => {
+        // 檢查請求成功
+        if (res.success) {
+          // 沒有選擇新增成員到課程
+          if (!addThenRegister) {
+            setMessage('新增成功')
+            return
+          }
+          // 有選擇新增成員到課程但是沒有選擇成員
+          if (selectedStudentId.length === 0 && addThenRegister) {
+            setMessage('新增成功')
+            return
+          }
         }
-        if (res.success && !addThenRegister) {
-          setMessage(res.msg)
-        } else {
-          setMessage(res.data.msg)
+        if (res?.success === false) {
+          if (res?.msg === '資料提供不完整') {
+            setMessage('資料提供不完整')
+            console.error(res)
+            initMessage()
+            return
+          } else if (res?.msg === '你已經有一樣名稱，科目，年級，班級的課程了') {
+            setMessage(`你已經有一樣名稱，科目，年級，班級的課程了`)
+            console.error(res)
+            return
+          } else {
+            setMessage(`發生錯誤`)
+            console.error(res)
+            return
+          }
         }
-        setLoading(true)
-        // 如果有選擇學生，並且addThenRegister為true，
-        // (有勾選是否要在新增課程時也將選擇的成員加入課程)
+        // 檢查是否有選擇學生
+        // 檢查是否勾選是否要在新增課程時也將選擇的成員加入課程
         if (selectedStudentId.length && addThenRegister) {
+          setLoading(true)
           data = {
             user_ids: selectedStudentId,
             // 將已選取的舊課程，以及新課程的都放在同一個陣列內
             course_ids: [...courses, res.data._id],
           }
-          adminService.registerMember(token, data).then((res) => {
-            if (res.success) {
-              setMessage(`${res.msg}`)
-              return
-            } else {
+          adminService
+            .registerMember(token, data)
+            .then((res) => {
+              if (res?.success) {
+                setMessage('新增成功')
+                return
+              }
+              if (res?.success === false && res?.msg === '你已經有一樣名稱，科目，年級，班級的課程了') {
+                setMessage(`你已經有一樣名稱，科目，年級，班級的課程了`)
+                console.error(res)
+                return
+              } else {
+                setMessage(`發生錯誤`)
+                console.error(res)
+                return
+              }
+            })
+            .catch((err) => {
               setMessage(`發生錯誤`)
-            }
-            setLoading(false)
-          })
+              console.error(err)
+            })
+            .finally(() => {
+              initMessage()
+            })
         }
         // 初始化: 課程list，input欄位
         adminService.getCourses(token, data).then((res) => {
@@ -164,10 +229,17 @@ export default function EditCourse() {
           setCourseNameInput('')
         })
       })
-    }
+      .catch((err) => {
+        console.error(err)
+        setMessage('發生錯誤')
+      })
+      .finally(() => {
+        initMessage()
+        initAddInfo()
+      })
   }
 
-  // 垃圾桶icon ， 刪除課程
+  // 點擊垃圾桶icon ， 刪除課程
   const deleteCourse = () => {
     if (needToDeleteCourseId !== '') {
       let data = {
@@ -190,7 +262,7 @@ export default function EditCourse() {
     }
   }
 
-  // 小鉛筆icon，編輯課程
+  // 點擊小鉛筆icon，編輯課程
   const editCourse = (_id, courseName, grade, subject, courseClass) => {
     // 先編輯，在取得課程，兩次請求
     const data = {
@@ -220,6 +292,10 @@ export default function EditCourse() {
       }
     })
   }
+
+  useEffect(() => {
+    setGradeInput(returnValue)
+  }, [returnValue])
 
   // 當年級、科目、班級更改時也會更改課名
   useEffect(() => {
@@ -264,6 +340,11 @@ export default function EditCourse() {
         })
       })
     }
+    if (token) {
+      userService.getGradeList(token).then((res) => {
+        setGradeList(res.data.grades)
+      })
+    }
   }, [token, page])
 
   // session取得使用者資料
@@ -277,6 +358,7 @@ export default function EditCourse() {
       setUser_id(id)
     }
   })
+
   const test = () => {}
 
   return (
@@ -286,7 +368,7 @@ export default function EditCourse() {
       {message && (
         <MessageAnime
           message={message}
-          top="50%"
+          top="200px"
           duration={2000}
         />
       )}
@@ -330,15 +412,30 @@ export default function EditCourse() {
         </div>
         <div className={style['input-area-container']}>
           <div className={`${style.input_area}`}>
-            <div>年級:</div>
-            <input
-              type="text"
-              className={`${style.grade_input}`}
-              onChange={(e) => {
-                setGradeInput(e.target.value)
-              }}
-              value={gradeInput}
-            />
+            <div className={style['grade-input']}>
+              <div>年級:</div>
+              <div className={style['input-area']}>
+                <input
+                  type="text"
+                  onFocus={() => {
+                    setGradeListFlag(true)
+                  }}
+                  onBlur={() => {
+                    handleBlur()
+                  }}
+                  onChange={(e) => {
+                    setGradeListFlag(false)
+                    setGradeInput(e.target.value)
+                  }}
+                  value={gradeInput}
+                />
+                {gradeListFlag && (
+                  <DropDown
+                    setReturnValue={setReturnValue}
+                    dataList={gradeList}></DropDown>
+                )}
+              </div>
+            </div>
             <div>科目:</div>
             <input
               type="text"
@@ -417,6 +514,7 @@ export default function EditCourse() {
 
         {addThenRegister && (
           <MemberSelector
+            gradeList={gradeList}
             selectedStudentId={selectedStudentId}
             setSelectedStudentId={setSelectedStudentId}></MemberSelector>
         )}

@@ -1,22 +1,13 @@
+import NextNProgress from 'nextjs-progressbar'
 // style調用
 // global
 import '../styles/global/global.css'
 import '../styles/global/unlogined.css'
+import '../styles/global/dropdown.css'
 // font
 import '../styles/global/font.css'
 // index
 import '../styles/index/index.css'
-// course
-// import '../styles/course/course.css'
-// import '../styles/course/videoUpload.css'
-// import '../styles/course/qaPage.css'
-// import '../styles/course/msgBoard.css'
-// import '../styles/course/imageZoom.css'
-// import '../styles/course/showMoreQA.css'
-// import '../styles/course/showPublicQA.css'
-// import '../styles/course/accessSetting.css'
-// import '../styles/course/studentSelector.css'
-// import '../styles/course/videoSelector.css'
 // course/component
 import '../styles/course/component/editVideoInfo.css'
 import '../styles/component/QA/editQA.css'
@@ -64,6 +55,8 @@ function MyApp({ Component, pageProps }) {
           href={webTitle.src}
         />
       </Head>
+
+      <NextNProgress />
       <Component {...pageProps}></Component>
     </>
   )

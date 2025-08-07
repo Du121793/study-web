@@ -10,7 +10,7 @@
     position: relative;
     width: 100%;
     @media (max-width: 860px) {
-      z-index: 2;
+      z-index: 4;
     }
   }
   .container {
@@ -19,14 +19,15 @@
     flex-direction: column;
     align-items: center;
     position: relative;
-    z-index: 2;
     width: 100%;
+    z-index: 2;
     .header-title-area {
       width: 90%;
       display: flex;
       align-items: center;
       position: relative;
       padding: 12px 0;
+      z-index: 4;
       .left {
         display: flex;
         align-items: flex-end;
@@ -69,6 +70,12 @@
         }
       }
     }
+    .components {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 1;
+    }
     .nav {
       width: 100%;
       position: relative;
@@ -77,6 +84,8 @@
       overflow: hidden;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
       margin-bottom: 24px;
+      position: relative;
+      z-index: 1;
       @media (max-width: 860px) {
       }
       .header {

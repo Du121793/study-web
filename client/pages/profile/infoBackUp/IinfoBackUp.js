@@ -21,19 +21,44 @@ function InfoBackUp() {
 
   const alertList = [`本備份機制僅在緊急遷移服務器或重大資料遺失時使用。`, `使用者若超過 24 小時未重新登入，將無法執行備份或還原等敏感操作。`, `備份會將圖片與文件資料回復至指定的時間點。`, `恢復資料不會回復 Vimeo 影片的狀態，且之後的刪除/新增影片仍會保留。`, `因為 Vimeo 影片狀態不一致，可能導致影片失去索引或殘留於平台，操作前請謹慎。`, `系統最多保留最近 10 筆備份（含手動建立的備份）。`, `每週日凌晨 03:00 執行一次備份，並依排程刪除超出保留上限的舊備份。`, `建議在進行任何還原前先手動建立並下載一筆備份以防萬一。`, `被刪除的備份在移除前可先下載備份檔以保留一份本地備份。`]
 
+  const initMessage = () => {
+    const timer = setTimeout(() => {
+      setHasMessage('')
+    }, 2000)
+    setLoading(false)
+    return clearTimeout(timer)
+  }
+
   // 獲取備份
   const getBackupList = () => {
     const token = localStorage.getItem('token')
     setLoading(true)
-    adminService.getBackupList(token).then((res) => {
-      if (Array.isArray(res.files) && res.files.length >= 0) {
-        const nextArray = res.files.map((item) => {
-          return item.split('.')[0]
-        })
-        setBackupList(nextArray)
-      }
-      setLoading(false)
-    })
+    adminService
+      .getBackupList(token)
+      .then((res) => {
+        if (res.msg === '距離上次登陸超過24小時，請重新登錄') {
+          console.log(123456)
+          setHasMessage('登陸逾期，請重新登錄')
+          initMessage()
+          return
+        }
+        if (res?.status === 401) {
+          setHasMessage('登陸逾期，請重新登錄')
+        }
+        if (Array.isArray(res.files) && res.files.length >= 0) {
+          const nextArray = res.files.map((item) => {
+            return item.split('.')[0]
+          })
+          setBackupList(nextArray)
+        }
+      })
+      .catch((err) => {
+        setHasMessage('發生錯誤')
+        console.error(err)
+      })
+      .finally(() => {
+        initMessage()
+      })
   }
   // 執行備份
   const runBackup = () => {
@@ -41,6 +66,12 @@ function InfoBackUp() {
     setLoading(true)
     adminService.runBackup(token).then((res) => {
       if (res?.success) getBackupList()
+      if (res?.status === 401) {
+        setHasMessage('登陸逾期，請重新登錄')
+      }
+      setTimeout(() => {
+        setHasMessage(null)
+      }, 1000)
     })
     setLoading(false)
   }
@@ -50,10 +81,12 @@ function InfoBackUp() {
     setLoading(true)
     if (filename) {
       adminService.downloadBackup(token, filename + '.zip').then((res) => {
+        if (res?.msg === '距離上次登陸超過24小時，請重新登錄') {
+          setHasMessage('登陸逾期，請重新登錄')
+          return
+        }
         const blob = res // 這裡直接就是 Blob，res === response.data
-
         const url = window.URL.createObjectURL(blob)
-
         const a = document.createElement('a')
         a.href = url
         a.download = `${filename}.zip`
@@ -74,9 +107,12 @@ function InfoBackUp() {
     setColdDown(true)
     adminService
       .applyBackup(token, filename + '.zip', body)
-      .then(() => {
+      .then((res) => {
         setLoading(false)
         setHasMessage('成功套用')
+        if (res?.status === 401) {
+          setHasMessage('登陸逾期，請重新登錄')
+        }
       })
       .then(() => {
         setTimeout(() => {
@@ -95,6 +131,9 @@ function InfoBackUp() {
       if (res?.success) {
         getBackupList()
         setHasMessage('成功刪除')
+      }
+      if (res?.status === 401) {
+        setHasMessage('登陸逾期，請重新登錄')
       }
       setTimeout(() => {
         setHasMessage(null)

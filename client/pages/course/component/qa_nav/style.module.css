@@ -98,7 +98,7 @@
 .qa-nav .QA-area .container .QA-header .show-delete-btn:hover {
   background-color: #e7a5a5;
 }
-.qa-nav .QA-area .container .page-switch {
+.qa-nav .QA-area .container .page-switch-area {
   width: 100%;
   display: flex;
   align-items: center;
@@ -121,22 +121,38 @@
 .qa-nav .QA-area .container .QA-grid .QA-container {
   min-height: 80px;
   padding: 0 24px 24px 24px;
-  display: flex;
-  justify-content: flex-start;
+  display: grid;
   flex-wrap: wrap;
   gap: 12px;
+}
+@media (min-width: 1920px) {
+  .qa-nav .QA-area .container .QA-grid .QA-container {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+@media (max-width: 1920px) {
+  .qa-nav .QA-area .container .QA-grid .QA-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+@media (max-width: 1280px) {
+  .qa-nav .QA-area .container .QA-grid .QA-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 945px) {
+  .qa-nav .QA-area .container .QA-grid .QA-container {
+    grid-template-columns: repeat(1, 1fr);
+  }
 }
 @media (max-width: 860px) {
   .qa-nav .QA-area .container .QA-grid .QA-container {
     width: 80vw;
     padding: 0;
-    flex-direction: column;
-    align-items: center;
   }
 }
 .qa-nav .QA-area .container .QA-grid .QA-container .QA-list {
   margin-bottom: 32px;
-  min-width: 220px;
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -145,16 +161,23 @@
   border-radius: 8px;
   gap: 18px;
   background-color: rgb(244, 244, 244);
+  min-width: 80%;
 }
-@media (max-width: 860px) {
+@media (max-width: 945px) {
   .qa-nav .QA-area .container .QA-grid .QA-container .QA-list {
     min-width: 100%;
   }
 }
 .qa-nav .QA-area .container .QA-grid .QA-container .QA-list .QA-tag {
   display: flex;
+  justify-content: center;
+  width: 100%;
+  cursor: pointer;
 }
 .qa-nav .QA-area .container .QA-grid .QA-container .QA-list .QA-tag .content {
+  display: flex;
+  justify-content: center;
+  min-width: 60%;
   font-weight: bold;
   font-size: 22px;
   padding: 4px 8px;
@@ -206,13 +229,14 @@
 }
 .qa-nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .qa-info-title {
   display: flex;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 4px;
 }
 .qa-nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info .qa-info-title .content {
   font-weight: bold;
   font-size: 18px;
-  padding: 4px 8px;
+  padding: 4px 24px;
   background-color: #b9cdf9;
   border-radius: 4px;
   box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
@@ -260,6 +284,9 @@
 }
 .qa-nav .QA-area .container .QA-grid .QA-container .QA-list .qa-info:hover {
   background-color: #dfefff;
+}
+.qa-nav .QA-area .container .QA-grid .QA-container .QA-list.hidden {
+  height: 38px;
 }
 .qa-nav .QA-area .container .QA-grid .QA-container .qa-info-area {
   color: black;

@@ -499,6 +499,31 @@ const userService = {
       }
     }
   },
+
+  async getGradeList(token) {
+    /**
+     * 獲取現有的年級
+     * @route GET /course/getGrades
+     */
+    try {
+      const authHeader = token ? { Authorization: token } : {}
+      const response = await axios.get(API_URL + `/course/getGrades`, {
+        headers: authHeader,
+      })
+
+      return response.data
+    } catch (e) {
+      if (e.response?.status === 401) {
+        signOut()
+        return
+      }
+      if (e.response?.data) {
+        return e.response.data
+      } else {
+        return e
+      }
+    }
+  },
 }
 
 export default userService

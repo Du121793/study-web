@@ -20,25 +20,36 @@
   gap: 12px;
 }
 .student-selector-main .student-selector-container .title {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 12px;
   font-size: 24px;
 }
 .student-selector-main .student-selector-container .search-area {
   display: flex;
 }
 .student-selector-main .student-selector-container .info-area {
-  max-height: 200px;
+  width: 100%;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 18px;
+  padding: 12px 0 24px 0;
+  border-bottom: 1px solid #ccc;
 }
 .student-selector-main .student-selector-container .info-area .member-info {
   cursor: pointer;
   display: flex;
-  border: 1px solid rgba(0, 0, 0, 0.4);
+  border: 1px solid #ccc;
   border-radius: 6px;
-  padding: 4px;
+  padding: 6px 12px;
   transition: 0.2s;
+  font-weight: 500;
+}
+.student-selector-main .student-selector-container .info-area .member-info:hover {
+  background-color: #e5f9e6;
 }
 .student-selector-main .student-selector-container .info-area .member-info .name {
   min-width: 100px;
@@ -56,10 +67,11 @@
 .student-selector-main .student-selector-container .info-area .active {
   background-color: #d2f8b3;
 }
-.student-selector-main .student-selector-container .finish-btn {
-  border: 1px solid rgba(0, 0, 0, 0.4);
-  padding: 4px 6px;
-  border-radius: 4px;
+.student-selector-main .student-selector-container .btn-area {
+  display: flex;
+  gap: 8px;
+}
+.student-selector-main .student-selector-container .btn-area .finish-btn {
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;

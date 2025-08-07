@@ -29,8 +29,6 @@ export default function BoardPage() {
   const [userRole, setUserRole] = useState(null)
   // 初始設為 null，代表尚未取得公告資料
   const [boardInfo, setBoardInfo] = useState(null)
-  // 編輯公告
-  const [editBoard, setEditBoard] = useState(false)
   // 二次確認刪除
   const [dbcheckDelete, setDbcheckDelete] = useState(false)
   // loading anime
@@ -39,36 +37,7 @@ export default function BoardPage() {
   const [message, setMessage] = useState('無訊息')
   const [messageStatus, setMessageStatus] = useState(false)
   const [messageColor, setMessageColor] = useState('')
-  // 綁定timeout，用於重計
-  const messageTimer = useRef(null)
-  const resetTimer = useRef(null)
-  //
   const [popUp, setHasPop] = useState(false)
-
-  const test = () => {}
-
-  // 控制訊息
-  const messageControl = (info, isSuccess) => {
-    setMessage(info)
-    setMessageStatus(true)
-    if (isSuccess) {
-      setMessageColor('rgba(195, 240, 178, 0.8)')
-    } else {
-      setMessageColor('rgba(240, 178, 178, 0.8)')
-    }
-
-    // 清除之前的 timer
-    if (messageTimer.current) clearTimeout(messageTimer.current)
-    if (resetTimer.current) clearTimeout(resetTimer.current)
-
-    messageTimer.current = setTimeout(() => {
-      setMessageStatus(false)
-      resetTimer.current = setTimeout(() => {
-        setMessage('無訊息')
-        setMessageColor('')
-      }, 200)
-    }, 2000)
-  }
 
   // 刪除公告
   const deletBoard = () => {
