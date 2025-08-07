@@ -113,22 +113,21 @@ export default function CoursePage() {
             </Link>
           </div>
         </div>
-        <div className="components">
-          {/* 影片組件 */}
-          <VideoNav
-            user_role={userRole}
-            course_id={courseId}
-            courseName={courseName}
-            setLoading={setLoading}></VideoNav>
-          {/* Q&A 組件 */}
-          <QaNav
-            qaHasUpload={qaHasUpload}
-            setQaHasUpload={setQaHasUpload}
-            user_role={userRole}
-            course_id={courseId}
-            courseName={courseName}
-            setLoading={setLoading}></QaNav>
-        </div>
+
+        {/* 影片組件 */}
+        <VideoNav
+          user_role={userRole}
+          course_id={courseId}
+          courseName={courseName}
+          setLoading={setLoading}></VideoNav>
+        {/* Q&A 組件 */}
+        <QaNav
+          qaHasUpload={qaHasUpload}
+          setQaHasUpload={setQaHasUpload}
+          user_role={userRole}
+          course_id={courseId}
+          courseName={courseName}
+          setLoading={setLoading}></QaNav>
       </div>
       <Footer></Footer>
     </div>

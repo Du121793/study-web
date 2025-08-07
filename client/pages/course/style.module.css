@@ -75,10 +75,7 @@
   background-color: #ececec;
 }
 .course-main .container .components {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  z-index: 1;
+  width: 100%;
 }
 .course-main .container .nav {
   width: 100%;
