@@ -6,7 +6,7 @@ import style from './style.module.css'
 // method
 import { useUserToken } from '../../../method/useUserToken'
 import adminService from '../../../method/adminService'
-
+import userService from '../../../method/userService'
 //public
 import dbArrowLeft from '../../../public/profile/doubleArrowLeft.png'
 import dbArrowRight from '../../../public/profile/doubleArrowRight.png'
@@ -17,6 +17,8 @@ import ArrowRight from '../../../public/profile/rightArrow.png'
 import BackGround from '../components/back_ground/BackGround'
 import LoadingAnime from '../../../components/loading_anime/LoadingAnime'
 import MessageAnime from '../../../components/message_anime/MessageAnime'
+import DropDown from '../../../components/dropDown/DropDown'
+
 export default function EditMembersInfo() {
   const token = useUserToken()
 
@@ -47,6 +49,15 @@ export default function EditMembersInfo() {
   const [message, setMessage] = useState(null)
   // 旋轉讀取
   const [loading, setLoading] = useState(false)
+  // 下拉選單
+  const [gradeList, setGradeList] = useState([])
+  const [gradeListFlag, setGradeListFlag] = useState(false)
+  const [returnValue, setReturnValue] = useState('')
+  const handleBlur = () => {
+    setTimeout(() => {
+      setGradeListFlag(false)
+    }, 20)
+  }
 
   const test = () => {}
 
@@ -177,6 +188,10 @@ export default function EditMembersInfo() {
     }, 2000)
   }
 
+  useEffect(() => {
+    setSearchGrade(returnValue)
+  }, [returnValue])
+
   // getMembers
   useEffect(() => {
     if (token) {
@@ -187,13 +202,17 @@ export default function EditMembersInfo() {
       }
       adminService.getMembers(token, data).then((res) => {
         if (res?.success) {
-          console.log(res.data)
           setLoading(false)
           setTotalPage(res.totalPage)
           setMembers(res.data)
         } else {
           setLoading(false)
         }
+      })
+    }
+    if (token) {
+      userService.getGradeList(token).then((res) => {
+        setGradeList(res.data.grades)
       })
     }
   }, [token, page])
@@ -241,15 +260,28 @@ export default function EditMembersInfo() {
           </div>
           <div className={style.grade}>
             <div className={style.content}>年級</div>
-            <input
-              type="text"
-              ref={GradeRef}
-              placeholder="可選"
-              defaultValue={searchGrade}
-              onChange={(e) => {
-                setSearchGrade(e.target.value)
-              }}
-            />
+            <div className={style['input-area']}>
+              <input
+                type="text"
+                ref={GradeRef}
+                placeholder="可選"
+                value={searchGrade}
+                onFocus={() => {
+                  setGradeListFlag(true)
+                }}
+                onBlur={() => {
+                  handleBlur()
+                }}
+                onChange={(e) => {
+                  setSearchGrade(e.target.value)
+                }}
+              />
+              {gradeListFlag && (
+                <DropDown
+                  dataList={gradeList}
+                  setReturnValue={setReturnValue}></DropDown>
+              )}
+            </div>
           </div>
           <div className={style.id}>
             <div className={style.content}>用戶ID</div>

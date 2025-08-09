@@ -12,7 +12,10 @@ import dbArrowLeft from '../../../public/profile/doubleArrowLeft.png'
 import dbArrowRight from '../../../public/profile/doubleArrowRight.png'
 import ArrowLeft from '../../../public/profile/leftArrow.png'
 import ArrowRight from '../../../public/profile/rightArrow.png'
-export default function MemberSelector({ selectedStudentId, setSelectedStudentId }) {
+// component
+import DropDown from '../../../components/dropDown/DropDown'
+
+export default function MemberSelector({ gradeList, selectedStudentId, setSelectedStudentId }) {
   // env
   const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
   const [isSelectAllCheckbox, setIsSelectAllCheckbox] = useState(false)
@@ -39,6 +42,17 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
   // 獲取資料
   const [members, setMembers] = useState([])
   const [totalArray, setTotalArray] = useState([])
+  // input的下拉式選單
+  const [gradeListFlag, setGradeListFlag] = useState(false)
+  const [returnValue, setReturnValue] = useState('')
+  const handleBlur = () => {
+    setTimeout(() => {
+      setGradeListFlag(false)
+    }, 20)
+  }
+  useEffect(() => {
+    setGradeInput(returnValue)
+  }, [returnValue])
 
   // 參數:總頁數，中間頁數，從中間往左右總共要幾頁
   function getPage(total, thisPage, pageSize = 5) {
@@ -222,15 +236,29 @@ export default function MemberSelector({ selectedStudentId, setSelectedStudentId
             />
           </div>
           {/* 年級 */}
-          <div>
+          <div className={style['grade-container']}>
             <span>年級:</span>
-            <input
-              className={`${style.input_grade}`}
-              onChange={(e) => {
-                setGradeInput(e.target.value)
-              }}
-              type="text"
-            />
+            <div className={style['input-area']}>
+              <input
+                className={`${style.input_grade}`}
+                onChange={(e) => {
+                  setGradeInput(e.target.value)
+                }}
+                onFocus={() => {
+                  setGradeListFlag(true)
+                }}
+                onBlur={() => {
+                  handleBlur()
+                }}
+                value={gradeInput}
+                type="text"
+              />
+              {gradeListFlag && (
+                <DropDown
+                  setReturnValue={setReturnValue}
+                  dataList={gradeList}></DropDown>
+              )}
+            </div>
           </div>
           {/* 身分組 */}
           <div className={`${style.role_inputs}`}>

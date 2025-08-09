@@ -1,18 +1,17 @@
-// 組件庫
+// 原生組件庫
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
 // method
-import { useUserToken } from '../../../method/useUserToken'
 import userService from '../../../method/userService'
 // public
 import blackRightArrow from '../../../public/arrow/right_arrow_black.png'
 import blackleftArrow from '../../../public/arrow/left_arrow_black.png'
 // css
 import style from './banner.module.css'
-
+// component
+import LoadingAnime from '../../../components/loading_anime/LoadingAnime'
+import MessageAnime from '../../../components/message_anime/MessageAnime'
 export default function Banner({ bannerHasChange = null, initialCarousel = [] }) {
-  const token = useUserToken()
-  const [role, setRole] = useState('')
   const [carousel, setCarousel] = useState(initialCarousel)
   // currentIndex 以克隆後的陣列來定位，初始值為 1（即第一個真實圖片）
   const [currentIndex, setCurrentIndex] = useState(1)
@@ -22,10 +21,21 @@ export default function Banner({ bannerHasChange = null, initialCarousel = [] })
   const [slides, setSlides] = useState([])
   const [slideCount, setSlideCount] = useState([])
   const autoSlideRef = useRef(null)
-  // 旋轉讀取
+  // UX
   const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
   // 節流鎖
   const lockRef = useRef(false)
+
+  const initUX = () => {
+    const timer = setTimeout(() => {
+      setMessage('')
+    }, 2000)
+    setLoading(false)
+    return () => {
+      clearTimeout(timer)
+    }
+  }
 
   // 利用克隆方法：當原始陣列不為空時，在前面加上最後一張，在後面加上第一張
   const getSlides = useCallback(() => {
@@ -40,12 +50,6 @@ export default function Banner({ bannerHasChange = null, initialCarousel = [] })
     slides.push(carousel[0]) // 克隆第一張放最後面
     setSlides(slides)
   })
-
-  useEffect(() => {
-    if (carousel) {
-      getSlides()
-    }
-  }, [carousel])
 
   const nextSlide = () => {
     if (lockRef.current) return
@@ -96,22 +100,23 @@ export default function Banner({ bannerHasChange = null, initialCarousel = [] })
     setTransitionEnabled(true)
   }
 
-  // 取得 user_role
-  useEffect(() => {
-    const userRole = localStorage.getItem('user_role')
-    if (userRole) setRole(userRole)
-  }, [])
-
   // 取得輪播圖圖片（這裡假設回傳的資料為圖片 URL 陣列）
   useEffect(() => {
     setLoading(true)
-    userService.getCarousels().then((res) => {
-      if (res.success) {
-        setLoading(false)
-        setCarousel(res.data)
-        setCurrentIndex(1) // 重新設定起始位置
-      }
-    })
+    userService
+      .getCarousels()
+      .then((res) => {
+        if (res.success) {
+          setCarousel(res.data)
+          setCurrentIndex(1) // 重新設定起始位置
+        } else {
+          setMessage('發生錯誤')
+        }
+      })
+      .catch((err) => setMessage('發生錯誤'))
+      .finally(() => {
+        initUX()
+      })
   }, [bannerHasChange])
 
   // 自動切換，每 5 秒移動下一張
@@ -150,14 +155,23 @@ export default function Banner({ bannerHasChange = null, initialCarousel = [] })
     }
   }, [carousel])
 
+  useEffect(() => {
+    if (carousel) {
+      getSlides()
+    }
+  }, [carousel])
+
   return (
     <div className={style['banner-main']}>
-      <div
-        className={style['right-bottom-loading-area']}
-        style={{ right: loading ? '8px' : '-100%' }}>
-        <div className={style['loading']}></div>
-      </div>
       <div className={style['banner']}>
+        {loading && <LoadingAnime top={'50%'} />}
+        {message && (
+          <MessageAnime
+            message={message}
+            top="100px"
+            duration={2000}
+          />
+        )}
         {/* 左箭頭 */}
         <div
           className={style['left-arrow-area']}

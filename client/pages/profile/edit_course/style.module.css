@@ -13,7 +13,6 @@
   justify-content: center;
 }
 .edit_course_main .title {
-  margin-top: 24px;
   font-size: clamp(28px, 2vw, 34px);
   background-color: #fff;
   padding: 12px;
@@ -112,6 +111,17 @@
   .edit_course_main .edit_course_function_area .input-area-container {
     align-items: center;
   }
+}
+.edit_course_main .edit_course_function_area .input-area-container .grade-input {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.edit_course_main .edit_course_function_area .input-area-container .grade-input .input-area {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 .edit_course_main .edit_course_function_area .input-area-container .input_area {
   display: flex;

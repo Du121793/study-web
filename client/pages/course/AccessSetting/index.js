@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -6,12 +6,14 @@ import Link from 'next/link'
 // method
 import { useUserToken } from '../../../method/useUserToken'
 import adminService from '../../../method/adminService'
-
-// 子組件
+import userService from '../../../method/userService'
+// component
 import StudentSelector from '../component/student_selector/StudentSelector'
 import VideoSelector from '../component/video_selector/VideoSelector'
 import AccessStudentList from '../component/access_student_list/AccessStudentList'
 import AccessVideoList from '../component/access_video_list/AccessVideoList'
+import LoadingAnime from '../../../components/loading_anime/LoadingAnime'
+import MessageAnime from '../../../components/message_anime/MessageAnime'
 
 // public
 import editIcon from '../../../public/global/edit.png'
@@ -30,8 +32,6 @@ export default function AccessSetting() {
   const { course_name, course_id } = router.query
   // 請求參數
   const [isPrivate, setIsPrivate] = useState(true)
-  // 獲得所有權杖狀態
-  const [accessInfo, setAccessInfo] = useState(null)
   // 控制新增權杖狀態
   const [isClickAdd, setIsClickAdd] = useState(false)
   // 控制學生選擇器狀態
@@ -56,10 +56,6 @@ export default function AccessSetting() {
   const [accessName, setAccessName] = useState('')
   // 二次確認刪除
   const [deleteDoubleCheck, setDeleteDoubleCheck] = useState(null)
-  // 訊息處理
-  const [messageStatus, setMessageStatus] = useState(false)
-  const [messageInfo, setMessageInfo] = useState('發生不明錯誤')
-  const [messageColor, setMessageColor] = useState('')
   // 編輯access狀態
   const [editAccessId, setEditAccessId] = useState('')
   const [editAccessName, setEditAccessName] = useState('')
@@ -68,8 +64,23 @@ export default function AccessSetting() {
   const [editIsPrivate, setEditIsPrivate] = useState(true)
   // header login state
   const [loginState, setLoginState] = useState(false)
+  // UX
+  const [loading, setLoading] = useState(true)
+  const [message, setMessage] = useState('')
+  const [fatherMessage, setFatherMessage] = useState('')
+  // 請求存取
+  const [accessInfo, setAccessInfo] = useState(null) // 獲得所有權杖狀態
+  const [allStds, setAllStds] = useState([]) // 獲得所有學生
+  const [allVdos, setAllVdos] = useState([]) // 獲得所有影片
 
   const test = () => {}
+
+  const initMessage = () => {
+    const timer = setTimeout(() => {
+      setMessage('')
+    }, 2000)
+    return () => clearTimeout(timer)
+  }
 
   // 新增權杖
   const submitNewAccess = () => {
@@ -83,24 +94,30 @@ export default function AccessSetting() {
           unlimited: isInfiniite ? isInfiniite : null,
           setPrivate: isPrivate,
         }
+        setLoading(true)
         adminService.addNewVideoAccess(token, course_id, data).then((res) => {
           if (res && res.success) {
-            messageControl('新增成功', true)
+            setMessage('新增成功')
             adminService.getAccessAllInfo(token, course_id).then((res) => {
               if (res.success === true) {
                 setAccessInfo(res.data)
+                setLoading(false)
+              } else {
+                setMessage('發生錯誤')
               }
             })
           } else {
+            setMessage('發生錯誤')
             return
           }
         })
       } else {
-        messageControl('名稱或結束日期不能為空')
+        setMessage('名稱或結束日期不能為空')
       }
     } catch (err) {
-      messageControl('發生錯誤:', err)
+      setMessage('發生錯誤')
     }
+    initMessage()
   }
 
   //刪除權杖
@@ -112,25 +129,26 @@ export default function AccessSetting() {
             .getAccessAllInfo(token, course_id)
             .then((res) => {
               if (res?.success === true) {
-                messageControl('刪除成功', true)
+                setMessage('刪除成功')
                 setAccessInfo(res.data)
               }
             })
             .catch((err) => {
-              messageControl('刪除失敗', true)
+              setMessage('刪除失敗')
               console.error(err)
             })
         })
       }
     } catch (err) {
-      messageControl('發生錯誤:', err)
+      setMessage('發生錯誤:')
     }
+    initMessage()
   }
 
   //編輯權杖
   const submitEditAccess = () => {
     if (editAccessName === '') {
-      messageControl(`名稱不能為空`, false)
+      setMessage(`名稱不能為空`)
       return
     }
     let data = {
@@ -143,88 +161,101 @@ export default function AccessSetting() {
       adminService.editAccessInfo(token, course_id, editAccessId, data).then((res) => {
         if (res.success === true) {
           setEditStatus(!editStatus)
-          messageControl(`編輯成功`, true)
+          setMessage(`編輯成功`)
         } else {
-          messageControl(`發生錯誤${res.data.msg}`, false)
+          setMessage(`發生錯誤${res.data.msg}`)
         }
       })
     } catch (err) {
-      messageControl(`發生錯誤:${err}`, false)
+      setMessage(`發生錯誤:${err}`)
     }
+    initMessage()
   }
 
-  const messageControl = (info, isSuccess) => {
-    setMessageInfo(info)
-    setMessageStatus(true)
-    if (isSuccess) {
-      setMessageColor('rgba(195, 240, 178, 0.8)')
-    } else {
-      setMessageColor('rgba(240, 178, 178, 0.8)')
-    }
-    setTimeout(() => {
-      setMessageStatus(false)
-      setTimeout(() => {
-        setMessageInfo('發生不明錯誤')
-        setMessageColor('')
-      }, 200)
-    }, 2000)
-  }
-
-  // 獲得該課程的成員資料
+  // 獲得該課程的權杖
   useEffect(() => {
-    if (token && course_id) {
-      setLoginState(true)
-      adminService.getAccessAllInfo(token, course_id).then((res) => {
+    if (!token || !course_id) return
+    setLoginState(true) // 登陸狀態
+    adminService
+      .getAccessAllInfo(token, course_id)
+      .then((res) => {
         if (res.success === true) {
           setAccessInfo(res.data)
+        } else {
+          setMessage('發生錯誤，取得資料失敗')
         }
       })
-    }
+      .catch((err) => {
+        setMessage('發生錯誤，取得資料失敗')
+        console.error(err)
+      })
+      .finally(() => {
+        setLoading(false)
+        initMessage()
+      })
   }, [token, course_id, editStatus])
+
+  // 取得所有(學生 / 影片)
+  useEffect(() => {
+    if (!token || !course_id) return
+    // 學生
+    const params = { courses: course_id }
+    adminService
+      .getMembers(token, params)
+      .then((res) => {
+        // 過濾學生
+        const studentArr = res.data.filter((item) => {
+          if (item.role === 'student') return item
+        })
+        setAllStds(studentArr)
+      })
+      .catch((err) => {
+        console.error(err)
+        setMessage('發生錯誤，獲取資料失敗')
+      })
+      .finally(() => {
+        setLoading(false)
+        initMessage()
+      })
+    // 影片
+    const data = {
+      type: 'MainClass',
+      pageSize: Infinity,
+      course_id,
+    }
+    userService
+      .getVideoInfo(token, course_id, data)
+      .then((res) => {
+        setAllVdos(res.data)
+      })
+      .catch((err) => {
+        console.error(err)
+        setMessage('發生錯誤，獲取資料失敗')
+      })
+      .finally(() => {
+        setLoading(false)
+        initMessage()
+      })
+  }, [token, course_id])
 
   return (
     <div className={style['access-setting-main']}>
+      {loading && <LoadingAnime></LoadingAnime>}
+      {message && (
+        <MessageAnime
+          message={message}
+          top="100px"
+          duration={2000}></MessageAnime>
+      )}
+      {fatherMessage && (
+        <MessageAnime
+          message={fatherMessage}
+          top="100px"
+          duration={2000}></MessageAnime>
+      )}
       <Header
         loginState={loginState}
         inIndex="course"></Header>
-      <div className={style['components']}>
-        {showStudentSelector && (
-          <StudentSelector
-            course_id={course_id}
-            showStudentSelector={showStudentSelector}
-            setShowStudentSelector={setShowStudentSelector}
-            selectedStudent={selectedStudent}
-            setSelectedStudent={setSelectedStudent}
-            messageControl={messageControl}></StudentSelector>
-        )}
-        {showVideoSelector && (
-          <VideoSelector
-            course_id={course_id}
-            showVideoSelector={showVideoSelector}
-            setShowVideoSelector={setShowVideoSelector}
-            selectedVideo={selectedVideo}
-            setSelectedVideo={setSelectedVideo}></VideoSelector>
-        )}
-        {showAccessStudentList && (
-          <AccessStudentList
-            showAccessStudentList={showAccessStudentList}
-            setShowAccessStudentList={setShowAccessStudentList}
-            course_id={course_id}
-            choseAccessId={choseAccessId}
-            editStatus={editStatus}
-            setEditStatus={setEditStatus}
-            messageControl={messageControl}></AccessStudentList>
-        )}
-        {showAccessVideoList && (
-          <AccessVideoList
-            showAccessVideoList={showAccessVideoList}
-            setShowAccessVideoList={setShowAccessVideoList}
-            course_id={course_id}
-            choseAccessId={choseAccessId}
-            editStatus={editStatus}
-            setEditStatus={setEditStatus}></AccessVideoList>
-        )}
-      </div>
       <div className={style['btn-area']}>
         <Link
           href={{ pathname: `${clientIp}/course`, query: { courseName: course_name, courseId: course_id } }}
@@ -262,23 +293,21 @@ export default function AccessSetting() {
             </div>
             <div className={style['studen-area']}>
               <div className={style['content']}>學生人數 {selectedStudent.length} 。</div>
-              <div
-                className="g-blue-btn"
-                onClick={() => {
-                  setShowStudentSelector(true)
-                }}>
-                選擇學生
-              </div>
+              <StudentSelector
+                course_id={course_id}
+                showStudentSelector={showStudentSelector}
+                setShowStudentSelector={setShowStudentSelector}
+                selectedStudent={selectedStudent}
+                setSelectedStudent={setSelectedStudent}></StudentSelector>
             </div>
             <div className={style['video-area']}>
               <div className={style['content']}>影片數量 {selectedVideo.length} 。</div>
-              <div
-                className="g-blue-btn"
-                onClick={() => {
-                  setShowVideoSelector(true)
-                }}>
-                選擇影片
-              </div>
+              <VideoSelector
+                course_id={course_id}
+                showVideoSelector={showVideoSelector}
+                setShowVideoSelector={setShowVideoSelector}
+                selectedVideo={selectedVideo}
+                setSelectedVideo={setSelectedVideo}></VideoSelector>
             </div>
             <div className={style['dateSetting-area']}>
               <div className={style[('content', 'title')]}>結束日期設定</div>
@@ -372,22 +401,24 @@ export default function AccessSetting() {
               <div className={style['video']}>
                 <div className={style['content']}>影片數量 : {item.videoIDs.length}</div>
               </div>
-              <div
-                className={style['list-btn']}
-                onClick={() => {
-                  setShowAccessStudentList(true)
-                  setChoseAccessId(item._id)
-                }}>
-                授權學生清單
-              </div>
-              <div
-                className={style['list-btn']}
-                onClick={() => {
-                  setShowAccessVideoList(true)
-                  setChoseAccessId(item._id)
-                }}>
-                授權影片清單
-              </div>
+
+              <AccessStudentList
+                allStds={allStds}
+                accessInfo={accessInfo}
+                course_id={course_id}
+                choseAccessId={item._id}
+                editStatus={editStatus}
+                setEditStatus={setEditStatus}
+                setFatherMessage={setFatherMessage}></AccessStudentList>
+
+              <AccessVideoList
+                allVdos={allVdos}
+                accessInfo={accessInfo}
+                course_id={course_id}
+                choseAccessId={item._id}
+                editStatus={editStatus}
+                setEditStatus={setEditStatus}
+                setFatherMessage={setFatherMessage}></AccessVideoList>
               {editAccessId === item._id && (
                 <div className={style['edit-area']}>
                   <div className={style['content']}>將影片設為私人</div>

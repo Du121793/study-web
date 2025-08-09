@@ -63,6 +63,11 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
   const [qaCardWidth, setQaCardWidth] = useState(0)
   /* QA加載中 */
   const [qaLoading, setQaLoading] = useState(false)
+  const [imgLoadComplete, setImgLoadComplete] = useState(false)
+
+  // 新版邏輯 收合UI
+  // 收合QA大標題
+  const qalistContainerRef = useRef()
 
   const test = () => {}
 
@@ -91,9 +96,6 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
   // 切換 QA 區塊展開/收合
   const toggleQA = () => {
     if (!qaOpen) {
-      if (qaContentRef.current) {
-        setQaHeight(qaContentRef.current.scrollHeight)
-      }
       setQaOpen(true)
     } else {
       setQaHeight(0)
@@ -179,8 +181,6 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
     const container = navInnerRef?.current
     if (!container) return
     if (headerRef && navInnerRef) {
-      const innerWidth = navInnerRef?.current?.clientWidth
-      const headerWidth = headerRef?.current?.clientWidth
       const innerHeight = navInnerRef?.current?.clientHeight
       const headerHeight = headerRef?.current?.clientHeight
       setQaHeight(innerHeight + headerHeight + 40)
@@ -228,15 +228,17 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
           setTotalPage(res.totalPage)
           setLoading(false)
           setQaLoading(false)
-          setTimeout(() => {
-            setQaHeight(navInnerRef?.current?.clientHeight + headerRef?.current?.clientHeight + 100)
-          }, 30)
-        } else {
-          messageControl('加載失敗', true)
         }
       })
     }
   }, [token, qaHasUpload, qaOpen, page])
+
+  // 當qa有改變，會更新UI內部高度，第二次是為了在圖片加載後再次更新高度
+  useEffect(() => {
+    if (qaOpen) {
+      setQaHeight(navInnerRef?.current?.clientHeight + headerRef?.current?.clientHeight + 100)
+    }
+  }, [imgLoadComplete, qaOpen])
 
   useEffect(() => {
     const localToken = localStorage.getItem('token')
@@ -247,9 +249,11 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
 
   return (
     <div className={style['qa-nav']}>
-      {/* 開關QA UI */}
+      {/* 開關UI按鈕 */}
       <div
-        onClick={toggleQA}
+        onClick={() => {
+          toggleQA()
+        }}
         className={style['header']}>
         <Image
           src={downArrow}
@@ -359,7 +363,7 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
               />
             )}
           </div>
-          <div className={style['page-switch']}>
+          <div className={`${style['page-switch-area']} page-switch`}>
             <Image
               alt="switch back to first page icon"
               src={dbArrowLeft}
@@ -371,7 +375,7 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
             <Image
               alt="switch back one page icon"
               src={ArrowLeft}
-              className={style['page-switcher']}
+              className={'page-switcher'}
               width={24}
               height={24}
               onClick={() => {
@@ -381,7 +385,7 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
             {getPage(totalPage, page).map((item, index) => (
               <div
                 key={index}
-                className={page === item ? `${style['now-page']} ${style['active']}` : style['now-page']}
+                className={page === item ? `${'now-page'} ${'active'}` : 'now-page'}
                 onClick={() => setPage(item)}>
                 {item}
               </div>
@@ -389,7 +393,7 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
             <Image
               alt="switch next to left page icon"
               src={ArrowRight}
-              className={style['page-switcher']}
+              className={'page-switcher'}
               width={24}
               height={24}
               onClick={() => {
@@ -425,8 +429,9 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
                   if (item.tag) {
                     return (
                       <div
-                        className={style['QA-list']}
+                        className={`${style['QA-list']}`}
                         key={index}
+                        ref={qalistContainerRef}
                         style={{ width: qaCardWidth }}
                         onClick={() => {}}>
                         {/* 主標題 */}
@@ -500,11 +505,11 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
                                     width={200}
                                     height={0}
                                     loading="lazy"
+                                    onLoadingComplete={() => {
+                                      setImgLoadComplete(!imgLoadComplete)
+                                    }}
                                     style={{ height: 'auto' }}
                                     alt="qa-image"
-                                    onClick={() => {
-                                      console.log(doc)
-                                    }}
                                   />
                                 )}
                               </div>
@@ -577,7 +582,10 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
                             width={300}
                             height={0}
                             alt="qa image pre view"
-                            style={{ height: 'auto' }}></Image>
+                            style={{ height: 'auto' }}
+                            onLoadingComplete={() => {
+                              setImgLoadComplete(!imgLoadComplete)
+                            }}></Image>
                         )}
                         <div className={style['content']}>
                           <div

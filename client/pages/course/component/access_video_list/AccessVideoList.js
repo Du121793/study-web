@@ -1,119 +1,168 @@
 // 原生組件
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
+import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 // method
 import { useUserToken } from '../../../../method/useUserToken'
 import adminService from '../../../../method/adminService'
-import userService from '../../../../method/userService'
 
 // style
 import style from './style.module.css'
-
+// component
+import LoadingAnime from '../../../../components/loading_anime/LoadingAnime'
+import MessageAnime from '../../../../components/message_anime/MessageAnime'
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
-export default function AccessVideoList({ editStatus, setEditStatus, choseAccessId, course_id, showAccessVideoList, setShowAccessVideoList }) {
+export default function AccessVideoList({ setFatherMessage, allVdos, accessInfo, editStatus, setEditStatus, choseAccessId, course_id }) {
   const token = useUserToken()
-  const [videos, setVideos] = useState()
-  const [members, setMembers] = useState()
-  const [choseAccessInfo, setChoseAccessInfo] = useState(null)
-  const [selectedVideo, setSelectedVideo] = useState([])
   const [student_id, setStudent_id] = useState([])
+  // UX
+  const [visibility, setVisibility] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
+  // 找出目前ID的access setting info
+  const [thisAccessInfo, setThisAccessInfo] = useState([])
+  const [selectedVideo, setSelectedVideo] = useState([])
 
+  const initMessage = () => {
+    const timer = setTimeout(() => {
+      setMessage('')
+      setFatherMessage('')
+    }, 2000)
+    return () => clearTimeout(timer)
+  }
+
+  // 儲存更動
   const clickComplate = () => {
+    console.log()
+    if (!thisAccessInfo) return
     const data = {
-      accessName: choseAccessInfo.accessName,
+      accessName: thisAccessInfo[0].accessName,
       videoIDs: selectedVideo,
-      studentIDs: student_id,
-      accessDate: choseAccessInfo.accessDate,
-      unlimited: choseAccessInfo.accessDate === null,
+      studentIDs: thisAccessInfo[0].studentIDs,
+      accessDate: thisAccessInfo[0].accessDate,
+      unlimited: thisAccessInfo[0].accessDate === null,
     }
-    adminService.editAccessInfo(token, course_id, choseAccessId, data).then((res) => {
-      if (res.success === true) setEditStatus(!editStatus)
-    })
+    setLoading(true)
+    adminService
+      .editAccessInfo(token, course_id, choseAccessId, data)
+      .then((res) => {
+        if (res.success === true) {
+          // 告訴父組件資料有改變
+          setEditStatus(!editStatus)
+          setVisibility(false)
+          setFatherMessage('編輯成功')
+        } else {
+          setMessage('儲存失敗，發生錯誤')
+          console.error(res)
+        }
+      })
+      .catch((err) => {
+        setMessage('發生錯誤')
+        console.error(err)
+      })
+      .finally(() => {
+        initMessage()
+        setLoading(false)
+      })
   }
 
-  const clickVideo = (element, _id) => {
-    element.classList.forEach((item) => {
-      if (item === style['active']) {
-        element.classList.remove(style['active'])
-        setSelectedVideo(selectedVideo.filter((item) => item !== _id))
-      } else {
-        element.classList.add(style['active'])
-        setSelectedVideo([...selectedVideo, _id])
-      }
-    })
+  const clickVideo = (id) => {
+    if (selectedVideo.includes(id)) {
+      setSelectedVideo(selectedVideo.filter((item) => item !== id))
+    } else {
+      setSelectedVideo([...selectedVideo, id])
+    }
   }
 
+  // 找出目前ID的access setting info，用來比對選擇的學生
   useEffect(() => {
-    if (token && course_id) {
-      const data = {
-        type: 'MainClass',
-        pageSize: Infinity,
-        course_id,
-      }
-      userService.getVideoInfo(token, course_id, data).then((res) => {
-        setVideos(res.data)
-      })
-    }
-  }, [token, course_id])
-
-  useEffect(() => {
-    if (token && course_id) {
-      const data = { course_id }
-      adminService.getMembers(token, data).then((res) => {
-        setMembers(res.data)
-      })
-
-      adminService.getAccessAllInfo(token, course_id, choseAccessId).then((res) => {
-        setChoseAccessInfo(res.data)
-        setStudent_id(res.data.studentIDs.map((item) => item._id))
-        setSelectedVideo(res.data.videoIDs.map((item) => item._id))
-      })
-    }
-  }, [token, course_id, choseAccessId])
+    if (!accessInfo || !choseAccessId) return
+    const newArr = accessInfo.filter((item) => {
+      return item._id === choseAccessId
+    })
+    setThisAccessInfo(newArr)
+    setSelectedVideo(newArr[0].videoIDs.map((item) => item._id))
+  }, [accessInfo, choseAccessId])
 
   return (
-    <div className={style['video-selector-main']}>
-      <div className={style['video-selector-container']}>
-        <div className={style['title']}>選擇要授權的影片</div>
-        <div className={style['info-area']}>
-          {videos &&
-            videos.map((item, index) => {
-              const isSelected = selectedVideo.includes(item._id)
-              return (
-                <div
-                  className={`${style['video-card']} ${isSelected ? style['active'] : ''}`}
-                  key={index}
-                  onClick={(e) => {
-                    clickVideo(e.currentTarget, item._id)
-                  }}>
-                  <div className={style['shot']}>
-                    <Image
-                      className={style['image']}
-                      src={item.thumbnail}
-                      loading="lazy"
-                      alt="video shot"
-                      quality={100}
-                      width={200}
-                      height={120}
-                    />
-                  </div>
-                  <div className={style['info']}>{item.title}</div>
-                </div>
-              )
-            })}
-        </div>
-        <div
-          className={style['finish-btn']}
-          onClick={() => {
-            setShowAccessVideoList(false)
-            clickComplate()
-          }}>
-          完成並儲存
-        </div>
+    <>
+      <div
+        className="g-blue-btn"
+        onClick={() => setVisibility(true)}>
+        授權影片清單
       </div>
-    </div>
+      <AnimatePresence>
+        {visibility && (
+          <motion.div
+            key={'container'}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className={style['video-selector-main']}
+            onClick={() => {
+              setVisibility(false)
+            }}>
+            <motion.div
+              key={'inner'}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className={style['video-selector-container']}
+              onClick={(e) => {
+                e.stopPropagation()
+              }}>
+              {message && (
+                <MessageAnime
+                  message={message}
+                  top="100px"
+                  duration={2000}
+                />
+              )}
+              {loading && <LoadingAnime></LoadingAnime>}
+              <div className={style['title']}>選擇要授權的影片</div>
+              <div className={style['info-area']}>
+                {allVdos &&
+                  allVdos.map((item, index) => {
+                    return (
+                      <div
+                        className={`${style['video-card']} ${selectedVideo.includes(item._id) ? style['active'] : ''}`}
+                        key={index}
+                        onClick={() => {
+                          clickVideo(item._id)
+                        }}>
+                        <div className={style['shot']}>
+                          <Image
+                            className={style['image']}
+                            src={item.thumbnail}
+                            loading="lazy"
+                            alt="video shot"
+                            quality={100}
+                            width={200}
+                            height={120}
+                          />
+                        </div>
+                        <div className={style['info']}>{item.title}</div>
+                      </div>
+                    )
+                  })}
+              </div>
+              <div className={style['btn-area']}>
+                <div
+                  className={`${style['finish-btn']} g-blue-btn`}
+                  onClick={() => {
+                    clickComplate()
+                  }}>
+                  完成並儲存
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   )
 }

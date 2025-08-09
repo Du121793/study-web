@@ -1,10 +1,6 @@
 // 組件庫
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
-// 子組件
-// import Header from '../components/global/Header'
-import Header from '../components/header/Header'
-import Footer from '../components/footer/Footer'
 // method
 import { useUserToken } from '../method/useUserToken'
 import userService from '../method/userService'
@@ -13,11 +9,14 @@ import Board from './components/board/Board'
 import Banner from './components/banner/Banner'
 import UploadBoard from './components/uploadBoard/UploadBoard'
 import UploadCarousel from './components/uploadCarousel/UploadCarousel'
+import Header from '../components/header/Header'
+import Footer from '../components/footer/Footer'
 // public
 import backgroundImage from '../public/backGroundIMG/stefanie-jockschat-9f1PRQs6Brs-unsplash.jpg'
 // style
 import style from './index.module.css'
 
+// ISR
 export async function getStaticProps() {
   try {
     // banner
@@ -42,20 +41,19 @@ export default function Index({ initialCarousel, initialHeader }) {
   const [logined, setLogined] = useState(false)
   const [userShot, setUserShot] = useState(null)
   const [userRole, setUserRole] = useState(null)
-  const [showUploadBoardUI, setShowUploadBoardUI] = useState(false)
   const [uploadBoardUIHeight, setUploadBoardUIHeight] = useState(0)
   const [bannerHasChange, setBannerHasChange] = useState(false)
   const [editHasChange, setEditHasChange] = useState(false)
   // 調整header的index用
   const [hasPop, setHasPop] = useState(false)
-  // 讀取旋轉
-  const [loading, setLoading] = useState(false)
   // 移動到最新消息function
   const moveToBoardRef = useRef(null)
-
+  // 是否正在請求中
+  const [requesting, setRequesting] = useState(true)
   // 控制滑條
   const mainRef = useRef()
 
+  // 用於在其他頁面點擊header的最新消息時回到首頁並導引到最新消息
   const callBoardMoveToBoardFunction = () => {
     if (moveToBoardRef.current) moveToBoardRef.current.doSomething()
   }
@@ -94,6 +92,7 @@ export default function Index({ initialCarousel, initialHeader }) {
         })
         .catch((err) => console.error('Error:', err))
     }
+    setRequesting(false)
   }, [token])
 
   useEffect(() => {
@@ -103,15 +102,12 @@ export default function Index({ initialCarousel, initialHeader }) {
     }
   }, [])
 
+  if (requesting) {
+    return <></>
+  }
+
   return (
-    <div
-      ref={mainRef}
-      className={style['index-main']}>
-      <div
-        className="right-bottom-loading-area"
-        style={{ right: loading ? '8px' : '-100%' }}>
-        <div className="loading"></div>
-      </div>
+    <div className={style['index-main']}>
       <div className={style['background-image']}>
         <Image
           src={backgroundImage}
@@ -147,7 +143,6 @@ export default function Index({ initialCarousel, initialHeader }) {
           <UploadBoard
             editHasChange={editHasChange}
             setEditHasChange={setEditHasChange}
-            setShowUploadBoardUI={setShowUploadBoardUI}
             setUploadBoardUIHeight={setUploadBoardUIHeight}
             uploadBoardUIHeight={uploadBoardUIHeight}
             setHasPop={setHasPop}

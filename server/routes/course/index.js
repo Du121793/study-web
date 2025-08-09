@@ -6,7 +6,6 @@
  */
 const router = require("express").Router();
 const Course = require("../../models").course;
-const User = require("../../models").user;
 const courseMethodRouter = require("./courseMethod");
 const modifyCourseRouter = require("./modifyCourse");
 const QARouter = require("./QA");
@@ -124,7 +123,7 @@ router.get("/getCourses", checkTeacherAccess, async (req, res) => {
 
 router.get("/getGrades", checkTeacherAccess, async (req, res) => {
   try {
-    const grades = await User.distinct("userinfo.grade");
+    const grades = await Course.distinct("grade");
     res.json({
       success: true,
       data: { grades },

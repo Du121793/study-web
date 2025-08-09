@@ -29,6 +29,11 @@
       flex-wrap: wrap;
       padding: 0 12px;
       gap: 8px;
+      .grade {
+        .input-area {
+          position: relative;
+        }
+      }
       .content {
         font-size: clamp(16px, 1.2vw, 20px);
       }

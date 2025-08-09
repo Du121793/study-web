@@ -271,9 +271,17 @@ router.get("/getCourseQAs/:course_id", async (req, res) => {
 
     // 執行聚合查詢
     const groups = await QA.aggregate(pipeline);
-    const totalGroups = await QA.countDocuments({
-      courses: req.params.course_id,
-    });
+    // 1. 聚合 pipeline：match → unwind → group → count
+    const countResult = await QA.aggregate([
+      { $match: { courses: req.params.course_id } },
+      { $unwind: `$${sortType}` },
+      { $group: { _id: `$${sortType}` } },
+      { $count: "totalGroups" }
+    ]);
+    // 如果沒有任何組，countResult 會是空陣列
+    const totalGroups = (countResult[0] && countResult[0].totalGroups) || 0;
+
+    // 2. 計算總頁數
     const totalPage = Math.ceil(totalGroups / pageSize);
 
     // 處理圖片URL

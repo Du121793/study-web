@@ -387,8 +387,6 @@ import ArrowRight from '../../public/profile/rightArrow.png'
 }
 .page-switch .page-switcher {
   transition: 0.2s;
-  border: 1px solid gray;
-  border-radius: 2px;
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;

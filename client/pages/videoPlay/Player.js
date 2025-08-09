@@ -11,12 +11,19 @@ import noThumbnailImg from '../../public/global/no-image-available-icon.jpg'
 import { useUserToken } from '../../method/useUserToken'
 import userService from '../../method/userService'
 import Footer from '../../components/footer/Footer'
-// env
-const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 // css
 import style from './player.module.css'
 
 export default function Player() {
+  // 監控視窗寬度
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 0 // SSR 安全
+  )
+  // env
+  const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
+  // url
+  const profilePage = `${clientIp}/profile`
+  // auth for api
   const token = useUserToken()
   // 路由初始化
   const router = useRouter()
@@ -29,9 +36,9 @@ export default function Player() {
   const [videoListWidth, setVideoListWidth] = useState(0)
   const [videoListMarginRight, setVideoListMarginRight] = useState('#fff')
   // 播放器需要的影片url
-  const [videoUrl, setVideoUrl] = useState()
+  const [videoUrl, setVideoUrl] = useState('')
   // 影片清單
-  const [VideosList, setVideosList] = useState([])
+  const [videoList, setVideoList] = useState([])
   // 根據是否打開清單決定影片資訊部分是否為置中
   const [isAlignCenter, setIsAlignCenter] = useState('flex-start')
   // 使用者line縮圖
@@ -40,77 +47,35 @@ export default function Player() {
   /* 根據寬度顯示畫面中間的影片清單 */
   const [showVideoListAfterInfo, setShowVideoListAfterInfo] = useState(false)
 
-  // 旋轉讀取
-  const [loading, setLoading] = useState(false)
-
   /* 監聽全局寬度變化，寬度變化設定windowsWidth */
   const isClient = typeof window === 'object'
   const [windowsWidth, setWindowsWidth] = useState(0)
 
   const playerRef = useRef()
   const hideListRef = useRef()
+  // 開關影片詳細資訊
+  const videoInfoRef = useRef()
+  const [isHideInfo, setIsHideInfo] = useState(false)
+  // 影片分頁展現，下拉到一定程度
+  const [nowPage, setNowPage] = useState(null)
+  const [totalPage, setTotalPage] = useState(0)
+  const [pageSize, setPageSize] = useState(8)
+  const isFetchingRef = useRef(false) // 正在發請求？(不觸發第二次)
+  const [hasMore, setHasMore] = useState(true) // 是否還有下一批
+  // UX
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
 
-  useEffect(() => {
-    if (!isClient) return false
-
-    const handleResize = () => {
-      setWindowsWidth(window.innerWidth)
-    }
-
-    window.addEventListener('resize', handleResize)
-    // 先觸發一次，保證初始值正確
-    handleResize()
-
+  // 初始化UX
+  const initUX = () => {
+    const timer = setTimeout(() => {
+      setMessage('')
+    }, 2000)
+    setLoading(false)
     return () => {
-      window.removeEventListener('resize', handleResize)
+      clearTimeout(timer)
     }
-  }, [isClient])
-
-  /* 根據寬度顯示畫面中間的影片清單 */
-  useEffect(() => {
-    if (windowsWidth <= 860) {
-      setShowVideoListAfterInfo(true)
-    }
-    if (windowsWidth > 860) {
-      setShowVideoListAfterInfo(false)
-    }
-  }, [windowsWidth])
-
-  /*
-    1. 請求獲得影片路徑
-    2. 請求獲得影片資訊
-    3. 請求獲得使用者資料
-  */
-  useEffect(() => {
-    if (token && course_id && video_id) {
-      setLoading(true)
-      userService.getVideoLink(token, course_id, video_id).then((res) => {
-        setLoading(false)
-        setVideoUrl(res.data.embedLink)
-      })
-    }
-    if (token && course_id) {
-      setLoading(true)
-      userService
-        .getVideoInfo(token, course_id, {
-          type: 'MainClass',
-          page: 1,
-          sortBy: 'recordDate',
-          sortOrder: 'asc',
-        })
-        .then((res) => {
-          setLoading(false)
-          setVideosList(res.data)
-        })
-    }
-  }, [token, course_id, video_id])
-
-  useEffect(() => {
-    const shot = localStorage.getItem('user_line_shot')
-    if (shot) {
-      setUserShot(shot)
-    }
-  }, [])
+  }
 
   /* 開關右方影片列表，僅在電腦寬度下出現 */
   const listSwitch = (e) => {
@@ -184,16 +149,117 @@ export default function Player() {
       return `${Math.floor(days / 365)}年前`
     }
   }
+  // 監控全局寬度
+  useEffect(() => {
+    if (!isClient) return false
 
+    const handleResize = () => {
+      setWindowsWidth(window.innerWidth)
+    }
+
+    window.addEventListener('resize', handleResize)
+    // 先觸發一次，保證初始值正確
+    handleResize()
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [isClient])
+
+  /* 根據寬度顯示畫面中間的影片清單 */
+  useEffect(() => {
+    if (windowsWidth <= 860) {
+      setShowVideoListAfterInfo(true)
+    }
+    if (windowsWidth > 860) {
+      setShowVideoListAfterInfo(false)
+    }
+  }, [windowsWidth])
+
+  /*
+    1. 請求獲得影片路徑
+    2. 請求獲得影片資訊
+    3. 請求獲得使用者資料
+  */
+  useEffect(() => {
+    if (!token || !course_id || !video_id) return
+    if (!hasMore) return
+
+    // 1) 播放連結
+    userService
+      .getVideoLink(token, course_id, video_id)
+      .then((res) => {
+        if (res.success && videoUrl !== res.data.embedLink) {
+          setVideoUrl(res.data.embedLink)
+        }
+      })
+      .catch(console.error)
+
+    // 2) 影片清單
+    userService
+      .getVideoInfo(token, course_id, {
+        type: 'MainClass',
+        page: 1,
+        sortBy: 'recordDate',
+        sortOrder: 'asc',
+        pageSize: pageSize,
+      })
+      .then((res) => {
+        if (!Array.isArray(res.data)) return
+
+        // 直接 push 會破壞舊陣列
+        setVideoList((prev) => {
+          // 去重
+          const seen = new Set(prev.map((v) => v._id))
+          const merged = [...prev]
+          res.data.forEach((item) => {
+            if (!seen.has(item._id)) merged.push(item)
+          })
+          return merged
+        })
+
+        setTotalPage(res.totalPage)
+        setNowPage(res.page)
+
+        // 檢查還有沒有更多：當前回傳數量已覆蓋全部或已到最後一頁就關閉
+        const reachedEnd = res.page >= res.totalPage || res.data.length === 0
+        if (reachedEnd) setHasMore(false)
+      })
+      .catch(console.error)
+      .finally(() => {
+        isFetchingRef.current = false // ✅ 解鎖，允許下一次觸發
+        initUX()
+      })
+  }, [token, course_id, video_id, pageSize, hasMore])
+
+  useEffect(() => {
+    const shot = localStorage.getItem('user_line_shot')
+    if (shot) {
+      setUserShot(shot)
+    }
+  }, [])
   // 解析query的JSON
   useEffect(() => {
     if (info) {
       setParsedInfo(JSON.parse(info))
     }
   }, [info])
+  // 監控頁面滾輪是否滑到底，用來請求更多影片
+  useEffect(() => {
+    const handleScroll = () => {
+      const el = document.documentElement
+      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 200 // 留緩衝
 
-  const test = () => {}
+      if (!atBottom) return
+      if (isFetchingRef.current) return // 🚫 正在載入，略過
+      if (!hasMore) return // 🚫 沒有更多，略過
 
+      isFetchingRef.current = true // ✅ 鎖住
+      setPageSize((prev) => prev + 8) // 觸發你的 useEffect 去請求
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [hasMore]) // hasMore 改變時，讓監聽獲得最新值
   return (
     <div className={style['video-player-main']}>
       <div
@@ -211,23 +277,40 @@ export default function Player() {
           回到課程
         </div>
         {/* logo */}
-        <Image
-          onClick={() => {
-            setLoading(!loading)
+        <Link
+          href={{
+            pathname: clientIp,
           }}
-          src={logo}
-          alt="logo"
-          className={style['logo']}
-          width={100}
-          height={100}></Image>
-        {userShot && (
+          className={style['logo-container']}>
           <Image
-            className={style['user-shot']}
-            src={userShot}
-            alt="user's shot"
+            onClick={() => {
+              setLoading(!loading)
+            }}
+            title={'王佑物理首頁'}
+            src={logo}
+            alt="logo"
+            className={style['logo']}
             width={100}
-            height={100}
-          />
+            height={100}></Image>
+        </Link>
+        {userShot && (
+          <Link
+            href={{
+              pathname: profilePage,
+              query: {
+                fc: 'public',
+                to: 'profile',
+              },
+            }}>
+            <Image
+              title={'個人資訊頁面'}
+              className={style['user-shot']}
+              src={userShot}
+              alt="user's shot"
+              width={100}
+              height={100}
+            />
+          </Link>
         )}
       </div>
       {/* 影片播放器、影片清單 */}
@@ -247,7 +330,28 @@ export default function Player() {
           {/* 影片資訊 */}
           <div className={style['video-info']}>
             {parsedInfo && (
-              <div className={style['introduce']}>
+              <div
+                className={style['introduce']}
+                ref={videoInfoRef}
+                style={{ padding: windowsWidth <= 860 && isHideInfo ? '12px' : '24px', minHeight: windowsWidth <= 860 && isHideInfo ? '34px' : '200px', height: windowsWidth <= 860 && isHideInfo ? '34px' : 'auto' }}>
+                {!isHideInfo && windowsWidth && windowsWidth <= 860 && (
+                  <div
+                    onClick={() => {
+                      setIsHideInfo(true)
+                    }}
+                    className={style['hide-info-btn']}>
+                    <span>收回影片詳細資訊</span>
+                  </div>
+                )}
+                {isHideInfo && windowsWidth && windowsWidth <= 860 && (
+                  <div
+                    onClick={() => {
+                      setIsHideInfo(false)
+                    }}
+                    className={style['show-info-btn']}>
+                    <span>打開影片詳細資訊</span>
+                  </div>
+                )}
                 <div className={style['title']}>{parsedInfo.title}</div>
                 <div className={style['time']}>{new Date(parsedInfo.time).toLocaleString()}</div>
                 <div className={style['description']}>{parsedInfo.description}</div>
@@ -262,7 +366,6 @@ export default function Player() {
             id="open-button"
             className={style['open-button']}
             onClick={(e) => {
-              console.log(playerRef.current.scrollHeight)
               listSwitch(e.target.id)
             }}>
             <Image
@@ -294,16 +397,51 @@ export default function Player() {
           <ul
             className={style['videos-area']}
             style={{ opacity: !videoListIsOpen ? 0 : 1 }}>
-            {VideosList &&
-              VideosList.map((item, index) => {
+            {/* 顯示目前播放的 */}
+            {videoList &&
+              videoList.map((item, index) => {
+                if (item.access && item.access.isAccess === true && item._id === video_id) {
+                  return (
+                    <Link
+                      className={`${style['video']} ${style['active']}`}
+                      key={index}
+                      href={{
+                        pathname: `${clientIp}/videoPlay/Player`,
+                        query: {
+                          course_name: course_name,
+                          video_id: item._id,
+                          course_id: course_id,
+                          info: JSON.stringify({ description: item.description, title: item.title, time: item.recordDate }),
+                        },
+                      }}>
+                      <div className={style['image-area']}>
+                        {item.thumbnail !== '' && (
+                          <Image
+                            className={style['pre-view-image']}
+                            src={item.thumbnail !== '' && item.thumbnail !== undefined ? item.thumbnail : noThumbnailImg}
+                            width={0}
+                            height={0}
+                            objectFit="contain"
+                            alt="video image"></Image>
+                        )}
+
+                        <div className={style['video-time']}>{formatTime(item.length)}</div>
+                      </div>
+                      <div className={style['info']}>
+                        <div className={style['video-title']}>{item.title}</div>
+                        <div className={style['video-time']}>{timeAgo(item.date)}</div>
+                      </div>
+                    </Link>
+                  )
+                }
+              })}
+            {videoList &&
+              videoList.map((item, index) => {
                 if (item.access && item.access.isAccess === true && item._id !== video_id) {
                   return (
                     <Link
                       className={style['video']}
                       key={index}
-                      onClick={() => {
-                        hideListRef.current.click()
-                      }}
                       href={{
                         pathname: `${clientIp}/videoPlay/Player`,
                         query: {
@@ -339,8 +477,45 @@ export default function Player() {
       </div>
       {showVideoListAfterInfo && (
         <div className={style['video-list-after-info-area']}>
-          {VideosList.map((item, idx) => {
-            if (item.access.isAccess) {
+          {/* 最上面顯示目前播放的影片 */}
+          {videoList.map((item, idx) => {
+            if (item.access.isAccess && item._id === video_id) {
+              return (
+                <div
+                  className={style['container']}
+                  key={idx}>
+                  <span className={style['hint']}>目前播放中</span>
+                  <Link
+                    href={{
+                      pathname: `${clientIp}/videoPlay/Player`,
+                      query: {
+                        course_name: course_name,
+                        video_id: item._id,
+                        course_id: course_id,
+                        info: JSON.stringify({ description: item.description, title: item.title, time: item.recordDate }),
+                      },
+                    }}
+                    className={`${style['info']} ${style['active']}`}>
+                    <div className={style['left']}>
+                      <Image
+                        src={item.thumbnail !== '' ? item.thumbnail : noThumbnailImg}
+                        width={0}
+                        height={0}
+                        alt="video image"
+                        className={style['image']}></Image>
+                      <div className={style['video-length']}>{formatTime(item.length)}</div>
+                    </div>
+                    <div className={style['right']}>
+                      <div className={style['title']}>{item.description}</div>
+                      <div className={style['time']}>{timeAgo(item.date)}</div>
+                    </div>
+                  </Link>
+                </div>
+              )
+            }
+          })}
+          {videoList.map((item, idx) => {
+            if (item.access.isAccess && item._id !== video_id) {
               return (
                 <Link
                   href={{
@@ -373,7 +548,9 @@ export default function Player() {
           })}
         </div>
       )}
-      <Footer></Footer>
+      <div className={style['footer-area']}>
+        <Footer></Footer>
+      </div>
     </div>
   )
 }
