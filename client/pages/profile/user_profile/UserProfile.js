@@ -99,6 +99,9 @@ export default function UserProfile() {
   return (
     <div className={`${style.user_profile}`}>
       <BackGround></BackGround>
+      <div className={style['header']}>
+        <div className={style.title}>個人資訊</div>
+      </div>
       <div className={style['container']}>
         {loading && <LoadingAnime top={'10%'}></LoadingAnime>}
         {message && (
@@ -108,11 +111,6 @@ export default function UserProfile() {
             duration={2000}
           />
         )}
-        <div
-          className={style.title}
-          onClick={test}>
-          個人資訊
-        </div>
 
         <div className={`${style.top_section}`}>
           {hideAvatar === false && (

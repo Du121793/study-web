@@ -35,17 +35,19 @@ export default function StudentSelector({ course_id, selectedStudent, setSelecte
 
   // 請求取得目前課程的學生
   useEffect(() => {
-    if (token && course_id) {
-      const data = { course_id }
-      adminService
-        .getMembers(token, data)
-        .then((res) => {
-          setMembers(res.data || [])
-          setLoading(false)
-        })
-        .catch(() => setMembers([]))
-    }
+    if (!token || !course_id) return
+    setLoading(true)
+    const params = { courses: course_id }
+    adminService
+      .getMembers(token, params)
+      .then((res) => {
+        setMembers(res.data)
+        setLoading(false)
+      })
+      .catch(() => setMembers([]))
   }, [token, course_id])
+
+  useEffect(() => {})
 
   return (
     <>

@@ -1,0 +1,43 @@
+.page-switch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0;
+}
+.page-switch .page-switcher {
+  transition: 0.2s;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  color: #525252;
+}
+.page-switch .page-switcher:hover {
+  background-color: rgb(225, 225, 225);
+}
+.page-switch .content {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  font-weight: bold;
+  color: #525252;
+}
+.page-switch .pointer {
+  cursor: pointer;
+}
+.page-switch .now-page {
+  cursor: pointer;
+  display: flex;
+  color: #9a9a9a;
+  gap: 4px;
+  font-size: clamp(16px, 1.2vw, 20px);
+}
+.page-switch .now-page .page {
+  cursor: pointer;
+}
+.page-switch .active {
+  font-weight: bold;
+  color: rgb(0, 0, 0);
+}

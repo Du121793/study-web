@@ -126,15 +126,15 @@ export default function Header({ initialHeader = [], callBoardMoveToBoardFunctio
             }}>
             最新消息
           </div>
-          <Link
-            href={{
-              pathname: profilePage,
-              query: {
-                fc: 'public',
-                to: 'myCourse',
-              },
-            }}>
-            {loginState === true && (
+          {loginState === true && (
+            <Link
+              href={{
+                pathname: profilePage,
+                query: {
+                  fc: 'public',
+                  to: 'myCourse',
+                },
+              }}>
               <div
                 className={style.content}
                 onClick={() => {
@@ -147,9 +147,8 @@ export default function Header({ initialHeader = [], callBoardMoveToBoardFunctio
                 }}>
                 我的課程
               </div>
-            )}
-          </Link>
-
+            </Link>
+          )}
           <Link
             className={style.content}
             href={GoogleLocation}
@@ -168,6 +167,7 @@ export default function Header({ initialHeader = [], callBoardMoveToBoardFunctio
           <Link href={HomePageURL}>
             <Image
               className={style['logo-img']}
+              title={'王佑物理首頁'}
               alt="logo,s image"
               src={logoC}
               width={0}
@@ -254,6 +254,7 @@ export default function Header({ initialHeader = [], callBoardMoveToBoardFunctio
                     },
                   }}>
                   <Image
+                    title={'個人資訊頁面'}
                     loading="lazy"
                     className={style.shot}
                     // 由於userShot在index頁面會來不及加載，因此會改為使用index傳過來的user_line_shot
@@ -287,6 +288,7 @@ export default function Header({ initialHeader = [], callBoardMoveToBoardFunctio
         {/* 菜單按鈕 */}
         {(inIndex === 'public' || inIndex === 'course') && (
           <div
+            title={'開啟菜單'}
             className={style['setting-btn']}
             ref={openMenuBtnRef}
             style={{ pointerEvents: listWidth === 0 ? 'all' : 'none' }}

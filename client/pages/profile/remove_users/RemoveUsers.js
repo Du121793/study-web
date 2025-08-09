@@ -202,6 +202,10 @@ export default function RemoveUsers() {
         />
       )}
       <BackGround></BackGround>
+
+      <div className={style['header']}>
+        <div className={style['title']}>刪除成員</div>
+      </div>
       <div className={style['option-container']}>
         {/* 搜尋選項: 姓名，電話，年級*/}
         <div className={`${style.remove_user_header}`}>
