@@ -261,13 +261,67 @@
       width: 90%;
       display: flex;
       gap: 16px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+      border-bottom: 1px solid #ccc;
+      @media (max-width: 860px) {
+        flex-direction: column;
+        gap: 0;
+        border: 1px solid #ccc;
+        padding: 12px;
+        border-radius: 8px;
+      }
       .user-shot-area {
         display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
         .user-shot {
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
           padding: 4px;
           border-radius: 64px;
+        }
+        .mobile-message-info {
+          display: none;
+        }
+        @media (max-width: 860px) {
+          justify-content: flex-start;
+          flex-direction: row;
+          gap: 8px;
+          margin-bottom: 12px;
+          .mobile-message-info {
+            display: flex;
+            justify-content: space-between;
+            flex: 1;
+            width: 100%;
+            gap: 8px;
+            .left {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              .name {
+                word-break: keep-all;
+                font-weight: 500;
+                font-size: 18px;
+              }
+            }
+            .right {
+              display: flex;
+              align-items: center;
+              gap: 4px;
+              .time {
+                font-size: 14px;
+                color: rgb(92, 92, 92);
+                word-break: keep-all;
+              }
+              .isBest {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                font-weight: bold;
+                border: 1px solid rgba(0, 0, 0, 0.2);
+                padding: 1px 8px;
+                border-radius: 12px;
+              }
+            }
+          }
         }
       }
       .message-info {
@@ -278,10 +332,20 @@
         overflow: hidden;
         word-wrap: break-word;
         width: 100%;
+        @media (max-width: 860px) {
+          margin-top: 0;
+          border-top: 1px solid #ccc;
+          gap: 0;
+        }
         .message-top {
           display: flex;
           align-items: center;
           gap: 6px;
+          @media (max-width: 860px) {
+            justify-content: center;
+            border-bottom: 1px solid #ccc;
+            padding: 4px 0;
+          }
           .isBest {
             display: flex;
             align-items: center;
@@ -290,15 +354,24 @@
             border: 1px solid rgba(0, 0, 0, 0.2);
             padding: 1px 8px;
             border-radius: 12px;
+            @media (max-width: 860px) {
+              display: none;
+            }
           }
           .time {
             font-size: 14px;
             color: rgb(92, 92, 92);
+            @media (max-width: 860px) {
+              display: none;
+            }
           }
           .name {
             height: 100%;
             font-weight: bold;
             font-size: 18px;
+            @media (max-width: 860px) {
+              display: none;
+            }
           }
           .function-btn-area {
             display: flex;
@@ -330,6 +403,7 @@
         .message-middle {
           margin-left: 12px;
           font-size: 15px;
+          padding: 8px 0;
         }
         .message-bottom {
           display: flex;

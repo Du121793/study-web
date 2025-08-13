@@ -1,20 +1,17 @@
 @charset "UTF-8";
-.ask-area {
-  overflow: auto;
+.container {
+  top: 0;
   position: fixed;
   display: flex;
-  justify-content: center;
   align-items: center;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 9;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
   background-color: rgba(0, 0, 0, 0.2);
-  padding-left: 12px;
-  padding-right: 80px;
+  z-index: 99;
 }
-.ask-area .ask-form {
+
+.ask-form {
   display: flex;
   justify-content: center;
   background-color: #fff;
@@ -22,7 +19,7 @@
   border-radius: 8px;
   height: 70vh;
 }
-.ask-area .ask-form .upload-img-area {
+.ask-form .upload-img-area {
   min-width: 40vw;
   padding: 8px;
   display: flex;
@@ -30,10 +27,10 @@
   align-items: center;
   gap: 0.5rem;
 }
-.ask-area .ask-form .upload-img-area span {
+.ask-form .upload-img-area span {
   font-size: 18px;
 }
-.ask-area .ask-form .upload-img-area .upload-img-btn {
+.ask-form .upload-img-area .upload-img-btn {
   cursor: pointer;
   border: 1px solid #ccc;
   padding: 6px;
@@ -43,7 +40,7 @@
   font-weight: bold;
   font-size: 18px;
 }
-.ask-area .ask-form .upload-img-area .preview-img {
+.ask-form .upload-img-area .preview-img {
   margin-bottom: 24px;
   overflow: hidden;
   display: flex;
@@ -54,21 +51,21 @@
   min-height: 40px;
   gap: 24px;
 }
-.ask-area .ask-form .upload-img-area .preview-img .preview-images-container {
+.ask-form .upload-img-area .preview-img .preview-images-container {
   position: relative;
 }
-.ask-area .ask-form .upload-img-area .preview-img .preview-images-container .remove-image-btn {
+.ask-form .upload-img-area .preview-img .preview-images-container .remove-image-btn {
   position: absolute;
   right: 4%;
   top: 2%;
   cursor: pointer;
 }
-.ask-area .ask-form .upload-img-area .preview-img .preview-images-container .preview-images {
+.ask-form .upload-img-area .preview-img .preview-images-container .preview-images {
   border: 1px solid rgba(0, 0, 0, 0.2);
   width: 99%;
   border-radius: 4px;
 }
-.ask-area .ask-form .qa-info-area {
+.ask-form .qa-info-area {
   flex: 1;
   min-width: 30vw;
   display: flex;
@@ -77,26 +74,26 @@
   gap: 8px;
   /* 問題描述 */
 }
-.ask-area .ask-form .qa-info-area .sortType-input-area {
+.ask-form .qa-info-area .sortType-input-area {
   display: flex;
   align-items: center;
   justify-content: space-around;
   width: 100%;
   gap: 12px;
 }
-.ask-area .ask-form .qa-info-area .sortType-input-area .title {
+.ask-form .qa-info-area .sortType-input-area .title {
   font-weight: bold;
   font-size: clamp(16px, 1.2vw, 20px);
 }
-.ask-area .ask-form .qa-info-area .sortType-input-area .input {
+.ask-form .qa-info-area .sortType-input-area .input {
   flex: 1;
 }
-.ask-area .ask-form .qa-info-area .view-card-area {
+.ask-form .qa-info-area .view-card-area {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
 }
-.ask-area .ask-form .qa-info-area .view-card-area .card {
+.ask-form .qa-info-area .view-card-area .card {
   display: flex;
   align-items: center;
   background-color: #eee;
@@ -106,21 +103,21 @@
   gap: 0.3rem;
   border: 1px solid #ccc;
 }
-.ask-area .ask-form .qa-info-area .view-card-area .delete-btn {
+.ask-form .qa-info-area .view-card-area .delete-btn {
   font-weight: bold;
   font-size: 16px;
   cursor: pointer;
 }
-.ask-area .ask-form .qa-info-area .description-input-area {
+.ask-form .qa-info-area .description-input-area {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
-.ask-area .ask-form .qa-info-area .description-input-area span {
+.ask-form .qa-info-area .description-input-area span {
   margin-bottom: 0.3rem;
   font-size: 18px;
 }
-.ask-area .ask-form .qa-info-area .description-input-area .ask-text-area {
+.ask-form .qa-info-area .description-input-area .ask-text-area {
   outline: none;
   flex: 1;
   padding: 0.5rem;
@@ -128,48 +125,57 @@
   border-radius: 4px;
   resize: none;
 }
-.ask-area .ask-form .qa-info-area .submit-area {
+.ask-form .qa-info-area .submit-area {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
   width: 100%;
 }
-.ask-area .ask-form .qa-info-area .submit-area .g-green-btn {
-  width: 100%;
+.ask-form .qa-info-area .submit-area .public-area {
+  display: flex;
+  gap: 4px;
+}
+.ask-form .qa-info-area .submit-area .btn-area {
+  gap: 12px;
+  display: flex;
 }
 @media (max-width: 860px) {
-  .ask-area {
-    padding-left: 0;
-    height: 100%;
-    width: 100%;
-    overflow: scroll;
+  .ask-form .qa-info-area .submit-area {
+    flex-direction: column;
   }
-  .ask-area .ask-form {
+}
+.ask-form .qa-info-area .submit-area .g-green-btn {
+  width: 100%;
+}
+
+@media (max-width: 860px) {
+  .ask-form {
     width: 70%;
     height: 90%;
     flex-direction: column;
   }
-  .ask-area .ask-form .upload-img-area {
+  .ask-form .upload-img-area {
     width: 90%;
     overflow: auto;
   }
-  .ask-area .ask-form .upload-img-area .preview-img {
+  .ask-form .upload-img-area .preview-img {
     width: 90%;
   }
-  .ask-area .ask-form .qa-info-area {
+  .ask-form .qa-info-area {
     width: 100%;
     padding: 0;
     margin-top: 6px;
   }
-  .ask-area .ask-form .qa-info-area .sortType-input-area {
+  .ask-form .qa-info-area .sortType-input-area {
     width: 100%;
     gap: 4px;
     flex-wrap: wrap;
   }
-  .ask-area .ask-form .qa-info-area .sortType-input-area input[type=text] {
+  .ask-form .qa-info-area .sortType-input-area input[type=text] {
     width: 20px;
   }
-  .ask-area .ask-form .description-input-area {
+  .ask-form .description-input-area {
     min-height: 200px;
   }
 }

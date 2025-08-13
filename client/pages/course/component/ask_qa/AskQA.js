@@ -1,16 +1,21 @@
 // 組件庫
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
+import { motion, AnimatePresence } from 'framer-motion'
 
 // method
 import { useUserToken } from '../../../../method/useUserToken'
 import userService from '../../../../method/userService'
-// nav組件
 import adminService from '../../../../method/adminService'
 // style
 import style from './style.module.css'
+// components
+import LoadingAnime from '../../../../components/loading_anime/LoadingAnime'
+import MessageAnime from '../../../../components/message_anime/MessageAnime'
 
-export default function AskNav({ setShowAskQA, qaHasUpload, setQaHasUpload, course_id, user_role }) {
+export default function AskNav({ userRole, setContainerIndex, setShowAskQA, qaHasUpload, setQaHasUpload, course_id, user_role }) {
+  // 控制介面開關
+  const [visibility, setVisibility] = useState(false)
   // 控制內部滾輪
   const [page_body, setPage_body] = useState([])
   // count用於控制nav收合
@@ -25,8 +30,6 @@ export default function AskNav({ setShowAskQA, qaHasUpload, setQaHasUpload, cour
   // loading
   const [postLoading, setpostLoading] = useState(false)
   // ask 區塊 - 同樣使用 ref 與 state 控制展開/收合
-  const [qaAsk, setQaAsk] = useState(false)
-  const askContentRef = useRef(null)
   const [askContentHeight, setAskContentHeight] = useState(0)
 
   // ask 區塊
@@ -46,9 +49,8 @@ export default function AskNav({ setShowAskQA, qaHasUpload, setQaHasUpload, cour
   const [hints, setHints] = useState([])
 
   // 控制訊息
-  const [message, setMessage] = useState('無訊息')
-  const [messageStatus, setMessageStatus] = useState(false)
-  const [messageColor, setMessageColor] = useState('')
+  const [message, setMessage] = useState('')
+  const [loading, setLoading] = useState(false)
 
   // 用於預覽圖片
   const [previewUrl, setPreviewUrl] = useState([])
@@ -59,22 +61,14 @@ export default function AskNav({ setShowAskQA, qaHasUpload, setQaHasUpload, cour
   const [searchHint, setSearchHint] = useState([])
   const [showSearchhHint, setShowSearchHint] = useState(false)
 
-  // 控制訊息
-  const messageControl = (info, isSuccess) => {
-    setMessage(info)
-    setMessageStatus(true)
-    if (isSuccess) {
-      setMessageColor('rgba(195, 240, 178, 0.8)')
-    } else {
-      setMessageColor('rgba(240, 178, 178, 0.8)')
-    }
-    setTimeout(() => {
-      setMessageStatus(false)
-      setTimeout(() => {
-        setMessage('無訊息')
-        setMessageColor('')
-      }, 200)
+  const initUX = () => {
+    const timer = setTimeout(() => {
+      setMessage('')
     }, 2000)
+    setLoading(false)
+    return () => {
+      clearTimeout(timer)
+    }
   }
 
   // 點擊刪除移除圖片功能
@@ -112,7 +106,7 @@ export default function AskNav({ setShowAskQA, qaHasUpload, setQaHasUpload, cour
 
     if (themeName) {
       if (theme.find((item) => item === themeName)) {
-        messageControl('這個主題已經有了', false)
+        setMessage('這個主題已經有了')
         return
       }
       setTheme(theme, theme.push(themeName))
@@ -121,12 +115,12 @@ export default function AskNav({ setShowAskQA, qaHasUpload, setQaHasUpload, cour
     }
 
     if (themeInput.trim() === '') {
-      messageControl('主題不能為空', false)
+      setMessage('主題不能為空')
       return
     }
 
     if (theme.find((item) => item === themeInput)) {
-      messageControl('這個主題已經有了', false)
+      setMessage('這個主題已經有了')
       return
     }
 
@@ -154,7 +148,7 @@ export default function AskNav({ setShowAskQA, qaHasUpload, setQaHasUpload, cour
     if (hintInput.length > 19) return
     if (hintName) {
       if (hints.find((item) => item === hintName)) {
-        messageControl('這個標籤已經有了')
+        setMessage('這個標籤已經有了')
         return
       }
       setHints(hints, hints.push(hintName))
@@ -163,11 +157,11 @@ export default function AskNav({ setShowAskQA, qaHasUpload, setQaHasUpload, cour
     }
 
     if (hintInput.trim() === '') {
-      messageControl('標籤不能為空', false)
+      setMessage('標籤不能為空')
       return
     }
     if (hints.find((item) => item === hintInput)) {
-      messageControl('這個標籤已經有了')
+      setMessage('這個標籤已經有了')
       return
     }
     setHints(hints, hints.push(hintInput))
@@ -202,15 +196,23 @@ export default function AskNav({ setShowAskQA, qaHasUpload, setQaHasUpload, cour
       formData.append('hints[]', item)
     })
     initInput()
-    setpostLoading(true)
-    userService.createNewQuestion(token, formData).then((res) => {
-      if (res.success) {
-        setpostLoading(false)
-        messageControl('新增成功', true)
-        setQaHasUpload(!qaHasUpload)
-        initInput()
-      }
-    })
+    setLoading(true)
+    userService
+      .createNewQuestion(token, formData)
+      .then((res) => {
+        if (res.success) {
+          setMessage('新增成功')
+          setQaHasUpload(!qaHasUpload)
+          initInput()
+        }
+      })
+      .catch((err) => {
+        setMessage('發生錯誤')
+        console.error(err)
+      })
+      .finally(() => {
+        initUX()
+      })
   }
 
   // 替換input按鈕
@@ -224,11 +226,6 @@ export default function AskNav({ setShowAskQA, qaHasUpload, setQaHasUpload, cour
     }, 10)
   }
 
-  const closeUI = () => {
-    setShowAskQA(false)
-    page_body.style.overflow = 'auto'
-  }
-
   useEffect(() => {
     if (token) {
       adminService.getCourseQAsByTag(token, course_id).then((res) => {
@@ -240,215 +237,218 @@ export default function AskNav({ setShowAskQA, qaHasUpload, setQaHasUpload, cour
     }
   }, [token])
 
-  // 控制頁面scroll狀態
-  useEffect(() => {
-    if (typeof document !== 'undefined') {
-      setPage_body(document.querySelector('body'))
-    }
-    if (page_body && page_body.style) {
-      page_body.style.overflow = 'hidden'
-    }
-  }, [page_body])
-
-  // 刪除圖片後，nav更新高度
-  useEffect(() => {
-    setTimeout(() => {
-      setAskContentHeight(innerEleHeight.current.scrollHeight)
-    }, 10)
-  }, [images, count, theme, hints])
-
   return (
-    <div
-      className={style['ask-area']}
-      onClick={closeUI}>
+    <AnimatePresence>
       <div
-        style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
-        className={style['message']}>
-        {message}
+        className="g-blue-btn"
+        onClick={() => {
+          setVisibility(true)
+          setContainerIndex('99')
+        }}>
+        我要提問
       </div>
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className={style['ask-form']}
-        ref={innerEleHeight}>
-        {postLoading && (
-          <div className={style['loading-main']}>
-            <div className={style['loader']}></div>
-          </div>
-        )}
-        <div className={style['upload-img-area']}>
-          <button
-            onClick={handleButtonClick}
-            className={style['g-black-btn']}>
-            上傳圖片
-          </button>
-          <input
-            ref={fileInputRef}
-            onChange={(e) => {
-              const file = e.target.files?.[0]
-              if (!file) return
-              setImages([...images, file])
-              setPreviewUrl([...previewUrl, URL.createObjectURL(file)])
-              e.target.value = ''
-            }}
-            style={{ display: 'none' }}
-            accept="image/jpeg, image/png"
-            type="file"
-          />
-          {previewUrl.length > 0 && (
-            <div className={style['preview-img']}>
-              {previewUrl.map((item, index) => (
-                <div
-                  key={index}
-                  className={style['preview-images-container']}>
-                  <div
-                    className={`${style['remove-image-btn']} ${style['g-light-red-btn']}`}
-                    onClick={() => removeChoseImage(index)}>
-                    刪除
-                  </div>
-                  <Image
-                    className={style['preview-images']}
-                    src={item}
-                    alt="user chose image"
-                    width={0}
-                    height={0}
-                    style={{ height: 'auto' }}
-                  />
+      {visibility && (
+        <motion.div
+          key={'container'}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.1 }}
+          className={style['container']}>
+          <motion.div
+            key={'inner'}
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ duration: 0.1 }}
+            onClick={(e) => e.stopPropagation()}
+            className={style['ask-form']}
+            ref={innerEleHeight}>
+            <div className={style['upload-img-area']}>
+              <button
+                onClick={handleButtonClick}
+                className="g-black-btn">
+                上傳圖片
+              </button>
+              <input
+                ref={fileInputRef}
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (!file) return
+                  setImages([...images, file])
+                  setPreviewUrl([...previewUrl, URL.createObjectURL(file)])
+                  e.target.value = ''
+                }}
+                style={{ display: 'none' }}
+                accept="image/jpeg, image/png"
+                type="file"
+              />
+              {previewUrl.length > 0 && (
+                <div className={style['preview-img']}>
+                  {previewUrl.map((item, index) => (
+                    <div
+                      key={index}
+                      className={style['preview-images-container']}>
+                      <div
+                        className={`${style['remove-image-btn']} ${style['g-light-red-btn']}`}
+                        onClick={() => removeChoseImage(index)}>
+                        刪除
+                      </div>
+                      <Image
+                        className={style['preview-images']}
+                        src={item}
+                        alt="user chose image"
+                        width={0}
+                        height={0}
+                        style={{ height: 'auto' }}
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
-          )}
-        </div>
 
-        <div className={style['qa-info-area']}>
-          {showSearchTheme && (
-            <div className={style['view-card-area']}>
-              {searchTheme.map((item, idx) => (
-                <div
-                  key={idx}
-                  className={style['card']}
-                  onClick={() => addNewTheme(item)}
-                  style={{ cursor: 'pointer' }}>
-                  {item}
+            <div className={style['qa-info-area']}>
+              {showSearchTheme && (
+                <div className={style['view-card-area']}>
+                  {searchTheme.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className={style['card']}
+                      onClick={() => addNewTheme(item)}
+                      style={{ cursor: 'pointer' }}>
+                      {item}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
-          <div className={style['sortType-input-area']}>
-            <span className={style['title']}>主題:</span>
-            <input
-              className={style['input']}
-              onChange={(e) => setThemeInput(e.target.value)}
-              type="text"
-            />
-            <button
-              className={style['g-green-btn']}
-              onClick={() => addNewTheme()}>
-              <div onClick={initScrollHeight}>新增</div>
-            </button>
-            <button
-              className={style['g-blue-btn']}
-              onClick={() => setShowSearchTheme(true)}>
-              顯示現有主題
-            </button>
-          </div>
-          <div className={style['view-card-area']}>
-            {theme.map((item, index) => (
-              <div
-                key={index}
-                className={style['card']}>
-                {item}
-                <span
-                  className={style['delete-btn']}
-                  onClick={() => removeTheme(item)}>
-                  x
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {showSearchhHint && (
-            <div className={style['view-card-area']}>
-              {searchHint.map((item, idx) => (
-                <div
-                  key={idx}
-                  className={style['card']}
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => addNewHint(item)}>
-                  {item}
-                </div>
-              ))}
-            </div>
-          )}
-          <div className={style['sortType-input-area']}>
-            <span className={style['title']}>標籤:</span>
-            <input
-              className={style['input']}
-              onChange={(e) => setHintInput(e.target.value)}
-              type="text"
-            />
-            <button
-              className={style['g-green-btn']}
-              onClick={() => addNewHint()}>
-              <div
-                className={style['content']}
-                onClick={initScrollHeight}>
-                新增
-              </div>
-            </button>
-            <button
-              className={style['g-blue-btn']}
-              onClick={() => setShowSearchHint(true)}>
-              顯示現有標籤
-            </button>
-          </div>
-          <div className={style['view-card-area']}>
-            {hints.map((item, index) => (
-              <div
-                key={index}
-                className={style['card']}>
-                {item}
-                <span
-                  className={style['delete-btn']}
-                  onClick={() => removeHint(item)}>
-                  x
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <div className={style['description-input-area']}>
-            <span>問題描述</span>
-            <textarea
-              value={description}
-              className={style['ask-text-area']}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
-
-          <div className={style['submit-area']}>
-            {user_role === 'teacher' && (
-              <div className={style['public-area']}>
-                是否要公開此提問
+              )}
+              <div className={style['sortType-input-area']}>
+                <span className={style['title']}>主題:</span>
                 <input
-                  type="checkbox"
-                  className={style['isPublic-checkbox']}
-                  onChange={(e) => setIsPublic(e.target.checked)}
+                  className={style['input']}
+                  onChange={(e) => setThemeInput(e.target.value)}
+                  type="text"
+                />
+                <button
+                  className={'g-green-btn'}
+                  onClick={() => {
+                    addNewTheme()
+                    initScrollHeight()
+                  }}>
+                  新增
+                </button>
+                <button
+                  className={'g-blue-btn'}
+                  onClick={() => setShowSearchTheme(true)}>
+                  顯示現有主題
+                </button>
+              </div>
+              <div className={style['view-card-area']}>
+                {theme.map((item, index) => (
+                  <div
+                    key={index}
+                    className={style['card']}>
+                    {item}
+                    <span
+                      className={style['delete-btn']}
+                      onClick={() => removeTheme(item)}>
+                      x
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {showSearchhHint && (
+                <div className={style['view-card-area']}>
+                  {searchHint.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className={style['card']}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => addNewHint(item)}>
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className={style['sortType-input-area']}>
+                <span className={style['title']}>標籤:</span>
+                <input
+                  className={style['input']}
+                  onChange={(e) => setHintInput(e.target.value)}
+                  type="text"
+                />
+                <button
+                  className={'g-green-btn'}
+                  onClick={() => {
+                    addNewHint()
+                    initScrollHeight()
+                  }}>
+                  新增
+                </button>
+                <button
+                  className={'g-blue-btn'}
+                  onClick={() => setShowSearchHint(true)}>
+                  顯示現有標籤
+                </button>
+              </div>
+              <div className={style['view-card-area']}>
+                {hints.map((item, index) => (
+                  <div
+                    key={index}
+                    className={style['card']}>
+                    {item}
+                    <span
+                      className={style['delete-btn']}
+                      onClick={() => removeHint(item)}>
+                      x
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className={style['description-input-area']}>
+                <span>問題描述</span>
+                <textarea
+                  value={description}
+                  className={style['ask-text-area']}
+                  onChange={(e) => setDescription(e.target.value)}
                 />
               </div>
-            )}
-            <button
-              onClick={createNewQA}
-              className={style['g-green-btn']}>
-              送出
-            </button>
-            <button
-              onClick={closeUI}
-              className={style['g-red-btn']}>
-              關閉介面
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+
+              <div className={style['submit-area']}>
+                {(userRole === 'admin' || userRole === 'teacher') && (
+                  <div className={style['public-area']}>
+                    是否要公開此提問
+                    <input
+                      type="checkbox"
+                      className={style['isPublic-checkbox']}
+                      onChange={(e) => {
+                        setIsPublic(e.target.checked)
+                      }}
+                    />
+                  </div>
+                )}
+                <div className={style['btn-area']}>
+                  <button
+                    onClick={createNewQA}
+                    className={'g-green-btn'}>
+                    送出
+                  </button>
+                  <button
+                    onClick={() => {
+                      setVisibility(false)
+                      setContainerIndex('1')
+                    }}
+                    className={'g-red-btn'}>
+                    關閉介面
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }

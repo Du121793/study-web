@@ -124,3 +124,13 @@ export default function PageSwitcher({ total = 0, page, setPage, pageSize, total
     </div>
   )
 }
+
+// 使用方法
+{
+  /* <PageSwitcher
+setPage={setPage}
+page={page}
+pageSize={pageSize}
+totalPage={totalPage}
+total={total}></PageSwitcher> */
+}

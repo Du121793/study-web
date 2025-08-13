@@ -35,26 +35,58 @@
 .msg-board .settings-area .upload-video-btn-area .file-input {
   display: none;
 }
-.msg-board .settings-area .image-name-area {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  width: 100%;
-}
-.msg-board .settings-area .image-name-area .image-name {
+.msg-board .settings-area .upload-video-name {
+  width: 90%;
   margin-bottom: 4px;
   display: flex;
   justify-content: space-between;
+  gap: 4px;
   align-items: center;
   font-size: 14px;
   height: 29px;
   background-color: #f3f3f3;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 4px;
+  padding: 4px 8px;
   border: 1px solid rgba(0, 0, 0, 0.2);
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
+}
+.msg-board .settings-area .upload-video-name .text {
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.msg-board .settings-area .image-name-area {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+.msg-board .settings-area .image-name-area .image-name {
+  width: 90%;
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  align-items: center;
+  font-size: 14px;
+  height: 29px;
+  background-color: #f3f3f3;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 4px 8px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+.msg-board .settings-area .image-name-area .image-name .text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .msg-board .settings-area .image-name-area .image-name .remove-image-btn {
   cursor: pointer;
@@ -72,7 +104,7 @@
   gap: 4px;
 }
 .msg-board .settings-area .checkbox-area .contianer {
-  width: 60%;
+  width: 90%;
   display: flex;
   justify-content: space-between;
   align-items: center;

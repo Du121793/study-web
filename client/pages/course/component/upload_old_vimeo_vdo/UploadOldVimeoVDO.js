@@ -1,15 +1,14 @@
 // 原生組件庫
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 // 附加庫
 import { motion, AnimatePresence } from 'framer-motion'
 // method
 import adminService from '../../../../method/adminService'
-import { useStrictClickHandler } from '../../../../method/userful'
 import { useUserToken } from '../../../../method/useUserToken'
 // style
 import style from './style.module.css'
 
-export default function UploadOldVimeoVDO({ course_id, uploadOldVimeoVDOInnerEleOpacity, setUploadOldVimeoVDOInnerEleOpacity, uploadOldVimeoVDOWidht, setUploadOldVimeoVDOWidht, setUploadOldVimeoVDOHeight, UploadOldVimeoVDOHeight }) {
+export default function UploadOldVimeoVDO({ setContainerIndex, course_id, setUploadOldVimeoVDOInnerEleOpacity, setUploadOldVimeoVDOWidht, setUploadOldVimeoVDOHeight }) {
   const token = useUserToken()
   // 控制開關ui
   const [showUploadOldVimeoVDOUI, setShowUploadOldVimeoVDOUI] = useState(false)
@@ -88,6 +87,7 @@ export default function UploadOldVimeoVDO({ course_id, uploadOldVimeoVDOInnerEle
           className="g-blue-btn"
           onClick={() => {
             setShowUploadOldVimeoVDOUI(true)
+            setContainerIndex('99')
           }}>
           編輯舊有Vimeo影片
         </div>
@@ -101,6 +101,7 @@ export default function UploadOldVimeoVDO({ course_id, uploadOldVimeoVDOInnerEle
             className={style['upload-old-vimeo-vdo-area']}
             onClick={() => {
               setShowUploadOldVimeoVDOUI(false)
+              setContainerIndex('1')
             }}>
             <motion.div
               key={'ui-inner'}
@@ -118,6 +119,7 @@ export default function UploadOldVimeoVDO({ course_id, uploadOldVimeoVDOInnerEle
                       className="g-red-btn"
                       onClick={() => {
                         setShowUploadOldVimeoVDOUI(false)
+                        setContainerIndex('1')
                       }}>
                       關閉
                     </div>
@@ -210,7 +212,7 @@ export default function UploadOldVimeoVDO({ course_id, uploadOldVimeoVDOInnerEle
                       videoMsg.length > 0 &&
                       videoMsg.map((item, index) => (
                         <div
-                          className="card"
+                          className={style['card']}
                           key={index}>
                           {/* 標題欄位 */}
                           <div className="uid">{item.uid + 1}</div>

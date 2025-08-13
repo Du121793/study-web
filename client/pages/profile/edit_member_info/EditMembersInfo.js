@@ -89,7 +89,7 @@ export default function EditMembersInfo() {
       pageSize: pageSize,
       realname: searchRealName,
       phoneNumber: searchPhone,
-      gradeInput: searchGrade,
+      grade: searchGrade,
     }
     setLoading(true)
     adminService

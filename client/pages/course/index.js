@@ -42,22 +42,8 @@ export default function CoursePage() {
   // 檢查是否有新增qa，用於更新子組件的qa
   const [qaHasUpload, setQaHasUpload] = useState(true)
   const [userRole, setUserRole] = useState(null)
-
-  // 設定sessionStorage
-  // useEffect(() => {
-  //   if (!localStorage.getItem('user_role') || !localStorage.getItem('user_id')) {
-  //     userService.getUserInfo(token).then((res) => {
-  //       localStorage.setItem('user_lineID', res.data.lineID)
-  //       localStorage.setItem('user_id', res.data._id)
-  //       localStorage.setItem('user_line_shot', res.data.userinfo.pictureUrl)
-  //       localStorage.setItem('user_role', res.data.role)
-  //     })
-  //   }
-  //   const role = localStorage.getItem('user_role')
-  //   if (role) {
-  //     setUserRole(role)
-  //   }
-  // }, [])
+  // 控制container zindex
+  const [containerIndex, setContainerIndex] = useState('1')
 
   // // 請求使用者資料
   useEffect(() => {
@@ -93,7 +79,9 @@ export default function CoursePage() {
           inIndex="course"
         />
       </div>
-      <div className={style['container']}>
+      <div
+        className={style['container']}
+        style={{ zIndex: containerIndex }}>
         <div className={style['header-title-area']}>
           <div className={style['left']}>
             <div className={style['course-title']}>{courseName}</div>
@@ -116,12 +104,14 @@ export default function CoursePage() {
 
         {/* 影片組件 */}
         <VideoNav
+          setContainerIndex={setContainerIndex}
           user_role={userRole}
           course_id={courseId}
           courseName={courseName}
           setLoading={setLoading}></VideoNav>
         {/* Q&A 組件 */}
         <QaNav
+          setContainerIndex={setContainerIndex}
           qaHasUpload={qaHasUpload}
           setQaHasUpload={setQaHasUpload}
           user_role={userRole}

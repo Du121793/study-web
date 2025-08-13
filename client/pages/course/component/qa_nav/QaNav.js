@@ -22,7 +22,7 @@ import style from './style.module.css'
 
 const client_URL = process.env.NEXT_PUBLIC_CLIENT_IP
 
-export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_role, course_id, courseName }) {
+export default function QaNav({ setContainerIndex, setLoading, qaHasUpload, setQaHasUpload, user_role, course_id, courseName }) {
   const token = useUserToken()
   const [courseQas, setCourseQas] = useState([])
   const [userToken, setUserToken] = useState('')
@@ -236,7 +236,9 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
   // 當qa有改變，會更新UI內部高度，第二次是為了在圖片加載後再次更新高度
   useEffect(() => {
     if (qaOpen) {
-      setQaHeight(navInnerRef?.current?.clientHeight + headerRef?.current?.clientHeight + 100)
+      setTimeout(() => {
+        setQaHeight(navInnerRef?.current?.clientHeight + headerRef?.current?.clientHeight + 100)
+      }, 100)
     }
   }, [imgLoadComplete, qaOpen])
 
@@ -251,9 +253,7 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
     <div className={style['qa-nav']}>
       {/* 開關UI按鈕 */}
       <div
-        onClick={() => {
-          toggleQA()
-        }}
+        onClick={toggleQA}
         className={style['header']}>
         <Image
           src={downArrow}
@@ -337,20 +337,15 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
                 刪除問題
               </div>
             )}
-            <div
-              className="g-black-btn"
-              onClick={() => setShowAskQA(true)}>
-              我要提問
-            </div>
-            {showAskQA && (
-              <AskNav
-                showAskQA={showAskQA}
-                setShowAskQA={setShowAskQA}
-                qaHasUpload={qaHasUpload}
-                setQaHasUpload={setQaHasUpload}
-                course_id={course_id}
-              />
-            )}
+            <AskNav
+              userRole={user_role}
+              setContainerIndex={setContainerIndex}
+              showAskQA={showAskQA}
+              setShowAskQA={setShowAskQA}
+              qaHasUpload={qaHasUpload}
+              setQaHasUpload={setQaHasUpload}
+              course_id={course_id}
+            />
             {showMoreQA && (
               <ShowMoreQA
                 setShowMoreQA={setShowMoreQA}

@@ -2,12 +2,13 @@
   display: flex;
   flex-direction: column;
   max-width: 100vw;
+  height: 100vh;
   overflow-x: hidden;
-  background-color: #fff;
 }
 .video-player-main .header {
   height: 64px;
   width: 100%;
+  padding: 8px 0;
   background-color: #282828;
   display: flex;
   align-items: center;
@@ -370,4 +371,7 @@
 }
 .video-player-main .video-list-after-info-area .active {
   background-color: #e2e2e2;
+}
+.video-player-main .footer-area {
+  margin-top: auto;
 }

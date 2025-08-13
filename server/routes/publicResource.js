@@ -177,9 +177,11 @@ router.get("/board/:board_id", async (req, res) => {
     // 處理公告內容中的圖片路徑
     // 將相對路徑轉換為完整的URL路徑（加入伺服器IP）
     const imageRegex = /<img[^>]+src="(\/resource\/public\/board\/[^"]+)"/g;
+    
+    if(!!boardData.content){
     boardData.content = boardData.content.replace(imageRegex, (match, path) => {
       return match.replace(path, `${process.env.SERVER_IP}${path}`);
-    });
+    });}
 
     // 回傳成功狀態和公告完整資訊
     return res.json({ success: true, data: boardData });

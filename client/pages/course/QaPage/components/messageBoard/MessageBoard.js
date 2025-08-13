@@ -4,7 +4,7 @@ import { useUserToken } from '../../../../../method/useUserToken'
 import userService from '../../../../../method/userService'
 // 傳送影片的請求
 import QAMsgUpload from '../../../../methods/QaMsgUpload'
-
+import MessageAnime from '../../../../../components/message_anime/MessageAnime'
 // style
 import style from './style.module.css'
 
@@ -15,24 +15,28 @@ export default function MessageBoard({ qa_id, submitSuccess, setSubmitSuccess })
   // 請求送出留言的參數
   const [content, setContent] = useState('')
   const [images, setImages] = useState([])
-  const [video, setVideo] = useState()
+  const [video, setVideo] = useState([])
   const [isPrivate, setIsPrivate] = useState(false)
   const [isBest, setIsBest] = useState(false)
   // 預覽圖片
   const [preViewImage, setPreViewImage] = useState([])
-  // 控制訊息
-  const [message, setMessage] = useState('無訊息')
-  const [messageStatus, setMessageStatus] = useState(false)
-  const [messageColor, setMessageColor] = useState('')
-  // 綁定timeout，用於重計
-  const messageTimer = useRef(null)
-  const resetTimer = useRef(null)
   // 用來清空message框、圖片、影片
   const textAreaRef = useRef(null)
   const imageRef = useRef(null)
   const VideoRef = useRef(null)
+  // UX
+  const [message, setMessage] = useState('')
 
   const test = () => {}
+
+  const initUX = () => {
+    const timer = setTimeout(() => {
+      setMessage('')
+    }, 2000)
+    return () => {
+      clearTimeout(timer)
+    }
+  }
 
   // 取得role與檢查是否登陸
   useEffect(() => {
@@ -52,6 +56,14 @@ export default function MessageBoard({ qa_id, submitSuccess, setSubmitSuccess })
 
   return (
     <div className={style['msg-board']}>
+      {message && (
+        <MessageAnime
+          message={message}
+          top="100px"
+          left={'50%'}
+          duration={2000}
+        />
+      )}
       <textarea
         type="text-area"
         className={style['text-area']}
@@ -81,6 +93,22 @@ export default function MessageBoard({ qa_id, submitSuccess, setSubmitSuccess })
               setVideo(e.target.files[0])
             }}
           />
+          {video?.name && (
+            <div className={style['upload-video-name']}>
+              <div
+                className={style["text"]}
+                title={video?.name}>
+                {video?.name}
+              </div>
+              <div
+                className="g-red-btn"
+                onClick={() => {
+                  setVideo([])
+                }}>
+                x
+              </div>
+            </div>
+          )}
         </div>
         <div className={style['upload-video-btn-area']}>
           <div
@@ -95,16 +123,10 @@ export default function MessageBoard({ qa_id, submitSuccess, setSubmitSuccess })
             ref={imageRef}
             type="file"
             onChange={(e) => {
-              if (!e.target.files || !e.target.files[0]) {
-                return
-              }
               const selectedFile = e.target.files[0]
-              if (images.find((item) => item.name === selectedFile.name)) {
-                messageControl('不能上傳同樣的圖片', false)
-              } else {
-                setImages([...images, selectedFile])
-                setPreViewImage([...preViewImage, selectedFile])
-              }
+
+              setImages([...images, selectedFile])
+              setPreViewImage([...preViewImage, selectedFile])
             }}
           />
         </div>
@@ -114,10 +136,11 @@ export default function MessageBoard({ qa_id, submitSuccess, setSubmitSuccess })
             images.map((item, index) => (
               <div
                 className={style['image-name']}
+                title={item.name}
                 key={index}>
-                <div>{item.name}</div>
+                <div className={style['text']}>{item.name}</div>
                 <div
-                  className={style['remove-image-btn']}
+                  className="g-red-btn"
                   onClick={() => {
                     setImages(images.filter((obj) => obj !== item))
                   }}>
@@ -152,6 +175,8 @@ export default function MessageBoard({ qa_id, submitSuccess, setSubmitSuccess })
         </div>
         <div className={style['submit-btn-area']}>
           <QAMsgUpload
+            setMessage={setMessage}
+            initUX={initUX}
             token={token}
             file={video}
             question_id={qa_id}

@@ -10,7 +10,7 @@ import { useUserToken } from '../../../../method/useUserToken'
 import { useStrictClickHandler } from '../../../../method/userful'
 // style
 import style from './style.module.css'
-export default function UploadVideoFc({ messageControl, getCourseVideos, isShowVideoUpload, course_id, setUploadSuccess, uploadSuccess }) {
+export default function UploadVideoFc({ setContainerIndex, messageControl, getCourseVideos, isShowVideoUpload, course_id, setUploadSuccess, uploadSuccess }) {
   const token = useUserToken()
   // 控制是否顯示UI
   const [showUploadVideoUI, setShowUploadVideoUI] = useState(false)
@@ -415,6 +415,7 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
           className={`g-blue-btn`}
           onClick={() => {
             setShowUploadVideoUI(true)
+            setContainerIndex('99')
           }}>
           上傳影片
         </div>
@@ -583,6 +584,7 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
                 <div
                   className="g-red-btn"
                   onClick={() => {
+                    setContainerIndex('1')
                     setShowUploadVideoUI(false)
                     setPreViewVideoImage('')
                     setTitle('')

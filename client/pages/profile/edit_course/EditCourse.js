@@ -412,10 +412,12 @@ export default function EditCourse() {
         </div>
         <div className={style['input-area-container']}>
           <div className={`${style.input_area}`}>
+            {/* 年級 */}
             <div className={style['grade-input']}>
               <div>年級:</div>
               <div className={style['input-area']}>
                 <input
+                  className={`${style.grade_input}`}
                   type="text"
                   onFocus={() => {
                     setGradeListFlag(true)
@@ -436,6 +438,7 @@ export default function EditCourse() {
                 )}
               </div>
             </div>
+            {/* 科目 */}
             <div>科目:</div>
             <input
               type="text"
@@ -445,6 +448,7 @@ export default function EditCourse() {
               }}
               value={subjectInput}
             />
+            {/* 班級 */}
             <div>班級:</div>
             <input
               type="text"
@@ -456,6 +460,7 @@ export default function EditCourse() {
             />
             <div className={style.content}>選擇老師</div>
             <select
+              className={style['teacher-select']}
               onChange={(e) => {
                 setSeletedTeacher(e.target.value)
               }}>
@@ -471,7 +476,7 @@ export default function EditCourse() {
                 ))}
             </select>
           </div>
-
+          {/* 課名 */}
           <div className={`${style.input_area} ${style.course_name}`}>
             <div>課名:</div>
             <input

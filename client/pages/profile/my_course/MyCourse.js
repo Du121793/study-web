@@ -60,10 +60,6 @@ export default function MyCourse() {
       })
   }
 
-  const test = () => {
-    console.log(courseInfo)
-  }
-
   // 請求所有用戶已註冊課程資訊
   useEffect(() => {
     setLoading(true)

@@ -24,11 +24,10 @@ import UploadOldVimeoVDO from '../upload_old_vimeo_vdo/UploadOldVimeoVDO'
 
 // style
 import style from './style.module.css'
-
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
-export default function VideoNav({ course_id, courseName, user_role, setLoading }) {
+export default function VideoNav({ setContainerIndex, course_id, courseName, user_role, setLoading }) {
   const token = useUserToken()
   // 控制頁面scroll狀態
   const [page_body, setPage_body] = useState([])
@@ -52,6 +51,7 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(8)
   const [totalPage, setTotalPage] = useState(1)
+  const [total, setTotal] = useState(0)
   const [chooseType, setChooseType] = useState('')
   const [chooseSortOrder, setChooseSortOrder] = useState('desc')
   const [isShowVideoUpload, setIsShowVideoUpload] = useState(false)
@@ -98,7 +98,9 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
     setCardImageHeight(topContainerRef?.current?.scrollHeight)
   }, [windowsWidth])
 
-  const test = () => {}
+  const test = () => {
+    console.log(videos)
+  }
 
   const messageControl = (info, isSuccess) => {
     setMessage(info)
@@ -274,6 +276,7 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
             setVideoLoading(false)
             setVideos(res.data)
             setTotalPage(res.totalPage)
+            setTotal(res.tatal)
           } else {
             messageControl('發生錯誤', false)
           }
@@ -351,6 +354,7 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
           <div className={style['components-container']}>
             {/* 上傳影片的子組件 */}
             <VideoUploadComponent
+              setContainerIndex={setContainerIndex}
               uploadVideoUIInnerOpacity={uploadVideoUIInnerOpacity}
               setUploadVideoUIInnerOpacity={setUploadVideoUIInnerOpacity}
               messageControl={messageControl}
@@ -384,6 +388,7 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
                 </span>
                 {editShowVideoInfo && (
                   <EditVideoInfo
+                    setContainerIndex={setContainerIndex}
                     getCourseVideos={getCourseVideos}
                     messageControl={messageControl}
                     setShowEditVideoInfo={setShowEditVideoInfo}
@@ -399,6 +404,7 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
             {/* 上傳舊vimeoVDO的組件 */}
             {user_role && (user_role === 'teacher' || user_role === 'admin') && (
               <UploadOldVimeoVDO
+                setContainerIndex={setContainerIndex}
                 course_id={course_id}
                 UploadOldVimeoVDOHeight={UploadOldVimeoVDOHeight}
                 setUploadOldVimeoVDOHeight={setUploadOldVimeoVDOHeight}
@@ -443,7 +449,6 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
           </div>
         </div>
       )}
-
       <div
         className={style['video-nav-content']}
         ref={videoContentRef}
@@ -452,7 +457,7 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
           overflow: 'hidden',
           transition: 'height 0.3s ease',
         }}>
-        <div className={style['page-switch']}>
+        <div className={`${style['page-switch-area']} page-switch`}>
           <Image
             alt="switch back to first page icon"
             src={dbArrowLeft}
@@ -577,6 +582,7 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
                       onClick={(e) => {
                         e.preventDefault()
                         setShowEditVideoInfo(true)
+                        setContainerIndex('99')
                         setVideo_id(item._id)
                         setChoseEditVideo(item)
                       }}>

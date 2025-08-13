@@ -90,6 +90,42 @@ export default function QaPage() {
   // 控制留言區的刷新
   const [commentHasChange, setCommentHasChange] = useState(false)
 
+  // 計算天數，留言用
+  function formatTimeAgo(dateString) {
+    const now = new Date()
+    const past = new Date(dateString)
+    const diffInSeconds = Math.floor((now - past) / 1000)
+
+    const minute = 60
+    const hour = minute * 60
+    const day = hour * 24
+    const week = day * 7
+    const month = day * 30 // 簡化為 30 天
+    const year = day * 365 // 簡化為 365 天
+
+    if (diffInSeconds < minute) {
+      return '剛剛'
+    } else if (diffInSeconds < hour) {
+      const minutes = Math.floor(diffInSeconds / minute)
+      return `${minutes} 分鐘前`
+    } else if (diffInSeconds < day) {
+      const hours = Math.floor(diffInSeconds / hour)
+      return `${hours} 小時前`
+    } else if (diffInSeconds < week) {
+      const days = Math.floor(diffInSeconds / day)
+      return `${days} 天前`
+    } else if (diffInSeconds < month) {
+      const weeks = Math.floor(diffInSeconds / week)
+      return `${weeks} 週前`
+    } else if (diffInSeconds < year) {
+      const months = Math.floor(diffInSeconds / month)
+      return `${months} 個月前`
+    } else {
+      const years = Math.floor(diffInSeconds / year)
+      return `${years} 年前`
+    }
+  }
+
   const messageControl = (info, isSuccess) => {
     setMessage(info)
     setMessageStatus(true)
@@ -294,6 +330,7 @@ export default function QaPage() {
           setLoading(false)
           setTotalPage(res.pagination.totalPages)
           setComments(res.data)
+          console.log(res.data)
         })
         .catch((err) => {
           console.error(err)
@@ -485,6 +522,29 @@ export default function QaPage() {
                     alt="user avatar"
                   />
                 )}
+                <div className={style['mobile-message-info']}>
+                  <div className={style['left']}>{item?.poster?.username ? <div className={style['name']}>{item.poster.username}</div> : <div className={style['name']}>用戶已刪除</div>}</div>
+                  <div className={style['right']}>
+                    {item?.isBest && (
+                      <div className={style['isBest']}>
+                        <Image
+                          loading="lazy"
+                          className={style['best-comment']}
+                          src={star}
+                          width={12}
+                          height={12}
+                          alt="best comment icon"
+                        />
+                        <div
+                          className={style['content']}
+                          style={{ color: '#46A3FF' }}>
+                          置頂
+                        </div>
+                      </div>
+                    )}
+                    {item?.date && <div className={style['time']}>{formatTimeAgo(item.date)}</div>}
+                  </div>
+                </div>
               </div>
               <div className={style['message-info']}>
                 <div className={style['message-top']}>
@@ -531,16 +591,14 @@ export default function QaPage() {
                   </div>
                 </div>
 
-                {item?.content ? (
-                  <div className={style['message-middle']}>{item.content}</div>
-                ) : (
+                {item?.content && <div className={style['message-middle']}>{item.content}</div>}
+                {!item.content && !item.videoURL && !item.image && (
                   <div
                     className={style['message-middle']}
                     style={{ color: 'gray', fontWeight: 'bold' }}>
                     留言內容丟失
                   </div>
                 )}
-
                 <div className={style['message-bottom']}>
                   {item?.videoURL &&
                     item.videoURL.map((v, idx) => (

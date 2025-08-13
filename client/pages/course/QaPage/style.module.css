@@ -276,15 +276,73 @@
   width: 90%;
   display: flex;
   gap: 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid #ccc;
+}
+@media (max-width: 860px) {
+  .qaPage-main .qaPage-container .comment-area {
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid #ccc;
+    padding: 12px;
+    border-radius: 8px;
+  }
 }
 .qaPage-main .qaPage-container .comment-area .user-shot-area {
   display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 .qaPage-main .qaPage-container .comment-area .user-shot-area .user-shot {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   padding: 4px;
   border-radius: 64px;
+}
+.qaPage-main .qaPage-container .comment-area .user-shot-area .mobile-message-info {
+  display: none;
+}
+@media (max-width: 860px) {
+  .qaPage-main .qaPage-container .comment-area .user-shot-area {
+    justify-content: flex-start;
+    flex-direction: row;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .qaPage-main .qaPage-container .comment-area .user-shot-area .mobile-message-info {
+    display: flex;
+    justify-content: space-between;
+    flex: 1;
+    width: 100%;
+    gap: 8px;
+  }
+  .qaPage-main .qaPage-container .comment-area .user-shot-area .mobile-message-info .left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .qaPage-main .qaPage-container .comment-area .user-shot-area .mobile-message-info .left .name {
+    word-break: keep-all;
+    font-weight: 500;
+    font-size: 18px;
+  }
+  .qaPage-main .qaPage-container .comment-area .user-shot-area .mobile-message-info .right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .qaPage-main .qaPage-container .comment-area .user-shot-area .mobile-message-info .right .time {
+    font-size: 14px;
+    color: rgb(92, 92, 92);
+    word-break: keep-all;
+  }
+  .qaPage-main .qaPage-container .comment-area .user-shot-area .mobile-message-info .right .isBest {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: bold;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    padding: 1px 8px;
+    border-radius: 12px;
+  }
 }
 .qaPage-main .qaPage-container .comment-area .message-info {
   display: flex;
@@ -295,10 +353,24 @@
   word-wrap: break-word;
   width: 100%;
 }
+@media (max-width: 860px) {
+  .qaPage-main .qaPage-container .comment-area .message-info {
+    margin-top: 0;
+    border-top: 1px solid #ccc;
+    gap: 0;
+  }
+}
 .qaPage-main .qaPage-container .comment-area .message-info .message-top {
   display: flex;
   align-items: center;
   gap: 6px;
+}
+@media (max-width: 860px) {
+  .qaPage-main .qaPage-container .comment-area .message-info .message-top {
+    justify-content: center;
+    border-bottom: 1px solid #ccc;
+    padding: 4px 0;
+  }
 }
 .qaPage-main .qaPage-container .comment-area .message-info .message-top .isBest {
   display: flex;
@@ -309,14 +381,29 @@
   padding: 1px 8px;
   border-radius: 12px;
 }
+@media (max-width: 860px) {
+  .qaPage-main .qaPage-container .comment-area .message-info .message-top .isBest {
+    display: none;
+  }
+}
 .qaPage-main .qaPage-container .comment-area .message-info .message-top .time {
   font-size: 14px;
   color: rgb(92, 92, 92);
+}
+@media (max-width: 860px) {
+  .qaPage-main .qaPage-container .comment-area .message-info .message-top .time {
+    display: none;
+  }
 }
 .qaPage-main .qaPage-container .comment-area .message-info .message-top .name {
   height: 100%;
   font-weight: bold;
   font-size: 18px;
+}
+@media (max-width: 860px) {
+  .qaPage-main .qaPage-container .comment-area .message-info .message-top .name {
+    display: none;
+  }
 }
 .qaPage-main .qaPage-container .comment-area .message-info .message-top .function-btn-area {
   display: flex;
@@ -346,6 +433,7 @@
 .qaPage-main .qaPage-container .comment-area .message-info .message-middle {
   margin-left: 12px;
   font-size: 15px;
+  padding: 8px 0;
 }
 .qaPage-main .qaPage-container .comment-area .message-info .message-bottom {
   display: flex;

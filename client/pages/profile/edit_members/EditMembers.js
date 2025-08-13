@@ -200,7 +200,7 @@ export default function EditMembers() {
       username: usernameInput,
       realname: realnameInput,
       phoneNumber: phoneNumberInput,
-      gradeInput: gradeInput,
+      grade: gradeInput,
       role: role,
     }
     setLoading(true)

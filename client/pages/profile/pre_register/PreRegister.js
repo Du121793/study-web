@@ -137,7 +137,7 @@ export default function PreRegister() {
           setMessage(`新增成員成功，${content}`)
           return res
         } else if (res.data.successMsg.successStudentId.length > 0 && chooseCourses.length === 0) {
-          messageControl('新增成員成功')
+          setMessage(`新增成員成功`)
           return res
         }
         return res
@@ -187,7 +187,7 @@ export default function PreRegister() {
         if (res?.success) {
           setGetCourses(res.data.courses)
         } else {
-          messageControl('發生錯誤')
+          setMessage('發生錯誤')
         }
         setLoading(false)
       })
