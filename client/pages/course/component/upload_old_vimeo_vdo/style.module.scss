@@ -36,7 +36,6 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 12px;
         .btn-area {
           position: relative;
           display: flex;
@@ -44,6 +43,8 @@
           flex-wrap: wrap;
           width: 100%;
           gap: 12px;
+          padding: 8px 0 24px 0;
+          border-bottom: 1px solid #ccc;
           .confirm {
             position: absolute;
             right: 0;
@@ -56,7 +57,7 @@
           display: flex;
           flex-wrap: wrap;
           justify-content: flex-start;
-          gap: 24px;
+          gap: 48px;
           width: 100%;
           padding: 24px;
           @media screen and (max-width: 1350px) {
@@ -67,11 +68,11 @@
             flex-wrap: wrap;
             box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
             padding: 24px;
-            width: 20vw;
             display: flex;
             flex-direction: column;
             overflow: hidden;
             gap: 12px;
+            border-radius: 8px;
             .uid {
               font-size: 20px;
               font-weight: bold;

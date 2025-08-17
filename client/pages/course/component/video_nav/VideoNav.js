@@ -24,11 +24,10 @@ import UploadOldVimeoVDO from '../upload_old_vimeo_vdo/UploadOldVimeoVDO'
 
 // style
 import style from './style.module.css'
-
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 
-export default function VideoNav({ course_id, courseName, user_role, setLoading }) {
+export default function VideoNav({ setContainerIndex, course_id, courseName, user_role, setLoading }) {
   const token = useUserToken()
   // 控制頁面scroll狀態
   const [page_body, setPage_body] = useState([])
@@ -52,6 +51,7 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(8)
   const [totalPage, setTotalPage] = useState(1)
+  const [total, setTotal] = useState(0)
   const [chooseType, setChooseType] = useState('')
   const [chooseSortOrder, setChooseSortOrder] = useState('desc')
   const [isShowVideoUpload, setIsShowVideoUpload] = useState(false)
@@ -98,9 +98,7 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
     setCardImageHeight(topContainerRef?.current?.scrollHeight)
   }, [windowsWidth])
 
-  const test = () => {
-    console.log(videos)
-  }
+  const test = () => {}
 
   const messageControl = (info, isSuccess) => {
     setMessage(info)
@@ -220,42 +218,6 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
       e.innerText = '在點擊一次確認刪除'
     }
   }
-
-  // 參數:總頁數，中間頁數，從中間往左右總共要幾頁
-  function getPage(total, thisPage, pageSize = 5) {
-    if (total <= 0 || thisPage <= 0 || thisPage > total) {
-      return []
-    }
-
-    let page = []
-    if (total <= pageSize) {
-      for (let i = 0; i < total; i++) {
-        page.push(i + 1)
-      }
-      return page
-    }
-
-    const leftSize = Math.floor((pageSize - 1) / 2)
-    const rightSize = pageSize - 1 - leftSize
-
-    let start = Math.max(1, thisPage - leftSize)
-    let end = Math.min(total, thisPage + rightSize)
-
-    if (start === 1) {
-      end = Math.min(total, pageSize)
-      start = 1
-    } else if (end === total) {
-      start = Math.max(1, total - pageSize + 1)
-      end = total
-    }
-
-    for (let i = start; i <= end; i++) {
-      page.push(i)
-    }
-
-    return page
-  }
-
   // 若是任何一個有改變，重新發一次影片請求
   useEffect(() => {
     if (token && course_id) {
@@ -276,12 +238,13 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
             setVideoLoading(false)
             setVideos(res.data)
             setTotalPage(res.totalPage)
+            setTotal(res.total)
           } else {
             messageControl('發生錯誤', false)
           }
         })
     }
-  }, [token, course_id, chooseType, chooseSortOrder, uploadSuccess, page, hasChange])
+  }, [token, course_id, chooseType, chooseSortOrder, uploadSuccess, pageSize, hasChange])
 
   // 當全局寬度有變動的話，計算nav內部元素的高度來相加並加上40
   useEffect(() => {
@@ -353,6 +316,7 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
           <div className={style['components-container']}>
             {/* 上傳影片的子組件 */}
             <VideoUploadComponent
+              setContainerIndex={setContainerIndex}
               uploadVideoUIInnerOpacity={uploadVideoUIInnerOpacity}
               setUploadVideoUIInnerOpacity={setUploadVideoUIInnerOpacity}
               messageControl={messageControl}
@@ -386,6 +350,7 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
                 </span>
                 {editShowVideoInfo && (
                   <EditVideoInfo
+                    setContainerIndex={setContainerIndex}
                     getCourseVideos={getCourseVideos}
                     messageControl={messageControl}
                     setShowEditVideoInfo={setShowEditVideoInfo}
@@ -401,6 +366,7 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
             {/* 上傳舊vimeoVDO的組件 */}
             {user_role && (user_role === 'teacher' || user_role === 'admin') && (
               <UploadOldVimeoVDO
+                setContainerIndex={setContainerIndex}
                 course_id={course_id}
                 UploadOldVimeoVDOHeight={UploadOldVimeoVDOHeight}
                 setUploadOldVimeoVDOHeight={setUploadOldVimeoVDOHeight}
@@ -445,7 +411,6 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
           </div>
         </div>
       )}
-
       <div
         className={style['video-nav-content']}
         ref={videoContentRef}
@@ -454,73 +419,6 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
           overflow: 'hidden',
           transition: 'height 0.3s ease',
         }}>
-        <div className={style['page-switch']}>
-          <Image
-            alt="switch back to first page icon"
-            src={dbArrowLeft}
-            className="page-switcher"
-            width={24}
-            height={24}
-            onClick={() => {
-              setPage(1)
-            }}></Image>
-          <Image
-            alt="switch back one page icon"
-            src={ArrowLeft}
-            className="page-switcher"
-            width={24}
-            height={24}
-            onClick={() => {
-              if (page === 1) {
-                return
-              } else {
-                setPage((prop) => prop - 1)
-              }
-            }}></Image>
-          {getPage(totalPage, page).map((item, index) => {
-            if (page === item) {
-              return (
-                <div
-                  key={index}
-                  className="now-page active">
-                  {item}
-                </div>
-              )
-            }
-            return (
-              <div
-                onClick={() => {
-                  setPage(item)
-                }}
-                key={index}
-                className="now-page">
-                {item}
-              </div>
-            )
-          })}
-          <Image
-            alt="switch next to left page icon"
-            src={ArrowRight}
-            className="page-switcher"
-            width={24}
-            height={24}
-            onClick={() => {
-              if (page === totalPage) {
-                return
-              } else {
-                setPage((prop) => prop + 1)
-              }
-            }}></Image>
-          <Image
-            alt="switch next one page icon"
-            src={dbArrowRight}
-            className="page-switcher"
-            width={24}
-            height={24}
-            onClick={() => {
-              setPage(totalPage)
-            }}></Image>
-        </div>
         {/* message */}
         {videoNavOpen && (
           <div className="meesage-area">
@@ -542,7 +440,6 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
               <div className={style['loader']}></div>
             </div>
           )}
-
           <div className={style['video-area']}>
             {videoLoading && (
               <div
@@ -579,6 +476,7 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
                       onClick={(e) => {
                         e.preventDefault()
                         setShowEditVideoInfo(true)
+                        setContainerIndex('99')
                         setVideo_id(item._id)
                         setChoseEditVideo(item)
                       }}>
@@ -673,6 +571,17 @@ export default function VideoNav({ course_id, courseName, user_role, setLoading 
                   </div>
                 </Link>
               ))}
+          </div>
+        </div>
+        <div className={style['bottom-btn-area']}>
+          <div
+            className="g-blue-btn"
+            onClick={() => {
+              setPageSize((prop) => {
+                prop + 8
+              })
+            }}>
+            {total === videos.length ? '已經到底啦' : '加載更多影片'}
           </div>
         </div>
       </div>

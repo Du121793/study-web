@@ -1,11 +1,8 @@
 import axios from 'axios'
 
 // env
-const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 const serverIp = process.env.NEXT_PUBLIC_SERVER_IP
-const API_URL = serverIp
 const COURSE_URL = `${serverIp}/course`
-const USER_URL = `${serverIp}/user`
 const QA_URL = `${serverIp}/course/question`
 
 const videoUploader = {

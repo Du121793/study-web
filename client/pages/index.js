@@ -50,8 +50,6 @@ export default function Index({ initialCarousel, initialHeader }) {
   const moveToBoardRef = useRef(null)
   // 是否正在請求中
   const [requesting, setRequesting] = useState(true)
-  // 控制滑條
-  const mainRef = useRef()
 
   // 用於在其他頁面點擊header的最新消息時回到首頁並導引到最新消息
   const callBoardMoveToBoardFunction = () => {

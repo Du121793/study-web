@@ -24,6 +24,15 @@
   display: flex;
   gap: 20px;
 }
+.footer-main .info-area .images .icon {
+  transition: 0.2s;
+}
+.footer-main .info-area .images .icon:hover {
+  transform: scale(1.2);
+}
+.footer-main .info-area .images .icon:active {
+  transform: scale(0.9);
+}
 .footer-main .info-area .info {
   display: flex;
   justify-content: center;

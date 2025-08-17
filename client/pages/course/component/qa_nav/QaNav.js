@@ -12,23 +12,23 @@ import dbArrowRight from '../../../../public/profile/doubleArrowRight.png'
 import ArrowLeft from '../../../../public/profile/leftArrow.png'
 import ArrowRight from '../../../../public/profile/rightArrow.png'
 import downArrow from '../../../../public/course/downArrow.png'
-import ShowMoreQA from '../show_more_qa/ShowMoreQA'
 import ImageZoom from '../image_zoom/ImageZoom'
 // 子組件
 import AskNav from '../ask_qa/AskQA'
 import ShowPublicQA from '../show_public_qa/ShowPublicQA'
+import ShowMoreQA from '../show_more_qa/ShowMoreQA'
 // style
 import style from './style.module.css'
 
 const client_URL = process.env.NEXT_PUBLIC_CLIENT_IP
 
-export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_role, course_id, courseName }) {
+export default function QaNav({ setContainerIndex, setLoading, qaHasUpload, setQaHasUpload, user_role, course_id, courseName }) {
   const token = useUserToken()
   const [courseQas, setCourseQas] = useState([])
   const [userToken, setUserToken] = useState('')
   // 頁數控制
   const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(4)
+  const [pageSize, setPageSize] = useState(30)
   const [totalPage, setTotalPage] = useState(1)
 
   const [defaultSortType, setDefaultSortType] = useState('')
@@ -64,6 +64,17 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
   /* QA加載中 */
   const [qaLoading, setQaLoading] = useState(false)
   const [imgLoadComplete, setImgLoadComplete] = useState(false)
+  // UX
+  const [message, setMessage] = useState('')
+
+  const initUX = () => {
+    const timer = setTimeout(() => {
+      setMessage('')
+    }, 2000)
+    return () => {
+      clearTimeout(timer)
+    }
+  }
 
   // 新版邏輯 收合UI
   // 收合QA大標題
@@ -222,23 +233,34 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
         pageSize: pageSize,
         page: page,
       }
-      userService.getCourseQAs(token, course_id, data).then((res) => {
-        if (res.success) {
-          setCourseQas(res.data)
-          setTotalPage(res.totalPage)
-          setLoading(false)
-          setQaLoading(false)
-        }
-      })
+      userService
+        .getCourseQAs(token, course_id, data)
+        .then((res) => {
+          if (res.success) {
+            setCourseQas(res.data)
+            setTotalPage(res.totalPage)
+            setLoading(false)
+            setQaLoading(false)
+          }
+        })
+        .catch(() => {
+          setMessage('發生錯誤')
+        })
+        .finally(() => {
+          initUX()
+        })
     }
   }, [token, qaHasUpload, qaOpen, page])
 
   // 當qa有改變，會更新UI內部高度，第二次是為了在圖片加載後再次更新高度
   useEffect(() => {
-    if (qaOpen) {
+    if (courseQas) {
       setQaHeight(navInnerRef?.current?.clientHeight + headerRef?.current?.clientHeight + 100)
+      setTimeout(() => {
+        setQaHeight(navInnerRef?.current?.clientHeight + headerRef?.current?.clientHeight + 100)
+      }, 200)
     }
-  }, [imgLoadComplete, qaOpen])
+  }, [imgLoadComplete, qaOpen, courseQas])
 
   useEffect(() => {
     const localToken = localStorage.getItem('token')
@@ -251,9 +273,7 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
     <div className={style['qa-nav']}>
       {/* 開關UI按鈕 */}
       <div
-        onClick={() => {
-          toggleQA()
-        }}
+        onClick={toggleQA}
         className={style['header']}>
         <Image
           src={downArrow}
@@ -337,31 +357,15 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
                 刪除問題
               </div>
             )}
-            <div
-              className="g-black-btn"
-              onClick={() => setShowAskQA(true)}>
-              我要提問
-            </div>
-            {showAskQA && (
-              <AskNav
-                showAskQA={showAskQA}
-                setShowAskQA={setShowAskQA}
-                qaHasUpload={qaHasUpload}
-                setQaHasUpload={setQaHasUpload}
-                course_id={course_id}
-              />
-            )}
-            {showMoreQA && (
-              <ShowMoreQA
-                setShowMoreQA={setShowMoreQA}
-                showMoreQA={showMoreQA}
-                courseName={courseName}
-                token={token}
-                course_id={course_id}
-                resourceCategory={sortBy === 'resourceCategories' && selectBy}
-                hint={sortBy === 'hints' && selectBy}
-              />
-            )}
+            <AskNav
+              userRole={user_role}
+              setContainerIndex={setContainerIndex}
+              showAskQA={showAskQA}
+              setShowAskQA={setShowAskQA}
+              qaHasUpload={qaHasUpload}
+              setQaHasUpload={setQaHasUpload}
+              course_id={course_id}
+            />
           </div>
           <div className={`${style['page-switch-area']} page-switch`}>
             <Image
@@ -532,14 +536,15 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
                             </Link>
                           ))}
                         {item?.docs?.length >= 3 && (
-                          <div
-                            className="g-blue-btn"
-                            onClick={() => {
-                              setShowMoreQA(true)
-                              setSelectBy(item.tag)
-                            }}>
-                            點擊加載全部
-                          </div>
+                          <ShowMoreQA
+                            setShowMoreQA={setShowMoreQA}
+                            showMoreQA={showMoreQA}
+                            courseName={courseName}
+                            token={token}
+                            course_id={course_id}
+                            resourceCategory={sortBy === 'resourceCategories' && selectBy}
+                            hint={sortBy === 'hints' && selectBy}
+                          />
                         )}
                       </div>
                     )
@@ -553,12 +558,12 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
                     return (
                       <Link
                         href={`${client_URL}/course/QaPage?qa_id=${item._id}&courseName=${courseName}&course_id=${course_id}`}
-                        className="qa-info-area"
+                        className={style['qa-info-area']}
                         style={{ width: qaCardWidth }}
                         key={index}>
                         {removeingQA && (
                           <button
-                            className="g-light-red-btn"
+                            className={style['g-light-red-btn']}
                             onClick={(e) => {
                               e.preventDefault()
                               e.stopPropagation()
@@ -577,7 +582,7 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
                         )}
                         {item.image && item.image.length > 0 && (
                           <Image
-                            className="qa-image"
+                            className={style['qa-image']}
                             src={`${item.image[0]}?token=${userToken}`}
                             width={300}
                             height={0}
@@ -589,18 +594,18 @@ export default function QaNav({ setLoading, qaHasUpload, setQaHasUpload, user_ro
                         )}
                         <div className={style['content']}>
                           <div
-                            className="is-replied"
+                            className={style['is-replied']}
                             style={{ color: item.replied ? 'purple' : 'blue' }}>
                             <div
-                              className="title"
+                              className={style['title']}
                               style={{ color: 'black' }}>
                               描述
                             </div>
                             {item.replied ? '已回覆' : '未回覆'}
                           </div>
-                          <div className="time">{new Date(item.date).toLocaleString()}</div>
+                          <div className={style['time']}>{new Date(item.date).toLocaleString()}</div>
                         </div>
-                        <div className="description-area">{item.description}</div>
+                        <div className={style['description-area']}>{item.description}</div>
                       </Link>
                     )
                   }

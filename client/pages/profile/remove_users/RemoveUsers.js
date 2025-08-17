@@ -21,7 +21,6 @@ export default function RemoveUsers() {
   const token = useUserToken()
   // get members
   const [getUsers, setGetUsers] = useState([])
-  const [membersTemp, setMembersTemp] = useState([])
   // 旋轉讀取
   const [loading, setLoading] = useState(false)
   // 請求參數
@@ -29,13 +28,11 @@ export default function RemoveUsers() {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [totalPage, setTotalPage] = useState(1)
-  const [realNameValue, setRealNameValue] = useState(null)
-  const [phoneValue, setPhoneValue] = useState(null)
-  const [choseRole, setChoseRole] = useState(null)
-  const [memberId, setMemberId] = useState(null)
-  const [grade, setGrade] = useState(null)
-  // 初始化所有資料的邊框
-  const [optionBorder, setOptionBorder] = useState('2px solid rgba(0, 0, 0, 0.2)')
+  const [realNameValue, setRealNameValue] = useState('')
+  const [phoneValue, setPhoneValue] = useState('')
+  const [choseRole, setChoseRole] = useState('')
+  const [memberId, setMemberId] = useState('')
+  const [grade, setGrade] = useState('')
   // 控制訊息
   const [message, setMessage] = useState(null)
 
@@ -51,6 +48,15 @@ export default function RemoveUsers() {
 
   const checkSelectedMembers = () => {}
 
+  const initUX = () => {
+    const timer = setTimeout(() => {
+      setMessage('')
+    }, 2000)
+    setLoading(false)
+    return () => {
+      clearTimeout(timer)
+    }
+  }
   // 參數:總頁數，中間頁數，從中間往左右總共要幾頁
   function getPage(total, thisPage, pageSize = 5) {
     if (total <= 0 || thisPage <= 0 || thisPage > total) {
@@ -123,7 +129,6 @@ export default function RemoveUsers() {
           setSelectedUserId([])
           getUsersFunction()
           clearSelectedMemebers()
-          messageControl(res.msg, true)
           setLoading(false)
           setMessage('刪除完成')
         } else {
@@ -164,6 +169,7 @@ export default function RemoveUsers() {
     })
   }
 
+  // 下拉式選單
   useEffect(() => {
     setGrade(returnValue)
   }, [returnValue])
@@ -176,18 +182,34 @@ export default function RemoveUsers() {
         pageSize: pageSize,
       }
       setLoading(true)
-      adminService.getMembers(token, data).then((res) => {
-        if (res.success) {
-          setTotalPage(res.totalPage)
-          setGetUsers(res.data)
-          setLoading(false)
-        }
-      })
+      adminService
+        .getMembers(token, data)
+        .then((res) => {
+          if (res.success) {
+            setTotalPage(res.totalPage)
+            setGetUsers(res.data)
+            setLoading(false)
+          }
+        })
+        .catch(() => {
+          setMessage('發生錯誤')
+        })
+        .finally(() => {
+          initUX()
+        })
     }
     if (token) {
-      userService.getGradeList(token).then((res) => {
-        setGradeList(res.data.grades)
-      })
+      userService
+        .getGradeList(token)
+        .then((res) => {
+          setGradeList(res.data.grades)
+        })
+        .catch(() => {
+          setMessage('發生錯誤')
+        })
+        .finally(() => {
+          initUX()
+        })
     }
   }, [token, page])
 

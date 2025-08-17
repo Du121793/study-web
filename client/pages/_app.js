@@ -9,12 +9,12 @@ import '../styles/global/font.css'
 // index
 import '../styles/index/index.css'
 // course/component
-import '../styles/course/component/editVideoInfo.css'
-import '../styles/component/QA/editQA.css'
-import '../styles/course/component/uploadOldVimeoVDO.css'
-import '../styles/course/component/askQA.css'
-import '../styles/course/component/videoNav.css'
-import '../styles/course/component/QANav.css'
+// import '../styles/course/component/editVideoInfo.css'
+// import '../styles/component/QA/editQA.css'
+// import '../styles/course/component/uploadOldVimeoVDO.css'
+// import '../styles/course/component/askQA.css'
+// import '../styles/course/component/videoNav.css'
+// import '../styles/course/component/QANav.css'
 //method的layout
 import '../styles/method/completeInfo.css'
 // Favicon
@@ -25,9 +25,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <>
       <Head>
-        {/* 網站標題 */}
         <title>王佑物理--最專業的高中物理</title>
-        {/* 字元編碼 & 響應式 */}
         <meta charSet="utf-8" />
         <meta
           name="language"
@@ -55,8 +53,9 @@ function MyApp({ Component, pageProps }) {
           href={webTitle.src}
         />
       </Head>
-
+      {/* 頁面加載中的頂部讀條 */}
       <NextNProgress />
+      {/* 組件 */}
       <Component {...pageProps}></Component>
     </>
   )

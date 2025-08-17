@@ -33,10 +33,16 @@
   gap: 12px;
   flex-wrap: wrap;
   font-size: clamp(16px, 1.2vw, 20px);
+  transition: 0.2s;
 }
 .member_select_area .classification .search_inputs .grade-container {
   display: flex;
   align-items: center;
+}
+@media (max-width: 860px) {
+  .member_select_area .classification .search_inputs .grade-container {
+    align-items: flex-start;
+  }
 }
 .member_select_area .classification .search_inputs .grade-container .input-area {
   position: relative;
@@ -64,6 +70,11 @@
   display: flex;
   align-items: center;
   gap: 4px;
+}
+.member_select_area .classification .search_inputs .input_grade.lock {
+  background-color: #ededed;
+  color: rgba(255, 255, 255, 0);
+  pointer-events: none;
 }
 .member_select_area .classification .search_inputs select {
   outline: none;

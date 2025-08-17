@@ -18,7 +18,6 @@ const server_base_URL = process.env.NEXT_PUBLIC_SERVER_IP
 // style
 import style from './style.module.css'
 export default function ShowPublicQA({ token, setShowPublicQASetting, question_id }) {
-  const image_base_url = `${server_base_URL}/resource/questionIMG/`
   const [page_body, setPage_body] = useState([])
 
   // session

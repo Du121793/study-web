@@ -148,9 +148,13 @@
   border: 2px solid rgb(149, 193, 230);
   -o-object-fit: cover;
      object-fit: cover;
+  transition: 0.2s;
 }
-.header-container .header-main .header-right .member-img:hover {
-  box-shadow: 0px 0px 6px 6px rgb(149, 193, 230);
+.header-container .header-main .header-right .member-img .shot:hover {
+  transform: scale(1.2);
+}
+.header-container .header-main .header-right .member-img .shot:active {
+  transform: scale(1);
 }
 .header-container .header-main .header-right .sign-out-area {
   cursor: pointer;

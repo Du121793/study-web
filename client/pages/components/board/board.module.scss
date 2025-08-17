@@ -76,9 +76,13 @@
         border-radius: 8px;
         height: 80px;
         overflow: hidden;
-        transition: 0.3s;
-        box-shadow: 1px 1px 6px 1px rgba(0, 0, 0, 0.2);
+        transition: 0.2s;
+        box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.2);
 
+        &:hover {
+          transform: scale(1.01);
+          color: black;
+        }
         @media (max-width: 860px) {
           height: 50px;
         }

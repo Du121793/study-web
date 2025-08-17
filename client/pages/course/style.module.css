@@ -31,7 +31,7 @@
   align-items: center;
   position: relative;
   padding: 12px 0;
-  z-index: 4;
+  z-index: 1;
 }
 .course-main .container .header-title-area .left {
   display: flex;
@@ -80,34 +80,62 @@
 .course-main .container .nav {
   width: 100%;
   position: relative;
-  top: 0;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  margin-bottom: 24px;
-  position: relative;
-  z-index: 1;
+  display: flex;
+  justify-content: center;
 }
-.course-main .container .nav .header {
-  font-weight: bold;
+.course-main .scroll-to-nav-container {
+  position: fixed;
+  z-index: 100;
+  top: 180px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+@media (max-width: 1100px) {
+  .course-main .scroll-to-nav-container {
+    top: 85%;
+    right: 85%;
+  }
+}
+.course-main .scroll-to-nav-container .btn {
+  padding: 8px;
+  border: 1px solid #696969;
+  border-radius: none;
+  background-color: #ffffff;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 20px;
+  border-radius: 50%;
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
-  border-radius: 8px;
-  background-color: var(--main-color);
-  display: flex;
-  cursor: pointer;
-  align-items: center;
-  position: relative;
-  width: 100%;
-  min-height: 80px;
-  font-size: 20px;
-  z-index: 1;
-  gap: 12px;
-  color: white;
 }
-.course-main .container .nav .header div {
-  padding-left: 24px;
+.course-main .scroll-to-nav-container .btn:hover {
+  transform: scale(1);
+}
+.course-main .scroll-to-nav-container .btn:active {
+  transform: scale(0.9);
+}
+@media (max-width: 1100px) {
+  .course-main .scroll-to-nav-container .btn {
+    left: 0;
+    bottom: 0;
+    padding: 8px;
+  }
+}
+.course-main .scroll-to-nav-container .btn .image {
+  width: 32px;
+  height: 32px;
+}
+@media (max-width: 1100px) {
+  .course-main .scroll-to-nav-container .btn .image {
+    width: 24px;
+    height: 24px;
+  }
 }
 .course-main .footer-main {
   position: relative;

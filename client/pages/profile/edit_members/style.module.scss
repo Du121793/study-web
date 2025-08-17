@@ -28,23 +28,74 @@
   }
   .input_area {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     gap: 12px;
-    font-size: clamp(16px, 1.2vw, 20px);
+    .text {
+      font-size: 24px;
+    }
+    .select {
+      padding: 4px;
+      font-size: 18px;
+    }
   }
   .member_selector_area {
-    width: 95%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 8px;
+    .header-option-container {
+      width: 90%;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
     .option_area {
       display: flex;
       flex-wrap: wrap;
-      justify-content: center;
-      gap: 24px;
+      flex-direction: column;
       font-weight: bold;
-      font-size: clamp(16px, 1.2vw, 20px);
+      border: 1px solid #ccc;
+      padding: 12px 18px;
+      gap: 8px;
+      border-radius: 4px;
+      background-color: #fbfbfb;
+      .text {
+        font-size: clamp(16px, 1.3vw, 20px);
+        color: rgb(0, 0, 0);
+      }
+      .btns {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        gap: 12px;
+        .btn {
+          font-weight: 400;
+          color: rgb(0, 0, 0);
+          background-color: #ededed;
+          font-size: clamp(16px, 1.2vw, 22px);
+          cursor: pointer;
+          transition: 0.1s;
+          border: 1px solid rgba(0, 0, 0, 0.2);
+          border-radius: 2px;
+          padding: 4px 6px;
+          &:hover {
+            background-color: #b3d3f6;
+          }
+        }
+        .active {
+          background-color: #6bb1fc;
+          &:hover {
+            background-color: #6bb1fc;
+          }
+        }
+        .lock {
+          background-color: #5b5b5b;
+          box-shadow: inset 0px 0px 4px 0.5px rgba(0, 0, 0, 0.3);
+          pointer-events: none;
+        }
+      }
       .button {
         cursor: pointer;
         transition: 0.2s;
@@ -80,12 +131,17 @@
       }
     }
     .search_form {
+      width: 90%;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       align-items: center;
-      width: 95%;
-      gap: 8px;
+      gap: 10px;
+      border: 1px solid #ccc;
+      padding: 8px 0;
+      background-color: #fbfbfb;
+      color: rgb(8, 8, 8);
+      border-radius: 4px;
       .username_input {
         word-break: keep-all;
         display: flex;
@@ -128,6 +184,21 @@
         gap: 4px;
       }
     }
+    .select-btns {
+      display: flex;
+      gap: 8px;
+      .select-button {
+        transition: 0.2s;
+        cursor: pointer;
+        border: none;
+        &:hover {
+          transform: scale(1.4);
+        }
+        &:active {
+          transform: scale(1);
+        }
+      }
+    }
     .member_list_area {
       width: 90%;
       display: flex;
@@ -135,7 +206,6 @@
       align-items: center;
       gap: 8px;
       border-radius: 8px;
-      padding: 24px;
       .inner_line {
         display: flex;
         justify-content: center;
@@ -143,7 +213,7 @@
         width: 100%;
         border: 2px solid rgba(0, 0, 0, 0.2);
         border-radius: 4px;
-        padding: 8px;
+        padding: 8px 0;
         gap: 4px;
         font-size: clamp(16px, 1.2vw, 20px);
         .user_name {

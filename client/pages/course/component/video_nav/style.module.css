@@ -60,11 +60,18 @@
   padding: 24px 0;
 }
 .video-nav .components .sort-options {
+  padding: 12px 0;
   display: flex;
   gap: 16px;
 }
 .video-nav .video-nav-content {
   background-color: #ffffff;
+}
+.video-nav .video-nav-content .page-switch-area {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
 }
 .video-nav .update-video-area {
   display: flex;
@@ -112,6 +119,7 @@
      -moz-user-select: none;
           user-select: none;
   background-color: #fff;
+  border-radius: 24px;
 }
 .video-nav .show-more-video-btn {
   margin-bottom: 12px;
@@ -141,6 +149,7 @@
   gap: 24px;
   padding: 0 64px;
   background-color: #fff;
+  padding-top: 24px;
 }
 @media (max-width: 1100px) {
   .video-nav .video-area {
@@ -161,10 +170,16 @@
   background-color: #f1f1f1;
   /* ===== 縮圖區塊：強制 16:9，先裁切再填滿 ===== */
 }
+.video-nav .video-area .video-card:hover {
+  transform: scale(1.1);
+}
 @media (max-width: 1100px) {
   .video-nav .video-area .video-card {
     width: 80%;
     background-color: #e4e4e4;
+  }
+  .video-nav .video-area .video-card:hover {
+    transform: scale(1);
   }
 }
 .video-nav .video-area .video-card .edit-btn {
@@ -191,6 +206,9 @@
   border-radius: 6px;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 @media (max-width: 860px) {
   .video-nav .video-area .video-card .top-container {
@@ -198,9 +216,6 @@
   }
 }
 .video-nav .video-area .video-card .top-container .videos-shot {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   -o-object-fit: cover;
@@ -321,8 +336,10 @@
     margin: 0;
   }
 }
-.video-nav .video-area .video-card:hover {
-  background-color: #efefef;
+.video-nav .bottom-btn-area {
+  display: flex;
+  width: 100%;
+  justify-content: center;
 }
 
 .video-card .bottom-container .info {

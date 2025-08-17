@@ -40,7 +40,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
 }
 .upload-old-vimeo-vdo-area .container .ui .inner-element .btn-area {
   position: relative;
@@ -49,6 +48,8 @@
   flex-wrap: wrap;
   width: 100%;
   gap: 12px;
+  padding: 8px 0 24px 0;
+  border-bottom: 1px solid #ccc;
 }
 .upload-old-vimeo-vdo-area .container .ui .inner-element .btn-area .confirm {
   position: absolute;
@@ -63,7 +64,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
-  gap: 24px;
+  gap: 48px;
   width: 100%;
   padding: 24px;
 }
@@ -77,11 +78,11 @@
   flex-wrap: wrap;
   box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
   padding: 24px;
-  width: 20vw;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   gap: 12px;
+  border-radius: 8px;
 }
 .upload-old-vimeo-vdo-area .container .ui .inner-element .card-area .card .uid {
   font-size: 20px;

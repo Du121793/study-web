@@ -31,10 +31,14 @@
       gap: 12px;
       flex-wrap: wrap;
       font-size: clamp(16px, 1.2vw, 20px);
+      transition: 0.2s;
       .grade-container {
         display: flex;
         align-items: center;
-        .input-area{
+        @media (max-width: 860px) {
+          align-items: flex-start;
+        }
+        .input-area {
           position: relative;
         }
       }
@@ -61,6 +65,11 @@
         display: flex;
         align-items: center;
         gap: 4px;
+      }
+      .input_grade.lock {
+        background-color: #ededed;
+        color: #ffffff00;
+        pointer-events: none;
       }
       select {
         outline: none;

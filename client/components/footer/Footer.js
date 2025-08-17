@@ -18,7 +18,9 @@ export default function Footer() {
     <div className={style['footer-main']}>
       <div className={style['info-area']}>
         <div className={style.images}>
-          <Link href={faceBookUrl}>
+          <Link
+            target="_blank"
+            href={faceBookUrl}>
             <Image
               className={style.icon}
               src={facebook}
@@ -26,7 +28,9 @@ export default function Footer() {
               width={36}
               height={36}></Image>
           </Link>
-          <Link href={lineUrl}>
+          <Link
+            target="_blank"
+            href={lineUrl}>
             <Image
               className={style.icon}
               src={line}
@@ -34,7 +38,9 @@ export default function Footer() {
               width={36}
               height={36}></Image>
           </Link>
-          <Link href={address}>
+          <Link
+            target="_blank"
+            href={address}>
             <Image
               className={style.icon}
               src={googleMap}

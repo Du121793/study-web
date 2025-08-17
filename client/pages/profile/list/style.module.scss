@@ -93,6 +93,14 @@
               cursor: pointer;
               transition: 0.2s;
               color: rgb(111, 111, 111);
+              user-select: none;
+              &:hover {
+                transform: scale(1.1);
+                color: black;
+              }
+              &:active {
+                transform: scale(0.8);
+              }
             }
             .item:hover {
               color: rgb(42, 42, 42);

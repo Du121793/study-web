@@ -101,6 +101,16 @@
   cursor: pointer;
   transition: 0.2s;
   color: rgb(111, 111, 111);
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+.list_main .list_info_area .list_option .funciton_area .options .item_area .item:hover {
+  transform: scale(1.1);
+  color: black;
+}
+.list_main .list_info_area .list_option .funciton_area .options .item_area .item:active {
+  transform: scale(0.8);
 }
 .list_main .list_info_area .list_option .funciton_area .options .item_area .item:hover {
   color: rgb(42, 42, 42);

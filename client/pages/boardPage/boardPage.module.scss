@@ -5,17 +5,17 @@
   min-height: 100vh;
   align-items: center;
   position: relative;
-  overflow-x: hidden;
   .header {
     width: 100%;
     position: relative;
-    @media (max-width: 860px) {
-      z-index: 2;
-    }
+    z-index: 9;
+  }
+  .components {
+    position: relative;
   }
   .g-btn-area {
     position: relative;
-    z-index: 4;
+    z-index: 1;
     margin: 12px 0 12px 0;
     display: flex;
     gap: 12px;
@@ -69,6 +69,7 @@
       width: 80%;
       display: flex;
       flex-direction: column;
+
       h1 {
         font-size: 32px;
       }
@@ -87,27 +88,44 @@
       h6 {
         font-size: 12px;
       }
-      .ql-font-serif {
+
+      /* 把 Quill 產生的 class 改成全域選擇器 */
+      :global(.ql-font-serif) {
         font-family: "Times New Roman", serif;
       }
-      .ql-font-monospace {
+      :global(.ql-font-monospace) {
         font-family: "Courier New", monospace;
       }
-      .ql-align-center {
+      :global(.ql-align-center) {
         text-align: center !important;
       }
-      .ql-align-right {
+      :global(.ql-align-right) {
         text-align: right !important;
       }
-      .ql-align-justify {
+      :global(.ql-align-justify) {
         text-align: justify !important;
       }
-      blockquote {
+
+      /* 內文常用 reset */
+      :global(blockquote) {
         padding: 0.5em 1em;
         margin: 1em 0;
         background-color: #f9f9f9;
         border-left: 5px solid #ccc;
         font-style: italic;
+      }
+
+      /* 圖片置中也常需要這條 */
+      :global(.ql-align-center img) {
+        margin-inline: auto;
+        display: block;
+      }
+      :global(.ql-video) {
+        display: block;
+        width: 100%;
+        aspect-ratio: 4/2; /* 讓 iframe 吃 16:9，會自動算高 */
+        height: auto;
+        border: 0;
       }
     }
     .announcement-footer {

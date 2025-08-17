@@ -8,7 +8,7 @@ import { useStrictClickHandler } from '../../../../method/userful'
 
 // style
 import style from './style.module.css'
-export default function EditVideoInfo({ setLoading, video_info, getCourseVideos, messageControl, setShowEditVideoInfo, token, video_id, course_id }) {
+export default function EditVideoInfo({ setContainerIndex, setLoading, video_info, getCourseVideos, messageControl, setShowEditVideoInfo, token, video_id, course_id }) {
   // 請求參數
   const [thumbnail, setThumbnail] = useState(video_info?.thumbnail)
   const [title, setTitle] = useState(video_info?.title)
@@ -19,11 +19,14 @@ export default function EditVideoInfo({ setLoading, video_info, getCourseVideos,
 
   const strictClickCloseUI = useStrictClickHandler(() => {
     setShowEditVideoInfo(false)
+    setContainerIndex('1')
   })
 
   const submitEdit = () => {
     if (title === null) {
       setShowEditVideoInfo(false)
+
+      setContainerIndex('1')
       messageControl('標題不能為空', false)
       return console.error('title不能為空')
     }
@@ -42,16 +45,16 @@ export default function EditVideoInfo({ setLoading, video_info, getCourseVideos,
         setLoading(false)
         setShowEditVideoInfo(false)
         getCourseVideos(false)
+        setContainerIndex('1')
         messageControl('編輯完成', true)
       } else {
         setShowEditVideoInfo(false)
+        setContainerIndex('1')
         console.error(res)
         messageControl('發生錯誤編輯失敗', false)
       }
     })
   }
-
-  const test = () => {}
 
   // 設定預覽圖
   useEffect(() => {

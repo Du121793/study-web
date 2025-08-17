@@ -15,7 +15,8 @@ import ArrowRight from '../../../public/profile/rightArrow.png'
 // global
 import LoadingAnime from '../../../components/loading_anime/LoadingAnime'
 import MessageAnime from '../../../components/message_anime/MessageAnime'
-
+import check from '../../../public/check(uncheck)/check.png'
+import unCheck from '../../../public/check(uncheck)/uncheck.png'
 // components
 import BackGround from '../components/back_ground/BackGround'
 export default function EditMembers() {
@@ -39,9 +40,6 @@ export default function EditMembers() {
   const [pageSize, setPageSize] = useState(10)
   const [totalPage, setTotalPage] = useState(1)
   const [courseId, setCourseId] = useState('')
-  // 限制多次下載用
-  const [exportRequested, setExportRequested] = useState(false)
-  const isExporting = useRef(false)
   // 目前成員的顯示狀態
   const [showMembersState, setShowMembersState] = useState('all')
   // 獲取資料
@@ -49,8 +47,6 @@ export default function EditMembers() {
   const [userRole, setUserRole] = useState('')
   // 旋轉讀取
   const [loading, setLoading] = useState(false)
-  // rander lock
-  const [randerLock, setRanderLock] = useState(0)
   // 搜尋用 payload
   const [usernameInput, setUsernameInput] = useState('')
   const [realnameInput, setRealnameInput] = useState('')
@@ -73,6 +69,15 @@ export default function EditMembers() {
     setGradeInput(returnValue)
   }, [returnValue])
 
+  const initUX = () => {
+    const timer = setTimeout(() => {
+      setMessage('')
+    }, 2000)
+    setLoading(false)
+    return () => {
+      clearTimeout(timer)
+    }
+  }
   // 初始化選擇狀態
   const initSelector = () => {
     let allActive = document.querySelectorAll('.select-active')
@@ -191,7 +196,7 @@ export default function EditMembers() {
   }
 
   /* 搜尋功能 */
-  const searchMembers = (role) => {
+  const searchMembers = () => {
     /* 
       由於api沒有根據課程拿到成員，
       根據目前搜尋根據成員的ID來比對
@@ -200,22 +205,28 @@ export default function EditMembers() {
       username: usernameInput,
       realname: realnameInput,
       phoneNumber: phoneNumberInput,
-      gradeInput: gradeInput,
+      grade: gradeInput,
       role: role,
+      courses: method.name === 'allMemberPage' ? '' : courseId, // 當選擇所有成員，搜尋功能變成無過濾id
     }
     setLoading(true)
-    if (role === '') {
-      setMethod({ name: 'courseMemberPage', page: 1 })
-      return
-    }
-    adminService.getMembers(token, data).then((res) => {
-      if (res?.success) {
-        const memberIds = new Set(courseMemberIds.map((m) => m._id))
-        const common = res.data.filter((item) => memberIds.has(item._id))
-        setMembers(common)
-      }
-      setLoading(false)
-    })
+    adminService
+      .getMembers(token, data)
+      .then((res) => {
+        if (res?.success) {
+          const memberIds = new Set(courseMemberIds.map((m) => m._id))
+          const common = res.data.filter((item) => memberIds.has(item._id))
+          setPage(1)
+          setTotalPage(res.totalPage)
+          setMembers(res.data)
+        }
+      })
+      .catch(() => {
+        setMessage('發生錯誤')
+      })
+      .finally(() => {
+        initUX()
+      })
   }
 
   // 導出成csv
@@ -311,11 +322,17 @@ export default function EditMembers() {
     }
   }
 
+  // 透過switch控制搜尋課程成員的方法
   const getMembers = () => {
     switch (method.name) {
       case 'allMemberPage':
         setLoading(true)
         let data = {
+          username: usernameInput,
+          realname: realnameInput,
+          phoneNumber: phoneNumberInput,
+          grade: gradeInput,
+          role: role,
           page: method.page,
           pageSize: pageSize,
         }
@@ -323,44 +340,63 @@ export default function EditMembers() {
           initSelector()
           setMethodTemp(method.name)
         }
-        adminService.getMembers(token, data).then((res) => {
-          if (res.success) {
-            setLoading(false)
-            setTotalPage(res.totalPage)
-            setShowMembersState('all')
-            setMembers(res.data)
-            setCourseMemberIds(res.data)
-          } else {
-            setLoading(false)
-            setMessage('發生錯誤', false)
-          }
-        })
+        adminService
+          .getMembers(token, data)
+          .then((res) => {
+            if (res.success) {
+              setPage(1)
+              setLoading(false)
+              setTotalPage(res.totalPage)
+              setShowMembersState('all')
+              setMembers(res.data)
+              setCourseMemberIds(res.data)
+            } else {
+              setMessage('發生錯誤', false)
+            }
+          })
+          .catch(() => {
+            setMessage('發生錯誤')
+          })
+          .finally(() => {
+            initUX()
+          })
         break
       case 'courseMemberPage':
         if (courseId !== '') {
           setLoading(true)
           let data = {
+            username: usernameInput,
+            realname: realnameInput,
+            phoneNumber: phoneNumberInput,
+            grade: gradeInput,
+            role: role,
             page: method.page,
             pageSize: pageSize,
             courses: courseId,
           }
-
           if (method.name !== methodTemp) {
             initSelector()
             setMethodTemp(method.name)
           }
-          adminService.getMembers(token, data).then((res) => {
-            if (res.success) {
-              setLoading(false)
-              setTotalPage(res.totalPage)
-              setShowMembersState('course members')
-              setMembers(res.data)
-              setCourseMemberIds(res.data)
-            } else {
-              setLoading(false)
-              setMessage('發生錯誤', false)
-            }
-          })
+          adminService
+            .getMembers(token, data)
+            .then((res) => {
+              if (res.success) {
+                setLoading(false)
+                setTotalPage(res.totalPage)
+                setShowMembersState('course members')
+                setMembers(res.data)
+                setCourseMemberIds(res.data)
+              } else {
+                setMessage('發生錯誤', false)
+              }
+            })
+            .catch(() => {
+              setMessage('發生錯誤')
+            })
+            .finally(() => {
+              initUX()
+            })
         } else {
           setMessage('請選擇課程', false)
           setMembers([])
@@ -371,6 +407,11 @@ export default function EditMembers() {
         if (courseId !== '') {
           setLoading(true)
           let data = {
+            username: usernameInput,
+            realname: realnameInput,
+            phoneNumber: phoneNumberInput,
+            grade: gradeInput,
+            role: role,
             page: method.page,
             pageSize: pageSize,
             withoutCourses: courseId,
@@ -380,18 +421,25 @@ export default function EditMembers() {
             initSelector()
             setMethodTemp(method.name)
           }
-          adminService.getMembers(token, data).then((res) => {
-            if (res.success) {
-              setLoading(false)
-              setTotalPage(res.totalPage)
-              setShowMembersState('all')
-              setMembers(res.data)
-              setCourseMemberIds(res.data)
-            } else {
-              setLoading(false)
-              setMessage('發生錯誤', false)
-            }
-          })
+          adminService
+            .getMembers(token, data)
+            .then((res) => {
+              if (res.success) {
+                setLoading(false)
+                setTotalPage(res.totalPage)
+                setShowMembersState('all')
+                setMembers(res.data)
+                setCourseMemberIds(res.data)
+              } else {
+                setMessage('發生錯誤', false)
+              }
+            })
+            .catch(() => {
+              setMessage('發生錯誤')
+            })
+            .finally(() => {
+              initUX()
+            })
         } else {
           setMessage('請選擇課程', false)
           setMembers([])
@@ -403,6 +451,7 @@ export default function EditMembers() {
     }
   }
 
+  // 當任何搜尋方式改變會改變獲取到的資料
   useEffect(() => {
     if (token) {
       getMembers()
@@ -443,8 +492,6 @@ export default function EditMembers() {
     setUserRole(user_role)
   }, [])
 
-  const test = () => {}
-
   return (
     <div className={`${style.edit_members_main}`}>
       <BackGround></BackGround>
@@ -456,26 +503,16 @@ export default function EditMembers() {
           duration={2000}
         />
       )}
-      <div
-        className={style.title}
-        onClick={test}>
-        編輯成員
-      </div>
+      <div className={style['title']}>編輯成員</div>
       <div className={style['option-container']}>
-        <div className={`${style.input_area}`}>
-          <span>課程名稱:</span>
+        <div className={style['input_area']}>
+          <span className={style['text']}>課程名稱:</span>
           <select
-            className={style.select}
+            className={style['select']}
             onChange={(e) => {
               setCourseId(e.target.value)
-              if (e.target.value === '') {
-                setShowMembersState('all')
-              } else {
-                setShowMembersState('course members')
-              }
-            }}
-            name=""
-            id="">
+              if (e.target.value === '') setMethod({ name: 'allMemberPage', page: 1 })
+            }}>
             <option value="">請選擇</option>
             {getedCourse.courses &&
               getedCourse.courses.map((item, index) => (
@@ -488,82 +525,92 @@ export default function EditMembers() {
           </select>
         </div>
         <div className={`${style.member_selector_area}`}>
-          <div className={`${style.option_area}`}>
-            {/* 顯示所有成員 */}
-            <div
-              className={`${style.button} ${method.name === 'allMemberPage' ? 'active' : null}`}
-              onClick={() => {
-                setMethod({
-                  name: 'allMemberPage',
-                  page: 1,
-                })
-              }}>
-              顯示所有成員
-            </div>
-            {/* 顯示課程以外成員 */}
-            <div
-              className={`${style.button} ${method.name === 'ousideMemberPage' ? 'active' : null}`}
-              onClick={() => {
-                setMethod({
-                  name: 'ousideMemberPage',
-                  page: 1,
-                })
-              }}>
-              顯示課程以外成員
-            </div>
-            {/* 顯示該課程成員 */}
-            <div
-              className={`${style.button} ${method.name === 'courseMemberPage' ? 'active' : null}`}
-              onClick={() => {
-                setMethod({
-                  name: 'courseMemberPage',
-                  page: 1,
-                })
-              }}>
-              顯示該課程成員
-            </div>
-          </div>
-          <div className={`${style.option_area}`}>
-            <div
-              className="g-blue-btn"
-              onClick={registerMemberToCourse}>
-              加入到課程
-            </div>
-            <div
-              className="g-red-btn"
-              onClick={removeRegisterCourse}>
-              移除出課程
-            </div>
-
-            <div
-              className="g-black-btn"
-              onClick={selectAll}>
-              全選此頁
-            </div>
-            <div
-              className="g-black-btn"
-              onClick={unSelectAll}>
-              反選此頁
-            </div>
-          </div>
-          {userRole && userRole === 'admin' && (
+          <div className={style['header-option-container']}>
             <div className={`${style.option_area}`}>
-              <div
-                className="g-blue-btn"
-                onClick={() => {
-                  exportCSV('search')
-                }}>
-                將搜尋到的成員匯出csv檔案
-              </div>
-              <div
-                className="g-blue-btn"
-                onClick={() => {
-                  exportCSV('selected')
-                }}>
-                將選取的成員匯出csv檔案
+              <div className={style['text']}>顯示成員</div>
+              <div className={style['btns']}>
+                {/* 顯示所有成員 */}
+                <div
+                  className={`${style['btn']} ${method.name === 'allMemberPage' ? style['active'] : null}`}
+                  onClick={() => {
+                    setMethod({
+                      name: 'allMemberPage',
+                      page: 1,
+                    })
+                  }}>
+                  所有
+                </div>
+                {/* 顯示課程以外成員 */}
+                <div
+                  className={`${style['btn']} ${method.name === 'ousideMemberPage' ? style['active'] : null}`}
+                  onClick={() => {
+                    if (!courseId) {
+                      setMessage('請先選擇課程')
+                      initUX()
+                      return
+                    }
+                    setMethod({
+                      name: 'ousideMemberPage',
+                      page: 1,
+                    })
+                  }}>
+                  課程以外
+                </div>
+                {/* 顯示該課程成員 */}
+                <div
+                  className={`${style['btn']} ${method.name === 'courseMemberPage' ? style['active'] : null}`}
+                  onClick={() => {
+                    if (!courseId) {
+                      setMessage('請先選擇課程')
+                      initUX()
+                      return
+                    }
+                    setMethod({
+                      name: 'courseMemberPage',
+                      page: 1,
+                    })
+                  }}>
+                  限該課程
+                </div>
               </div>
             </div>
-          )}
+            <div className={`${style.option_area}`}>
+              <div className={style['text']}>成員操作</div>
+              <div className={style['btns']}>
+                <div
+                  className={`g-green-btn ${!courseId && style['lock']}`}
+                  onClick={registerMemberToCourse}>
+                  加入到課程
+                </div>
+                <div
+                  className={`g-red-btn ${!courseId && style['lock']}`}
+                  onClick={removeRegisterCourse}>
+                  移除出課程
+                </div>
+              </div>
+            </div>
+            {userRole && userRole === 'admin' && (
+              <div className={`${style.option_area}`}>
+                <div className={style['text']}>匯出CSV檔案</div>
+                <div className={style['btns']}>
+                  <div
+                    className="g-blue-btn"
+                    onClick={() => {
+                      exportCSV('search')
+                    }}>
+                    搜尋到的成員
+                  </div>
+                  <div
+                    className="g-blue-btn"
+                    onClick={() => {
+                      exportCSV('selected')
+                    }}>
+                    選取的成員
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
 
           <form
             className={`${style.search_form}`}
@@ -574,6 +621,7 @@ export default function EditMembers() {
             <div className={`${style.username_input}`}>
               <div className={style.content}>暱稱</div>
               <input
+                placeholder="選填"
                 type="text"
                 onChange={(e) => {
                   setUsernameInput(e.target.value)
@@ -583,6 +631,7 @@ export default function EditMembers() {
             <div className={`${style.realname_input}`}>
               <div className={style.content}>姓名</div>
               <input
+                placeholder="選填"
                 type="text"
                 onChange={(e) => {
                   setUsernameInput(e.target.value)
@@ -592,6 +641,7 @@ export default function EditMembers() {
             <div className={`${style.phoneNumber_input}`}>
               <div className={style.content}>電話號碼</div>
               <input
+                placeholder="選填"
                 type="text"
                 onChange={(e) => {
                   setPhoneNumberInput(e.target.value)
@@ -601,6 +651,7 @@ export default function EditMembers() {
             <div className={`${style.grade_input}`}>
               <div className={style.content}>年級</div>
               <input
+                placeholder="選填"
                 type="text"
                 onChange={(e) => {
                   setGradeInput(e.target.value)
@@ -612,7 +663,7 @@ export default function EditMembers() {
               <select
                 className=""
                 onChange={(e) => {
-                  searchMembers(e.target.value)
+                  setRole(e.target.value)
                 }}>
                 <option value="">全部</option>
                 <option value="teacher">教師</option>
@@ -626,7 +677,24 @@ export default function EditMembers() {
               搜尋
             </button>
           </form>
-
+          <div className={style['select-btns']}>
+            <Image
+              className={style['select-button']}
+              src={check}
+              onClick={selectAll}
+              alt="select all button"
+              title="全選此頁成員"
+              width={32}
+              height={32}></Image>
+            <Image
+              className={style['select-button']}
+              src={unCheck}
+              onClick={unSelectAll}
+              alt="unselect all button"
+              title="反選此頁成員"
+              width={32}
+              height={32}></Image>
+          </div>
           <div className={`${style.member_list_area}`}>
             <div className={`${style.inner_line}`}>
               <span className={`${style.user_name}`}>暱稱</span>

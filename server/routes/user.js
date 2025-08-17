@@ -235,13 +235,13 @@ router.get("/registedCourse", async (req, res) => {
  * @param {string} phoneNumber - 電話號碼過濾
  * @param {string} _id - 用戶ID過濾
  * @param {string} role - 角色過濾
- * @param {string} courses - 課程過濾
+ * @param {string} courses - 課程過濾（只包含）
  * @param {string} withoutCourses - 排除特定課程的使用者
  * @param {string} grade - 年級過濾
  * @param {number} page - 頁碼
  * @param {number} pageSize - 每頁筆數
- * @param {string} sortBy - 排序欄位
- * @param {string} sortOrder - 排序方向
+ * @param {string} sortBy - 排序欄位（"grade" 或 "date"）
+ * @param {string} sortOrder - 排序方向（"asc" 或 "desc"）
  * @returns {Object} 會員列表及分頁資訊
  */
 router.get("/getMembers", checkTeacherAccess, async (req, res) => {
@@ -258,44 +258,38 @@ router.get("/getMembers", checkTeacherAccess, async (req, res) => {
       grade,
     } = req.query;
     const { page = 1, pageSize = 10, sortBy, sortOrder = "asc" } = req.query;
-    const parsedPage = parseInt(page);
-    const parsedPageSize = parseInt(pageSize);
+    const parsedPage = parseInt(page, 10);
+    const parsedPageSize = parseInt(pageSize, 10);
 
     // 建立過濾條件
     const filter = {};
-    if (username) {
-      filter["userinfo.username"] = new RegExp(username, "i");
-    }
-    if (realname) {
-      filter["userinfo.realname"] = new RegExp(realname, "i");
-    }
-    if (phoneNumber) {
+
+    // 一般欄位過濾
+    if (username) filter["userinfo.username"] = new RegExp(username, "i");
+    if (realname) filter["userinfo.realname"] = new RegExp(realname, "i");
+    if (phoneNumber)
       filter["userinfo.phoneNumber"] = new RegExp(phoneNumber, "i");
-    }
-    if (_id) {
-      filter._id = _id;
-    }
-    if (role) {
-      filter.role = role;
-    }
-    if (courses) {
-      filter.courses = { $in: [ courses ] };
-    }
-    if (withoutCourses) {
-      filter.courses = { $nin: [withoutCourses] };
-    }
-    if (grade) {
-      filter["userinfo.grade"] = new RegExp(grade, "i");
+    if (_id) filter._id = _id;
+    if (role) filter.role = role;
+    if (grade) filter["userinfo.grade"] = new RegExp(grade, "i");
+
+    // 處理課程篩選：合併 $in 和 $nin，並排除空陣列
+    const courseFilter = {};
+    if (courses) courseFilter.$in = [courses];
+    if (withoutCourses) courseFilter.$nin = [withoutCourses];
+    if (Object.keys(courseFilter).length > 0) {
+      filter.courses = courseFilter;
+      filter["courses.0"] = { $exists: true };
     }
 
     // 設定排序條件
     let sortQuery = {};
     if (sortBy === "grade") {
-      if (sortOrder === "asc") {
-        sortQuery = { "userinfo.grade": -1, date: 1 };
-      } else {
-        sortQuery = { "userinfo.grade": 1, date: -1 };
-      }
+      // 年級排序時，用 grade 反向排序搭配 date 次級排序
+      sortQuery = {
+        "userinfo.grade": sortOrder === "asc" ? -1 : 1,
+        date: sortOrder === "asc" ? 1 : -1,
+      };
     } else if (sortBy === "date") {
       sortQuery = { date: sortOrder === "asc" ? 1 : -1 };
     }
@@ -908,71 +902,6 @@ router.delete("/deleteMember", checkAdminAccess, async (req, res) => {
       serverErrorUsers,
     },
   });
-});
-
-/**
- * 臨時測試用路由 - 更改用戶身分
- * @route POST /changeRole
- * @param {string} role - 要更改的身分 (student/admin/teacher)
- * @returns {Object} 更新結果
- */
-router.post("/changeRole", async (req, res) => {
-  try {
-    const { role } = req.body;
-
-    // 檢查傳入的身分是否有效
-    if (!["student", "admin", "teacher"].includes(role)) {
-      return res.status(400).json({
-        success: false,
-        msg: "無效的身分，請傳入 student、admin 或 teacher",
-      });
-    }
-
-    // 更新用戶身分
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user._id,
-      { role },
-      { new: true }
-    );
-
-    if (!updatedUser) {
-      return res.status(404).json({
-        success: false,
-        msg: "找不到該用戶",
-      });
-    }
-
-    log(
-      {
-        userIp: req.ip,
-        userId: req.user._id,
-        userName: req.user.userinfo.realname,
-      },
-      `更改身分為 ${role}`
-    );
-
-    return res.json({
-      success: true,
-      msg: "成功更新用戶身分",
-      data: updatedUser,
-    });
-  } catch (error) {
-    logError(
-      {
-        userIp: req.ip,
-        userId: req.user._id,
-        userName: req.user.userinfo.realname,
-      },
-      "user.js",
-      "POST /changeRole",
-      req.body,
-      error
-    );
-    return res.status(500).json({
-      success: false,
-      msg: "更新用戶身分時發生錯誤",
-    });
-  }
 });
 
 module.exports = router;

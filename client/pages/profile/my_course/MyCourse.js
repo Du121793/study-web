@@ -11,6 +11,7 @@ import { useUserToken } from '../../../method/useUserToken'
 // components
 import LoadingAnime from '../../../components/loading_anime/LoadingAnime'
 import MessageAnime from '../../../components/message_anime/MessageAnime'
+import LoadingArea from '../../../components/loading_area/LoadingArea'
 // env
 const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
 // components
@@ -26,6 +27,7 @@ export default function MyCourse() {
   // UX
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
+  const [userInfoIsLoading, setUserInfoIsLoading] = useState(false)
 
   const initUX = () => {
     const timer = setTimeout(() => {
@@ -60,19 +62,17 @@ export default function MyCourse() {
       })
   }
 
-  const test = () => {
-    console.log(courseInfo)
-  }
-
   // 請求所有用戶已註冊課程資訊
   useEffect(() => {
-    setLoading(true)
     if (token) {
+      setLoading(true)
+      setUserInfoIsLoading(true)
       userService
         .getUserRegistedCourses(token)
         .then((res) => {
           if (res.success) {
             setCourseInfo(res.data)
+            setUserInfoIsLoading(false)
           } else {
             setMessage('發生錯誤')
           }

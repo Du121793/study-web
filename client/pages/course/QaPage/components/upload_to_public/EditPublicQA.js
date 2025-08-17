@@ -15,6 +15,9 @@ import rightArrow from '../../../../../public/course/rightArrow.png'
 // style
 import style from './style.module.css'
 
+// commponent
+import MessageAnime from '../../../../../components/message_anime/MessageAnime'
+
 export default function ShowPublicQA({ token, setShowPublicQASetting, question_id }) {
   const [page_body, setPage_body] = useState([])
   const [visibility, setVisibility] = useState(false)
@@ -38,37 +41,19 @@ export default function ShowPublicQA({ token, setShowPublicQASetting, question_i
   //選擇資料夾用於新增QA
   const [selectedFolders, setSelectedFolders] = useState([])
   // 控制訊息
-  const [message, setMessage] = useState('無訊息')
-  const [messageStatus, setMessageStatus] = useState(false)
-  const [messageColor, setMessageColor] = useState('')
-  // 綁定timeout，用於重計
-  const messageTimer = useRef(null)
-  const resetTimer = useRef(null)
+  const [message, setMessage] = useState('')
+
+  const initUX = () => {
+    const timer = setTimeout(() => {
+      setMessage('')
+    }, 2000)
+    return () => {
+      clearTimeout(timer)
+    }
+  }
 
   const initSelectedFolder = () => {
     setSelectedFolders([])
-  }
-  // 控制訊息
-  const messageControl = (info, isSuccess) => {
-    setMessage(info)
-    setMessageStatus(true)
-    if (isSuccess) {
-      setMessageColor('rgba(195, 240, 178, 0.8)')
-    } else {
-      setMessageColor('rgba(240, 178, 178, 0.8)')
-    }
-
-    // 清除之前的 timer
-    if (messageTimer.current) clearTimeout(messageTimer.current)
-    if (resetTimer.current) clearTimeout(resetTimer.current)
-
-    messageTimer.current = setTimeout(() => {
-      setMessageStatus(false)
-      resetTimer.current = setTimeout(() => {
-        setMessage('無訊息')
-        setMessageColor('')
-      }, 200)
-    }, 2000)
   }
   // 將QA新增到選擇到的folder
   const pushQAtoFolder = () => {
@@ -104,18 +89,26 @@ export default function ShowPublicQA({ token, setShowPublicQASetting, question_i
             folders: folder_ids,
             isPublic: true,
           }
-          adminService.patchQaToFolders(token, data).then((response) => {
-            if (response?.success) {
-              messageControl('新增成功', true)
-              initSelectedFolder()
-            } else {
-              messageControl('新增失敗', false)
-            }
-          })
+          adminService
+            .patchQaToFolders(token, data)
+            .then((response) => {
+              if (response?.success) {
+                setMessage('新增成功')
+                initSelectedFolder()
+              } else {
+                setMessage('新增失敗')
+              }
+            })
+            .catch((error) => {
+              console.error(error)
+            })
+            .finally(() => {
+              initUX()
+            })
         }
       })
     } else {
-      messageControl('請選擇要加入的資料夾', false)
+      setMessage('請選擇要加入的資料夾')
     }
   }
 
@@ -219,6 +212,13 @@ export default function ShowPublicQA({ token, setShowPublicQASetting, question_i
 
   return (
     <div className={style['show-more-public-main']}>
+      {message && (
+        <MessageAnime
+          message={message}
+          top="100px"
+          duration={2000}
+        />
+      )}
       <AnimatePresence>
         <div
           className="g-blue-btn"

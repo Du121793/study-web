@@ -1,0 +1,33 @@
+.loading-area-main {
+  border-radius: 8px;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 99;
+  /* 固定一個漸層，移動背景即可 */
+  --base: #e9e9e9;
+  --shine: #f6f6f6;
+  background: linear-gradient(90deg, var(--base) 0%, var(--shine) 50%, var(--base) 100%);
+  background-size: 200% 100%;
+  animation: anime 2s linear infinite;
+  will-change: background-position; /* 提示瀏覽器優化 */
+}
+
+@keyframes anime {
+  0% {
+    background-position: 100% 0;
+  }
+  50% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+/* 使用者偏好減少動效時自動關閉 */
+@media (prefers-reduced-motion: reduce) {
+  .loading-area-main {
+    animation: none;
+    background-position: 50% 0;
+  }
+}

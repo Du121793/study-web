@@ -29,23 +29,53 @@
         display: none;
       }
     }
+    .upload-video-name {
+      width: 90%;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      gap: 4px;
+      align-items: center;
+      font-size: 14px;
+      height: 29px;
+      background-color: #f3f3f3;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 4px 8px;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      user-select: none;
+      .text {
+        font-size: 14px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
     .image-name-area {
       display: flex;
       flex-direction: column;
+      justify-content: center;
+      align-items: center;
       gap: 4px;
       width: 100%;
       .image-name {
+        width: 90%;
         margin-bottom: 4px;
         display: flex;
         justify-content: space-between;
+        gap: 4px;
         align-items: center;
         font-size: 14px;
         height: 29px;
         background-color: #f3f3f3;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        padding: 4px;
+        padding: 4px 8px;
         border: 1px solid rgba(0, 0, 0, 0.2);
         user-select: none;
+        .text {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
         .remove-image-btn {
           cursor: pointer;
           font-size: 16px;
@@ -63,7 +93,7 @@
       align-items: center;
       gap: 4px;
       .contianer {
-        width: 60%;
+        width: 90%;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -111,7 +141,7 @@
     padding: 8px;
     transition: 0.2s;
     @media (max-width: 576px) {
-      height: 320px;
+      height: 200px;
     }
   }
   .is-private-checkbox-area {

@@ -14,7 +14,8 @@ import userService from '../../method/userService'
 
 // public
 import leftArrow from '../../public/course/leftArrow.png'
-
+import video from '../../public/video/video.png'
+import qa from '../../public/qa/qa.png'
 // nav組件
 import VideoNav from './component/video_nav/VideoNav'
 import QaNav from './component/qa_nav/QaNav'
@@ -42,22 +43,22 @@ export default function CoursePage() {
   // 檢查是否有新增qa，用於更新子組件的qa
   const [qaHasUpload, setQaHasUpload] = useState(true)
   const [userRole, setUserRole] = useState(null)
+  // 控制container zindex
+  const [containerIndex, setContainerIndex] = useState('1')
 
-  // 設定sessionStorage
-  // useEffect(() => {
-  //   if (!localStorage.getItem('user_role') || !localStorage.getItem('user_id')) {
-  //     userService.getUserInfo(token).then((res) => {
-  //       localStorage.setItem('user_lineID', res.data.lineID)
-  //       localStorage.setItem('user_id', res.data._id)
-  //       localStorage.setItem('user_line_shot', res.data.userinfo.pictureUrl)
-  //       localStorage.setItem('user_role', res.data.role)
-  //     })
-  //   }
-  //   const role = localStorage.getItem('user_role')
-  //   if (role) {
-  //     setUserRole(role)
-  //   }
-  // }, [])
+  const [videoRefHeight, setVideoRefHeight] = useState('')
+  const [qaRefHeight, setQaRefHeight] = useState('')
+  const videoRef = useRef()
+  const qaRef = useRef()
+
+  const scrollToRef = (ref) => {
+    if (ref.current) {
+      ref.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    }
+  }
 
   // // 請求使用者資料
   useEffect(() => {
@@ -80,6 +81,12 @@ export default function CoursePage() {
     }
   }, [courseName, courseId])
 
+  // 用於重記高度
+  useEffect(() => {
+    if (videoRefHeight) setVideoRefHeight(videoRef.current.offsetHeight)
+    if (qaRefHeight) setQaRefHeight(qaRef.current.offsetHeight)
+  }, [videoRefHeight, qaRefHeight])
+
   return (
     <div className={style['course-main']}>
       <div
@@ -93,7 +100,9 @@ export default function CoursePage() {
           inIndex="course"
         />
       </div>
-      <div className={style['container']}>
+      <div
+        className={style['container']}
+        style={{ zIndex: containerIndex }}>
         <div className={style['header-title-area']}>
           <div className={style['left']}>
             <div className={style['course-title']}>{courseName}</div>
@@ -115,19 +124,53 @@ export default function CoursePage() {
         </div>
 
         {/* 影片組件 */}
-        <VideoNav
-          user_role={userRole}
-          course_id={courseId}
-          courseName={courseName}
-          setLoading={setLoading}></VideoNav>
+        <div
+          className={style['nav']}
+          ref={videoRef}>
+          <VideoNav
+            setContainerIndex={setContainerIndex}
+            user_role={userRole}
+            course_id={courseId}
+            courseName={courseName}
+            setLoading={setLoading}></VideoNav>
+        </div>
         {/* Q&A 組件 */}
-        <QaNav
-          qaHasUpload={qaHasUpload}
-          setQaHasUpload={setQaHasUpload}
-          user_role={userRole}
-          course_id={courseId}
-          courseName={courseName}
-          setLoading={setLoading}></QaNav>
+        <div
+          className={style['nav']}
+          ref={qaRef}>
+          <QaNav
+            setContainerIndex={setContainerIndex}
+            qaHasUpload={qaHasUpload}
+            setQaHasUpload={setQaHasUpload}
+            user_role={userRole}
+            course_id={courseId}
+            courseName={courseName}
+            setLoading={setLoading}></QaNav>
+        </div>
+      </div>
+      <div className={style['scroll-to-nav-container']}>
+        <div className={style['btn']}>
+          <Image
+            src={video}
+            className={style['image']}
+            alt="scroll to video btn"
+            width={0}
+            height={0}
+            onClick={() => {
+              scrollToRef(videoRef)
+            }}></Image>
+        </div>
+        <div className={style['btn']}>
+          <Image
+            src={qa}
+            className={style['image']}
+            alt="scroll to QA btn"
+            width={0}
+            height={0}
+            onClick={() => {
+              scrollToRef(qaRef)
+            }}></Image>
+        </div>
       </div>
       <Footer></Footer>
     </div>

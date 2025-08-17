@@ -7,10 +7,9 @@ import { Upload } from 'tus-js-client'
 // method
 import videoUploader from '../../../../method/videoUploader'
 import { useUserToken } from '../../../../method/useUserToken'
-import { useStrictClickHandler } from '../../../../method/userful'
 // style
 import style from './style.module.css'
-export default function UploadVideoFc({ messageControl, getCourseVideos, isShowVideoUpload, course_id, setUploadSuccess, uploadSuccess }) {
+export default function UploadVideoFc({ setContainerIndex, messageControl, getCourseVideos, isShowVideoUpload, course_id, setUploadSuccess, uploadSuccess }) {
   const token = useUserToken()
   // 控制是否顯示UI
   const [showUploadVideoUI, setShowUploadVideoUI] = useState(false)
@@ -31,7 +30,8 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
   const [fileSize, setFileSize] = useState(0)
   // pre view
   const [preViewVideoImage, setPreViewVideoImage] = useState(null)
-  // const [autoExtractFrame, setAutoExtractFrame] = useState('')
+  // 藉由ref與effect來避免state的非同步特性導致無法使用最新值
+  const uploadsRef = useRef([])
   // ui控制
   const uiRef = useRef(null)
 
@@ -111,6 +111,7 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
     })
   }
 
+  // 檢查影片是否有標題
   const isUserHasInputVideoTitle = () => {
     const titleInput = document.querySelector('#video-title')
     if (titleInput && titleInput.value.length) {
@@ -168,7 +169,7 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
         // 呼叫後端取得上傳連結
         const data = await videoUploader.requestUploadLink(token, course_id, formData)
         if (!data.success) {
-          throw new Error(data.message || '後端建立上傳連結失敗')
+          console.error(data)
         }
 
         // 開始 tus 上傳
@@ -188,6 +189,7 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
 
   // STEP 4: 開始 TUS 上傳
   const startTusUpload = (upUrl, vidId, file, uploadId) => {
+    // 如果沒有檔案或上傳連結，通知後端失敗
     if (!file || !upUrl) {
       ;(async () => {
         try {
@@ -294,27 +296,24 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
 
   // 終止上傳
   const handleCancelUpload = async (uploadId) => {
-    let found = null
-    setUploads((prev) => {
-      found = prev.find((u) => u.id === uploadId)
-      return prev
-    })
+    const found = uploadsRef.current.find((u) => u.id === uploadId)
     if (!found) return
 
     if (found.tusInstance && (found.message === '上傳中' || found.message === '已暫停') && typeof found.tusInstance.abort === 'function') {
       found.tusInstance.abort()
     } else {
       console.error('無有效的 tusInstance，無法真正終止上傳。')
+      messageControl('發生錯誤，無法終止', false)
     }
 
     if (found.videoId) {
       try {
         await videoUploader.returnUploadStatus(token, course_id, found.videoId, false)
       } catch (err) {
-        console.error('通知後端刪除失敗: ', err)
+        messageControl('發生錯誤，無法終止', false)
       }
     }
-
+    // 立即移除該上傳項目
     setUploads((prev) => prev.filter((u) => u.id !== uploadId))
   }
 
@@ -375,6 +374,11 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
     )
   }
 
+  // 藉由ref與effect來避免state的非同步特性導致無法使用最新值
+  useEffect(() => {
+    uploadsRef.current = uploads
+  }, [uploads])
+
   // 初始化欄位
   useEffect(() => {
     if (fileInput?.current) {
@@ -415,6 +419,7 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
           className={`g-blue-btn`}
           onClick={() => {
             setShowUploadVideoUI(true)
+            setContainerIndex('99')
           }}>
           上傳影片
         </div>
@@ -583,6 +588,7 @@ export default function UploadVideoFc({ messageControl, getCourseVideos, isShowV
                 <div
                   className="g-red-btn"
                   onClick={() => {
+                    setContainerIndex('1')
                     setShowUploadVideoUI(false)
                     setPreViewVideoImage('')
                     setTitle('')

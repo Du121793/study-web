@@ -32,6 +32,11 @@
       .grade {
         .input-area {
           position: relative;
+          .lock {
+            background-color: #ededed;
+            color: #ffffff00;
+            pointer-events: none;
+          }
         }
       }
       .content {
@@ -40,6 +45,15 @@
       .id {
         input {
           width: 320px;
+        }
+      }
+      .role {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        select {
+          height: 32px;
         }
       }
     }

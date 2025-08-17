@@ -117,28 +117,24 @@ router.post("/postNewAccess", async (req, res) => {
       accessDate = null;
     }
 
-    // 2) 確認 studentIDs 都屬於該課程
-    if (studentIDs && Array.isArray(studentIDs)) {
-      // 從 User 模型中查詢，必須同時符合 _id 在 studentIDs 且 courses 陣列包含 req.course._id
-      const validCount = await User.countDocuments({
-        _id: { $in: studentIDs },
-        courses: req.course._id,
-      });
-      if (validCount !== studentIDs.length) {
-        return res.status(400).json({
-          success: false,
-          msg: "有指定的 studentIDs 不屬於本課程成員",
-        });
-      }
+    // 2) 確認並過濾 studentIDs：只保留屬於本課程的
+    let removedStudentIDs = [];
+    if (Array.isArray(studentIDs) && studentIDs.length) {
+      const found = await User.find(
+        { _id: { $in: studentIDs }, courses: req.course._id },
+        "_id"
+      );
+      const validIds = found.map((u) => u._id.toString());
+      removedStudentIDs = studentIDs.filter((id) => !validIds.includes(id));
+      studentIDs = validIds;
     }
 
     // 3) 確認 videoIDs 皆屬於該課程
-    if (videoIDs && Array.isArray(videoIDs) && videoIDs.length > 0) {
-      const foundVideos = await VideoInfo.find({
-        _id: { $in: videoIDs },
-        courseID: req.course._id,
-      }).select("_id");
-      // 若查到的數量小於傳入的數量，表示有不屬於本課程的影片
+    if (Array.isArray(videoIDs) && videoIDs.length > 0) {
+      const foundVideos = await VideoInfo.find(
+        { _id: { $in: videoIDs }, courseID: req.course._id },
+        "_id"
+      );
       if (foundVideos.length < videoIDs.length) {
         return res.status(400).json({
           success: false,
@@ -155,16 +151,15 @@ router.post("/postNewAccess", async (req, res) => {
       }
     }
 
-    // 5) 建立新的 VideoAccess 紀錄，所有課程強制指定為 req.course._id
+    // 5) 建立並儲存新的 VideoAccess 紀錄
     const newAccess = new VideoAccess({
       courseID: req.course._id,
+      accessName,
       videoIDs,
       studentIDs,
       accessDate,
-      accessName,
       creater: req.user._id,
     });
-
     const savedAccess = await newAccess.save();
 
     log(
@@ -176,7 +171,14 @@ router.post("/postNewAccess", async (req, res) => {
       `創建影片權限記錄 ${accessName}`
     );
 
-    return res.status(201).json({ success: true, data: savedAccess });
+    // 6) 回傳結果，並告知哪些成員被移除（若有）
+    const response = { success: true, data: savedAccess };
+    if (removedStudentIDs.length) {
+      response.msg = `已移除不屬於本課程的成員：${removedStudentIDs.join(
+        ", "
+      )}`;
+    }
+    return res.status(201).json(response);
   } catch (e) {
     logError(
       {
@@ -224,7 +226,40 @@ router.patch("/patchAccess/:id", async (req, res) => {
       accessDate = null;
     }
 
-    // 建立更新物件
+    // 1) 確認並過濾 studentIDs：只保留屬於本課程的
+    let removedStudentIDs = [];
+    if (Array.isArray(studentIDs)) {
+      const found = await User.find(
+        { _id: { $in: studentIDs }, courses: req.course._id },
+        "_id"
+      );
+      const validIds = found.map((u) => u._id.toString());
+      removedStudentIDs = studentIDs.filter((id) => !validIds.includes(id));
+      studentIDs = validIds;
+    }
+
+    // 2) 確認 videoIDs 是否皆屬於該課程
+    if (Array.isArray(videoIDs) && videoIDs.length) {
+      const foundVideos = await VideoInfo.find(
+        { _id: { $in: videoIDs }, courseID: req.course._id },
+        "_id"
+      );
+      if (foundVideos.length < videoIDs.length) {
+        return res
+          .status(400)
+          .json({ success: false, msg: "有指定的 videoIDs 不屬於本課程" });
+      }
+
+      // 如果 setPrivate 為 true，將這些影片設為私密
+      if (setPrivate) {
+        await VideoInfo.updateMany(
+          { _id: { $in: videoIDs } },
+          { $set: { isPrivate: true } }
+        );
+      }
+    }
+
+    // 3) 組裝更新物件
     const updateObj = {
       creater: req.user._id,
       date: Date.now(),
@@ -234,54 +269,16 @@ router.patch("/patchAccess/:id", async (req, res) => {
     if (studentIDs !== undefined) updateObj.studentIDs = studentIDs;
     if (accessDate !== undefined) updateObj.accessDate = accessDate;
 
-    // 1) 檢查 studentIDs 是否皆屬於該課程
-    // 從 User 模型中查詢，必須同時符合 _id 在 studentIDs 且 courses 陣列包含 req.course._id
-    if (studentIDs && Array.isArray(studentIDs)) {
-      const validCount = await User.countDocuments({
-        _id: { $in: studentIDs },
-        courses: req.course._id,
-      });
-      if (validCount !== studentIDs.length) {
-        return res.status(400).json({
-          success: false,
-          msg: "有指定的 studentIDs 不屬於本課程成員",
-        });
-      }
-    }
-
-    // 2) 檢查 videoIDs 是否皆屬於該課程
-    if (videoIDs && Array.isArray(videoIDs) && videoIDs.length > 0) {
-      const foundVideos = await VideoInfo.find({
-        _id: { $in: videoIDs },
-        courseID: req.course._id,
-      }).select("_id");
-      if (foundVideos.length < videoIDs.length) {
-        return res
-          .status(400)
-          .json({ success: false, msg: "有指定的 videoIDs 不屬於本課程" });
-      }
-
-      // 3) 如果提供了新的 videoIDs 且 setPrivate 為 true，將這些影片設為私密
-      if (setPrivate) {
-        await VideoInfo.updateMany(
-          { _id: { $in: videoIDs } },
-          { $set: { isPrivate: true } }
-        );
-      }
-    }
-
-    // 4) 建立查詢條件 (Admin 可修改所有紀錄，非 Admin 只可修改該課程的紀錄)
+    // 4) 查找並更新（Admin 可修改所有紀錄，非 Admin 只可修改本課程的）
     const queryCondition = { _id: recordId };
     if (req.user.role !== "admin") {
       queryCondition.courseID = req.course._id;
     }
-
     const updatedRecord = await VideoAccess.findOneAndUpdate(
       queryCondition,
       { $set: updateObj },
       { new: true }
     );
-
     if (!updatedRecord) {
       return res
         .status(404)
@@ -297,7 +294,14 @@ router.patch("/patchAccess/:id", async (req, res) => {
       `更新影片權限記錄 ${recordId}`
     );
 
-    return res.json({ success: true, data: updatedRecord });
+    // 5) 回傳結果，並告知哪些成員被移除（若有）
+    const response = { success: true, data: updatedRecord };
+    if (removedStudentIDs.length) {
+      response.msg = `已移除不屬於本課程的成員：${removedStudentIDs.join(
+        ", "
+      )}`;
+    }
+    return res.json(response);
   } catch (e) {
     logError(
       {

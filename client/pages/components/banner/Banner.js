@@ -164,7 +164,12 @@ export default function Banner({ bannerHasChange = null, initialCarousel = [] })
   return (
     <div className={style['banner-main']}>
       <div className={style['banner']}>
-        {loading && <LoadingAnime top={'50%'} />}
+        {loading && (
+          <LoadingAnime
+            left={'50%'}
+            top={'50%'}
+          />
+        )}
         {message && (
           <MessageAnime
             message={message}

@@ -4,9 +4,8 @@ import Image from 'next/image'
 import style from './style.module.css'
 // method組件
 import adminService from '../../../method/adminService'
+import userService from '../../../method/userService'
 import { useUserToken } from '../../../method/useUserToken'
-// global
-import LoadingAnime from '../../../components/loading_anime/LoadingAnime'
 //public
 import dbArrowLeft from '../../../public/profile/doubleArrowLeft.png'
 import dbArrowRight from '../../../public/profile/doubleArrowRight.png'
@@ -14,11 +13,11 @@ import ArrowLeft from '../../../public/profile/leftArrow.png'
 import ArrowRight from '../../../public/profile/rightArrow.png'
 // component
 import DropDown from '../../../components/dropDown/DropDown'
+import MessageAnime from '../../../components/message_anime/MessageAnime'
+import LoadingAnime from '../../../components/loading_anime/LoadingAnime'
 
-export default function MemberSelector({ gradeList, selectedStudentId, setSelectedStudentId }) {
+export default function MemberSelector({ selectedStudentId, setSelectedStudentId }) {
   // env
-  const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
-  const [isSelectAllCheckbox, setIsSelectAllCheckbox] = useState(false)
   const token = useUserToken()
 
   const [memberloading, setMemberLoading] = useState()
@@ -26,23 +25,22 @@ export default function MemberSelector({ gradeList, selectedStudentId, setSelect
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [totalPage, setTotalPage] = useState(1)
-  const [nameInput, setNameInput] = useState(null)
-  const [phoneInput, setPhoneInput] = useState(null)
-  const [gradeInput, setGradeInput] = useState(null)
-  const [roleInput, setRoleInput] = useState(null)
-  const [selectCourse, setSelectCourse] = useState(null)
+  const [nameInput, setNameInput] = useState('')
+  const [phoneInput, setPhoneInput] = useState('')
+  const [gradeInput, setGradeInput] = useState('')
+  const [roleInput, setRoleInput] = useState('')
+  const [selectCourse, setSelectCourse] = useState('')
 
-  // 控制訊息
-  const [message, setMessage] = useState('無訊息')
-  const [messageStatus, setMessageStatus] = useState(false)
-  const [messageColor, setMessageColor] = useState('')
-  // 綁定timeout，用於重計
-  const messageTimer = useRef(null)
-  const resetTimer = useRef(null)
   // 獲取資料
   const [members, setMembers] = useState([])
   const [totalArray, setTotalArray] = useState([])
+
+  // UX
+  const [message, setMessage] = useState('')
+  const [loading, setLoading] = useState(false)
+
   // input的下拉式選單
+  const [gradeList, setGradeList] = useState([])
   const [gradeListFlag, setGradeListFlag] = useState(false)
   const [returnValue, setReturnValue] = useState('')
   const handleBlur = () => {
@@ -53,6 +51,17 @@ export default function MemberSelector({ gradeList, selectedStudentId, setSelect
   useEffect(() => {
     setGradeInput(returnValue)
   }, [returnValue])
+
+  // 初始化UX
+  const initUX = () => {
+    const timer = setTimeout(() => {
+      setMessage('')
+    }, 2000)
+    setLoading(false)
+    return () => {
+      clearTimeout(timer)
+    }
+  }
 
   // 參數:總頁數，中間頁數，從中間往左右總共要幾頁
   function getPage(total, thisPage, pageSize = 5) {
@@ -89,29 +98,6 @@ export default function MemberSelector({ gradeList, selectedStudentId, setSelect
     return page
   }
 
-  // 控制訊息
-  const messageControl = (info, isSuccess) => {
-    setMessage(info)
-    setMessageStatus(true)
-    if (isSuccess) {
-      setMessageColor('rgba(195, 240, 178, 0.8)')
-    } else {
-      setMessageColor('rgba(240, 178, 178, 0.8)')
-    }
-
-    // 清除之前的 timer
-    if (messageTimer.current) clearTimeout(messageTimer.current)
-    if (resetTimer.current) clearTimeout(resetTimer.current)
-
-    messageTimer.current = setTimeout(() => {
-      setMessageStatus(false)
-      resetTimer.current = setTimeout(() => {
-        setMessage('無訊息')
-        setMessageColor('')
-      }, 200)
-    }, 2000)
-  }
-
   // 全選按鈕
   const selectAllStudent = () => {
     setSelectedStudentId(
@@ -126,19 +112,21 @@ export default function MemberSelector({ gradeList, selectedStudentId, setSelect
     setSelectedStudentId([])
   }
 
-  // 搜尋按鈕
+  // 搜尋功能
   const searchStudentButton = () => {
-    try {
-      let data = {
-        realname: nameInput,
-        phoneNumber: phoneInput,
-        gradeInput: gradeInput,
-        role: roleInput,
-        courses: selectCourse,
-        page: page,
-        pageSize: pageSize,
-      }
-      adminService.getMembers(token, data).then((res) => {
+    let data = {
+      realname: nameInput,
+      phoneNumber: phoneInput,
+      grade: roleInput === 'teacher' || roleInput === 'admin' ? '' : gradeInput,
+      role: roleInput,
+      courses: selectCourse,
+      page: page,
+      pageSize: pageSize,
+    }
+    setLoading(true)
+    adminService
+      .getMembers(token, data)
+      .then((res) => {
         setMembers(res.data)
         setTotalPage(res.totalPage)
         let temp = []
@@ -147,25 +135,12 @@ export default function MemberSelector({ gradeList, selectedStudentId, setSelect
         }
         setTotalArray(temp)
       })
-    } catch (e) {
-      console.error(e)
-    }
-  }
-
-  // 按下打勾變色
-  const checkboxClickEvent = (e) => {
-    if (e.parentNode.style.border === '2px solid rgb(124, 225, 180)') {
-      e.parentNode.style.border = '2px solid rgb(0, 0, 0,0.2)'
-    } else {
-      e.parentNode.style.border = '2px solid rgb(124, 225, 180)'
-    }
-  }
-
-  // 點擊整片區域都能選取到
-  const memberAreaClickEvent = (e) => {
-    if (e.firstChild) {
-      e.firstChild.click()
-    }
+      .catch(() => {
+        setMessage('發生錯誤')
+      })
+      .finally(() => {
+        initUX()
+      })
   }
 
   // 初始化已選擇的學生
@@ -181,9 +156,12 @@ export default function MemberSelector({ gradeList, selectedStudentId, setSelect
         page: page,
         pageSize: pageSize,
         role: roleInput,
+        grade: roleInput === 'teacher' || roleInput === 'admin' ? '' : gradeInput,
       }
-      try {
-        adminService.getMembers(token, data).then((res) => {
+      setLoading(true)
+      adminService
+        .getMembers(token, data)
+        .then((res) => {
           if (res.success) {
             setMembers(res.data)
             setTotalPage(res.totalPage)
@@ -193,23 +171,34 @@ export default function MemberSelector({ gradeList, selectedStudentId, setSelect
               temp.push(i)
             }
             setTotalArray(temp)
-          } else {
-            messageControl('發生錯誤，即將回到首頁', false)
-            setTimeout(() => {
-              window.location(clientIp)
-            }, 3000)
           }
         })
-      } catch (e) {
-        alert(e)
-      }
+        .catch(() => {
+          setMessage('發生錯誤')
+        })
+        .finally(() => {
+          initUX()
+        })
+    }
+
+    if (token) {
+      const query = 'user'
+      userService.getGradeList(token, query).then((res) => {
+        setGradeList(res.data.grades)
+      })
     }
   }, [token, page, pageSize, roleInput])
 
-  const test = () => {}
-
   return (
     <div className={`${style.member_select_area}`}>
+      {loading && <LoadingAnime top={'50%'}></LoadingAnime>}
+      {message && (
+        <MessageAnime
+          message={message}
+          top="100px"
+          duration={2000}
+        />
+      )}
       <div className={`${style.member_select_header}`}>成員搜尋功能</div>
       <div className={style['classification']}>
         <div className={`${style.search_inputs}`}>
@@ -240,7 +229,7 @@ export default function MemberSelector({ gradeList, selectedStudentId, setSelect
             <span>年級:</span>
             <div className={style['input-area']}>
               <input
-                className={`${style.input_grade}`}
+                className={`${style.input_grade} ${roleInput === 'teacher' || roleInput === 'admin' ? style['lock'] : null}`}
                 onChange={(e) => {
                   setGradeInput(e.target.value)
                 }}
@@ -270,6 +259,7 @@ export default function MemberSelector({ gradeList, selectedStudentId, setSelect
               <option value="">全部</option>
               <option value="teacher">教師</option>
               <option value="student">學生</option>
+              <option value="admin">管理員</option>
             </select>
           </div>
         </div>

@@ -21,23 +21,52 @@ const signOut = () => {
   }, 100)
 }
 
+// 創建實例用於設定攔截器
+const axiosInstance = axios.create()
+
+// 回應攔截器
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response
+  },
+  (error) => {
+    if (error.response?.status === 401) {
+      signOut()
+      return
+    }
+    if (error.response?.data) {
+      return Promise.reject(error.response.data)
+    }
+    return Promise.reject(error)
+  }
+)
+
+// 請求攔截器
+axiosInstance.interceptors.request.use(
+  (config) => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token')
+      if (token) {
+        config.headers = config.headers || {}
+        config.headers.Authorization = token
+      }
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
+
+//目前只有getUserInfo有使用攔截器
 const userService = {
   // 獲得使用者資料
-  async getUserInfo(token) {
+  async getUserInfo() {
     try {
-      const authHeader = token ? { Authorization: token } : {}
-      const response = await axios.get(USER_URL, { headers: authHeader })
+      const response = await axiosInstance.get(USER_URL)
       return response.data
     } catch (e) {
-      if (e.response?.status === 401) {
-        signOut()
-        return
-      }
-      if (e.response?.data) {
-        return e.response.data
-      } else {
-        return e
-      }
+      return e
     }
   },
 
@@ -500,17 +529,16 @@ const userService = {
     }
   },
 
-  async getGradeList(token) {
+  async getGradeList(token, query) {
     /**
      * 獲取現有的年級
      * @route GET /course/getGrades
      */
     try {
       const authHeader = token ? { Authorization: token } : {}
-      const response = await axios.get(API_URL + `/course/getGrades`, {
+      const response = await axios.get(API_URL + `/course/getGrades?queryType=${query}`, {
         headers: authHeader,
       })
-
       return response.data
     } catch (e) {
       if (e.response?.status === 401) {

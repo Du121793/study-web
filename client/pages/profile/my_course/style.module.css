@@ -1,3 +1,4 @@
+@charset "UTF-8";
 .myCourse_main {
   flex: 1;
   z-index: 999;
@@ -36,6 +37,17 @@
   gap: 12px;
   justify-content: center;
   align-items: center;
+  width: 80%;
+}
+@media (max-width: 1800px) {
+  .myCourse_main .courses_container .course-info-area {
+    width: 60%;
+  }
+}
+@media (max-width: 1280px) {
+  .myCourse_main .courses_container .course-info-area {
+    width: 100%;
+  }
 }
 .myCourse_main .courses_container .search_area {
   display: flex;
@@ -54,23 +66,49 @@
   width: 95%;
 }
 .myCourse_main .courses_container .flex_wrapper .courses {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
   width: 100%;
   gap: 24px;
+  /* 1280–1639px：2 欄 */
+  /* ≥1640px：3 欄 */
+  /* <1280px：縱向 */
+}
+@media (min-width: 1280px) and (max-width: 1639.98px) {
+  .myCourse_main .courses_container .flex_wrapper .courses {
+    grid-template-columns: repeat(2, 1fr);
+    /* 只有 1 張卡時拉滿 2 欄 */
+  }
+  .myCourse_main .courses_container .flex_wrapper .courses > :only-child {
+    grid-column: 1/-1;
+  }
+}
+@media (min-width: 1640px) {
+  .myCourse_main .courses_container .flex_wrapper .courses {
+    grid-template-columns: repeat(2, 1fr);
+    /* 只有 1 張卡時拉滿 3 欄 */
+  }
+  .myCourse_main .courses_container .flex_wrapper .courses > :only-child {
+    grid-column: 1/-1;
+  }
+}
+@media (max-width: 1279.98px) {
+  .myCourse_main .courses_container .flex_wrapper .courses {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 }
 .myCourse_main .courses_container .flex_wrapper .courses .course {
+  width: 100%;
   overflow: hidden;
-  width: 26vw;
   background-color: #e9e9e9;
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
   transition: 0.2s;
 }
-@media (max-width: 860px) {
+@media (max-width: 1280px) {
   .myCourse_main .courses_container .flex_wrapper .courses .course {
-    width: 90vw;
+    width: 80%;
   }
 }
 .myCourse_main .courses_container .flex_wrapper .courses .course .course_header {

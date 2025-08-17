@@ -10,13 +10,14 @@ import { useUserToken } from '../../../method/useUserToken'
 // css
 import style from './uploadBoard.module.css'
 import btn_style from '../../../styles/global/button.module.css'
+// component
+import MessageAnime from '../../../components/message_anime/MessageAnime'
+import LoadingAnime from '../../../components/loading_anime/LoadingAnime'
 
-export default function UploadBoard({ mode, setHasPop, boardInfo, setEditHasChange, editHasChange, board_id = null, whichMethod = 'upload', setShowUploadBoardUI }) {
+export default function UploadBoard({ setShowUploadBoardUI, mode, setHasPop, boardInfo, setEditHasChange, editHasChange, board_id = null }) {
   const token = useUserToken()
   // 控制UI顯示
   const [visibility, setVisibility] = useState(false)
-  // 控制body滑動條
-  const [page_body, setPage_body] = useState([])
   // 請求參數
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
@@ -25,58 +26,86 @@ export default function UploadBoard({ mode, setHasPop, boardInfo, setEditHasChan
   const [editTitle, setEditTitle] = useState(boardInfo?.title ? boardInfo.title : '')
   const [editContent, setEditContent] = useState(boardInfo?.content ? boardInfo.content : '')
   const [editSubTitle, setEditSubTitle] = useState(boardInfo?.subTitle ? boardInfo.subTitle : '')
-  // 用於控制ui高度
-  const uiElement = useRef(null)
-  const [getUiHeight, setGetUiHeight] = useState(0)
   // 控制訊息
   const [message, setMessage] = useState('')
-  const [messageStatus, setMessageStatus] = useState(false)
-  const [messageColor, setMessageColor] = useState('')
+  const [loading, setLoading] = useState(false)
+  // ref
+  const titleRef = useRef()
+  const subTitleRef = useRef()
+  const contentRef = useRef()
+  // 初始化UX
+  const initUX = () => {
+    const timer = setTimeout(() => {
+      setMessage('')
+    }, 2000)
+    setLoading(false)
+    return () => {
+      clearTimeout(timer)
+    }
+  }
 
-  const uploadSuccess = () => {
-    setGetUiHeight(0)
-    setTimeout(() => {
-      setShowUploadBoardUI(false)
-    }, 200)
+  const closeUI = () => {
+    setTitle('')
+    setContent('')
   }
 
   // 新增board
   const uploadBoard = () => {
-    if (title === '' || title === null || content === '' || content === null || subTitle === '' || subTitle === null) {
+    if (title === '' || title === null || content === '' || content === null || content === '<p><br></p>') {
+      setMessage('請重新確認必填欄位已填寫')
+      initUX()
       return
     }
     const data = {
-      title: title,
+      title: titleRef.current.value,
       content: content,
-      subTitle: subTitle,
+      subTitle: subTitleRef.current.value,
     }
-    adminService.postBoard(token, data).then((res) => {
-      if (res.success) {
-        setEditHasChange(!editHasChange)
-        uploadSuccess()
-        setVisibility(false)
-        setHasPop(false)
-      }
-    })
+    adminService
+      .postBoard(token, data)
+      .then((res) => {
+        if (res.success) {
+          setEditHasChange(!editHasChange)
+          setVisibility(false)
+          setHasPop(false)
+        } else {
+          setMessage('發生錯誤')
+        }
+      })
+      .catch(() => {
+        setMessage('發生錯誤')
+      })
+      .finally(() => {
+        initUX()
+      })
   }
 
   // 編輯board
   const editBoard = () => {
     if (board_id) {
-      /*
-        若無輸入，會用舊值
-      */
+      // 若無輸入，會用舊值
       const data = { board_id: board_id, title: editTitle ? editTitle : boardInfo.title, subTitle: editSubTitle ? editSubTitle : boardInfo.subTitle, content: editContent ? editContent : boardInfo.content }
-      adminService.putBoard(token, data).then((res) => {
-        if (res.success) {
-          setEditHasChange(!editHasChange)
-          setVisibility(false)
-          window.location.reload()
-        }
-      })
+      adminService
+        .putBoard(token, data)
+        .then((res) => {
+          if (res.success) {
+            setEditHasChange(!editHasChange)
+            setVisibility(false)
+            window.location.reload()
+          } else {
+            setMessage('發生錯誤')
+          }
+        })
+        .catch(() => {
+          setMessage('發生錯誤')
+        })
+        .finally(() => {
+          initUX()
+        })
     }
   }
 
+  // 檢查是從首頁開啟上傳介面還是從公告頁開啟編輯介面
   useEffect(() => {
     if (mode === 'upload') {
       setContent('')
@@ -93,6 +122,9 @@ export default function UploadBoard({ mode, setHasPop, boardInfo, setEditHasChan
         onClick={() => {
           setVisibility(true)
           setHasPop(true)
+          if (setShowUploadBoardUI) {
+            setShowUploadBoardUI(true)
+          }
         }}>
         {mode === 'upload' && '上傳公告'}
         {mode === 'edit' && '編輯公告'}
@@ -113,24 +145,27 @@ export default function UploadBoard({ mode, setHasPop, boardInfo, setEditHasChan
               transition={{ duration: 0.1 }}
               onClick={(e) => e.stopPropagation()} // 防止點到背景關閉
             >
-              {/* message */}
-              <div
-                style={{ height: messageStatus ? '20px' : '0', padding: messageStatus ? '24px' : '0', backgroundColor: messageColor }}
-                className={style['message']}>
-                {message}
-              </div>
               <div
                 className={style['upload-board-ui']}
-                ref={uiElement}
                 onClick={(e) => e.stopPropagation()}>
+                {message && (
+                  <MessageAnime
+                    message={message}
+                    top="100px"
+                    duration={2000}
+                  />
+                )}
+                {loading && <LoadingAnime top={'40%'}></LoadingAnime>}
                 {mode === 'edit' ? <div className={`${style['title']}`}>編輯公告</div> : <div className={style['title']}>上傳公告</div>}
 
                 <div className={style['input-container']}>
                   <div className={style['content']}>公告標題 :</div>
                   <input
                     type="text"
+                    placeholder="必填"
                     className={style['input']}
                     defaultValue={boardInfo?.title}
+                    ref={titleRef}
                     onChange={(e) => {
                       setTitle(e.target.value)
                       setEditTitle(e.target.value)
@@ -139,8 +174,10 @@ export default function UploadBoard({ mode, setHasPop, boardInfo, setEditHasChan
                   <div className="content">副標題 :</div>
                   <input
                     type="text"
+                    placeholder="選填"
                     className={style['input']}
                     defaultValue={boardInfo?.subTitle}
+                    ref={subTitleRef}
                     onChange={(e) => {
                       setSubTitle(e.target.value)
                       setEditSubTitle(e.target.value)
@@ -150,6 +187,8 @@ export default function UploadBoard({ mode, setHasPop, boardInfo, setEditHasChan
                 <div className={style['textarea-container']}>
                   <div className={style['content']}>公告內文</div>
                   <MyReactQuill
+                    ref={contentRef}
+                    placeholder="必填"
                     className={style['editor']}
                     value={content}
                     onChange={(value) => {
@@ -171,6 +210,7 @@ export default function UploadBoard({ mode, setHasPop, boardInfo, setEditHasChan
                         onClick={() => {
                           setVisibility(false)
                           setHasPop(false)
+                          setShowUploadBoardUI(false)
                         }}>
                         關閉介面
                       </div>
@@ -181,6 +221,9 @@ export default function UploadBoard({ mode, setHasPop, boardInfo, setEditHasChan
                         className={btn_style['g-red-btn']}
                         onClick={() => {
                           setVisibility(false)
+                          if (setShowUploadBoardUI) {
+                            setShowUploadBoardUI(false)
+                          }
                         }}>
                         關閉介面
                       </div>

@@ -15,10 +15,9 @@ import folder from '../../../../public/course/folder.png'
 import rightArrow from '../../../../public/course/rightArrow.png'
 // style
 import style from './style.module.css'
-// env
-const client_URL = process.env.NEXT_PUBLIC_CLIENT_IP
-const server_base_URL = process.env.NEXT_PUBLIC_SERVER_IP
 export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, course_name, course_id }) {
+  // env
+  const client_URL = process.env.NEXT_PUBLIC_CLIENT_IP
   const [page_body, setPage_body] = useState([])
   const [visibility, setVisibility] = useState(false)
   // session
@@ -48,13 +47,6 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, cours
   const [sortType, setSortType] = useState('resourceCategories')
   const [QAsInfo, setQAsInfo] = useState([])
 
-  // 控制訊息
-  const [message, setMessage] = useState('無訊息')
-  const [messageStatus, setMessageStatus] = useState(false)
-  const [messageColor, setMessageColor] = useState('')
-  // 綁定timeout，用於重計
-  const messageTimer = useRef(null)
-  const resetTimer = useRef(null)
   // 刪除QA
   const [removeingQA, setRemoveingQA] = useState(false)
   //loading
@@ -179,64 +171,6 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, cours
     })
   }
 
-  const getRoot = () => {
-    if (token) {
-      setRequesting(true)
-      setLoading(true)
-      userService.getRootFolder(token).then((res) => {
-        if (!res?.success) return
-        setRootFolder(res.data.find((item) => item?.name === 'root'))
-        setNowFolder(res.data.find((item) => item?.name === 'root')._id)
-        const root = res.data.find((item) => item?.name === 'root')
-        // 先將捷徑設為root
-        setShortcut([root])
-        // 檢查是否為root
-        if (root?.isRoot === true) {
-          let data = { folder_id: root._id }
-          userService.getChildFolders(token, data).then((res) => {
-            if (res?.success) {
-              setChildFolders(res.data)
-              setLoading(false)
-              setRequesting(false)
-            }
-          })
-        }
-      })
-    }
-    if (nowFolder) {
-      setLoading(true)
-      setRequesting(true)
-      let data = {
-        folder_id: nowFolder,
-        page: page,
-        pageSize: pageSize,
-        sortBy: sortBy,
-        sortType: 'none',
-        sortOrder: sortOrder,
-      }
-
-      userService
-        .getFolderQuestions(token, data)
-        .then((res) => {
-          if (res.message === 'Network Error') {
-          }
-          setTimeout(() => {
-            if (!res) {
-              setLoading(false)
-            }
-          }, 3000)
-          if (res?.success) {
-            setQAsInfo(res.data)
-            setLoading(false)
-            setRequesting(false)
-          }
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    }
-  }
-
   // session setting
   useEffect(() => {
     if (!sessionStorage.getItem('user_role') || !sessionStorage.getItem('user_id')) {
@@ -259,30 +193,29 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, cours
 
   // get root
   useEffect(() => {
-    if (token) {
-      setRequesting(true)
-      setLoading(true)
-      userService.getRootFolder(token).then((res) => {
-        if (!res?.success) return
-        setRootFolder(res.data.find((item) => item?.name === 'root'))
-        setNowFolder(res.data.find((item) => item?.name === 'root')._id)
-        const root = res.data.find((item) => item?.name === 'root')
-        // 先將捷徑設為root
-        setShortcut([root])
-        // 檢查是否為root
-        if (root?.isRoot === true) {
-          let data = { folder_id: root._id }
-          userService.getChildFolders(token, data).then((res) => {
-            if (res?.success) {
-              setChildFolders(res.data)
-              setLoading(false)
-              setRequesting(false)
-            }
-          })
-        }
-      })
-    }
-  }, [token])
+    if (!visibility || !token) return
+    setRequesting(true)
+    setLoading(true)
+    userService.getRootFolder(token).then((res) => {
+      if (!res?.success) return
+      setRootFolder(res.data.find((item) => item?.name === 'root'))
+      setNowFolder(res.data.find((item) => item?.name === 'root')._id)
+      const root = res.data.find((item) => item?.name === 'root')
+      // 先將捷徑設為root
+      setShortcut([root])
+      // 檢查是否為root
+      if (root?.isRoot === true) {
+        let data = { folder_id: root._id }
+        userService.getChildFolders(token, data).then((res) => {
+          if (res?.success) {
+            setChildFolders(res.data)
+            setLoading(false)
+            setRequesting(false)
+          }
+        })
+      }
+    })
+  }, [visibility])
 
   // get folder's qa
   useEffect(() => {
@@ -301,7 +234,8 @@ export default function ShowPublicQA({ qaHasUpload, setQaHasUpload, token, cours
       userService
         .getFolderQuestions(token, data)
         .then((res) => {
-          if (res.message === 'Network Error') {s
+          if (res.message === 'Network Error') {
+            s
           }
           setTimeout(() => {
             if (!res) {

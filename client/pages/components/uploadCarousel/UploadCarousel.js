@@ -9,12 +9,13 @@ import adminService from '../../../method/adminService'
 // css
 import style from './uploadCarousel.module.css'
 import btn_style from '../../../styles/global/button.module.css'
+// components
+import MessageAnime from '../../../components/message_anime/MessageAnime'
+import LoadingAnime from '../../../components/loading_anime/LoadingAnime'
 
 export default function UploadCarousel({ setHasPop, bannerHasChange, setBannerHasChange }) {
   // 控制UI的顯示
   const [showCarouselEdit, setShowCarouselEdit] = useState(false)
-  // 控制body滑動條
-  const [page_body, setPage_body] = useState([])
   // 二次確認刪除用
   const [wantRemoveImageId, setWantRemoveImageId] = useState('')
   // 收起預覽圖片
@@ -28,52 +29,75 @@ export default function UploadCarousel({ setHasPop, bannerHasChange, setBannerHa
   const [files, setFiles] = useState(null)
   const formData = new FormData()
   // 請求獲得參數
-  const [carousel, setCarousel] = useState(null)
+  const [carousel, setCarousel] = useState('')
 
-  // 控制訊息
+  // UX
   const [message, setMessage] = useState('')
-  const [messageStatus, setMessageStatus] = useState(false)
-  const [messageColor, setMessageColor] = useState('')
-  // 綁定timeout，用於重計
-  const messageTimer = useRef(null)
-  const resetTimer = useRef(null)
+  const [loading, setLoading] = useState(false)
 
-  // 控制訊息
-  const messageControl = (info, isSuccess) => {
-    setMessage(info)
-    setMessageStatus(true)
-    if (isSuccess) {
-      setMessageColor('rgba(195, 240, 178, 0.8)')
-    } else {
-      setMessageColor('rgba(240, 178, 178, 0.8)')
-    }
-
-    // 清除之前的 timer
-    if (messageTimer.current) clearTimeout(messageTimer.current)
-    if (resetTimer.current) clearTimeout(resetTimer.current)
-
-    messageTimer.current = setTimeout(() => {
-      setMessageStatus(false)
-      resetTimer.current = setTimeout(() => {
-        setMessage('無訊息')
-        setMessageColor('')
-      }, 200)
+  // 初始化UX
+  const initUX = () => {
+    const timer = setTimeout(() => {
+      setMessage('')
     }, 2000)
+    setLoading(false)
+    return () => {
+      clearTimeout(timer)
+    }
+  }
+
+  // 取得輪播圖
+  const getCarousels = () => {
+    setLoading(true)
+    setWantRemoveImageId(null)
+    userService
+      .getCarousels(token)
+      .then((res) => {
+        if (res.success) {
+          setCarousel(res.data)
+          initCarouselsTemp()
+        } else {
+          setMessage('獲取輪播圖資訊失敗')
+        }
+      })
+      .catch((err) => {
+        console.error(err)
+        setMessage('發生錯誤')
+      })
+      .finally(() => {
+        initUX()
+      })
+  }
+
+  const initCarouselsTemp = () => {
+    setFiles(null)
+    setPreviewUrl(null)
   }
 
   // 上傳輪播圖
   const postCarousel = () => {
     if (files) {
+      setLoading(true)
       formData.append('image', files)
-      adminService.postCarousels(token, formData).then((res) => {
-        if (res.success) {
-          setBannerHasChange(!bannerHasChange)
-          init()
-          messageControl('上傳成功', true)
-        } else {
-          messageControl('上傳失敗', false)
-        }
-      })
+      adminService
+        .postCarousels(token, formData)
+        .then((res) => {
+          if (res.success) {
+            setBannerHasChange(!bannerHasChange)
+            getCarousels()
+            setMessage('上傳成功')
+            initCarouselsTemp()
+          } else {
+            setMessage('發生錯誤，上傳失敗')
+          }
+        })
+        .catch((err) => {
+          console.error(err)
+          setMessage('發生錯誤')
+        })
+        .finally(() => {
+          initUX()
+        })
     }
   }
 
@@ -87,34 +111,52 @@ export default function UploadCarousel({ setHasPop, bannerHasChange, setBannerHa
       .then((res) => {
         if (res.success) {
           setBannerHasChange(!bannerHasChange)
-          init()
-          messageControl('刪除成功', true)
+          getCarousels()
+          setMessage('刪除成功')
+          initCarouselsTemp()
+        } else {
+          setMessage('發生錯誤，刪除失敗')
         }
       })
       .catch((err) => {
         console.error(err)
-        messageControl('刪除失敗', false)
+        setMessage('發生錯誤')
+      })
+      .finally(() => {
+        initUX()
       })
   }
 
-  const init = () => {
-    userService.getCarousels(token).then((res) => {
-      if (res.success) {
-        setCarousel(res.data)
-      }
-    })
+  // 關閉UI
+  const closeUI = () => {
+    setShowCarouselEdit(false)
+    setHasPop(false) // 關閉彈窗
+    setPreviewUrl('') // 清空預計要被上傳的圖片的預覽圖
+    setFiles(null) // 清空預計要被上傳的圖片
+    setWantRemoveImageId(null) // 清空預計要被刪除的id
   }
 
   // 獲得所有輪播圖
   useEffect(() => {
     if (token) {
-      userService.getCarousels(token).then((res) => {
-        if (res.success) {
-          setCarousel(res.data)
-        } else {
-          messageControl('獲取輪播圖資訊失敗', false)
-        }
-      })
+      setLoading(true)
+      userService
+        .getCarousels(token)
+        .then((res) => {
+          if (res.success) {
+            setCarousel(res.data)
+            initCarouselsTemp()
+          } else {
+            setMessage('獲取輪播圖資訊失敗')
+          }
+        })
+        .catch((err) => {
+          console.error(err)
+          setMessage('發生錯誤')
+        })
+        .finally(() => {
+          initUX()
+        })
     }
   }, [token])
 
@@ -149,49 +191,47 @@ export default function UploadCarousel({ setHasPop, bannerHasChange, setBannerHa
                 onClick={(e) => {
                   e.stopPropagation()
                 }}>
+                {loading && <LoadingAnime top={'50%'}></LoadingAnime>}
                 <div
                   className={style['title']}
                   onClick={test}>
                   編輯輪播圖功能
                 </div>
-                {carousel && carousel.length > 0 ? (
-                  <div className={style['image-area']}>
-                    <div className={style['setting-area']}>
-                      <div
-                        className={`${btn_style['g-red-btn']} ${style['header-option-btn']}`}
-                        onClick={() => {
-                          setShowCarouselEdit(false)
-                          setHasPop(false)
-                        }}>
-                        關閉介面
-                      </div>
-                      <div
-                        className={`${btn_style['g-blue-btn']} ${style['header-option-btn']}`}
-                        onClick={() => {
-                          inputHandle.current.click()
-                        }}>
-                        選擇圖片
-                      </div>
-                      <div
-                        className={`${btn_style['g-blue-btn']} ${style['header-option-btn']}`}
-                        onClick={postCarousel}>
-                        執行上傳
-                      </div>
-                      <input
-                        type="file"
-                        className={style['file-input']}
-                        accept="image/png image/jpg"
-                        style={{ display: 'none' }}
-                        ref={inputHandle}
-                        onClick={(e) => (e.target.value = null)}
-                        onChange={(e) => {
-                          setPreviewUrl(URL.createObjectURL(e.target.files[0]))
-                          setFiles(e.target.files[0])
-                        }}
-                      />
+                <div className={style['image-area']}>
+                  <div className={style['setting-area']}>
+                    <div
+                      className={`${btn_style['g-red-btn']} ${style['header-option-btn']}`}
+                      onClick={closeUI}>
+                      關閉介面
                     </div>
-                    <div className={style['images']}>
-                      {carousel.map((item, index) => (
+                    <div
+                      className={`${btn_style['g-blue-btn']} ${style['header-option-btn']}`}
+                      onClick={() => {
+                        inputHandle.current.click()
+                      }}>
+                      選擇圖片
+                    </div>
+                    <div
+                      className={`${btn_style['g-blue-btn']} ${style['header-option-btn']}`}
+                      onClick={postCarousel}>
+                      執行上傳
+                    </div>
+                    <input
+                      type="file"
+                      className={style['file-input']}
+                      accept="image/png image/jpg"
+                      style={{ display: 'none' }}
+                      ref={inputHandle}
+                      onClick={(e) => (e.target.value = null)}
+                      onChange={(e) => {
+                        setPreviewUrl(URL.createObjectURL(e.target.files[0]))
+                        setFiles(e.target.files[0])
+                      }}
+                    />
+                  </div>
+                  <div className={style['images']}>
+                    {carousel.length > 0 &&
+                      carousel.map((item, index) => (
                         <div
                           className={style['image']}
                           key={index}
@@ -268,11 +308,8 @@ export default function UploadCarousel({ setHasPop, bannerHasChange, setBannerHa
                             className={style['carousel']}></Image>
                         </div>
                       ))}
-                    </div>
                   </div>
-                ) : (
-                  <div className={style['h2']}>現在還沒有圖片</div>
-                )}
+                </div>
                 <div className={style['preview-image-area']}>
                   {previewUrl && (
                     <Image

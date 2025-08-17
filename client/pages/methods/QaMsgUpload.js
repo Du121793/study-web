@@ -6,6 +6,8 @@ import userService from '../../method/userService'
 import styles from '../../styles/course/methods/qaMsgUpload.module.css'
 
 export default function QAMsgUpload({
+  setMessage,
+  initUX,
   token,
   question_id,
   file, // 影片檔案 (File)
@@ -65,7 +67,7 @@ export default function QAMsgUpload({
       uploadLength: file.size,
 
       onError: async (error) => {
-        messageControl('上傳失敗', false)
+        setMessage('上傳失敗')
         console.error('TUS 上傳失敗:', error)
         setUploads((prev) => prev.map((u) => (u.id === uploadId ? { ...u, message: '上傳失敗', progress: 0 } : u)))
         try {
@@ -81,10 +83,12 @@ export default function QAMsgUpload({
       },
 
       onSuccess: async () => {
-        messageControl('上傳成功', true)
+        setMessage('上傳成功')
         setSubmitSuccess(!submitSuccess)
         try {
-          await videoUploader.returnQuestionUploadStatus(token, question_id, commentID, true)
+          await videoUploader.returnQuestionUploadStatus(token, question_id, commentID, true).then((res) => {
+            console.log(res)
+          })
         } catch (err) {
           console.error('通知後端失敗: ', err)
         }
@@ -106,12 +110,14 @@ export default function QAMsgUpload({
     try {
       // 送出留言並取得 uploadLink、commentID
       const res = await userService.submitQaMessage(token, question_id, formData)
+      console.log(res.data.uploadLink.length)
 
       // 若回應成功但沒有 uploadLink，代表沒有影片要上傳
-      if (res.success === true && !res.data.uploadLink) {
+      if (res.success && !res.data.uploadLink.length) {
         // setSubmitSuccess取返來更新父組件的留言區狀態
         setSubmitSuccess(!submitSuccess)
         setUploadLock(false)
+        return
       }
 
       if (res.success) {

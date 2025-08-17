@@ -35,11 +35,25 @@
 .edit_members_info_main .search_area .input_area .grade .input-area {
   position: relative;
 }
+.edit_members_info_main .search_area .input_area .grade .input-area .lock {
+  background-color: #ededed;
+  color: rgba(255, 255, 255, 0);
+  pointer-events: none;
+}
 .edit_members_info_main .search_area .input_area .content {
   font-size: clamp(16px, 1.2vw, 20px);
 }
 .edit_members_info_main .search_area .input_area .id input {
   width: 320px;
+}
+.edit_members_info_main .search_area .input_area .role {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.edit_members_info_main .search_area .input_area .role select {
+  height: 32px;
 }
 .edit_members_info_main .search_area .btn_area {
   display: flex;

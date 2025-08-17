@@ -106,6 +106,12 @@ a {
   outline: none;
   font-size: clamp(16px, 1.1vw, 20px);
 }
+.g-blue-btn:hover {
+  transform: scale(1);
+}
+.g-blue-btn:active {
+  transform: scale(0.8);
+}
 
 .g-blue-btn:hover {
   background-color: #0069d9;
@@ -128,6 +134,12 @@ a {
   word-break: keep-all;
   outline: none;
   font-size: clamp(16px, 1.1vw, 20px);
+}
+.g-green-btn:hover {
+  transform: scale(1);
+}
+.g-green-btn:active {
+  transform: scale(0.8);
 }
 
 .g-green-btn:hover {
@@ -152,6 +164,12 @@ a {
   outline: none;
   font-size: clamp(16px, 1.1vw, 20px);
 }
+.g-red-btn:hover {
+  transform: scale(1);
+}
+.g-red-btn:active {
+  transform: scale(0.8);
+}
 
 .g-red-btn:hover {
   background-color: #e03535;
@@ -174,6 +192,12 @@ a {
   word-break: keep-all;
   outline: none;
   font-size: clamp(16px, 1.1vw, 20px);
+}
+.g-light-red-btn:hover {
+  transform: scale(1);
+}
+.g-light-red-btn:active {
+  transform: scale(0.8);
 }
 
 .g-light-red-btn:hover {
@@ -199,6 +223,12 @@ a {
   outline: none;
   font-size: clamp(16px, 1.1vw, 20px);
 }
+.g-white-btn:hover {
+  transform: scale(1);
+}
+.g-white-btn:active {
+  transform: scale(0.8);
+}
 
 .g-white-btn:hover {
   background-color: #f1f1f1;
@@ -221,6 +251,12 @@ a {
   word-break: keep-all;
   outline: none;
   font-size: clamp(16px, 1.1vw, 20px);
+}
+.g-black-btn:hover {
+  transform: scale(1);
+}
+.g-black-btn:active {
+  transform: scale(0.8);
 }
 
 .g-black-btn:hover {

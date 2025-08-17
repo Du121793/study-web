@@ -15,10 +15,6 @@ import Footer from '../../components/footer/Footer'
 import style from './player.module.css'
 
 export default function Player() {
-  // 監控視窗寬度
-  const [windowWidth, setWindowWidth] = useState(
-    typeof window !== 'undefined' ? window.innerWidth : 0 // SSR 安全
-  )
   // env
   const clientIp = process.env.NEXT_PUBLIC_CLIENT_IP
   // url
@@ -65,6 +61,44 @@ export default function Player() {
   // UX
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
+
+  // 用於監聽滾動事件
+  const containerRef = useRef()
+  const [isBottom, setIsBottom] = useState(false)
+
+  const windowReload = () => {
+    const timer = setTimeout(() => {
+      window.location.reload()
+    }, 200)
+    return () => {
+      clearTimeout(timer)
+    }
+  }
+
+  // 檢查是否滾動到底部
+  const handleScroll = () => {
+    // 獲取容器的 DOM 元素
+    const container = containerRef.current
+    if (!container) return
+
+    // 判斷是否滑動到底部
+    // scrollTop + clientHeight >= scrollHeight
+    // 考慮誤差值，所以通常會留個緩衝
+    const atBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 50
+
+    // 如果滑動到底部且尚未觸發過，就更新狀態
+    if (atBottom && !isBottom) {
+      setIsBottom(true)
+      setPageSize((prop) => {
+        return prop + 8
+      })
+      console.log(pageSize)
+      // 在這裡執行你的邏輯，例如：載入更多資料
+    } else if (!atBottom && isBottom) {
+      // 當使用者滑離底部時，重設狀態
+      setIsBottom(false)
+    }
+  }
 
   // 初始化UX
   const initUX = () => {
@@ -238,30 +272,34 @@ export default function Player() {
       setUserShot(shot)
     }
   }, [])
+
   // 解析query的JSON
   useEffect(() => {
     if (info) {
       setParsedInfo(JSON.parse(info))
     }
   }, [info])
-  // 監控頁面滾輪是否滑到底，用來請求更多影片
+
+  // 掛載監聽給containerRef
   useEffect(() => {
-    const handleScroll = () => {
-      const el = document.documentElement
-      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 200 // 留緩衝
-
-      if (!atBottom) return
-      if (isFetchingRef.current) return // 🚫 正在載入，略過
-      if (!hasMore) return // 🚫 沒有更多，略過
-
-      isFetchingRef.current = true // ✅ 鎖住
-      setPageSize((prev) => prev + 8) // 觸發你的 useEffect 去請求
+    const container = containerRef.current
+    if (container) {
+      // 在元件掛載時，為容器添加監聽器
+      container.addEventListener('scroll', handleScroll)
     }
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [hasMore]) // hasMore 改變時，讓監聽獲得最新值
+
+    // 在元件卸載時，移除監聽器
+    return () => {
+      if (container) {
+        container.removeEventListener('scroll', handleScroll)
+      }
+    }
+  }, [isBottom]) // 監聽 isBottom 狀態的變化
+
   return (
-    <div className={style['video-player-main']}>
+    <div
+      className={style['video-player-main']}
+      ref={containerRef}>
       <div
         className={style['right-bottom-loading-area']}
         style={{ right: loading ? '8px' : '-100%' }}>
@@ -450,6 +488,9 @@ export default function Player() {
                           course_id: course_id,
                           info: JSON.stringify({ description: item.description, title: item.title, time: item.recordDate }),
                         },
+                      }}
+                      onClick={() => {
+                        windowReload()
                       }}>
                       <div className={style['image-area']}>
                         {item.thumbnail !== '' && (

@@ -61,6 +61,16 @@ export default function EditMembersInfo() {
 
   const test = () => {}
 
+  const initUX = () => {
+    const timer = setTimeout(() => {
+      setMessage('')
+    }, 2000)
+    setLoading(false)
+    return () => {
+      clearTimeout(timer)
+    }
+  }
+
   // 初始化
   const initSearchInput = () => {
     setSearchRealName(undefined)
@@ -89,7 +99,8 @@ export default function EditMembersInfo() {
       pageSize: pageSize,
       realname: searchRealName,
       phoneNumber: searchPhone,
-      gradeInput: searchGrade,
+      grade: roleInput === 'teacher' || roleInput === 'admin' ? '' : searchGrade,
+      role: roleInput,
     }
     setLoading(true)
     adminService
@@ -98,15 +109,16 @@ export default function EditMembersInfo() {
         if (res?.success) {
           setTotalPage(res.totalPage)
           setMembers(res.data)
+        } else {
+          setMessage('發生錯誤')
         }
       })
-      .catch((err) => {
+      .catch(() => {
         setMessage('發生錯誤')
       })
-    setLoading(false)
-    setTimeout(() => {
-      setMessage(null)
-    }, 2000)
+      .finally(() => {
+        initUX()
+      })
   }
 
   // 取得成員
@@ -200,22 +212,69 @@ export default function EditMembersInfo() {
         page: page,
         pageSize: pageSize,
       }
-      adminService.getMembers(token, data).then((res) => {
-        if (res?.success) {
-          setLoading(false)
-          setTotalPage(res.totalPage)
-          setMembers(res.data)
-        } else {
-          setLoading(false)
-        }
-      })
+      adminService
+        .getMembers(token, data)
+        .then((res) => {
+          if (res?.success) {
+            setLoading(false)
+            setTotalPage(res.totalPage)
+            setMembers(res.data)
+          } else {
+            setLoading(false)
+          }
+        })
+        .catch(() => {
+          setMessage('發生錯誤')
+        })
+        .finally(() => {
+          initUX()
+        })
     }
+    const query = 'user'
     if (token) {
-      userService.getGradeList(token).then((res) => {
-        setGradeList(res.data.grades)
-      })
+      userService
+        .getGradeList(token, query)
+        .then((res) => {
+          setGradeList(res.data.grades)
+        })
+        .catch(() => {
+          setMessage('發生錯誤')
+        })
+        .finally(() => {
+          initUX()
+        })
     }
-  }, [token, page])
+  }, [token])
+
+  useEffect(() => {
+    if (token) {
+      let data = {
+        page: page,
+        pageSize: pageSize,
+        realname: searchRealName,
+        phoneNumber: searchPhone,
+        grade: roleInput === 'teacher' || roleInput === 'admin' ? '' : searchGrade,
+        role: roleInput,
+      }
+      setLoading(true)
+      adminService
+        .getMembers(token, data)
+        .then((res) => {
+          if (res?.success) {
+            setTotalPage(res.totalPage)
+            setMembers(res.data)
+          } else {
+            setMessage('發生錯誤')
+          }
+        })
+        .catch(() => {
+          setMessage('發生錯誤')
+        })
+        .finally(() => {
+          initUX()
+        })
+    }
+  }, [page])
 
   return (
     <div className={`${style.edit_members_info_main} g-shadow`}>
@@ -234,7 +293,12 @@ export default function EditMembersInfo() {
         編輯成員資訊功能
       </div>
 
-      <div className={`${style.search_area}`}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          searchMembers()
+        }}
+        className={`${style.search_area}`}>
         <div className={`${style.input_area}`}>
           <div className={style.realName}>
             <div className={style.content}>真實姓名</div>
@@ -258,14 +322,27 @@ export default function EditMembersInfo() {
               }}
             />
           </div>
+          <div className={style.id}>
+            <div className={style.content}>用戶ID</div>
+            <input
+              type="text"
+              ref={IdRef}
+              placeholder="可選"
+              defaultValue={searchId}
+              onChange={(e) => {
+                setSearchId(e.target.value)
+              }}
+            />
+          </div>
           <div className={style.grade}>
             <div className={style.content}>年級</div>
-            <div className={style['input-area']}>
+            <div className={`${style['input-area']} ${roleInput === 'teacher' || roleInput === 'admin' ? style['lock'] : null}`}>
               <input
                 type="text"
                 ref={GradeRef}
                 placeholder="可選"
                 value={searchGrade}
+                className={`${style['grade-input']} ${roleInput === 'teacher' || roleInput === 'admin' ? style['lock'] : null}`}
                 onFocus={() => {
                   setGradeListFlag(true)
                 }}
@@ -283,17 +360,17 @@ export default function EditMembersInfo() {
               )}
             </div>
           </div>
-          <div className={style.id}>
-            <div className={style.content}>用戶ID</div>
-            <input
-              type="text"
-              ref={IdRef}
-              placeholder="可選"
-              defaultValue={searchId}
+          <div className={style['role']}>
+            <div className={style['content']}>身分組</div>
+            <select
               onChange={(e) => {
-                setSearchId(e.target.value)
-              }}
-            />
+                setRoleInput(e.target.value)
+              }}>
+              <option value="">全部</option>
+              <option value="teacher">教師</option>
+              <option value="student">學生</option>
+              <option value="admin">管理員</option>
+            </select>
           </div>
         </div>
         <div className={`${style.btn_area}`}>
@@ -302,13 +379,13 @@ export default function EditMembersInfo() {
             onClick={initSearchInput}>
             清空選項
           </div>
-          <div
+          <button
             className="g-blue-btn"
-            onClick={searchMembers}>
+            type="submit">
             搜尋
-          </div>
+          </button>
         </div>
-      </div>
+      </form>
       <div className={`${style.member_list_area} g-shadow`}>
         <div className={`${style.inner_line}`}>
           <div className={`${style.user_name}`}>暱稱</div>
