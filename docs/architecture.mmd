@@ -1,0 +1,11 @@
+%% 根據此版本程式的責任與相依繪製，不代表已完成外部服務或硬體驗收
+flowchart TB
+  USER["瀏覽器<br/>學生 / 教學與管理使用者"] --> CLIENT["Next.js / React<br/>課程 / 影片 / 問答 / 公告"]
+  CLIENT --> SERVER["Express API<br/>Session / JWT / 權限 / 資源"]
+  LINE["LINE Login<br/>OAuth 身分"] <--> SERVER
+  SERVER --> DB[("MongoDB<br/>使用者 / 課程 / 內容")]
+  SERVER --> FILES["本機 resource<br/>圖片與上傳資源"]
+  SERVER <-->|"影片管理 / 上傳"| VIMEO["Vimeo API<br/>外部影片服務"]
+  CLIENT -->|"影片播放"| VIMEO
+  DB --> BACKUP["備份工具<br/>Mongo 匯出 / 資源壓縮"]
+  FILES --> BACKUP
